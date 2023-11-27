@@ -64,6 +64,11 @@ nav a:hover{
     text-shadow: 1px 0px 0px #2C1A1D;
 }
 
+nav .logo{
+    margin-top: .9rem;
+    margin-left: .9rem;
+    margin-right: .9rem;
+}
 
 
 
@@ -96,9 +101,15 @@ nav a:hover{
 
 /* css for inputs */
 
-.textInput, .buttonInput, .checkboxInput{
+.textInput, .checkboxInput{
     width: 100%;
     margin-top: .6rem;
+    margin-bottom: .6rem;
+}
+
+.buttonInput{
+    width: 100%;
+    margin-top: 1.2rem;
     margin-bottom: .6rem;
 }
 
@@ -108,7 +119,7 @@ nav a:hover{
     padding-left: .9rem;
     padding-right: .9rem;
     box-sizing: border-box;
-    border-radius: .6rem;
+    border-radius: .45rem;
     border: .06rem solid #C8C8C8;
     box-shadow: .06rem .06rem 0.09rem #2C1A1D;
     background-color: #ffffff;
@@ -124,7 +135,7 @@ nav a:hover{
     padding-left: .9rem;
     padding-right: .9rem;
     box-sizing: border-box;
-    border-radius: .6rem;
+    border-radius: .45rem;
     border: .06rem solid #C8C8C8;
     box-shadow: .06rem .06rem 0.09rem #2C1A1D;
     line-height:18px;
@@ -134,7 +145,7 @@ nav a:hover{
     width: 100%;
     padding: .36rem;
     box-sizing: border-box;
-    border-radius: .6rem;
+    border-radius: .45rem;
     border: none;
     box-shadow: .09rem .09rem 0.09rem #2C1A1D;
     color: #f5f8fa;
@@ -173,6 +184,11 @@ nav a:hover{
     display: flex;
     width:100%;
     margin: 0rem;
+    margin-top: -.6rem;
     padding: 0rem;
     gap:1rem;
+}
+
+.void{
+    width: 100%;
 }
