@@ -1,0 +1,91 @@
+:root{
+    font-size: 16px;
+    font-family: verdana;
+    background-color: #f5f8fa;
+}
+
+
+/* fieldset inputs */
+
+.fieldsetTypeA {
+    width: 100%;
+    max-width: 45rem;
+    margin-top: 3rem;
+    box-sizing: border-box;
+    border: none;
+    border-top:0.1rem solid #2C1A1D;
+}
+
+.fieldsetTypeA legend {
+    margin-left: 3rem;
+    margin-bottom: .3rem;
+    padding-left: .3rem;
+    padding-right: .3rem;
+    border-left:.09rem solid #2C1A1D;
+    border-right:.09rem solid #2C1A1D;
+    font-size: 30px;
+}
+
+
+
+
+
+/* css for inputs */
+
+.textInput, .buttonInput, .checkboxInput{
+    width: 100%;
+    margin-top: .6rem;
+    margin-bottom: .6rem;
+}
+
+.textInput input{
+    width: 100%;
+    padding: .3rem;
+    padding-left: .9rem;
+    padding-right: .9rem;
+    box-sizing: border-box;
+    border-radius: .6rem;
+    border: .06rem solid #C8C8C8;
+    box-shadow: .06rem .06rem 0.09rem #2C1A1D;
+}
+
+.buttonInput input{
+    width: 100%;
+    padding: .3rem;
+    box-sizing: border-box;
+    border-radius: .6rem;
+    border: none;
+    box-shadow: .09rem .09rem 0.09rem #2C1A1D;
+    color: #f5f8fa;
+    background-color: #065f46;
+}
+
+.textInput input:focus, .buttonInput input:active{
+    outline: none;
+    box-shadow: none;
+    margin-top: .06rem;
+    margin-left: .06rem;
+    margin-bottom: -.06rem;
+    margin-right: -.06rem;
+}
+
+.textInput label{
+    margin: .9rem;
+}
+
+
+
+
+
+.centred{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.splitSpace{
+    display: flex;
+    width:100%;
+    margin: 0rem;
+    padding: 0rem;
+    gap:1rem;
+}

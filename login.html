@@ -4,29 +4,31 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bucket List - Home</title>
+    <title>Bucket List - Login</title>
     <link rel="stylesheet" href="./styles/main.css" />
 </head>
 
 <body>
-    <fieldset class="fieldsetTypeA">
-        <legend>Log in</legend>
-        <div class="textInput">
-            <label for="uname">Username</label>
-            <input type="text" name="userName" id="uname" placeholder="Your Username"/>
-        </div>
-        <div class="textInput">
-            <label for="passwd">Password</label>
-            <input type="password" name="password" id="passwd" placeholder="Your Password" />
-        </div>
-        <div class="splitSpace">
-            <div class="buttonInput">
-                <input type="submit" name="submit" value="Log in"/>
+    <div class="mainDiv">
+        <fieldset class="fieldsetTypeA centred">
+            <legend>Login</legend>
+            <div class="textInput">
+                <label for="uname">Username</label>
+                <input type="text" name="userName" id="uname" placeholder="Your Username"/>
             </div>
-            <div class="checkboxInput">
-                <input type="checkbox" name="remember me" id="remember" value="1"/>
-                <label for="remember">Remember Me</label>
+            <div class="textInput">
+                <label for="passwd">Password</label>
+                <input type="password" name="password" id="passwd" placeholder="Your Password" />
             </div>
-        </div>
-    </fieldset>
+            <div class="splitSpace">
+                <div class="buttonInput">
+                    <input type="submit" name="submit" value="Login"/>
+                </div>
+                <div class="checkboxInput">
+                    <input type="checkbox" name="remember me" id="remember" value="1"/>
+                    <label for="remember">Remember Me</label>
+                </div>
+            </div>
+        </fieldset>
+    </div>
 </body>
