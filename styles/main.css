@@ -12,6 +12,14 @@ body{
     overflow-x: hidden;
 }
 
+h3 {
+    margin-top: 2rem;
+    margin-left: 0.5rem;
+    margin-bottom: 0.2rem;
+    font-weight: 100;
+    font-size: 24px;
+}
+
 
 
 
@@ -34,6 +42,26 @@ nav{
     padding-left: 12.3rem;
     width: auto;
     height: auto;
+}
+
+nav a{
+    margin-left: 1.5rem;
+    padding: .3rem;
+    padding-left: .6rem;
+    border-left: .09rem solid #2C1A1D;
+    font-size: 18px;
+    color: #2C1A1D;
+    text-decoration: none;
+}
+
+nav a:hover{
+    margin-left: 1.5rem;
+    padding: .3rem;
+    padding-left: .9rem;
+    font-size: 18px;
+    color: #2C1A1D;
+    text-decoration: none;
+    text-shadow: 1px 0px 0px #2C1A1D;
 }
 
 
@@ -74,6 +102,22 @@ nav{
     margin-bottom: .6rem;
 }
 
+.checkboxInput div{
+    width: 100%;
+    padding: .3rem;
+    padding-left: .9rem;
+    padding-right: .9rem;
+    box-sizing: border-box;
+    border-radius: .6rem;
+    border: .06rem solid #C8C8C8;
+    box-shadow: .06rem .06rem 0.09rem #2C1A1D;
+    background-color: #ffffff;
+}
+
+.buttonInput input:hover, .checkboxInput div:hover, .checkboxInput input:hover, .checkboxInput label:hover{
+    cursor: pointer;
+}
+
 .textInput input{
     width: 100%;
     padding: .3rem;
@@ -83,20 +127,27 @@ nav{
     border-radius: .6rem;
     border: .06rem solid #C8C8C8;
     box-shadow: .06rem .06rem 0.09rem #2C1A1D;
+    line-height:18px;
 }
 
 .buttonInput input{
     width: 100%;
-    padding: .3rem;
+    padding: .36rem;
     box-sizing: border-box;
     border-radius: .6rem;
     border: none;
     box-shadow: .09rem .09rem 0.09rem #2C1A1D;
     color: #f5f8fa;
     background-color: #065f46;
+    font-size: 16px;
+    line-height:18px;
 }
 
-.textInput input:focus, .buttonInput input:active{
+.checkboxInput input{
+    accent-color: #065f46;
+}
+
+.textInput input:focus, .buttonInput input:active, .checkboxInput div:active{
     outline: none;
     box-shadow: none;
     margin-top: .06rem;
