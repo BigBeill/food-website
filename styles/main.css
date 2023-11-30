@@ -101,21 +101,19 @@ nav .logo{
 
 /* css for inputs */
 
-.textInput, .checkboxInput{
+.textInput{
     width: 100%;
-    margin-top: .6rem;
-    margin-bottom: .6rem;
+    padding-top: .3rem;
+    padding-bottom: .3rem;
 }
-
-.buttonInput{
+.buttonInput, .checkboxInput{
     width: 100%;
-    margin-top: 1.2rem;
-    margin-bottom: .6rem;
+    padding-top: .9rem;
+    padding-bottom: .3rem;
 }
 
 .checkboxInput div{
     width: 100%;
-    margin-top: .6rem;
     padding: .3rem;
     padding-left: .9rem;
     padding-right: .9rem;
@@ -185,7 +183,6 @@ nav .logo{
     display: flex;
     width:100%;
     margin: 0rem;
-    margin-top: -.6rem;
     padding: 0rem;
     gap:1rem;
 }
