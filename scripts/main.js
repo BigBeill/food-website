@@ -1,4 +1,8 @@
-document.getElementById('navBar').innerHTML = 
+//general css that will be equipped to every html document
+
+const navBar = document.getElementById('navBar')
+
+navBar.innerHTML = 
 ` <img class="logo" src="./images/BigBeill-logo_black.png" alt="Beill Greenhouse Logo">
 
 <h3>Find Recipes</h3>
@@ -12,4 +16,16 @@ document.getElementById('navBar').innerHTML =
 
 <h3>Account</h3>
 <a href="login.html">Login</a>
-<a href="register.html">Create Account</a> `;
+<a href="register.html">Create Account</a> 
+<div class="thumbButton" id="thumbButton"></div>`;
+
+const thumbButton = document.getElementById('thumbButton');
+
+thumbButton.addEventListener("click", () => {
+  if (navBar.classList.contains("open")){
+    navBar.classList.remove("open");
+  }
+  else{
+    navBar.classList.add("open");
+  }
+});

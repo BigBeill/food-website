@@ -32,7 +32,7 @@ nav{
     width: 12rem;
     height: 100%;
     border-right: 0.3rem solid #065f46;
-    box-shadow: 0.03rem 0.03rem 0.3rem #2C1A1D;
+    box-shadow: 0.06rem 0.06rem 0.15rem #2C1A1D;
     display: flex;
     flex-direction: column;
     background-color: #ffffff;
@@ -42,6 +42,46 @@ nav{
     padding-left: 12.3rem;
     width: auto;
     height: auto;
+}
+
+.thumbButton{
+  position: fixed;
+  bottom: 2.4rem;
+  left: -3.6rem;
+  width: 3.6rem;
+  height: 3.6rem;
+  background-color: #065f46;
+  border-radius: 0rem .45rem .45rem 0rem;
+  box-shadow: none;
+}
+
+@media only screen and (max-width: 720px) {
+  
+ nav{
+   left: -12.3rem;
+   box-shadow: none;
+   transition: all 0.3s ease-in-out;
+ }
+ 
+ nav.open{
+   left: 0;
+   box-shadow: 0.06rem 0.06rem 0.15rem #2C1A1D;
+ }
+ 
+  .mainDiv{
+    padding: 0;
+    width: 100%;
+  }
+  
+  .thumbButton{
+    left: 0;
+    box-shadow: 0.06rem 0.06rem 0.15rem #2C1A1D;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  nav.open .thumbButton{
+    left: 12.3rem;
+  }
 }
 
 nav a{
