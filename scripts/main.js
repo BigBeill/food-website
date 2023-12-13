@@ -1,7 +1,8 @@
 //general css that will be equipped to every html document
 
-const navBar = document.getElementById('navBar')
 
+//css for nav bar
+const navBar = document.getElementById('navBar');
 navBar.innerHTML = 
 ` <img class="logo" src="./images/BigBeill-logo_black.png" alt="Beill Greenhouse Logo">
 

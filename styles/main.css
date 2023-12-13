@@ -2,6 +2,7 @@
     font-size: 16px;
     font-family: verdana;
     background-color: #f5f8fa;
+    --base-color: #065F46;
 }
 
 body{
@@ -31,7 +32,7 @@ nav{
     top: 0;
     width: 12rem;
     height: 100%;
-    border-right: 0.3rem solid #065f46;
+    border-right: 0.3rem solid var(--base-color);
     box-shadow: 0.06rem 0.06rem 0.15rem #2C1A1D;
     display: flex;
     flex-direction: column;
@@ -50,7 +51,7 @@ nav{
   left: -3.6rem;
   width: 3.6rem;
   height: 3.6rem;
-  background-color: #065f46;
+  background-color: var(--base-color);
   border-radius: 0rem .45rem .45rem 0rem;
   box-shadow: none;
 }
@@ -188,13 +189,13 @@ nav .logo{
     border: none;
     box-shadow: .09rem .09rem 0.09rem #2C1A1D;
     color: #f5f8fa;
-    background-color: #065f46;
+    background-color: var(--base-color);
     font-size: 16px;
     line-height:18px;
 }
 
 .checkboxInput input{
-    accent-color: #065f46;
+    accent-color: var(--base-color);
 }
 
 .textInput input:focus, .buttonInput input:active, .checkboxInput div:active{
@@ -225,6 +226,12 @@ nav .logo{
     margin: 0rem;
     padding: 0rem;
     gap:1rem;
+}
+
+@media only screen and (max-width: 720px) {
+  .splitSpace{
+    display: inline;
+  }
 }
 
 .void{
