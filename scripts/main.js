@@ -30,3 +30,20 @@ thumbButton.addEventListener("click", () => {
     navBar.classList.add("open");
   }
 });
+
+const checkboxList = document.querySelectorAll(".checkboxInput");
+
+checkboxList.forEach(function (checkboxDiv){
+  console.log("checkbox found");
+  const checkbox = checkboxDiv.querySelector("input");
+  console.log(checkbox)
+  checkboxDiv.addEventListener("click", () => {
+    console.log("clicked");
+    if (checkbox.checked){
+      checkbox.checked = false;
+    }
+    else{
+      checkbox.checked = true;
+    }
+  });
+});

@@ -211,9 +211,21 @@ nav .logo{
     margin: .9rem;
 }
 
+.error{
+  margin: .9rem;
+  color: #990D35;
+  font-style: italic;
+}
 
 
 
+
+
+
+
+.hidden{
+  display: none;
+}
 
 .centred{
     margin-left: auto;

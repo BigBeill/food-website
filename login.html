@@ -6,38 +6,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Beill's Greenhouse - Login</title>
     <script defer src="./scripts/main.js"></script>
+    <script defer src="./scripts/login.js"></script>
     <link rel="stylesheet" href="./styles/main.css" />
 </head>
 
 <body>
+  
     <nav id="navBar"></nav>
 
     <div class="mainDiv">
-        <fieldset class="fieldsetTypeA centred">
-            <legend>Login</legend>
-            <div class="textInput">
-                <label for="uname">Username</label>
-                <input type="text" name="userName" id="uname" placeholder="Your Username"/>
+      <fieldset class="fieldsetTypeA centred" id="loginForm">
+        <legend>Login</legend>
+        <div class="textInput">
+          <label for="uname">Username</label>
+          <input 
+          type="text" 
+          name="userName" 
+          id="uname" 
+          placeholder="Your Username"
+          />
+          <span class="error hidden">No username given</span>
+          <span class="error hidden">Username not found</span>
+        </div>
+        <div class="textInput">
+          <label for="password">Password</label>
+          <input 
+          type="password" 
+          name="password" 
+          id="password" 
+          placeholder="Your Password" 
+          />
+          <span class="error hidden">No password given</span>
+          <span class="error hidden">Incorrect password</span>
+        </div>
+          <div class="splitSpace">
+            <div class="buttonInput">
+              <input 
+              type="submit" 
+              name="Submit" 
+              id="submitButton"
+              value="Login"
+              />
             </div>
-            <div class="textInput">
-                <label for="passwd">Password</label>
-                <input type="password" name="password" id="passwd" placeholder="Your Password" />
+            <div class="checkboxInput">
+              <div>
+                <input type="checkbox"
+                name="remember me" 
+                id="remember" 
+                value="1"/>
+                <label for="remember">Remember Me</label>
+              </div>
             </div>
-            <div class="splitSpace">
-                <div class="buttonInput">
-                    <input type="submit" name="Submit" value="Login"/>
-                </div>
-                <div class="checkboxInput">
-                    <div>
-                        <input type="checkbox" name="remember me" id="remember" value="1"/>
-                        <label for="remember">Remember Me</label>
-                    </div>
-                </div>
-            </div>
-        </fieldset>
-    </div>
-
-    <script>
-        sessionStorage.setItem('id',1);
-    </script>
+        </div>
+      </fieldset>
+   </div>
 </body>
