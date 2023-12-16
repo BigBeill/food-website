@@ -85,17 +85,28 @@ nav{
   }
 }
 
-nav a{
+nav .logo{
+    margin-top: .9rem;
+    margin-left: .9rem;
+    margin-right: .9rem;
+}
+
+nav a, nav button{
     margin-left: 1.5rem;
     padding: .3rem;
     padding-left: .6rem;
+    background-color: #ffffff;
+    border: none;
     border-left: .09rem solid #2C1A1D;
+    text-align: start;
+    font-family: verdana;
     font-size: 18px;
     color: #2C1A1D;
     text-decoration: none;
+    transition: all 0.03s ease-in-out;
 }
 
-nav a:hover{
+nav a:hover, nav button:hover{
     margin-left: 1.5rem;
     padding: .3rem;
     padding-left: .9rem;
@@ -103,14 +114,8 @@ nav a:hover{
     color: #2C1A1D;
     text-decoration: none;
     text-shadow: 1px 0px 0px #2C1A1D;
+    cursor: pointer;
 }
-
-nav .logo{
-    margin-top: .9rem;
-    margin-left: .9rem;
-    margin-right: .9rem;
-}
-
 
 
 

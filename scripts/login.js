@@ -1,4 +1,4 @@
-//css that goes with login page
+//js that goes with login page
 
 const loginForm = document.getElementById("loginForm");
 const submitButton = document.getElementById("submitButton");
@@ -11,7 +11,13 @@ const passwordInput = document.getElementById("password");
 const passwordNone = passwordInput.nextElementSibling;
 const passwordInvalid = passwordNone.nextElementSibling;
 
-submitButton.addEventListener("click", () => {
+submitButton.addEventListener("click", attemptLogin);
+passwordInput.addEventListener("keydown", (event) => {
+  if(event.key == "Enter")
+    attemptLogin();
+});
+
+function attemptLogin() {
   let errors = false;
   
   usernameNone.classList.add("hidden");
@@ -19,7 +25,6 @@ submitButton.addEventListener("click", () => {
   
   passwordNone.classList.add("hidden");
   passwordInvalid.classList.add("hidden");
-  
   
   if (usernameInput.value.length == 0){
     usernameNone.classList.remove("hidden");
@@ -39,7 +44,8 @@ submitButton.addEventListener("click", () => {
       passwordInvalid.classList.remove("hidden");
     }
     else{
-      
+      sessionStorage.setItem('user_id', 1);
+      window.location.href = 'index.html';
     }
   }
-});
+}

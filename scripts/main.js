@@ -1,7 +1,8 @@
-//general css that will be equipped to every html document
+//general javascript code that will be equipped to every html document
 
+var user_id = sessionStorage.getItem('user_id');
 
-//css for nav bar
+//html for nav bar
 const navBar = document.getElementById('navBar');
 navBar.innerHTML = 
 ` <img class="logo" src="./images/BigBeill-logo_black.png" alt="Beill Greenhouse Logo">
@@ -12,38 +13,53 @@ navBar.innerHTML =
 <a href="index.html">Search</a>
 
 <h3>Your Recipes</h3>
-<a href="index.html">Owned</a>
+<a href="index.html">Personal</a>
 <a href="index.html">Saved</a>
 
-<h3>Account</h3>
-<a href="login.html">Login</a>
-<a href="register.html">Create Account</a> 
-<div class="thumbButton" id="thumbButton"></div>`;
+<h3>Account</h3>`;
 
+if (user_id == null){
+  navBar.innerHTML +=
+  `<a href="login.html">Login</a>
+  <a href="register.html">Create Account</a>`;
+}
+else {
+  navBar.innerHTML +=
+  `<a href="index.html">Settings</a>
+  <button id="logoutButton">Logout</button>`;
+}
+
+navBar.innerHTML += `<div class="thumbButton" id="thumbButton"></div>`
+
+
+//code for opening/closing the nav bar
 const thumbButton = document.getElementById('thumbButton');
-
 thumbButton.addEventListener("click", () => {
-  if (navBar.classList.contains("open")){
+  if (navBar.classList.contains("open"))
     navBar.classList.remove("open");
-  }
-  else{
+  else
     navBar.classList.add("open");
-  }
 });
 
-const checkboxList = document.querySelectorAll(".checkboxInput");
+const logoutButton = document.getElementById("logoutButton");
+if (logoutButton){
+  logoutButton.addEventListener("click", () => {
+    sessionStorage.removeItem('user_id');
+    window.location.href = 'login.html';
+  });
+}
 
+//for each div around a checkbox, add an event listener that lets user click the whole div
+const checkboxList = document.querySelectorAll(".checkboxInput");
 checkboxList.forEach(function (checkboxDiv){
-  console.log("checkbox found");
   const checkbox = checkboxDiv.querySelector("input");
-  console.log(checkbox)
-  checkboxDiv.addEventListener("click", () => {
-    console.log("clicked");
-    if (checkbox.checked){
-      checkbox.checked = false;
-    }
-    else{
-      checkbox.checked = true;
+  const checkboxLabel = checkboxDiv.querySelector("label");
+  checkboxDiv.addEventListener("click", (event) => {
+    if (!(event.target == checkbox || event.target == checkboxLabel)){
+      if (checkbox.checked)
+        checkbox.checked = false;
+      else
+        checkbox.checked = true;
     }
   });
 });
