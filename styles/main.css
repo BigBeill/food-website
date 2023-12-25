@@ -121,7 +121,7 @@ nav a:hover, nav button:hover{
 
 /* css for fieldsets */
 
-.fieldsetTypeA {
+.pageContentTypeA {
     width: 100%;
     max-width: 46rem;
     margin: .3rem;
@@ -131,14 +131,19 @@ nav a:hover, nav button:hover{
     border-top:0.09rem solid #2C1A1D;
 }
 
-.fieldsetTypeA legend {
+.pageContentTypeA h1 {
+    margin-top: -1.2rem;
     margin-left: 3rem;
     margin-bottom: .3rem;
     padding-left: .3rem;
     padding-right: .3rem;
+    width: min-content;
     border-left:.09rem solid #2C1A1D;
     border-right:.09rem solid #2C1A1D;
-    font-size: 30px;
+    font-size: 1.8rem;
+    font-weight: 400;
+    white-space: nowrap;
+    background-color: #f5f8fa;
 }
 
 
