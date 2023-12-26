@@ -40,7 +40,8 @@ nav{
 }
 
 .mainDiv{
-    padding-left: 12.3rem;
+    padding:.3rem;
+    padding-left: 12.6rem;
     width: auto;
     height: auto;
 }
@@ -70,8 +71,8 @@ nav{
  }
  
   .mainDiv{
-    padding: 0;
-    width: 100%;
+    padding: .3rem;
+    width: auto;
   }
   
   .thumbButton{
