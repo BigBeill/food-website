@@ -8,28 +8,29 @@ navBar.innerHTML =
 ` <img class="logo" src="./images/BigBeill-logo_black.png" alt="Beill Greenhouse Logo">
 
 <h3>Find Recipes</h3>
-<a href="index.html">Public</a>
-<a href="index.html">Friends</a>
-<a href="index.html">Search</a>
+<a href="index">Public</a>
+<a href="index">Friends</a>
+<a href="index">Search</a>
 
 <h3>Your Recipes</h3>
-<a href="index.html">Personal</a>
-<a href="index.html">Saved</a>
+<a href="index">Personal</a>
+<a href="index">Saved</a>
 
 <h3>Account</h3>`;
 
 if (user_id == null){
   navBar.innerHTML +=
-  `<a href="login.html">Login</a>
-  <a href="register.html">Create Account</a>`;
+  `<a href="login">Login</a>
+  <a href="register">Create Account</a>`;
 }
 else {
   navBar.innerHTML +=
-  `<a href="index.html">Settings</a>
+  `<a href="index">Settings</a>
   <button id="logoutButton">Logout</button>`;
 }
 
 navBar.innerHTML += `<div class="thumbButton" id="thumbButton"></div>`
+
 
 
 //code for opening/closing the nav bar
@@ -48,6 +49,8 @@ if (logoutButton){
     window.location.href = 'login.html';
   });
 }
+
+
 
 //for each div around a checkbox, add an event listener that lets user click the whole div
 const checkboxList = document.querySelectorAll(".checkboxInput");
