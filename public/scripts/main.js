@@ -42,11 +42,12 @@ thumbButton.addEventListener("click", () => {
     navBar.classList.add("open");
 });
 
+//js for logout button in nav
 const logoutButton = document.getElementById("logoutButton");
 if (logoutButton){
   logoutButton.addEventListener("click", () => {
     sessionStorage.removeItem('user_id');
-    window.location.href = 'login.html';
+    window.location.href = 'login';
   });
 }
 

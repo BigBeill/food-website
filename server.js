@@ -16,7 +16,7 @@ app.use('/login', loginRouter)
 const registerRouter = require('./routes/register')
 app.use('/register', registerRouter)
 
-const userRouter = require('./routes/user')
-app.use('/user', userRouter)
+const profileRouter = require('./routes/profile')
+app.use('/profile', profileRouter)
 
 app.listen(3000)
