@@ -37,15 +37,19 @@ function attemptLogin() {
   }
   
   if (!errors){
-    if (usernameInput.value != "BigBeill"){
-      usernameInvalid.classList.remove("hidden");
+    var postRequest = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        username: usernameInput.value,
+        password: passwordInput.value
+      })
     }
-    else if (passwordInput.value != "123"){
-      passwordInvalid.classList.remove("hidden");
-    }
-    else{
-      sessionStorage.setItem('user_id', 1);
-      window.location.href = 'index.html';
-    }
+    console.log(postRequest)
+    var loginAttempt  = fetch('/login', postRequest)
+    window.location.href = '/index';
   }
 }

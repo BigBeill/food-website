@@ -34,6 +34,7 @@ submitButton.addEventListener("click", () => {
         usernameInvalid.classList.remove("hidden")
         errors = true;
     }
+
     if (emailInput.value.length == 0){
         emailNone.classList.remove("hidden");
         errors = true;
@@ -42,6 +43,7 @@ submitButton.addEventListener("click", () => {
         emailInvalid.classList.remove("hidden");
         errors = true
     }
+
     if (passwordInputOne.value.length == 0){
         passwordNoneOne.classList.remove("hidden");
         errors = true;
@@ -56,7 +58,19 @@ submitButton.addEventListener("click", () => {
     }
 
     if (!errors){
-        sessionStorage.setItem('user_id', 2);
-        window.location.href = 'index.html';
+        var postRequest = {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: "application/json",
+            },
+            body: JSON.stringify({
+              username: usernameInput.value,
+              email: emailInput.value,
+              password: passwordInputOne.value
+            })
+        }
+        var loginAttempt  = fetch('/register', postRequest)
+        window.location.href = '/index';
     }
 });
