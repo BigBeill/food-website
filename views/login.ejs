@@ -60,6 +60,12 @@
           </div>
         </div>
       </div>
+
+      <div>
+        <% if (messages.error) { %>
+          <%= messages.error %>
+        <% } %>
+      </div>
     </div>
   </div>
 </body>
