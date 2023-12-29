@@ -70,7 +70,6 @@ submitButton.addEventListener("click", () => {
               password: passwordInputOne.value
             })
         }
-        var loginAttempt  = fetch('/register', postRequest)
-        window.location.href = '/index';
+        fetch('/register', postRequest)
     }
 });

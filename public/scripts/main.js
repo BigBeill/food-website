@@ -46,7 +46,7 @@ thumbButton.addEventListener("click", () => {
 const logoutButton = document.getElementById("logoutButton");
 if (logoutButton){
   logoutButton.addEventListener("click", () => {
-    sessionStorage.removeItem('user_id');
+    fetch('/logout?_method=DELETE', {method: 'POST'})
     window.location.href = 'login';
   });
 }

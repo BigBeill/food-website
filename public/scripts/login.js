@@ -49,7 +49,6 @@ function attemptLogin() {
       })
     }
     console.log(postRequest)
-    var loginAttempt  = fetch('/login', postRequest)
-    window.location.href = '/index';
+    fetch('/login', postRequest)
   }
 }
