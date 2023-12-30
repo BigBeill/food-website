@@ -18,19 +18,22 @@ app.set('view engine', 'ejs')
 app.use(express.static('./public'))
 app.use(methodOverride('_method'))
 
-const indexRouter = require('./routes/index')
+const indexRouter = require('./routes/index.route')
 app.use('/', indexRouter)
 app.use('/home', indexRouter)
 app.use('/index', indexRouter)
 
-const loginRouter = require('./routes/login')
+const loginRouter = require('./routes/login.route')
 app.use('/login', loginRouter)
 
-const registerRouter = require('./routes/register')
+const registerRouter = require('./routes/register.route')
 app.use('/register', registerRouter)
 
-const profileRouter = require('./routes/profile')
+const profileRouter = require('./routes/profile.route')
 app.use('/profile', profileRouter)
+
+const userRouter = require('./routes/user.route')
+app.use('/user', userRouter)
 
 app.delete('/logout', (req, res) => {
     req.logOut()
