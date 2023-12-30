@@ -1,23 +1,25 @@
 const express = require("express")
 const router = express.Router()
 
-const bcrypt = require('bcrypt')
-const passport = require('passport')
-const initializePassport = require('../passport-config')
-initializePassport(passport, username => {
-    return users.find(user => user.username === username)
+const connection = require('../config/connectDB')
+router.get('/', (req, res) => {
+    res.render('index')
 })
 
-//const connection = require('../config/connectDB')
-
-const users = []
-
 router.get('/login', (req, res) => {
-    res.render('login')
+    res.render('user/login')
 })
 
 router.get('/register', (req, res) => {
-    res.render('register')
+    res.render('user/register')
+})
+
+router.post('/register', (req, res) => {
+    connection.query(
+        "INSERT INTO `users` (`username`, `email`, `password`) VALUES ('test', 'test@gmail.com', '123')",
+        function (err, results){
+        console.log(results)
+    })
 })
 
 

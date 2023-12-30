@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
 
 <head>
     <meta charset="utf-8" />
@@ -11,5 +9,10 @@
 <body>
 
     <p>Hello world - Home page</p>
+
+    <% if (recipes) { %>
+    <% recipes.forEach(recipe => { %>
+        <div><%= recipe.title %></div>
+    <% })} %>
     
 </body>
