@@ -1,43 +1,22 @@
+// import express
 const express = require('express')
 const app = express()
+const expressLayouts = require('express-ejs-layouts')
 
-const passport = require('passport')
-const flash = require('express-flash')
-const session = require('express-session')
-const initializePassport = require('./passport-config')
-const methodOverride = require('method-override')
-
-initializePassport(
-  passport,
-  email => users.find(user => user.email === email),
-  id => users.find(user => user.id === id)
-)
-
+//setup server
 app.set('view engine', 'ejs')
+app.set('layout', 'layouts/layout')
+app.use(expressLayouts)
+app.use(express.static('public'))
 
-app.use(express.static('./public'))
-app.use(methodOverride('_method'))
-
+//redirect request to routers
 const indexRouter = require('./routes/index.route')
 app.use('/', indexRouter)
 app.use('/home', indexRouter)
 app.use('/index', indexRouter)
 
-const loginRouter = require('./routes/login.route')
-app.use('/login', loginRouter)
-
-const registerRouter = require('./routes/register.route')
-app.use('/register', registerRouter)
-
-const profileRouter = require('./routes/profile.route')
-app.use('/profile', profileRouter)
-
 const userRouter = require('./routes/user.route')
 app.use('/user', userRouter)
 
-app.delete('/logout', (req, res) => {
-    req.logOut()
-    req.redirect('/login')
-})
-
+//listen to port
 app.listen(3000)

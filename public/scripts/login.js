@@ -49,6 +49,6 @@ function attemptLogin() {
       })
     }
     console.log(postRequest)
-    fetch('/login', postRequest)
+    fetch('login', postRequest)
   }
 }

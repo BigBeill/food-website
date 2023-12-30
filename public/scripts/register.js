@@ -70,6 +70,6 @@ submitButton.addEventListener("click", () => {
               password: passwordInputOne.value
             })
         }
-        fetch('/register', postRequest)
+        fetch('register', postRequest)
     }
 });

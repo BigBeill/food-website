@@ -8,15 +8,17 @@ initializePassport(passport, username => {
     return users.find(user => user.username === username)
 })
 
-
 //const connection = require('../config/connectDB')
 
-router.get("/login", (req, res) => {
-    res.render('login');
+const users = []
+
+router.get('/login', (req, res) => {
+    res.render('login')
 })
 
-router.get("/register", (req, res) => {
-    res.render('register');
+router.get('/register', (req, res) => {
+    res.render('register')
 })
+
 
 module.exports = router
