@@ -1,7 +1,8 @@
 const express = require("express")
 const router = express.Router()
 
-const connection = require('../config/connectDB')
+const processQuery = require('../models/dbQuery')
+
 router.get('/', (req, res) => {
     res.render('index')
 })
@@ -15,11 +16,8 @@ router.get('/register', (req, res) => {
 })
 
 router.post('/register', (req, res) => {
-    connection.query(
-        "INSERT INTO `users` (`username`, `email`, `password`) VALUES ('test', 'test@gmail.com', '123')",
-        function (err, results){
-        console.log(results)
-    })
+    var results = processQuery("INSERT INTO `users` (`username`, `email`, `password`) VALUES ('test', 'test@gmail.com', '123')")
+    console.log(results)
 })
 
 

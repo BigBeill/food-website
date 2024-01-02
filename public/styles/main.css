@@ -228,6 +228,34 @@ nav a:hover, nav button:hover{
   font-style: italic;
 }
 
+.searchBar{
+    margin: .6rem 3rem .6rem 1.5rem;
+    padding: .45rem .9rem .3rem .9rem;
+    width: auto;
+    max-width: 24rem;
+    display: flex;
+    border: .09rem solid #2c1a1d40;
+    border-radius: .9rem;
+    background-color: #ffffff;
+    box-shadow: .06rem .06rem 0.09rem #2C1A1D;
+    font-size: 1.2rem;
+}
+
+.searchBar input{
+    margin-bottom: .06rem;
+    margin-left: .3rem;
+    border: none;
+    width: 100%;
+    border-bottom: .09rem solid #2C1A1D;
+    font-size: 0.9rem;
+}
+
+.searchBar input:focus{
+    margin-bottom: 0rem;
+    outline: none;
+    border-bottom: .12rem solid #2C1A1D;
+}
+
 
 
 
