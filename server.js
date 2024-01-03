@@ -12,10 +12,7 @@ app.use(express.static('public'))
 app.use(bodyParser.urlencoded({limit: '10mb', extended: false}))
 app.use(express.json());
 
-//establish connection with database
-// const connection = require('../config/connectDB')
-
-//redirect request to routers
+//redirect requests to routers
 const indexRouter = require('./routes/index.route')
 app.use('/', indexRouter)
 app.use('/home', indexRouter)
