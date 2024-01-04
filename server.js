@@ -3,6 +3,7 @@ const express = require('express')
 const app = express()
 const expressLayouts = require('express-ejs-layouts')
 const bodyParser = require ('body-parser')
+const mognoConnection = require ('./config/connectMongo')
 
 //setup server
 app.set('view engine', 'ejs')
