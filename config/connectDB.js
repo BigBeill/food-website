@@ -17,7 +17,7 @@ const connection = mysql.createConnection({
 
 connection.connect(function(err){
     if (err) throw err
-    console.log("SQL Database connected")
+    else console.log("Azure SQL database connected")
 })
 
 module.exports = connection
