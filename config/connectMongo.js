@@ -1,24 +1,20 @@
-const session = require('express-session');
-const MongoStore = require('connect-mongo');
 const mongoose = require('mongoose');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config()
 
-
+//connect to mongoDB using link
 const mongoLink = "mongodb+srv://BigBeill:" + process.env.MONGO_DB_PASSWORD + "@beillsgreenhouse.oull8qn.mongodb.net/?retryWrites=true&w=majority"
+const connection = mongoose.createConnection(mongoLink)
 
-const mongoOptinos = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}
-
-const connection = mongoose.createConnection(mongoLink, mongoOptinos)
-
+//confirm connection has been made
 if (connection) {
   console.log("Mongoose database connected")
 }
 
+//make connection accessible to the server
 module.exports = connection
+
+
 /*
 const uri = "mongodb+srv://BigBeill:" + process.env.MONGO_DB_PASSWORD + "@beillsgreenhouse.oull8qn.mongodb.net/?retryWrites=true&w=majority"
 
