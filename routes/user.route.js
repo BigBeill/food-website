@@ -1,7 +1,10 @@
 const express = require("express")
 const router = express.Router()
 
-const processQuery = require('../models/dbQuery')
+const processQuery = require('../models/dbQuery');
+const passport = require("passport");
+
+router.post('login', passport.Authenticator('local'), (req, res, next) => {});
 
 router.get('/', (req, res) => {
     res.render('index')
