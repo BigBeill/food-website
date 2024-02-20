@@ -2,6 +2,7 @@ const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 const connection = require('./connectMongo')
 const User = connection.models.User
+const validPassword = require('../library/passwordUtils').validPassword
 
 const customFields = {
     usernameField: 'uname',
