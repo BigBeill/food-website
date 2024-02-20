@@ -1,10 +1,11 @@
-// import express
+// imports
 const express = require('express')
 const expressLayouts = require('express-ejs-layouts')
 const bodyParser = require ('body-parser')
 const mongoConnection = require ('./config/connectMongo')
 const session = require ('express-session')
 const MongoStore = require('connect-mongo')(session)
+const passport = require('passport')
 
 //setup server
 const app = express()
@@ -29,6 +30,11 @@ app.use(session({
         maxAge: 1000 * 60 * 60 * 24
     }
 }))
+
+require('./config/passport')
+app.use(passport.initialize())
+app.use(passport.session())
+
 
 //redirect requests to routers
 const indexRouter = require('./routes/index.route')

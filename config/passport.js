@@ -1,5 +1,5 @@
 const passport = require('passport')
-const LocalStrategy = require('passsport-local').Strategy
+const LocalStrategy = require('passport-local').Strategy
 const connection = require('./connectMongo')
 const User = connection.models.User
 
@@ -27,4 +27,18 @@ const verifyCallback = (username, password, done) => {
         })
 }
 
-const strategy = new LocalStrategy()
+const strategy = new LocalStrategy(customFields, verifyCallback)
+
+passport.use(strategy)
+
+passport.serializeUser((user, done) => {
+    done(null, user.id)
+})
+
+passport.deserializeUser((userId, done) => {
+    User.findById(userId)
+        .then((user) => {
+            done(null, user)
+        })
+        .catch(err => done(err))
+})

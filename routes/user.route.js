@@ -4,7 +4,7 @@ const router = express.Router()
 const processQuery = require('../models/dbQuery');
 const passport = require("passport");
 
-router.post('login', passport.Authenticator('local'), (req, res, next) => {});
+router.post('login', passport.authenticate('local'), (req, res, next) => {});
 
 router.get('/', (req, res) => {
     res.render('index')
