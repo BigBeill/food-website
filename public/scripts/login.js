@@ -1,7 +1,5 @@
 //js that goes with login page
 
-const { response } = require("express");
-
 const loginForm = document.getElementById("loginForm");
 const submitButton = document.getElementById("submitButton");
 
