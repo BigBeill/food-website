@@ -65,11 +65,14 @@ submitButton.addEventListener("click", () => {
               Accept: "application/json",
             },
             body: JSON.stringify({
-              username: usernameInput.value,
-              email: emailInput.value,
-              password: passwordInputOne.value
+              uname: usernameInput.value,
+              pw: passwordInputOne.value
             })
         }
-        fetch('register', postRequest)
+        fetch('register', postRequest) .then((response) => {
+            if (response.redirected) {
+                location.assign(response.url)
+            }
+        })
     }
 });

@@ -17,7 +17,7 @@ const verifyCallback = (username, password, done) => {
             
             const isValid = validPassword(password, user.hash, user.salt)
 
-            if (ifValid) {
+            if (isValid) {
                 return done(null, user)
             } else {
                 return done(null, false)
@@ -28,9 +28,7 @@ const verifyCallback = (username, password, done) => {
         })
 }
 
-const strategy = new LocalStrategy(customFields, verifyCallback)
-
-passport.use(strategy)
+passport.use(new LocalStrategy(customFields, verifyCallback))
 
 passport.serializeUser((user, done) => {
     done(null, user.id)

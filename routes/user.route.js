@@ -1,14 +1,21 @@
-const express = require("express")
-const router = express.Router()
+const router = require("express").Router()
 const processQuery = require('../models/dbQuery');
 const passport = require("passport");
 const genPassword = require('../library/passwordUtils').genPassword
+const mongoConnection = require('../config/connectMongo')
+const User = mongoConnection.models.User
+
+
 
 // ---------- User Post Routes ----------
 
-router.post('login', passport.authenticate('local'), (req, res, next) => {});
+router.post('/login', passport.authenticate('local', {
+    failureRedirect: '/login', 
+    successRedirect: '/index'
+}))
 
 router.post('/register', (req, res, next) => {
+
     const saltHash = genPassword(req.body.pw)
     const salt = saltHash.salt
     const hash = saltHash.hash
@@ -24,8 +31,12 @@ router.post('/register', (req, res, next) => {
             console.log(user)
         })
     
-    res.redirect('/login')
+    res.redirect('login')
 })
+
+
+
+// ---------- User Get Routs ----------
 
 router.get('/', (req, res) => {
     res.render('index')
@@ -39,12 +50,6 @@ router.get('/register', (req, res) => {
     res.render('user/register')
 })
 
-/*
-router.post('/register', (req, res) => {
-    var results = processQuery("INSERT INTO `users` (`username`, `email`, `password`) VALUES ('test', 'test@gmail.com', '123')")
-    console.log(results)
-})
-*/
 
 
 module.exports = router

@@ -1,5 +1,7 @@
 //js that goes with login page
 
+const { response } = require("express");
+
 const loginForm = document.getElementById("loginForm");
 const submitButton = document.getElementById("submitButton");
 
@@ -44,11 +46,12 @@ function attemptLogin() {
         Accept: "application/json",
       },
       body: JSON.stringify({
-        username: usernameInput.value,
-        password: passwordInput.value
+        uname: usernameInput.value,
+        pw: passwordInput.value
       })
     }
-    console.log(postRequest)
-    fetch('login', postRequest)
+    fetch('login', postRequest) .then((response) => {
+      console.log(response)
+    })
   }
 }
