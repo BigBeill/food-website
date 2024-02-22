@@ -44,12 +44,14 @@ function attemptLogin() {
         Accept: "application/json",
       },
       body: JSON.stringify({
-        uname: usernameInput.value,
-        pw: passwordInput.value
+        username: usernameInput.value,
+        password: passwordInput.value
       })
     }
     fetch('login', postRequest) .then((response) => {
-      console.log(response)
+      if (response.redirected){
+        location.assign(response.url)
+      }
     })
-  }
+   }
 }

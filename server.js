@@ -27,13 +27,23 @@ app.use(session({
     saveUninitialized: true,
     store: sessionStore,
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24
+        maxAge: 1000 * 60 * 60 * 24 // expires after 24 hours
     }
 }))
 
 require('./config/passport')
 app.use(passport.initialize())
 app.use(passport.session())
+
+app.use((req, res, next) => {
+    console.log()
+    console.log("session information:")
+    console.log(req.session)
+    console.log()
+    console.log("user information:")
+    console.log(req.user)
+    next()
+})
 
 
 //redirect requests to routers

@@ -65,8 +65,8 @@ submitButton.addEventListener("click", () => {
               Accept: "application/json",
             },
             body: JSON.stringify({
-              uname: usernameInput.value,
-              pw: passwordInputOne.value
+              username: usernameInput.value,
+              password: passwordInputOne.value
             })
         }
         fetch('register', postRequest) .then((response) => {
