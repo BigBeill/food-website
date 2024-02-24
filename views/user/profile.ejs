@@ -1,0 +1,36 @@
+<head>
+    <title>Beill's Greenhouse - Profile</title>
+</head>
+
+<body>
+    <div class="pageContentTypeB">
+        <div>
+            <h1>Profile</h1>
+            <div class="displayData">
+                <p>Username:</p>
+                <p><%= username %></p>
+            </div>
+            <div class="displayData">
+                <p>Email:</p>
+                <% if(email){ %>
+                    <p><%= email %></p>
+                <% } else{ %>
+                    <p class="softText">Not Provided</p>
+                <% } %>
+            </div>
+        </div>
+        <div>
+            <% console.log(recipes) %>
+            <% if(recipes){ %>
+                <% recipes.forEach((recipe) => { %>
+                    <div>
+                        <p><%= recipe.title %></p>
+                        <p><%= recipe.description %></p>
+                    </div>
+                <% }) %>
+            <% } else{ %>
+                <p class="softText">no owned recipes</p>
+            <% } %>
+        </div>
+    </div>
+</body>

@@ -35,17 +35,6 @@ require('./config/passport')
 app.use(passport.initialize())
 app.use(passport.session())
 
-app.use((req, res, next) => {
-    console.log()
-    console.log("session information:")
-    console.log(req.session)
-    console.log()
-    console.log("user information:")
-    console.log(req.user)
-    next()
-})
-
-
 //redirect requests to routers
 const indexRouter = require('./routes/index.route')
 app.use('/', indexRouter)
@@ -54,6 +43,9 @@ app.use('/index', indexRouter)
 
 const userRouter = require('./routes/user.route')
 app.use('/user', userRouter)
+
+const recipeRouter = require('./routes/recipe.route')
+app.use('/recipe', recipeRouter)
 
 //listen to port
 app.listen(3000)

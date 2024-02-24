@@ -3,6 +3,7 @@
     font-family: verdana;
     background-color: #f5f8fa;
     --base-color: #065F46;
+    --light-base-color: #10b981;
 }
 
 body{
@@ -25,106 +26,11 @@ h3 {
 
 
 
-/* css for nav */
-
-nav{
-    position: fixed;
-    top: 0;
-    width: 12rem;
-    height: 100%;
-    border-right: 0.3rem solid var(--base-color);
-    box-shadow: 0.06rem 0.06rem 0.15rem #2C1A1D;
-    display: flex;
-    flex-direction: column;
-    background-color: #ffffff;
-}
-
-.mainDiv{
-    padding:.3rem;
-    padding-left: 12.6rem;
-    width: auto;
-    height: auto;
-}
-
-.thumbButton{
-  position: fixed;
-  bottom: 2.4rem;
-  left: -3.6rem;
-  width: 3.6rem;
-  height: 3.6rem;
-  background-color: var(--base-color);
-  border-radius: 0rem .45rem .45rem 0rem;
-  box-shadow: none;
-}
-
-@media only screen and (max-width: 720px) {
-  
- nav{
-   left: -12.3rem;
-   box-shadow: none;
-   transition: all 0.3s ease-in-out;
- }
- 
- nav.open{
-   left: 0;
-   box-shadow: 0.06rem 0.06rem 0.15rem #2C1A1D;
- }
- 
-  .mainDiv{
-    padding: .3rem;
-    width: auto;
-  }
-  
-  .thumbButton{
-    left: 0;
-    box-shadow: 0.06rem 0.06rem 0.15rem #2C1A1D;
-    transition: all 0.3s ease-in-out;
-  }
-  
-  nav.open .thumbButton{
-    left: 12.3rem;
-  }
-}
-
-nav .logo{
-    margin-top: .9rem;
-    margin-left: .9rem;
-    margin-right: .9rem;
-}
-
-nav a, nav button{
-    margin-left: 1.5rem;
-    padding: .3rem;
-    padding-left: .6rem;
-    background-color: #ffffff;
-    border: none;
-    border-left: .09rem solid #2C1A1D;
-    text-align: start;
-    font-family: verdana;
-    font-size: 18px;
-    color: #2C1A1D;
-    text-decoration: none;
-    transition: all 0.03s ease-in-out;
-}
-
-nav a:hover, nav button:hover{
-    margin-left: 1.5rem;
-    padding: .3rem;
-    padding-left: .9rem;
-    font-size: 18px;
-    color: #2C1A1D;
-    text-decoration: none;
-    text-shadow: 1px 0px 0px #2C1A1D;
-    cursor: pointer;
-}
-
-
-
-/* css for fieldsets */
+/* ------------ css for fieldsets ------------ */
 
 .pageContentTypeA {
     width: 100%;
-    max-width: 46rem;
+    max-width: 45rem;
     margin: .3rem;
     margin-top: 3rem;
     box-sizing: border-box;
@@ -147,13 +53,44 @@ nav a:hover, nav button:hover{
     background-color: #f5f8fa;
 }
 
+.pageContentTypeB{
+    margin-top: 3rem;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 1.2rem;
+}
+
+.pageContentTypeB div{
+    width: 100%;
+    max-width: 18rem;
+}
+
+.pageContentTypeB div:first-child{
+    padding-bottom: 1.5rem;
+    border: 0.09rem solid var(--base-color);
+    background-color: #ffffff;
+    border-radius: .72rem;
+    box-shadow: .06rem .06rem 0.09rem #2C1A1D;
+}
+
+.pageContentTypeB div:first-child h1 {
+    width: min-content;
+    margin: 0rem;
+    margin-left: 1.2rem;
+    margin-bottom: .9rem;
+    padding: 0.9rem 0.45rem 0.12rem 0.45rem;
+    border-bottom: 0.24rem solid var(--base-color);
+}
 
 
 
 
-/* css for inputs */
+
+/* ------------ css for inputs ------------ */
 
 .textInput{
+    display: block;
     width: 100%;
     padding-top: .3rem;
     padding-bottom: .3rem;
@@ -260,7 +197,7 @@ nav a:hover, nav button:hover{
 
 
 
-
+/* ------------ other css ------------ */
 
 .hidden{
   display: none;
@@ -278,11 +215,28 @@ nav a:hover, nav button:hover{
     padding: 0rem;
     gap:1rem;
 }
+.splitSpace div{
+    width: 100%;
+}
 
 @media only screen and (max-width: 720px) {
   .splitSpace{
     display: inline;
   }
+}
+
+.displayData{
+    margin-left: 1.2rem;
+}
+
+.displayData p{
+    display: inline-block;
+    margin: .3rem 0rem;
+}
+
+.softText{
+    color: #4b4b4b;
+    font-style: italic;
 }
 
 .void{

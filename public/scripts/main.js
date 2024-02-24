@@ -8,16 +8,6 @@ thumbButton.addEventListener("click", () => {
     navBar.classList.add("open");
 });
 
-/*
-//js for logout button in nav
-const logoutButton = document.getElementById("logoutButton");
-if (logoutButton){
-  logoutButton.addEventListener("click", () => {
-    fetch('/logout?_method=DELETE', {method: 'POST'})
-    window.location.href = '/user/login';
-  });
-}
-*/
 
 
 //for each div around a checkbox, add an event listener that lets user click the whole div

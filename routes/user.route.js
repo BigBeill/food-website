@@ -3,10 +3,43 @@ const passport = require("passport");
 const genPassword = require('../library/passwordUtils').genPassword
 const mongoConnection = require('../config/connectMongo')
 const User = mongoConnection.models.User
+const recipes = require('../schemas/recipe')
 
 
 
-// ---------- User Post Routes ----------
+// ------------ User Get Routes ------------
+
+router.get('/', (req, res) => {
+    res.render('index')
+})
+
+router.get('/login', (req, res) => {
+    res.render('user/login')
+})
+
+router.get('/register', (req, res) => {
+    res.render('user/register')
+})
+
+router.get('/profile', async (req, res) => {
+    if (req.user){
+        var result
+        result = await recipes.find()
+        console.log(result)
+        data = {
+            username: req.user.username,
+            email: req.user.email,
+            recipes: result
+        }
+        res.render('user/profile', data)
+    }else{
+        res.render('user/login')
+    }
+})
+
+
+
+// ------------ User Post Routes ------------
 
 router.post('/login', passport.authenticate('local', {
     failureRedirect: 'login', 
@@ -30,22 +63,6 @@ router.post('/register', (req, res, next) => {
     })
     
     res.redirect('login')
-})
-
-
-
-// ---------- User Get Routs ----------
-
-router.get('/', (req, res) => {
-    res.render('index')
-})
-
-router.get('/login', (req, res) => {
-    res.render('user/login')
-})
-
-router.get('/register', (req, res) => {
-    res.render('user/register')
 })
 
 
