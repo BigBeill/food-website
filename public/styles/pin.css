@@ -1,0 +1,19 @@
+.pin{
+    margin: 0rem 0rem 0.6rem 0.6rem;
+    display: inline-block;
+    width: 12rem;
+    height: 15rem;
+    border: .12rem solid #065F46;
+    border-radius: .9rem;
+    font-size: 1rem;
+    background-color: #ffffff;
+    box-shadow: .06rem .06rem .09rem #2C1A1D;
+}
+
+h4 {
+    margin-left: 1.2rem;
+}
+
+p {
+    margin-left: .9rem;
+}

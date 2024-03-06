@@ -1,9 +1,8 @@
 :root{
-    font-size: 16px;
+    font-size: 1rem;
     font-family: verdana;
     background-color: #f5f8fa;
     --base-color: #065F46;
-    --light-base-color: #10b981;
 }
 
 body{
@@ -54,19 +53,19 @@ h3 {
 }
 
 .pageContentTypeB{
+    margin-left: 1.2rem;
     margin-top: 3rem;
     width: 100%;
+    max-width: 58.32rem;
     display: flex;
     justify-content: center;
     gap: 1.2rem;
 }
 
-.pageContentTypeB div{
+.pageContentTypeB > div:first-child{
     width: 100%;
     max-width: 18rem;
-}
-
-.pageContentTypeB div:first-child{
+    height: min-content;
     padding-bottom: 1.5rem;
     border: 0.09rem solid var(--base-color);
     background-color: #ffffff;
@@ -74,13 +73,19 @@ h3 {
     box-shadow: .06rem .06rem 0.09rem #2C1A1D;
 }
 
-.pageContentTypeB div:first-child h1 {
+.pageContentTypeB > div:first-child h1 {
     width: min-content;
     margin: 0rem;
     margin-left: 1.2rem;
     margin-bottom: .9rem;
     padding: 0.9rem 0.45rem 0.12rem 0.45rem;
     border-bottom: 0.24rem solid var(--base-color);
+}
+
+.pageContentTypeB > div:nth-child(2) {
+    padding-right: 0.6rem;
+    max-width: 39.12rem;
+    font-size: 0rem;
 }
 
 

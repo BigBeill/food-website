@@ -35,6 +35,15 @@ require('./config/passport')
 app.use(passport.initialize())
 app.use(passport.session())
 
+//some print stuff for debugging
+app.use((req, res, next) => {
+    res.locals.user = req.user
+    console.log()
+    console.log(req.session)
+    console.log(req.user)
+    next()
+})
+
 //redirect requests to routers
 const indexRouter = require('./routes/index.route')
 app.use('/', indexRouter)

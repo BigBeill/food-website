@@ -16,9 +16,12 @@
     <a href="/recipe/new">New Recipe</a>
 
     <h3>Account</h3>
-    <a href="/user/profile">Profile</a>
-    <a href="/user/login">Login</a>
-    <a href="/user/register">Create Account</a>
+    <% if (user) { %>
+        <a href="/user/profile">Profile</a>
+    <% } else { %>
+        <a href="/user/login">Login</a>
+        <a href="/user/register">Create Account</a>
+    <% } %>
 
     <div class="thumbButton" id="thumbButton"></div>
 </nav>

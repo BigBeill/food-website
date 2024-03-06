@@ -23,10 +23,7 @@
             <% console.log(recipes) %>
             <% if(recipes){ %>
                 <% recipes.forEach((recipe) => { %>
-                    <div>
-                        <p><%= recipe.title %></p>
-                        <p><%= recipe.description %></p>
-                    </div>
+                    <%- include('../partials/pin.ejs', { recipe: recipe }) %>
                 <% }) %>
             <% } else{ %>
                 <p class="softText">no owned recipes</p>
