@@ -4,9 +4,24 @@
 </head>
 
 <body>
+    <div class="searchBar" id="searchBar">
+        <i class="fa-solid fa-magnifying-glass" style="color: #065f46;"></i>
+        <input id="testing" type="text" name="search term" placeholder="Search">
+    </div>
+
+    <p>Home page</p>
+
+    <div class="recipesDisplayContainer">
     <% if (recipes) { %>
-    <% recipes.forEach(recipe => { %>
-        <div><%= recipe.title %></div>
-    <% })} %>
-    
+        <% recipes.forEach(recipe => { %>
+            <div class="recipe">
+                <div class="recipeImage">
+                <img src="/images/burger.jpg" width="100" height="100">
+                </div>
+                <a class="recipeTitle">
+                    <%= recipe.title %>
+                </a>
+            </div>
+        <% })} %>
+    </div>
 </body>
