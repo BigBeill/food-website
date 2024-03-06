@@ -13,6 +13,9 @@ router.get("/", async (req, res) => {
 
 router.get("/search", async (req, res) => {
     var result
+    var request = "/" + req.query.value + "/"
+    console.log(request)
+    result = await recipes.find({"title": /test/})
     res.render("index", {recipes: result})
 })
 
