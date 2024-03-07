@@ -30,18 +30,10 @@ submitButton.addEventListener("click", () => {
         usernameNone.classList.remove("hidden");
         errors = true;
     }
-    else if (usernameInput.value == "BigBeill"){
-        usernameInvalid.classList.remove("hidden")
-        errors = true;
-    }
 
     if (emailInput.value.length == 0){
         emailNone.classList.remove("hidden");
         errors = true;
-    }
-    else if (emailInput.value == "BigBeill@gmail.com"){
-        emailInvalid.classList.remove("hidden");
-        errors = true
     }
 
     if (passwordInputOne.value.length == 0){
@@ -70,8 +62,15 @@ submitButton.addEventListener("click", () => {
             })
         }
         fetch('register', postRequest) .then((response) => {
-            if (response.redirected) {
+            console.log(response)
+            if (response.redirected){
                 location.assign(response.url)
+            }
+            if (!response.usernameAvailable){
+                usernameInvalid.classList.remove("hidden")
+            }
+            if (!response.emailAvailable){
+                emailInvalid.classList.remove("hidden")
             }
         })
     }
