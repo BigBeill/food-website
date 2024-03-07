@@ -43,7 +43,7 @@ router.get('/profile', async (req, res) => {
 // ------------ User Post Routes ------------
 
 router.post('/login', passport.authenticate('local', {
-    failureRedirect: 'login', 
+    failureMessage: true,
     successRedirect: '/index'
 }))
 
@@ -84,6 +84,13 @@ router.post('/register', async (req, res, next) => {
     })
     
     res.redirect('login')
+})
+
+router.post('/logout', (req, res) => {
+    console.log("attempting logut")
+    req.logout( (err) => {
+        res.redirect("login")
+    })
 })
 
 

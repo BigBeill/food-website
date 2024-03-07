@@ -52,6 +52,7 @@ function attemptLogin() {
       if (response.redirected){
         location.assign(response.url)
       }
+      console.log(response)
     })
    }
 }
