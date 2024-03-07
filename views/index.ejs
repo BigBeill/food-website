@@ -1,3 +1,4 @@
+
 <head>
     <title>Beill's Greenhouse - Home</title>
     <script defer src="/scripts/viewSpecific/index.js"></script>
@@ -30,4 +31,8 @@
             </div>
         <% })} %>
     </div>
+    <% if (recipes) { %>
+    <% recipes.forEach(recipe => { %>
+        <div><%= recipe.title %></div>
+    <% })} %>
 </body>

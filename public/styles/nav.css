@@ -1,11 +1,7 @@
 /* css for navBar */
-.pageContainer{
-  display: flex;
-  flex-direction:row;
-}
+
 nav{
-    /*position: fixed;*/
-    padding:1rem;
+    position: fixed;
     top: 0;
     width: 12rem;
     height: 100%;
@@ -17,10 +13,8 @@ nav{
 }
 
 .mainDiv{
-    display:block;
-    padding:2rem;
-    padding-top:0;
-    /*padding-left: 12.6rem;*/
+    padding:.3rem;
+    padding-left: 12.6rem;
     width: auto;
     height: auto;
 }

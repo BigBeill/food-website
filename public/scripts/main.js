@@ -33,6 +33,6 @@ const searchBarInput = document.getElementById("searchBar").lastElementChild;
 searchBarInput.addEventListener("keydown", (event) => {
     if(event.key == "Enter"){
         console.log("search" + searchBarInput.value)
-        window.location.href = "/index/search?value=" + searchBarInput.value
+        window.location.href = "/index/search?term=" + searchBarInput.value
     }
 })
