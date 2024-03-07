@@ -257,6 +257,35 @@ h3 {
 .recipe{
     display: flex;
     flex-direction: column;
+    width: 100px;
+    border-radius: 1rem;
+    padding:1rem 0rem 1rem 0rem;
+    margin:2rem;
+    border:1px solid black;
+    justify-content: center;
+}
+.recipeImage{
+    display:flex;
+    flex-direction: row;
+    justify-content: center;
+    border-bottom:1px solid black;
+    display:block;
+}
+.recipeTitle{
+    display:flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.recipesDisplayContainer{
+    display:flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    
+}
+.recipe{
+    display: flex;
+    flex-direction: column;
     width: 150px;
     border-radius: 1rem;
     padding:0rem 0rem 1rem 0rem;
