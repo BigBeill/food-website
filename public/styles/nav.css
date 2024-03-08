@@ -15,6 +15,10 @@ nav{
   background-color: #ffffff;
 }
 
+nav>h3{
+  font-weight: 500;
+}
+
 .mainDiv{
   display:block;
   padding:2rem;
@@ -77,7 +81,7 @@ nav a, nav button{
     border: none;
     border-left: .09rem solid #2C1A1D;
     text-align: start;
-    font-family: verdana;
+    font-family: Inter, "Inter Fallback";
     font-size: 18px;
     color: #2C1A1D;
     text-decoration: none;

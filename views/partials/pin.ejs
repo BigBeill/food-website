@@ -1,8 +1,21 @@
 <head>
     <link rel="stylesheet" href="/styles/pin.css" />
 </head>
+<%# must be given a unique ID. Ideally each recipe will have an ID %>
+<div class="pin" id="pin"> 
+    <div class="pin-inner">
+        <div class="pin-front">
+            <div class="recipeImage">
+                <%# thinking of having a categorical emoji per recipe%>
+                &#129374
+            </div>
+            <div class="recipeTitle">
+                <h2> <%= recipe.title %></h4>
 
-<div class="pin" id="pin">
-    <h4> <%= recipe.title %> </h4>
-    <p> <%= recipe.description %> </p>
+            </div>
+        </div>
+        <div class="pin-back">
+            <p> <%= recipe.description %> </p>
+        </div>
+    </div>
 </div>

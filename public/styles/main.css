@@ -1,6 +1,6 @@
 :root{
     font-size: 1rem;
-    font-family: verdana;
+    font-family: Inter, "Inter Fallback";
     background-color: #f5f8fa;
     --base-color: #065F46;
 }
@@ -93,6 +93,16 @@ h3 {
 
 
 /* ------------ css for inputs ------------ */
+.splitSpace .buttonInput{
+    padding-left:0;
+    padding-right:0;
+    width:100%;
+}
+.splitSpace .checkboxInput{
+    padding-left:0;
+    padding-right:0;
+    width:100%;
+}
 
 .textInput{
     display: block;
@@ -101,11 +111,11 @@ h3 {
     padding-bottom: .3rem;
 }
 .buttonInput, .checkboxInput{
-    width: 100%;
+    width: auto;
     padding-top: .9rem;
-    padding-bottom: .3rem;
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
 }
-
 .checkboxInput div{
     width: 100%;
     padding: .3rem;
@@ -248,64 +258,3 @@ h3 {
     width: 100%;
 }
 
-.recipesDisplayContainer{
-    display:flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    
-}
-.recipe{
-    display: flex;
-    flex-direction: column;
-    width: 100px;
-    border-radius: 1rem;
-    padding:1rem 0rem 1rem 0rem;
-    margin:2rem;
-    border:1px solid black;
-    justify-content: center;
-}
-.recipeImage{
-    display:flex;
-    flex-direction: row;
-    justify-content: center;
-    border-bottom:1px solid black;
-    display:block;
-}
-.recipeTitle{
-    display:flex;
-    flex-direction: row;
-    justify-content: center;
-}
-
-.recipesDisplayContainer{
-    display:flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    
-}
-.recipe{
-    display: flex;
-    flex-direction: column;
-    width: 150px;
-    border-radius: 1rem;
-    padding:0rem 0rem 1rem 0rem;
-    margin:2rem;
-    border:1px solid black;
-    justify-content: center;
-}
-.recipeImage{
-    display:flex;
-    flex-direction: row;
-    justify-content: center;
-    border-bottom:1px solid black;
-    display:block;
-    font-size:1.2rem;
-    width: 100px;
-    height: 100px;
-    padding:25px;
-}
-.recipeTitle{
-    display:flex;
-    flex-direction: row;
-    justify-content: center;
-}
