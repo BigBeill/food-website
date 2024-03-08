@@ -7,6 +7,8 @@ const titleNone = titleInput.nextElementSibling
 const descriptionInput = document.getElementById("description")
 const descriptionNone = descriptionInput.nextElementSibling
 
+const imageInput = document.getElementById("image")
+
 submitButton.addEventListener("click", addRecpie)
 
 function addRecpie() {
@@ -34,7 +36,8 @@ function addRecpie() {
             },
             body: JSON.stringify({
               title: titleInput.value,
-              description: descriptionInput.value
+              description: descriptionInput.value,
+              image: imageInput.value
             })
         }
         fetch('new', postRequest) .then((response) => {

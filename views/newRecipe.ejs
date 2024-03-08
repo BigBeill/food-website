@@ -30,6 +30,15 @@
             <div class="void"></div>
         </div>
 
+        <!-- im kind of just throwing this in, move around later -->
+        <label for="image">Choose a image:</label>
+        <select name="image" id="image">
+            <% imageOptions.forEach((option) => { %>
+                <option value="<%=option%>"> <%=option%> </option>
+            <% }) %>
+        </select>
+
+
         <div class="splitSpace">
             <div class="buttonInput">
                 <input 
