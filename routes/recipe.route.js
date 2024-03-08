@@ -9,7 +9,7 @@ router.get('/new', (req, res) => {
     if (req.user){
         res.render("newRecipe")
     } else{
-        res.render("/index")
+        res.redirect("/index")
     }
 })
 
