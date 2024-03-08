@@ -6,15 +6,18 @@
     <div class="pin-inner">
         <div class="pin-front">
             <div class="recipeImage">
-                <%# thinking of having a categorical emoji per recipe%>
-                &#129374
+                <%# thinking of having a categorical emoji per recipe %>
+                <%= recipe.image%>
             </div>
             <div class="recipeTitle">
                 <h2> <%= recipe.title %></h4>
-
             </div>
         </div>
         <div class="pin-back">
+            <div class="recipeImage">
+                <%# thinking of having a categorical emoji per recipe %>
+                <%= recipe.image%>
+            </div>
             <p> <%= recipe.description %> </p>
         </div>
     </div>
