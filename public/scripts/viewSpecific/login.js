@@ -37,6 +37,7 @@ function attemptLogin() {
   }
   
   if (!errors){
+    // submit a login post request to try and sign user in
     var postRequest = {
       method: 'POST',
       headers: {
@@ -48,11 +49,50 @@ function attemptLogin() {
         password: passwordInput.value
       })
     }
-    fetch('login', postRequest) .then((response) => {
+    fetch('login', postRequest) 
+    .then((response) => {
+
+      //if postRequest to login returns a redirect, go to new page
       if (response.redirected){
         location.assign(response.url)
+        exit()
       }
-      console.log(response)
+
+      //if no redirect given, submit a getRequest to tools/getFlash to find out why
+      var getRequest = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: "application/json",
+        }
+      }
+
+      fetch('/tools/getFlash', getRequest) 
+      .then(response => response.json()) 
+      .then((data) => {
+        try{
+          //grab the error from flashMessages
+          var message = data.flashMessage.error[0]
+
+          //show user why they were not able to sign in
+          if (message == "badUser"){
+            usernameInvalid.classList.remove("hidden")
+            passwordInvalid.classList.add("hidden")
+          } else if (message == "badPass"){
+            usernameInvalid.classList.add("hidden")
+            passwordInvalid.classList.remove("hidden")
+          } else {
+            //if unexpected error returned print to client console for debugging
+            usernameInvalid.classList.add("hidden")
+            passwordInvalid.classList.add("hidden")
+            console.log("unexpected flash given from passport: ", message)
+          }
+
+        } catch {
+          //if any issues with getting error from tools/getFlash, notify client by printing to console
+          console.log("error reading flash message from passport")
+        }
+      })
     })
    }
 }

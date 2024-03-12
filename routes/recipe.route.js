@@ -7,6 +7,7 @@ const recipeSchema = require("../schemas/recipe")
 // ------------ recipe get routes ------------
 
 router.get('/new', async (req, res) => {
+    console.log("recipe/new get request triggered...")
     if (req.user){
         const imageOptions = await recipeSchema.schema.path('image').enumValues
         res.render("newRecipe", {imageOptions: imageOptions})
@@ -20,6 +21,7 @@ router.get('/new', async (req, res) => {
 // ---------- recipe post routes ------------
 
 router.post('/new', (req, res) => {
+    console.log("recipe/new post request triggered...")
     const newRecipe = new recipe ({
         owner: req.user._id,
         title: req.body.title,

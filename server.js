@@ -6,6 +6,7 @@ const mongoConnection = require ('./config/connectMongo')
 const session = require ('express-session')
 const MongoStore = require('connect-mongo')(session)
 const passport = require('passport')
+const flash = require('connect-flash')
 
 //setup server
 const app = express()
@@ -15,6 +16,7 @@ app.use(expressLayouts)
 app.use(express.static('public'))
 app.use(bodyParser.urlencoded({limit: '10mb', extended: false}))
 app.use(express.json());
+app.use(flash())
 
 // setup sessionStore using mongo db
 const sessionStore = new MongoStore({
@@ -35,12 +37,15 @@ require('./config/passport')
 app.use(passport.initialize())
 app.use(passport.session())
 
-//some print stuff for debugging
 app.use((req, res, next) => {
     res.locals.user = req.user
+
+    //some print stuff for debugging
+    /*
     console.log()
     console.log(req.session)
     console.log(req.user)
+    */
     next()
 })
 
@@ -55,6 +60,9 @@ app.use('/user', userRouter)
 
 const recipeRouter = require('./routes/recipe.route')
 app.use('/recipe', recipeRouter)
+
+const toolsRouter = require('./routes/tools.route')
+app.use('/tools', toolsRouter)
 
 //listen to port
 app.listen(3000)

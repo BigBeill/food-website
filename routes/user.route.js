@@ -11,18 +11,22 @@ const users = require('../schemas/user')
 // ------------ User Get Routes ------------
 
 router.get('/', (req, res) => {
+    console.log("user/ get request triggered...")
     res.render('index')
 })
 
 router.get('/login', (req, res) => {
+    console.log("user/login get request triggered...")
     res.render('user/login')
 })
 
 router.get('/register', (req, res) => {
+    console.log("user/register get request triggered...")
     res.render('user/register')
 })
 
 router.get('/profile', async (req, res) => {
+    console.log("user/profile get request triggered...")
     if (req.user){
         var result
         result = await recipes.find()
@@ -42,12 +46,20 @@ router.get('/profile', async (req, res) => {
 
 // ------------ User Post Routes ------------
 
-router.post('/login', passport.authenticate('local', {
-    failureMessage: true,
-    successRedirect: '/index'
-}))
+router.post('/login', (req, res, next) => {
+    console.log("user/login post request triggered...")
+    next()
+},
+    passport.authenticate('local', {
+        successRedirect: '/index',
+        failureFlash: true
+    }
+))
+
+router.post('/login')
 
 router.post('/register', async (req, res, next) => {
+    console.log("user/register post request triggered...")
 
     //list of items that needs to be true for username to be added
     checklist = {
@@ -87,7 +99,7 @@ router.post('/register', async (req, res, next) => {
 })
 
 router.post('/logout', (req, res) => {
-    console.log("attempting logut")
+    console.log("user/logout post request triggered...")
     req.logout( (err) => {
         res.redirect("login")
     })
