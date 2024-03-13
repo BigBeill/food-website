@@ -30,7 +30,6 @@ router.get('/profile', async (req, res) => {
     if (req.user){
         var result
         result = await recipes.find()
-        console.log(result)
         data = {
             username: req.user.username,
             email: req.user.email,
@@ -40,6 +39,14 @@ router.get('/profile', async (req, res) => {
     }else{
         res.render('user/login')
     }
+})
+
+router.get("/friends", (req, res) => {
+    
+})
+
+router.get("/friendRequests", (req, res) => {
+
 })
 
 

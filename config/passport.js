@@ -11,8 +11,10 @@ const customFields = {
 
 const verifyCallback = (username, password, done) => {
 
-    User.findOne({ username: username})
+    User.findOne({ username: username}).select('+hash +salt')
         .then((user) => {
+
+            console.log(user)
 
             if (!user) { 
                 return done(null, false, { message: 'badUser' })
@@ -21,6 +23,8 @@ const verifyCallback = (username, password, done) => {
             const isValid = validPassword(password, user.hash, user.salt)
 
             if (isValid) {
+                delete user.hash
+                delete user.salt
                 return done(null, user, {message: 'authenticated'})
             } else {
                 return done(null, false, { message: 'badPass' })
