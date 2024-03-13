@@ -41,14 +41,8 @@ router.get('/profile', async (req, res) => {
     }
 })
 
-router.get("/friends", (req, res) => {
-    
-})
-
-router.get("/friendRequests", (req, res) => {
-
-})
-
+const friendsRouter = require("./userSubroutes/friends.route")
+router.use('/friends', friendsRouter)
 
 
 // ------------ User Post Routes ------------
