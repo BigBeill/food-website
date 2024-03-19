@@ -28,8 +28,7 @@ router.get('/register', (req, res) => {
 router.get('/profile', async (req, res) => {
     console.log("user/profile get request triggered...")
     if (req.user){
-        var result
-        result = await recipes.find()
+        var result = await recipes.find({owner: req.user._id})
         data = {
             username: req.user.username,
             email: req.user.email,
@@ -39,6 +38,18 @@ router.get('/profile', async (req, res) => {
     }else{
         res.render('user/login')
     }
+})
+
+router.get('/findUser/:datatype/:value', async (req, res) => {
+    console.log("user/findUser get request triggered...")
+    var input = req.params
+    console.log(input)
+    var query = {}
+    query[input.datatype] = {'$regex': input.value}
+    var result = await User.find(query)
+    console.log(result)
+    res.send(result)
+    
 })
 
 const friendsRouter = require("./userSubroutes/friends.route")
@@ -56,8 +67,6 @@ router.post('/login', (req, res, next) => {
         failureFlash: true
     }
 ))
-
-router.post('/login')
 
 router.post('/register', async (req, res, next) => {
     console.log("user/register post request triggered...")
