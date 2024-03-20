@@ -21,7 +21,7 @@ function getUsers() {
         }
         data.forEach(userInfo => {
             // I want to try and make this work with include() or something, ill need to figure this out later
-            output.innerHTML += include('../../partials/userPin.ejs') +
+            output.innerHTML +=
                 `<div class="userPin">
                     <p>` + userInfo.username + `</p>
                 </div>`
