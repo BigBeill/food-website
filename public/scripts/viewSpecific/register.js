@@ -61,7 +61,8 @@ submitButton.addEventListener("click", () => {
               password: passwordInputOne.value
             })
         }
-        fetch('register', postRequest) .then((response) => {
+        fetch('register', postRequest) 
+        .then((response) => {
             console.log(response)
             if (response.redirected){
                 location.assign(response.url)

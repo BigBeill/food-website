@@ -20,11 +20,34 @@ function getUsers() {
             output.innerHTML = "<p>no users found</p>"
         }
         data.forEach(userInfo => {
-            // I want to try and make this work with include() or something, ill need to figure this out later
             output.innerHTML +=
                 `<div class="userPin">
                     <p>` + userInfo.username + `</p>
+                    <button class="addFriendButton" id="friendId_` + userInfo._id + `"> Add friend </button>
                 </div>`
         });
+        addButtonListeners()
+    })
+}
+
+function addButtonListeners () {
+    var addFriendButtons = document.getElementsByClassName("addFriendButton")
+    Array.prototype.forEach.call(addFriendButtons, (button) => {
+        button.addEventListener("click", (event) => {
+            var postRequest = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: "application/json"
+                },
+                body: JSON.stringify({
+                    id: button.id.replace("friendId_", "")
+                })
+            }
+            fetch('sendRequest', postRequest)
+            .then((response) => {
+                button.classList.add("hidden")
+            })
+        })
     })
 }

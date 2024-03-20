@@ -43,11 +43,9 @@ router.get('/profile', async (req, res) => {
 router.get('/findUser/:datatype/:value', async (req, res) => {
     console.log("user/findUser get request triggered...")
     var input = req.params
-    console.log(input)
     var query = {}
     query[input.datatype] = {'$regex': input.value}
     var result = await User.find(query)
-    console.log(result)
     res.send(result)
     
 })
