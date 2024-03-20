@@ -10,30 +10,42 @@ input.addEventListener("keydown", (event) => {
 })
 
 function getUsers() {
+    //empty username section
     output.innerHTML = ""
     
+    //get all usernames from db that match search
     fetch('/user/findUser/username/' + input.value)
     .then(response => response.json())
     .then(data => {
         console.log(data)
+
+        //if no usernames found that match search, tell user
         if (data.length == 0){
             output.innerHTML = "<p>no users found</p>"
+        } 
+        
+        //display any usernames returned by query to user, with a button to go with each username
+        else {
+            data.forEach(userInfo => {
+                output.innerHTML +=
+                    `<div class="userPin">
+                        <p>` + userInfo.username + `</p>
+                        <button class="addFriendButton" id="friendId_` + userInfo._id + `"> Add friend </button>
+                    </div>`
+            });
+            //add an event listener to each button associated with a username
+            addButtonListeners()
         }
-        data.forEach(userInfo => {
-            output.innerHTML +=
-                `<div class="userPin">
-                    <p>` + userInfo.username + `</p>
-                    <button class="addFriendButton" id="friendId_` + userInfo._id + `"> Add friend </button>
-                </div>`
-        });
-        addButtonListeners()
     })
 }
 
 function addButtonListeners () {
+    //get all buttons that have been associated with a username
     var addFriendButtons = document.getElementsByClassName("addFriendButton")
     Array.prototype.forEach.call(addFriendButtons, (button) => {
+        //add a click event listener to each button
         button.addEventListener("click", (event) => {
+            //on click seond a post request to server to attach friend request to target
             var postRequest = {
                 method: 'POST',
                 headers: {
@@ -45,6 +57,7 @@ function addButtonListeners () {
                 })
             }
             fetch('sendRequest', postRequest)
+            //once response is given remove button (will change to only remove button if post request was successfull later)
             .then((response) => {
                 button.classList.add("hidden")
             })
