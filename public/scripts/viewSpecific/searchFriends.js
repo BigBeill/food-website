@@ -10,16 +10,21 @@ input.addEventListener("keydown", (event) => {
 })
 
 function getUsers() {
-    output.innerHTML == ""
+    output.innerHTML = ""
     
     fetch('/user/findUser/username/' + input.value)
     .then(response => response.json())
     .then(data => {
+        console.log(data)
         if (data.length == 0){
-            output.innerHTML == "<p>no users found</p>"
+            output.innerHTML = "<p>no users found</p>"
         }
-        data.forEach(info => {
-            output.innerHTML += ""
+        data.forEach(userInfo => {
+            // I want to try and make this work with include() or something, ill need to figure this out later
+            output.innerHTML += include('../../partials/userPin.ejs') +
+                `<div class="userPin">
+                    <p>` + userInfo.username + `</p>
+                </div>`
         });
     })
 }
