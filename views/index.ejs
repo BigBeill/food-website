@@ -9,6 +9,7 @@
     <h1>Recipes</h1>
 
     <div class="recipesDisplayContainer">
+        <%= console.log(recipes) %>
         <% if(recipes){ %>
             <% recipes.forEach((recipe) => { %>
                 <%- include('./partials/pin.ejs', { recipe: recipe }) %>

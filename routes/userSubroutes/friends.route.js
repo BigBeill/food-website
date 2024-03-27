@@ -11,12 +11,18 @@ router.get("/list", (req, res) => {
     if (req.user){
         res.render('user/friends/friendsList')
     } else {
-        res.render('user/login')
+        res.redirect('/user/login')
     }
 })
 
-router.get("/requests", (req, res) => {
+router.get("/requests", async (req, res) => {
     console.log("user/friends/request get request triggered...")
+    if (req.user){
+        var results = await users.findOne({_id: req.user._id}).select('friendRequests')  
+        res.render('user/friends/requestList', {requests: results.friendRequests})
+    } else {
+        res.redirect('/user/login')
+    }
 })
 
 router.get("/search", async (req, res) => {
@@ -24,7 +30,7 @@ router.get("/search", async (req, res) => {
     if (req.user){
         res.render('user/friends/searchFriends')
     } else {
-        res.render('user/login')
+        res.redirect('/user/login')
     }
 })
 

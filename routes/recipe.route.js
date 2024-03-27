@@ -36,5 +36,4 @@ router.post('/new', (req, res) => {
     res.redirect('/index')
 })
 
-
 module.exports = router

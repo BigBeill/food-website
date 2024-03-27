@@ -43,11 +43,16 @@ router.get('/profile', async (req, res) => {
 router.get('/findUser/:datatype/:value', async (req, res) => {
     console.log("user/findUser get request triggered...")
     var input = req.params
-    var query = {}
-    query[input.datatype] = {'$regex': input.value}
-    var result = await User.find(query)
-    res.send(result)
-    
+    console.log("searching database: datatype = " + input.datatype + " value = " + input.value)
+    if (input.datatype == "_id"){
+        result = await User.findOne({_id: input.value})
+        res.send(result)
+    } else {
+        var query = {}
+        query[input.datatype] = {'$regex': input.value}
+        var result = await User.find(query)
+        res.send(result)
+    }
 })
 
 const friendsRouter = require("./userSubroutes/friends.route")

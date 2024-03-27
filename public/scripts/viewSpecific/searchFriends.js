@@ -12,7 +12,12 @@ input.addEventListener("keydown", (event) => {
 function getUsers() {
     //empty username section
     output.innerHTML = ""
-    
+
+    if (input.value.length == 0){
+        output.innerHTML = "<p>invalid search</p>"
+        return
+    }
+
     //get all usernames from db that match search
     fetch('/user/findUser/username/' + input.value)
     .then(response => response.json())
@@ -56,6 +61,9 @@ function addButtonListeners () {
                     id: button.id.replace("friendId_", "")
                 })
             }
+
+            console.log(postRequest)
+
             fetch('sendRequest', postRequest)
             //once response is given remove button (will change to only remove button if post request was successfull later)
             .then((response) => {
