@@ -1,1 +1,0 @@
-const pin = document.getElementById("pin")
