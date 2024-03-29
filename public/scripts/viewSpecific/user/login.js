@@ -55,7 +55,6 @@ function attemptLogin() {
       //if postRequest to login returns a redirect, go to new page
       if (response.redirected){
         location.assign(response.url)
-        exit()
       }
 
       //if no redirect given, submit a getRequest to tools/getFlash to find out why

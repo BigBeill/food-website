@@ -40,48 +40,39 @@ router.get("/search", async (req, res) => {
 
 router.post("/sendRequest", async (req, res) => {
     console.log("user/friend/sendRequest post request triggered...")
-    console.log(req.user._id)
     if (req.user){
-        user.updateOne({_id: req.body.id}, {$addToSet: {friendRequests: req.user._id}})
-        .then((response) => {
-            console.log(response)
-        })
+        await user.updateOne({_id: req.body.id}, {$addToSet: {friendRequests: req.user._id}})
+        res.send({message: "friend request sent"})
+    } else { 
+        res.send({message: "current user is not signed in"})
     }
-    res.send()
 })
 
-router.post("/processRequest", async (req, res) => {
-    console.log("user/friends/processRequest post request triggered...")
-    console.log("current user id: " + req.user._id)
-    console.log("target user id: " + req.body.id)
-    console.log("action type: " + req.body.action)
-
-    //repsonse message will be sent as a response to the client
-    //if this post request is working correctly responseMessage will be overwriten with something else
-    //if client recieves "request failed" something went wrong with post request
-    responseMessage = "request failed"
-
-    if (req.body.action == "request"){
-
-    } else if (req.body.action == "accept") {
-        console.log("attempting to accept friend request...")
-        //make sure current user actually possesses a friend request from target user
-        hasRequest = user.findOne({_id: req.user._id, friendRequests: {$in: [req.body.id]}})
-        if(!hasRequest){
-            console.log("no original friend request found")
-            responseMessage = "no friend request from target user found"
+router.post("/acceptRequest", async (req, res) => {
+    console.log("user/friend/acceptRequest post request triggered...")
+    if (req.user){
+        result = user.findOne({_id: req.user._id, friendRequests: {$in: [req.body.id]}})
+        if (!result){
+            res.send({message: "current user does not have a valid friend request from target"})
         } else {
-            console.log("original friend request found")
-            //user.updateOne({_id: req.user._id}, {$addToSet: {friends: req.user._id}}) .then((response) => {console.log(response)})
-            //user.updateOne({_id: req.body.id}, {$addToSet: {friends: req.user._id}}) .then((response) => {console.log(response)})
+            await user.updateOne({_id: req.user._id}, {$pull: {friendRequests: req.body.id}})
+            await user.updateOne({_id: req.user._id}, {$addToSet: {friends: req.body.id}})
+            await user.updateOne({_id: req.body.id}, {$addToSet: {friends: req.user._id}})
+            res.send({message: "friend added"})
         }
-
-    } else if (req.body.action == "reject") {
-
+    } else {
+        res.send ({message: "current user is not signed in"})
     }
+})
 
-    console.log("sending message to client: " + responseMessage)
-    res.send(responseMessage)
+router.post("/rejectRequest", async (req, res) => {
+    console.log("user/friend/rejectRequest post request triggered...")
+    if (req.user){
+        await user.updateOne({_id: req.user._id}, {$pull: {friendRequests: req.body.id}})
+        res.send({message: "friend request removed"})
+    } else {
+        res.send({message: "current user is not signed in"})
+    }
 })
 
 module.exports = router

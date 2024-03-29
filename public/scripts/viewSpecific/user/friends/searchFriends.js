@@ -63,8 +63,7 @@ function addButtonListeners () {
             }
 
             fetch('sendRequest', postRequest)
-            //once response is given remove button (will change to only remove button if post request was successfull later)
-            .then((response) => {
+            .then(() => {
                 button.classList.add("hidden")
             })
         })

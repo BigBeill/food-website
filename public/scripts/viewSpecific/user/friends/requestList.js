@@ -1,7 +1,7 @@
 console.log(input)
 output = document.getElementById("usernameSection")
 
-if (!input){
+if (input.length == 0){
     output.innerHTML = "<p> No pending friend requests </p>"
 } else {
     count = 0
@@ -29,7 +29,7 @@ if (!input){
 function addButtonListeners() {
     acceptButtons = document.getElementsByClassName("acceptFriendButton")
     console.log(acceptButtons)
-    Array.prototype.forEach.call(acceptButtons, (button) => {s
+    Array.prototype.forEach.call(acceptButtons, (button) => {
         button.addEventListener("click", (event) => {
             userId = button.id.replace("acceptId_", "")
             console.log("attempting to accept friend request from id: " + userId)
@@ -40,12 +40,11 @@ function addButtonListeners() {
                     Accept: "application/json"
                 },
                 body: JSON.stringify({
-                    id: button.id.replace("acceptId_", ""),
-                    action: "accept"
+                    id: button.id.replace("acceptId_", "")
                 })
             }
 
-            fetch('processRequest', postRequest)
+            fetch('acceptRequest', postRequest)
             .then((response) => {
                 console.log(response)
                 button.classList.add("hidden")
@@ -65,12 +64,11 @@ function addButtonListeners() {
                     Accept: "application/json"
                 },
                 body: JSON.stringify({
-                    id: userId,
-                    action: "reject"
+                    id: button.id.replace("rejectId_", "")
                 })
             }
 
-            fetch('processRequest', postRequest)
+            fetch('rejectRequest', postRequest)
             .then((response) => {
                 console.log(response)
                 button.classList.add("hidden")
