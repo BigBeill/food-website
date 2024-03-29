@@ -65,4 +65,5 @@ const toolsRouter = require('./routes/tools.route')
 app.use('/tools', toolsRouter)
 
 //listen to port
-app.listen(3000)
+const PORT = 4000
+app.listen(PORT, () => {console.log("Server started on port " + PORT)})
