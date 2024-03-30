@@ -10,11 +10,27 @@ function Nav() {
     const [items, setItems] = useState ([])
 
     const fetchItems = async() => {
+        console.log("test")
         const data = await fetch('/user/data')
+        .then(response => console.log(response))
+        console.log("test2")
+        const items = await data.json()
+        console.log("test3")
+        setItems(items)
     }
 
 
     return(
+        <>
+        {
+            items.map(item => {
+                <div>
+                    <p>{item.messageOne}</p>
+                    <p>{item.messageTwo}</p>
+                </div>
+            })
+        }
+
         <nav className="navBar" id="navBar">
 
             <h3>Find Recipes</h3>
@@ -23,6 +39,7 @@ function Nav() {
             <a href="/index">Search</a>
 
         </nav>
+        </>
     )
 }
 

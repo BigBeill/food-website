@@ -10,6 +10,15 @@ const users = require('../schemas/user')
 
 // ------------ User Get Routes ------------
 
+router.get('/userInfo', (req, res) => {
+    console.log("user/userInfo get request triggered...")
+    message = [{
+        "messageOne": "test",
+        "messageTwo": "testing"
+    }]
+    res.end(JSON.stringify(message))
+})
+
 router.get('/', (req, res) => {
     console.log("user/ get request triggered...")
     res.render('index')

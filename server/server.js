@@ -40,12 +40,10 @@ app.use(passport.session())
 app.use((req, res, next) => {
     res.locals.user = req.user
 
-    //some print stuff for debugging
-    /*
     console.log()
     console.log(req.session)
     console.log(req.user)
-    */
+
     next()
 })
 

@@ -7,22 +7,12 @@ function App() {
 
   const [backendData, setBackendData] = useState([{}])
 
-  useEffect(() => {
-    fetch("/api")
-    .then (response => response.json()) 
-    .then (
-      data => {
-        setBackendData(data)
-      }
-    )
-  }, [])
-
   return (
     <BrowserRouter>
       <div>
         <Nav />
         <Routes>
-          <Route path="/" exact component={Home} />
+          <Route path="/" exact element={<Home />} />
         </Routes>
       </div>
     </BrowserRouter>
