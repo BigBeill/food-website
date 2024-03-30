@@ -47,6 +47,11 @@ app.use((req, res, next) => {
     next()
 })
 
+app.use('/server', (req, res, next) => {
+    console.log("request made from client")
+    next()
+})
+
 //redirect requests to routers
 const indexRouter = require('./routes/index.route')
 app.use('/', indexRouter)

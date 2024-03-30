@@ -10,20 +10,19 @@ function Nav() {
     const [items, setItems] = useState ([])
 
     const fetchItems = async() => {
-        console.log("test")
-        const data = await fetch('api/user/data')
-        .then(response => console.log(response))
-        console.log("test2")
-        const items = await data.json()
-        console.log("test3")
-        setItems(items)
+        await fetch('server/user/userInfo')
+        .then(response => { return response.json() })
+        .then(items => {
+            console.log(items)
+            setItems(items)
+        })
     }
 
 
     return(
         <>
         {
-            items.map(item => {
+            items.forEach(item => {
                 <div>
                     <p>{item.messageOne}</p>
                     <p>{item.messageTwo}</p>
