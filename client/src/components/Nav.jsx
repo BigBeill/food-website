@@ -11,7 +11,7 @@ function Nav() {
 
     const fetchItems = async() => {
         console.log("test")
-        const data = await fetch('/user/data')
+        const data = await fetch('api/user/data')
         .then(response => console.log(response))
         console.log("test2")
         const items = await data.json()
