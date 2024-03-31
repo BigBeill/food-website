@@ -12,11 +12,8 @@ const users = require('../schemas/user')
 
 router.get('/userInfo', (req, res) => {
     console.log("user/userInfo get request triggered...")
-    message = {
-        "messageOne": "test",
-        "messageTwo": "testing"
-    }
-    res.end(JSON.stringify(message))
+    data = req.user
+    res.end(JSON.stringify(data))
 })
 
 router.get('/', (req, res) => {
@@ -64,7 +61,8 @@ router.get('/findUser/:datatype/:value', async (req, res) => {
     }
 })
 
-const friendsRouter = require("./userSubroutes/friends.route")
+const friendsRouter = require("./userSubroutes/friends.route");
+const { response } = require("express");
 router.use('/friends', friendsRouter)
 
 

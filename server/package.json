@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "server": "nodemon server.js",
-    "client": "npm run client --prefix ../frontend",
+    "client": "npm run client --prefix ../client",
     "dev": "concurrently --kill-other-on-fail \"npm run server\" \"npm run client\""
   },
   "author": "Mackenzie Neill",
