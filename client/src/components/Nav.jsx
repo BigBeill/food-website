@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {Link} from 'react-router-dom'
+import './nav.css'
 
 function Nav(data) {
     console.log("building the nav bar")

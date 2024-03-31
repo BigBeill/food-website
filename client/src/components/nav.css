@@ -1,0 +1,100 @@
+/* css for navBar */
+.pageContainer{
+  display:flex;
+  flex-direction:row;
+}
+
+nav{
+  padding:1rem;
+  top: 0;
+  width: 12rem;
+  border-right: 0.3rem solid var(--base-color);
+  box-shadow: 0.06rem 0.06rem 0.15rem #2C1A1D;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+}
+
+nav>h3{
+  font-weight: 500;
+}
+
+.mainDiv{
+  display:block;
+  padding:2rem;
+  padding-top:0;
+    width: auto;
+    height: auto;
+}
+
+.thumbButton{
+  position: fixed;
+  bottom: 2.4rem;
+  left: -3.6rem;
+  width: 3.6rem;
+  height: 3.6rem;
+  background-color: var(--base-color);
+  border-radius: 0rem .45rem .45rem 0rem;
+  box-shadow: none;
+}
+
+@media only screen and (max-width: 720px) {
+  
+ nav{
+   left: -12.3rem;
+   box-shadow: none;
+   transition: all 0.3s ease-in-out;
+ }
+ 
+ nav.open{
+   left: 0;
+   box-shadow: 0.06rem 0.06rem 0.15rem #2C1A1D;
+ }
+ 
+  .mainDiv{
+    padding: .3rem;
+    width: auto;
+  }
+  
+  .thumbButton{
+    left: 0;
+    box-shadow: 0.06rem 0.06rem 0.15rem #2C1A1D;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  nav.open .thumbButton{
+    left: 12.3rem;
+  }
+}
+
+nav .logo{
+    margin-top: .9rem;
+    margin-left: .9rem;
+    margin-right: .9rem;
+}
+
+nav a, nav button{
+    margin-left: 1.5rem;
+    padding: .3rem;
+    padding-left: .6rem;
+    background-color: #ffffff;
+    border: none;
+    border-left: .09rem solid #2C1A1D;
+    text-align: start;
+    font-family: Inter, "Inter Fallback";
+    font-size: 18px;
+    color: #2C1A1D;
+    text-decoration: none;
+    transition: all 0.03s ease-in-out;
+}
+
+nav a:hover, nav button:hover{
+    margin-left: 1.5rem;
+    padding: .3rem;
+    padding-left: .9rem;
+    font-size: 18px;
+    color: #2C1A1D;
+    text-decoration: none;
+    text-shadow: 1px 0px 0px #2C1A1D;
+    cursor: pointer;
+}
