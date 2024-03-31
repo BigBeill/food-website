@@ -11,27 +11,26 @@ function Nav() {
 
     const fetchItems = async() => {
         await fetch('server/user/userInfo')
-        .then(response => { return response.json() })
-        .then(items => {
-            console.log(items)
-            setItems(items)
-        })
+        .then(response => response.json() )
+        .then(data => {setItems([data])})
     }
 
 
     return(
         <>
-        {
-            items.forEach(item => {
-                <div>
-                    <p>{item.messageOne}</p>
-                    <p>{item.messageTwo}</p>
-                </div>
-            })
-        }
-
         <nav className="navBar" id="navBar">
+            {items.map((item, index) => (
+                <>
+                    {console.log(item)}
+                    <div>testing</div>
+                    <div>{item.messageOne}</div>
+                    <div>{item.messageTwo}</div>
+                </>
+            ))
 
+            }
+
+            
             <h3>Find Recipes</h3>
             <a href="/index">Public</a>
             <a href="/index">Following</a>

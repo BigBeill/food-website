@@ -12,10 +12,10 @@ const users = require('../schemas/user')
 
 router.get('/userInfo', (req, res) => {
     console.log("user/userInfo get request triggered...")
-    message = [{
+    message = {
         "messageOne": "test",
         "messageTwo": "testing"
-    }]
+    }
     res.end(JSON.stringify(message))
 })
 
