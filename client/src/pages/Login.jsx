@@ -2,7 +2,7 @@
 
 
 function Login(){
-  console.log("building log in form")
+  console.log("building login form")
 
   return(
     <>

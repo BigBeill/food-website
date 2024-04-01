@@ -29,7 +29,7 @@ function Nav(data) {
 
             <h3>Account</h3>
             <a href="/profile">Profile</a>
-
+            
             </> : <>
             
             <h3>Account</h3>
