@@ -21,12 +21,14 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div>
+      <div className='splitSpace background'>
         <Nav userData = {userData}/>
-        <Routes>
-          <Route path="/" exact element={<Home />} />
-          <Route path="/login" exact element={<Login />} />
-        </Routes>
+        <div>
+          <Routes>
+            <Route path="/" exact element={<Home />} />
+            <Route path="/login" exact element={<Login />} />
+          </Routes>
+        </div>
       </div>
     </BrowserRouter>
   )
