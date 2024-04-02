@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Nav from './components/Nav'
-import Home from './pages/Home'
 import Login from './pages/Login'
+import Home from './pages/Home'
 
 function App() {
 
@@ -16,19 +16,17 @@ function App() {
       await fetch('server/user/userInfo')
       .then(response => response.json())
       .then(data => {setUserData([data])})
-      .catch(() => {console.log("no user found")})
+      .catch(error => {console.error("No user found", error);})
   }
 
   return (
     <BrowserRouter>
       <div className='splitSpace background'>
         <Nav userData = {userData}/>
-        <div>
-          <Routes>
-            <Route path="/" exact element={<Home />} />
-            <Route path="/login" exact element={<Login />} />
-          </Routes>
-        </div>
+        <Routes>
+          <Route path="/" exact element={<Home />} />
+          <Route path="/login" exact element={<Login />} />
+        </Routes>
       </div>
     </BrowserRouter>
   )
