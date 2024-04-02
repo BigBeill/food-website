@@ -1,7 +1,17 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 function Pin({ recipe }) {
+    import('./pin.css')
 
+
+    Pin.propTypes = {
+        recipe: PropTypes.shape({
+          image: PropTypes.string,
+          title: PropTypes.string,
+          description: PropTypes.string,
+        }).isRequired,
+      };
     return (
         <div className="pin" id="pin"> 
           <div className="pin-inner">

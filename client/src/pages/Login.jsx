@@ -9,7 +9,7 @@ function Login(){
 
   return(
     <>
-    <div className="loginForm" id="loginForm">
+    <div className="loginForm split" id="loginForm">
       <h1>Login</h1>
       
       <div className="textInput">

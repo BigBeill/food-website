@@ -4,6 +4,7 @@
                 
 :root{
   font-size: 1rem;
+  letter-spacing: 1px;
   font-family: 'Coolvetica', sans-serif;
   background-color: #f5f8fa;
   --base-color: #065F46;
@@ -163,7 +164,7 @@ display: none;
   padding: 0rem;
   gap:1rem;
 }
-.splitSpace div{
+.split{
   width: 100%;
 }
 
