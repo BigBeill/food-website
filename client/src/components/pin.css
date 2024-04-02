@@ -12,11 +12,7 @@ h4 {
 p {
     margin-left: .9rem;
 }
-.recipesDisplayContainer{
-    display:flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-}
+
 .recipeImage{
     display:flex;
     flex-direction: row;
