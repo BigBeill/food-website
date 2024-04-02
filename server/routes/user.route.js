@@ -16,16 +16,6 @@ router.get('/userInfo', (req, res) => {
     res.end(JSON.stringify(data))
 })
 
-router.get('/', (req, res) => {
-    console.log("user/ get request triggered...")
-    res.render('index')
-})
-
-router.get('/login', (req, res) => {
-    console.log("user/login get request triggered...")
-    res.render('user/login')
-})
-
 router.get('/register', (req, res) => {
     console.log("user/register get request triggered...")
     res.render('user/register')
@@ -70,6 +60,7 @@ router.use('/friends', friendsRouter)
 
 router.post('/login', (req, res, next) => {
     console.log("user/login post request triggered...")
+    console.log(req.body)
     next()
 },
     passport.authenticate('local', {

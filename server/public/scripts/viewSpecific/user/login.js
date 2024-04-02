@@ -1,4 +1,8 @@
-//js that goes with login page
+
+
+// login page moved over to react, router should not refrence this page anymore
+
+
 
 const loginForm = document.getElementById("loginForm");
 const submitButton = document.getElementById("submitButton");

@@ -11,7 +11,7 @@ function Nav(data) {
         <nav className="navBar" id="navBar">
 
         <h3>Find Recipes</h3>
-        <a href="/index">Public</a>
+        <a href="/">Public</a>
         <a href="/index">Following</a>
         <a href="/index">Search</a>
 

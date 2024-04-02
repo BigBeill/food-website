@@ -1,11 +1,36 @@
-import React, { Suspense } from 'react'
+import React, { useState, useEffect } from 'react'
+import { Navigate } from 'react-router-dom'
 import './login.css'
-
 
 function Login(){
   console.log("building login form")
-  import('./loginImage.css')
 
+  useEffect(() => {
+    console.log("importing image")
+    import('./loginImage.css')
+  }, [])
+
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+
+  function attemptLogin(){
+    console.log("Login button clicked")
+
+    const postRequest = {
+      method: 'POST',
+      headers: { 'Content-type': 'application/json; charset=UTF-8', },
+      body: JSON.stringify({
+        username: username,
+        password: password,
+      })
+    }
+
+    fetch("server/user/login", postRequest)
+    .then(response => {
+      console.log(response) 
+      location.assign('/')
+    })
+  }
 
   return(
     <>
@@ -16,10 +41,12 @@ function Login(){
         <input 
         type="text" 
         name="userName" 
-        id="uname" 
+        id="username" 
         placeholder=' '
+        value={username}
+        onChange={(event) => setUsername(event.target.value)}
         />
-        <label htmlFor="uname">Username</label>
+        <label htmlFor="username">Username</label>
         <span className="error hidden">No username given</span>
         <span className="error hidden">Username not found</span>
       </div>
@@ -30,6 +57,8 @@ function Login(){
         name="password" 
         id="password" 
         placeholder=' '
+        value={password}
+        onChange={(event) => setPassword(event.target.value)}
         />
         <label htmlFor="password">Password</label>
         <span className="error hidden">No password given</span>
@@ -49,7 +78,11 @@ function Login(){
       <button 
       name="Submit" 
       id="submitButton"
+      onClick={attemptLogin}
       > Login </button>
+
+      <p>dont have an account?</p>
+      <a href='/register'>create account</a>
       
     </div>
     </>

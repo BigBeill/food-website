@@ -24,7 +24,7 @@ function App() {
       <div className='splitSpace background'>
         <Nav userData = {userData}/>
         <Routes>
-          <Route path="/index" exact element={<Home />} />
+          <Route path="/" exact element={<Home />} />
           <Route path="/login" exact element={<Login />} />
         </Routes>
       </div>
