@@ -11,11 +11,11 @@ function Home() {
   const [recipes, setRecipes] = useState([]);
 
   const fetchRecipeData = async() => {
-    await fetch('/server/recipes/publicRecipes')
+    await fetch('server/recipe/publicRecipes')
     .then(response => response.json())
     .then(data => {setRecipes([data]); console.log(data);})
     .catch(error => {console.error("Error fetching Recipes:", error);})
-}
+  }
 
   if (!recipes.length) {
     return <p className="softText">no owned recipes</p>
