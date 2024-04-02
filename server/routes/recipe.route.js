@@ -1,6 +1,6 @@
 const router = require("express").Router()
 const mongoConnection = require('../config/connectMongo') 
-const recipe = mongoConnection.models.recipe
+const recipes = mongoConnection.models.recipe
 const recipeSchema = require("../schemas/recipe")
 
 
@@ -16,13 +16,19 @@ router.get('/new', async (req, res) => {
     }
 })
 
+router.get('/publicRecipes', async (req, res) => {
+    console.log("recipe/publicRecipes get request triggered...")
+    data = await recipes.find()
+    res.end(JSON.stringify(data))
+})
+
 
 
 // ---------- recipe post routes ------------
 
 router.post('/new', (req, res) => {
     console.log("recipe/new post request triggered...")
-    const newRecipe = new recipe ({
+    const newRecipe = new recipes ({
         owner: req.user._id,
         title: req.body.title,
         description: req.body.description,

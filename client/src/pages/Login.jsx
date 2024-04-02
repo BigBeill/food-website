@@ -1,9 +1,10 @@
 import React, { Suspense } from 'react'
+import './login.css'
 
 
 function Login(){
   console.log("building login form")
-  import('./login.css')
+  import('./loginImage.css')
 
 
   return(
@@ -16,6 +17,7 @@ function Login(){
         type="text" 
         name="userName" 
         id="uname" 
+        placeholder=' '
         />
         <label htmlFor="uname">Username</label>
         <span className="error hidden">No username given</span>
@@ -27,6 +29,7 @@ function Login(){
         type="password" 
         name="password" 
         id="password" 
+        placeholder=' '
         />
         <label htmlFor="password">Password</label>
         <span className="error hidden">No password given</span>
@@ -43,14 +46,10 @@ function Login(){
         </div>
       </div>
 
-      <div className="buttonInput">
-        <input 
-        type="submit" 
-        name="Submit" 
-        id="submitButton"
-        value="Login"
-        />
-      </div>
+      <button 
+      name="Submit" 
+      id="submitButton"
+      > Login </button>
       
     </div>
     </>
