@@ -76,7 +76,7 @@ function Login(){
       onClick={attemptLogin}
       > Login </button>
 
-      <p>Dont have an account?</p>
+      <p>Don&apos;t have an account?</p>
       <a href='/register'>create account</a>
       
     </div>
