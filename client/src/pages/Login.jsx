@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { Navigate } from 'react-router-dom'
 import './login.css'
 
 function Login(){
-  console.log("building login form")
 
   useEffect(() => {
-    console.log("importing image")
     import('./loginImage.css')
   }, [])
 
@@ -14,8 +11,6 @@ function Login(){
   const [password, setPassword] = useState("")
 
   function attemptLogin(){
-    console.log("Login button clicked")
-
     const postRequest = {
       method: 'POST',
       headers: { 'Content-type': 'application/json; charset=UTF-8', },
@@ -34,13 +29,13 @@ function Login(){
 
   return(
     <>
-    <div className="loginForm split" id="loginForm">
+    <div className="loginForm" id="loginForm">
       <h1>Login</h1>
       
       <div className="textInput">
         <input 
         type="text" 
-        name="userName" 
+        name="username" 
         id="username" 
         placeholder=' '
         value={username}
@@ -81,7 +76,7 @@ function Login(){
       onClick={attemptLogin}
       > Login </button>
 
-      <p>dont have an account?</p>
+      <p>Dont have an account?</p>
       <a href='/register'>create account</a>
       
     </div>
