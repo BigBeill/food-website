@@ -165,7 +165,7 @@ display: none;
   gap:1rem;
 }
 .split{
-  width: 100%;
+  flex-grow:0.8;
 }
 
 @media only screen and (max-width: 720px) {
