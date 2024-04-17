@@ -65,10 +65,10 @@ router.post('/login', (req, res, next) => {
     passport.authenticate('local', (error, user, info) => {
         if (error) {return res.end(JSON.stringify(error))}
         if (!user) {return res.end(JSON.stringify(info))}
-        if (user) {
-            req.user = user
-            return res.end(JSON.stringify({message: "success"})
-        )}
+        req.login(user, (error) => {
+            if (error) {return res.end(error)}
+            else {return res.end(JSON.stringify({message: "success"}))}
+        })
     })(req, res, next)
 })
 
