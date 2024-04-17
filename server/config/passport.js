@@ -13,11 +13,9 @@ const verifyCallback = (username, password, done) => {
 
     User.findOne({ username: username}).select('+hash +salt')
         .then((user) => {
-
-            console.log(user)
-
+            
             if (!user) { 
-                return done(null, false, { message: 'badUser' })
+                return done(null, false, {message: 'badUser'})
             }
             
             const isValid = validPassword(password, user.hash, user.salt)
@@ -27,7 +25,7 @@ const verifyCallback = (username, password, done) => {
                 delete user.salt
                 return done(null, user, {message: 'authenticated'})
             } else {
-                return done(null, false, { message: 'badPass' })
+                return done(null, false, {message: 'badPass'})
             }
         })
         .catch((err) => {

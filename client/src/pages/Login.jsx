@@ -1,35 +1,50 @@
-import React, { useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import './login.css'
 
 function Login(){
+  const errorRef = useRef()
+
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [errorMessage, setErrorMessage] = useState("")
 
   useEffect(() => {
     import('./loginImage.css')
   }, [])
 
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
-
+  useEffect(() => {
+    setErrorMessage("");
+  }, [username, password])
+ 
   function attemptLogin(){
-    const postRequest = {
-      method: 'POST',
-      headers: { 'Content-type': 'application/json; charset=UTF-8', },
-      body: JSON.stringify({
-        username: username,
-        password: password,
+    if (!username){setErrorMessage("no username given")}
+    else if (!password){setErrorMessage("no password given")}
+    else {
+      const postRequest = {
+        method: 'POST',
+        headers: { 'Content-type': 'application/json; charset=UTF-8', },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+        })
+      }
+
+      fetch("server/user/login", postRequest)
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        if (data.message == "badUser"){setErrorMessage("Username not found")}
+        if (data.message == "badPass"){setErrorMessage("Password incorrect")}
+        if (data.message == "success"){location.assign('/')}
       })
     }
-
-    fetch("server/user/login", postRequest)
-    .then(response => {
-      console.log(response) 
-      location.assign('/')
-    })
   }
+  //location.assign('/')
 
   return(
     <>
     <div className="loginForm" id="loginForm">
+
       <h1>Login</h1>
       
       <div className="textInput">
@@ -42,8 +57,6 @@ function Login(){
         onChange={(event) => setUsername(event.target.value)}
         />
         <label htmlFor="username">Username</label>
-        <span className="error hidden">No username given</span>
-        <span className="error hidden">Username not found</span>
       </div>
 
       <div className="textInput">
@@ -56,8 +69,6 @@ function Login(){
         onChange={(event) => setPassword(event.target.value)}
         />
         <label htmlFor="password">Password</label>
-        <span className="error hidden">No password given</span>
-        <span className="error hidden">Incorrect password</span>
       </div>
 
       <div className="splitSpace">
@@ -75,6 +86,8 @@ function Login(){
       id="submitButton"
       onClick={attemptLogin}
       > Login </button>
+
+      <p ref={errorRef} className={errorMessage ? "error" : "hidden"} area-live="assertive">{errorMessage}</p>
 
       <p>Don&apos;t have an account?</p>
       <a href='/register'>create account</a>

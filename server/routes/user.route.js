@@ -61,13 +61,16 @@ router.use('/friends', friendsRouter)
 router.post('/login', (req, res, next) => {
     console.log("user/login post request triggered...")
     console.log(req.body)
-    next()
-},
-    passport.authenticate('local', {
-        successRedirect: '/index',
-        failureFlash: true
-    }
-))
+
+    passport.authenticate('local', (error, user, info) => {
+        if (error) {return res.end(JSON.stringify(error))}
+        if (!user) {return res.end(JSON.stringify(info))}
+        if (user) {
+            req.user = user
+            return res.end(JSON.stringify({message: "success"})
+        )}
+    })(req, res, next)
+})
 
 router.post('/register', async (req, res, next) => {
     console.log("user/register post request triggered...")
