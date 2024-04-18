@@ -6,6 +6,11 @@ const User = mongoConnection.models.user
 const recipes = require('../schemas/recipe')
 const users = require('../schemas/user')
 
+// ------------ User Subroutes ------------
+const friendsRouter = require("./userSubroutes/friends.route");
+const { json } = require("express");
+router.use('/friends', friendsRouter)
+
 
 
 // ------------ User Get Routes ------------
@@ -14,26 +19,6 @@ router.get('/userInfo', (req, res) => {
     console.log("user/userInfo get request triggered...")
     data = req.user
     res.end(JSON.stringify(data))
-})
-
-router.get('/register', (req, res) => {
-    console.log("user/register get request triggered...")
-    res.render('user/register')
-})
-
-router.get('/profile', async (req, res) => {
-    console.log("user/profile get request triggered...")
-    if (req.user){
-        var result = await recipes.find({owner: req.user._id})
-        data = {
-            username: req.user.username,
-            email: req.user.email,
-            recipes: result
-        }
-        res.render('user/profile', data)
-    }else{
-        res.render('user/login')
-    }
 })
 
 router.get('/findUser/:datatype/:value', async (req, res) => {
@@ -51,16 +36,13 @@ router.get('/findUser/:datatype/:value', async (req, res) => {
     }
 })
 
-const friendsRouter = require("./userSubroutes/friends.route");
-const { response } = require("express");
-router.use('/friends', friendsRouter)
 
 
 // ------------ User Post Routes ------------
 
 router.post('/login', (req, res, next) => {
     console.log("user/login post request triggered...")
-    console.log(req.body)
+    console.log(req.user)
 
     passport.authenticate('local', (error, user, info) => {
         if (error) {return res.end(JSON.stringify(error))}
@@ -72,24 +54,17 @@ router.post('/login', (req, res, next) => {
     })(req, res, next)
 })
 
-router.post('/register', async (req, res, next) => {
+router.post('/register', async (req, res) => {
     console.log("user/register post request triggered...")
 
-    //list of items that needs to be true for username to be added
-    checklist = {
-        usernameAvailable: false,
-        emailAvailable: true, //website does not yet take email
-        userSaved: false
-    }
+    //make sure no data is missing
+    if (!req.body.username) { res.end(JSON.stringify({message: "noUsername"}))}
+    if (!req.body.email) { res.end(JSON.stringify({message: "noEmail"}))}
+    if (!req.body.password) { res.end(JSON.stringify({message: "noPassword"}))}
 
     //check if username is available
     var result = await users.find({username: req.body.username})
-    if (result.length != 0 ){
-        res.send(checklist)
-        return;
-    } else {
-        checklist.usernameAvailable = true
-    }
+    if (result.length != 0 ) { res.end(JSON.stringify({message: "takenUsername"}))}
 
     // hash password
     const saltHash = genPassword(req.body.password)
@@ -104,18 +79,22 @@ router.post('/register', async (req, res, next) => {
     })
 
     // add new user to database
-    newUser.save() .then((user) => {
-        checklist.userSaved = true
-        console.log(user)
+    newUser.save()
+
+    // login new user
+    .then((user) => {
+        req.login(user, (error) => {
+            if (error) { res.end(error)}
+            else { res.end(JSON.stringify({message: "success"}))}
+        })
     })
-    
-    res.redirect('login')
 })
 
 router.post('/logout', (req, res) => {
     console.log("user/logout post request triggered...")
-    req.logout( (err) => {
-        res.redirect("login")
+    req.logout( (error) => {
+        if (error) {res.end(error)}
+        else {res.end(JSON.stringify({message: "success"}))}
     })
 })
 

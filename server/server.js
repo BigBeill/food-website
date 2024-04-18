@@ -52,20 +52,11 @@ app.use('/server', (req, res, next) => {
     next()
 })
 
-//redirect requests to routers
-const indexRouter = require('./routes/index.route')
-app.use('/', indexRouter)
-app.use('/home', indexRouter)
-app.use('/index', indexRouter)
-
 const userRouter = require('./routes/user.route')
 app.use('/user', userRouter)
 
 const recipeRouter = require('./routes/recipe.route')
 app.use('/recipe', recipeRouter)
-
-const toolsRouter = require('./routes/tools.route')
-app.use('/tools', toolsRouter)
 
 //listen to port
 const PORT = 4000

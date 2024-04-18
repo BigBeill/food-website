@@ -4,6 +4,7 @@ import Nav from './components/Nav'
 import Login from './pages/Login'
 import Home from './pages/Home'
 import Register from './pages/Register'
+import Profile from './pages/Profile'
 
 function App() {
 
@@ -28,6 +29,7 @@ function App() {
           <Route path="/" exact element={<Home />} />
           <Route path="/login" exact element={<Login />} />
           <Route path="/register" exact element={<Register />} />
+          <Route path="/profile" exact element={<Profile />} />
         </Routes>
       </div>
     </BrowserRouter>
