@@ -35,7 +35,7 @@ function Register() {
         })
       }
 
-      fetch("sever/user/register", postRequest)
+      fetch("server/user/register", postRequest)
       .then(response => response.json())
       .then(data => {
         if (data.message == "badUser"){setErrorMessage("username taken")}

@@ -7,7 +7,7 @@ function Nav(data) {
         <>
         <nav className="navBar" id="navBar">
 
-            <img class="logo" src="/BigBeill-logo_black.png" alt="Beill Greenhouse Logo" />
+            <img className="logo" src="/BigBeill-logo_black.png" alt="Beill Greenhouse Logo" />
 
 
             <h3>Find Recipes</h3>

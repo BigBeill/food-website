@@ -42,7 +42,6 @@ router.get('/findUser/:datatype/:value', async (req, res) => {
 
 router.post('/login', (req, res, next) => {
     console.log("user/login post request triggered...")
-    console.log(req.user)
 
     passport.authenticate('local', (error, user, info) => {
         if (error) {return res.end(JSON.stringify(error))}
@@ -80,7 +79,7 @@ router.post('/register', async (req, res) => {
 
     // add new user to database
     newUser.save()
-
+ 
     // login new user
     .then((user) => {
         req.login(user, (error) => {
