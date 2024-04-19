@@ -22,7 +22,7 @@ function Nav(data) {
                 <h3>Your Recipes</h3>
                 <a href="/index">Personal</a>
                 <a href="/index">Saved</a>
-                <a href="/createRecipe">New Recipe</a>
+                <a href="/editRecipe">New Recipe</a>
 
                 <h3>Social</h3>
                 <a href="/friendsList">Friends</a>

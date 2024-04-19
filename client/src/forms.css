@@ -1,0 +1,13 @@
+.formTypeA{
+  margin: 6rem 9rem;
+  width: 100%;
+  padding: 3rem;
+  background-color: #fafaf9;
+  border-radius: 0.75rem;
+  box-shadow: 0.09rem 0.09rem 0.3rem #2C1A1D;
+}
+
+.formTypeA h1{
+  text-decoration: underline #065F46;
+  margin-top: 0rem;
+}
