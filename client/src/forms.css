@@ -11,3 +11,28 @@
   text-decoration: underline #065F46;
   margin-top: 0rem;
 }
+
+.formTypeA .textInput{
+  width: 100%;
+  padding-top: .3rem;
+  padding-bottom: .3rem;
+}
+
+.formTypeA .textInput label{
+  display: inline-block;
+  margin-bottom: .09rem;
+}
+
+.formTypeA .textInput input, .formTypeA .textInput textarea{
+  width: 100%;
+  padding: .48rem;
+  background-color: #e5e5e5;
+  border: none;
+  border-radius: .15rem;
+  resize: none;
+}
+
+.formTypeA .textInput input:focus, .formTypeA .textInput textarea:focus{
+  outline-color: #065F46;
+  padding: .48rem;
+}

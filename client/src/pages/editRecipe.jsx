@@ -11,12 +11,21 @@ function createRecipe () {
 
       <div className='splitSpace'>
         <div>
-
           <div className='textInput'>
             <label htmlFor="title">Recipe Name</label>
-            <input type="text" />
+            <input 
+            type="text" 
+            id="title"
+            placeholder="Name your recipe" />
           </div>
-
+          <div className='textInput'>
+          <label htmlFor="description">Recipe Description</label>
+            <textarea
+            type="text" 
+            id="description"
+            rows="12"
+            placeholder="Describe your recipe" />
+          </div>
         </div>
         <div>
 
