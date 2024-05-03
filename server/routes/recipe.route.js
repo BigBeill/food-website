@@ -35,7 +35,8 @@ router.post('/new', (req, res) => {
         image: req.body.image
     })
 
-    newRecipe.save() .then((recipe) => {
+    newRecipe.save() 
+    .then((recipe) => {
         console.log(recipe)
     })
     

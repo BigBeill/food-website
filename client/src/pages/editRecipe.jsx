@@ -3,17 +3,23 @@ import React, { useRef, useState, useEffect } from 'react'
 function createRecipe () {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
+  const [ingredientList, setIngredientList] = useState([])
+  const [newIngredientAmount, setNewIngredientAmount] = useState("")
+  const [newIngredientUnit, setNewIngredientUnit] = useState("")
+  const [newIngredientName, setNewIngredientName] = useState("")
   const [instructionList, setInstructionList] = useState([])
   const [newInstruction, setNewInstruction] = useState("")
 
   function addIngredient() {
-
+    
   }
 
   function addInstruction() {
-    setInstructionList((list) => {
-      return [...list, newInstruction]
-    })
+    if (newInstruction != ""){
+      setInstructionList((list) => {
+        return [...list, newInstruction]
+      })
+    }
   }
 
   return(
@@ -50,12 +56,14 @@ function createRecipe () {
       <div className='splitSpace'>
         <div>
           <h2>Ingredients</h2>
-          <button
-          name="addIngredient"
-          id="addIngredientButton"
-          className="addItemButton"
-          onClick={addIngredient}
-          >+</button>
+          <div> 
+            <button
+            name="addIngredient"
+            id="addIngredientButton"
+            className="addItemButton"
+            onClick={addIngredient}
+            >+</button>
+          </div>
         </div>
         <div>
           <h2>Instructions</h2>

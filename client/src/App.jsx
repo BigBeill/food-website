@@ -6,6 +6,7 @@ import Home from './pages/Home'
 import Register from './pages/Register'
 import Profile from './pages/Profile'
 import EditRecipe from './pages/editRecipe'
+import AddIngredient from './devTools/addIngredient'
 
 function App() {
 
@@ -31,7 +32,8 @@ function App() {
           <Route path="/login" exact element={<Login />} />
           <Route path="/register" exact element={<Register />} />
           <Route path="/profile" exact element={<Profile />} />
-          <Route path="/editRecipe"exact element={<EditRecipe />} />
+          <Route path="/editRecipe" exact element={<EditRecipe />} />
+          <Route path="/addIngredient" exact element={<AddIngredient />} /> {/*remove before production*/}
         </Routes>
       </div>
     </BrowserRouter>
