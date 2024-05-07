@@ -2,7 +2,8 @@ const router = require("express").Router()
 const mongoConnection = require('../config/connectMongo') 
 const recipes = mongoConnection.models.recipe
 const recipeSchema = require("../schemas/recipe")
-
+const ingredients = mongoConnection.models.recipe
+const ingredientSchema = require("../schemas/ingredient")
 
 // ------------ recipe get routes ------------
 
@@ -38,7 +39,29 @@ router.get('/publicRecipes', async (req, res) => {
 // if arguments are not provided:
 //   name: nothing will be returned
 //   amount: assume amount is 5
-router.get('/findIngredient')
+router.get('/findIngredient', async (req, res) => {
+    console.log("recipe/findIngredient get request triggered...")
+
+    const name = req.query.name || '';
+    const amount = parseInt(req.query.amount, 10) || 5;
+
+    try {
+        // Check if name was provided; if not, return an empty array
+        if (!name) {
+            return res.status(400).json({ message: "Name parameter is required." });
+        }
+
+        // Perform a search using a case-insensitive regex based on the 'name' parameter
+        const data = await ingredients.find({
+            name: { $regex: new RegExp(name, 'i') }
+        }).limit(amount);
+
+        res.end(JSON.stringify(data));
+    } catch (error) {
+        console.error("Error fetching ingredients:", error);
+        res.status(500).json({ message: "Server error occurred." });
+    }
+})
 
 
 

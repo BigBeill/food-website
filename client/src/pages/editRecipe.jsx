@@ -26,6 +26,8 @@ function editRecipe () {
   const [instructionList, setInstructionList] = useState([])
   const [newInstruction, setNewInstruction] = useState("")
 
+  const [recipes, setRecipes] = useState([]);
+  
   const defaultUnits = [
     {full: 'milliliters', short: 'mL'},
     {full: 'liters', short: 'L'},
@@ -36,9 +38,24 @@ function editRecipe () {
     {full: 'ounces', short: 'oz'},
   ]
 
-  function ingredientNameChange(event) {
-    setNewIngredientName(event.target.value)
-    const getRequest
+  const fetchIngredientData = async (ingredientName, amount = 5) => {
+    const url = `server/recipe/findIngredient?name=${encodeURIComponent(ingredientName)}&amount=${amount}`;
+    await fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        setRecipes(data);  // Assuming the response data is directly usable
+      })
+      .catch(error => {
+        console.error("Error fetching Recipes:", error);
+      });
+  }
+
+  const ingredientNameChange = (event) => {
+    const ingredientName = event.target.value;
+    setNewIngredientName(ingredientName);
+    if (ingredientName.length > 0) {  // Optionally, trigger the fetch only if the input length is sufficient
+      fetchIngredientData(ingredientName);
+    }
   }
 
   function addIngredient() {
@@ -123,7 +140,7 @@ function editRecipe () {
           >+</button>
         </div>
 
-        {/* div for user to inpue recipe instructions */}
+        {/* div for user to input recipe instructions */}
         <div>
           <h2>Instructions</h2>
           <div>
