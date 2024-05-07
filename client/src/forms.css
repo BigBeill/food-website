@@ -61,7 +61,32 @@
   height: 1.5rem;
 }
 
-.formTypeA .textInput input:focus, .formTypeA .textInput textarea:focus{
+.formTypeA input:focus, .formTypeA textarea:focus{
   outline-color: #065F46;
+}
+
+.formTypeA .newIngredientDiv {
+  padding: .3rem;
+}
+
+.formTypeA .newIngredientDiv input, .formTypeA .newIngredientDiv select{
+  box-sizing: border-box;
   padding: .48rem;
+  background-color: #e5e5e5;
+  border: none;
+  border-radius: .15rem;
+}
+
+.formTypeA .newIngredientDiv div input:first-child{
+  margin-right: .3rem;
+  width: calc(35% - .15rem)
+}
+
+.formTypeA .newIngredientDiv div select{
+  width: calc(65% - .15rem);
+}
+
+.formTypeA .newIngredientDiv div input:last-child{
+  margin-top: .3rem;
+  width: 100%;
 }
