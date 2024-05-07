@@ -6,16 +6,18 @@ const recipeSchema = require("../schemas/recipe")
 
 // ------------ recipe get routes ------------
 
-router.get('/new', async (req, res) => {
-    console.log("recipe/new get request triggered...")
-    if (req.user){
-        const imageOptions = await recipeSchema.schema.path('image').enumValues
-        res.render("newRecipe", {imageOptions: imageOptions})
-    } else{
-        res.redirect("/index")
-    }
-})
+// STILL WORKING ON THIS ROUTE, DISCRIPTION DOES NOT YET MATCH OUTPUT
 
+// takes 2 arguments from body:
+//   name: string
+//   amount: int
+
+// route will:
+//   return list of max size {amount}, containing the information on recipes with a similer title to {name}
+
+// if arguments are not provided:
+//   name: return recipes with any title
+//   amount: assume amount is 20
 router.get('/publicRecipes', async (req, res) => {
     console.log("recipe/publicRecipes get request triggered...")
     data = await recipes.find()
@@ -24,23 +26,23 @@ router.get('/publicRecipes', async (req, res) => {
 
 
 
+// STILL WORKING ON THIS ROUTE, DISCRIPTION DOES NOT YET MATCH OUTPUT
+
+// takes 2 arguments from body: 
+//   name: string
+//   amount: int
+
+// route will:
+//   return a list of max size {amount}, containing the name of ingredients in database with a similer name to the {name} given in body
+
+// if arguments are not provided:
+//   name: nothing will be returned
+//   amount: assume amount is 5
+router.get('/findIngredient')
+
+
+
 // ---------- recipe post routes ------------
 
-router.post('/new', (req, res) => {
-    console.log("recipe/new post request triggered...")
-    const newRecipe = new recipes ({
-        owner: req.user._id,
-        title: req.body.title,
-        description: req.body.description,
-        image: req.body.image
-    })
-
-    newRecipe.save() 
-    .then((recipe) => {
-        console.log(recipe)
-    })
-    
-    res.redirect('/index')
-})
 
 module.exports = router

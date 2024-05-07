@@ -6,40 +6,34 @@ const User = mongoConnection.models.user
 const recipes = require('../schemas/recipe')
 const users = require('../schemas/user')
 
-// ------------ User Subroutes ------------
-const friendsRouter = require("./userSubroutes/friends.route");
-const { json } = require("express");
-router.use('/friends', friendsRouter)
-
 
 
 // ------------ User Get Routes ------------
 
+// takes 0 arguments from body
+
+// route will:
+//   return data for user that is currently logged in
 router.get('/userInfo', (req, res) => {
     console.log("user/userInfo get request triggered...")
     data = req.user
     res.end(JSON.stringify(data))
 })
 
-router.get('/findUser/:datatype/:value', async (req, res) => {
-    console.log("user/findUser get request triggered...")
-    var input = req.params
-    console.log("searching database: datatype = " + input.datatype + " value = " + input.value)
-    if (input.datatype == "_id"){
-        result = await User.findOne({_id: input.value})
-        res.send(result)
-    } else {
-        var query = {}
-        query[input.datatype] = {'$regex': input.value}
-        var result = await User.find(query)
-        res.send(result)
-    }
-})
-
 
 
 // ------------ User Post Routes ------------
 
+// takes 2 arguments from body:
+//   username, password: string
+
+// route will:
+//   use passport local strategy to verify {username} and {password} are correct
+//   save user data in server
+//   return error data or {message: "success"}
+
+// if arguments are not provided:
+//   username, password: login will fail and error will be returned
 router.post('/login', (req, res, next) => {
     console.log("user/login post request triggered...")
 
@@ -53,6 +47,19 @@ router.post('/login', (req, res, next) => {
     })(req, res, next)
 })
 
+
+
+// takes 3 arguments from body:
+//   username, email, password: string
+
+// route will:
+//   create a new user with data provided and save it in the database
+//   save user data to server and log new user in to the account
+//   if route fails to create new user, return {message: reason for failure}
+//   if successful return {message: "success"}
+
+// if arguments not provided:
+//   username, email, password: route will fail to create new user
 router.post('/register', async (req, res) => {
     console.log("user/register post request triggered...")
 
@@ -89,6 +96,13 @@ router.post('/register', async (req, res) => {
     })
 })
 
+
+
+// takes 0 arguments from body
+
+// route will:
+//   logout current user
+//   return error data or {message: "success"}
 router.post('/logout', (req, res) => {
     console.log("user/logout post request triggered...")
     req.logout( (error) => {
