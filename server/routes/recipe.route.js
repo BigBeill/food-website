@@ -2,14 +2,14 @@ const router = require("express").Router()
 const mongoConnection = require('../config/connectMongo') 
 const recipes = mongoConnection.models.recipe
 const recipeSchema = require("../schemas/recipe")
-const ingredients = mongoConnection.models.recipe
 const ingredientSchema = require("../schemas/ingredient")
+const ingredients = require("../schemas/ingredient")
 
 // ------------ recipe get routes ------------
 
 // STILL WORKING ON THIS ROUTE, DISCRIPTION DOES NOT YET MATCH OUTPUT
 
-// takes 2 arguments from body:
+// takes 2 arguments from url:
 //   name: string
 //   amount: int
 
@@ -29,7 +29,7 @@ router.get('/publicRecipes', async (req, res) => {
 
 // STILL WORKING ON THIS ROUTE, DISCRIPTION DOES NOT YET MATCH OUTPUT
 
-// takes 2 arguments from body: 
+// takes 2 arguments from url: 
 //   name: string
 //   amount: int
 
@@ -52,10 +52,11 @@ router.get('/findIngredient', async (req, res) => {
         }
 
         // Perform a search using a case-insensitive regex based on the 'name' parameter
-        const data = await ingredients.find({
-            name: { $regex: new RegExp(name, 'i') }
-        }).limit(amount);
-
+        const data = await ingredients.find(
+            { name: {$regex: new RegExp(name, 'i')} },
+            { name:1}
+        ).limit(amount)
+        console.log(data)
         res.end(JSON.stringify(data));
     } catch (error) {
         console.error("Error fetching ingredients:", error);

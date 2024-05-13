@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect } from 'react'
 function IngredientInput(props) {
   const {options, changeHandler, name} = props 
   return (
+    <>
     <div className='ingredientInput'>
       <input 
       type='text'
@@ -10,6 +11,22 @@ function IngredientInput(props) {
       onChange={changeHandler}
       placeholder='Ingredient Name'/>
     </div>
+
+    <ul className='searchbarResults'>
+      {options.map((option) => {
+        return(
+          <button
+          id={option._id}
+          value={option.name}
+          type='button'
+          key={option._id}
+          onClick={changeHandler}>
+            {option.name}
+          </button>
+        )
+      })}
+    </ul>
+    </>
   )
 }
 
@@ -20,13 +37,11 @@ function editRecipe () {
   const [ingredientList, setIngredientList] = useState([])
   const [newIngredientAmount, setNewIngredientAmount] = useState("")
   const [newIngredientUnit, setNewIngredientUnit] = useState("")
-  const [newIngredientName, setNewIngredientName] = useState("")
+  const [newIngredientName, setNewIngredientName] = useState({name: "", _id: ""})
   const [dropdownOptions, setDropdownOptions] = useState([])
 
   const [instructionList, setInstructionList] = useState([])
   const [newInstruction, setNewInstruction] = useState("")
-
-  const [recipes, setRecipes] = useState([]);
   
   const defaultUnits = [
     {full: 'milliliters', short: 'mL'},
@@ -38,23 +53,32 @@ function editRecipe () {
     {full: 'ounces', short: 'oz'},
   ]
 
-  const fetchIngredientData = async (ingredientName, amount = 5) => {
+  const fetchIngredientData = (ingredientName, amount = 5) => {
     const url = `server/recipe/findIngredient?name=${encodeURIComponent(ingredientName)}&amount=${amount}`;
-    await fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        setRecipes(data);  // Assuming the response data is directly usable
-      })
-      .catch(error => {
-        console.error("Error fetching Recipes:", error);
-      });
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      setDropdownOptions(data);
+    })
+    .catch(error => {
+      console.error("Error fetching Recipes:", error);
+    });
   }
 
   const ingredientNameChange = (event) => {
     const ingredientName = event.target.value;
-    setNewIngredientName(ingredientName);
-    if (ingredientName.length > 0) {  // Optionally, trigger the fetch only if the input length is sufficient
-      fetchIngredientData(ingredientName);
+    if(event.type == "change"){ // text input was changed
+      console.log("test")
+      setNewIngredientName({name: ingredientName, _id: ""});
+      if (ingredientName.length > 0) {  // Optionally, trigger the fetch only if the input length is sufficient
+        fetchIngredientData(ingredientName);
+      } else {
+        setDropdownOptions([])
+      }
+    } else if(event.type == "click") { // button was clicked
+      console.log(event.target)
+      setNewIngredientName({name: event.target.value, _id: event.target.id})
+      setDropdownOptions([])
     }
   }
 
@@ -129,7 +153,7 @@ function editRecipe () {
                   <option key={index}>{unit.full}</option>
                 ))}
               </select>
-              <IngredientInput options={dropdownOptions} changeHandler={ingredientNameChange} name={newIngredientName} />
+              <IngredientInput options={dropdownOptions} changeHandler={ingredientNameChange} name={newIngredientName.name}/>
             </div>
           </div>
           <button

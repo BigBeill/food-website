@@ -10,7 +10,7 @@ const users = require('../schemas/user')
 
 // ------------ User Get Routes ------------
 
-// takes 0 arguments from body
+// takes 0 arguments from url
 
 // route will:
 //   return data for user that is currently logged in
