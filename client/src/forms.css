@@ -77,16 +77,16 @@
   border-radius: .15rem;
 }
 
-.formTypeA .newIngredientDiv div input:first-child{
+.formTypeA .newIngredientDiv input{
   margin-right: .3rem;
   width: calc(35% - .15rem)
 }
 
-.formTypeA .newIngredientDiv div select{
+.formTypeA .newIngredientDiv select{
   width: calc(65% - .15rem);
 }
 
-.formTypeA .newIngredientDiv div input:last-child{
+.formTypeA .newIngredientDiv .activeSearchBar input{
   margin-top: .3rem;
   width: 100%;
 }

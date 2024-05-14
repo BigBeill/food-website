@@ -1,34 +1,5 @@
-import React, { useRef, useState, useEffect } from 'react'
-
-function IngredientInput(props) {
-  const {options, changeHandler, name} = props 
-  return (
-    <>
-    <div className='ingredientInput'>
-      <input 
-      type='text'
-      value={name}
-      onChange={changeHandler}
-      placeholder='Ingredient Name'/>
-    </div>
-
-    <ul className='searchbarResults'>
-      {options.map((option) => {
-        return(
-          <button
-          id={option._id}
-          value={option.name}
-          type='button'
-          key={option._id}
-          onClick={changeHandler}>
-            {option.name}
-          </button>
-        )
-      })}
-    </ul>
-    </>
-  )
-}
+import React, { useState } from 'react'
+import ActiveSearchBar from '../components/ActiveSearchBar'
 
 function editRecipe () {
   const [title, setTitle] = useState("")
@@ -53,7 +24,7 @@ function editRecipe () {
     {full: 'ounces', short: 'oz'},
   ]
 
-  const fetchIngredientData = (ingredientName, amount = 5) => {
+  function fetchIngredientData(ingredientName, amount = 5) {
     const url = `server/recipe/findIngredient?name=${encodeURIComponent(ingredientName)}&amount=${amount}`;
     fetch(url)
     .then(response => response.json())
@@ -65,13 +36,11 @@ function editRecipe () {
     });
   }
 
-  const ingredientNameChange = (event) => {
-    const ingredientName = event.target.value;
+  function ingredientNameChange(event) {
     if(event.type == "change"){ // text input was changed
-      console.log("test")
-      setNewIngredientName({name: ingredientName, _id: ""});
-      if (ingredientName.length > 0) {  // Optionally, trigger the fetch only if the input length is sufficient
-        fetchIngredientData(ingredientName);
+      setNewIngredientName({name: event.target.value, _id: ""});
+      if (event.target.value.length > 0) {  // Optionally, trigger the fetch only if the input length is sufficient
+        fetchIngredientData(event.target.value);
       } else {
         setDropdownOptions([])
       }
@@ -139,22 +108,21 @@ function editRecipe () {
           <h2>Ingredients</h2>
           <div className='newIngredientDiv'>
             <h3>New Ingredient</h3>
-            <div>
-              <input 
-              type='number'
-              value={newIngredientAmount}
-              onChange={(event) => setNewIngredientAmount(event.target.value)}
-              placeholder='Amount'/>
-              <select 
-              defaultValue={""}
-              onChange={(event) => setNewIngredientUnit(event.target.value)}>
-                <option value="" disabled hidden>Units</option>
-                {defaultUnits.map((unit, index) => (
-                  <option key={index}>{unit.full}</option>
-                ))}
-              </select>
-              <IngredientInput options={dropdownOptions} changeHandler={ingredientNameChange} name={newIngredientName.name}/>
-            </div>
+            <input 
+            type='number'
+            value={newIngredientAmount}
+            onChange={(event) => setNewIngredientAmount(event.target.value)}
+            placeholder='Amount'/>
+            <select 
+            defaultValue={""}
+            onChange={(event) => setNewIngredientUnit(event.target.value)}>
+              <option value="" disabled hidden>Units</option>
+              {defaultUnits.map((unit, index) => (
+                <option key={index}>{unit.full}</option>
+              ))}
+            </select>
+            <ActiveSearchBar currentValue={newIngredientName.name} options={dropdownOptions} eventHandler={ingredientNameChange} />
+            
           </div>
           <button
           name="addIngredient"
