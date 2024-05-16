@@ -6,9 +6,7 @@ function editRecipe () {
   const [description, setDescription] = useState("")
 
   const [ingredientList, setIngredientList] = useState([])
-  const [newIngredientAmount, setNewIngredientAmount] = useState("")
-  const [newIngredientUnit, setNewIngredientUnit] = useState("")
-  const [newIngredientName, setNewIngredientName] = useState({name: "", _id: ""})
+  const [newIngredient, setNewIngredient] = useState({name: "", _id: "", unit: "", amount: ""})
   const [dropdownOptions, setDropdownOptions] = useState([])
 
   const [instructionList, setInstructionList] = useState([])
@@ -38,21 +36,44 @@ function editRecipe () {
 
   function ingredientNameChange(event) {
     if(event.type == "change"){ // text input was changed
-      setNewIngredientName({name: event.target.value, _id: ""});
+      setNewIngredient({...newIngredient, name: event.target.value, _id: ""});
       if (event.target.value.length > 0) {  // Optionally, trigger the fetch only if the input length is sufficient
         fetchIngredientData(event.target.value);
       } else {
         setDropdownOptions([])
       }
     } else if(event.type == "click") { // button was clicked
-      console.log(event.target)
-      setNewIngredientName({name: event.target.value, _id: event.target.id})
+      setNewIngredient({...newIngredient, name: event.target.value, _id: event.target.id})
       setDropdownOptions([])
     }
   }
 
   function addIngredient() {
-
+    //check for any missing data
+    if (newIngredient.name == "" || newIngredient.amount == "" || newIngredient.unit == ""){
+      return
+    } else if (newIngredient._id == ""){
+      // attempt to find newIngredient._id if missing
+      fetch (`server/recipe/findIngredient?name=${encodeURIComponent(newIngredient.name)}&amount=1`)
+      .then((response) => response.json())
+      .then((data) => {
+        const dataIngredient = data[0]
+        if (!dataIngredient){ return }
+        else if (newIngredient.name != dataIngredient.name){ return }
+        else { 
+          // if able to be resolved, add _id to new ingredient and post recipe
+          newIngredient._id = dataIngredient._id
+          setIngredientList((list) => {
+            return [...list, newIngredient]
+          })
+        }
+      })
+    } else {
+      //if no data is missing add ingredient to list of ingredients
+      setIngredientList((list) => {
+        return [...list, newIngredient]
+      })
+    }
   }
 
   function addInstruction() {
@@ -62,6 +83,8 @@ function editRecipe () {
       })
     }
   }
+
+  console.log(ingredientList)
 
   return(
     <>
@@ -110,18 +133,18 @@ function editRecipe () {
             <h3>New Ingredient</h3>
             <input 
             type='number'
-            value={newIngredientAmount}
-            onChange={(event) => setNewIngredientAmount(event.target.value)}
+            value={newIngredient.amount}
+            onChange={(event) => setNewIngredient({...newIngredient, amount: event.target.value})}
             placeholder='Amount'/>
             <select 
             defaultValue={""}
-            onChange={(event) => setNewIngredientUnit(event.target.value)}>
+            onChange={(event) => setNewIngredient({...newIngredient, unit: event.target.value})}>
               <option value="" disabled hidden>Units</option>
               {defaultUnits.map((unit, index) => (
                 <option key={index}>{unit.full}</option>
               ))}
             </select>
-            <ActiveSearchBar currentValue={newIngredientName.name} options={dropdownOptions} eventHandler={ingredientNameChange} />
+            <ActiveSearchBar currentValue={newIngredient.name} options={dropdownOptions} eventHandler={ingredientNameChange} />
             
           </div>
           <button
