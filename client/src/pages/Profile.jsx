@@ -3,7 +3,7 @@ import UserPin from '../components/UserPin'
 
 function Profile(userData) {
   return(
-    <div className='centered'>
+    <div className='profile'>
       <UserPin userData = {userData}/>
     </div>
   )

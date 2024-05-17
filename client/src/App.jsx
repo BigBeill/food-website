@@ -27,17 +27,20 @@ function App() {
   return (
     <BrowserRouter>
       <Nav userData = {userData}/>
-      <main>
-        <Routes>
-          <Route path="/" exact element={<Home />} />
-          <Route path="/login" exact element={<Login />} />
-          <Route path="/register" exact element={<Register />} />
-          <Route path="/editRecipe" exact element={<EditRecipe />} />
-          <Route path="/friendsList" exact element={<FriendsList />} />
-          <Route path="/profile" exact element={<Profile userData = {userData}/>} />
-          <Route path="/addIngredient" exact element={<AddIngredient />} /> {/*remove before production*/}
-        </Routes>
-      </main>
+      <div style={{width:"100%"}}>
+        <header></header>
+        <main>
+          <Routes>
+            <Route path="/" exact element={<Home />} />
+            <Route path="/login" exact element={<Login />} />
+            <Route path="/register" exact element={<Register />} />
+            <Route path="/editRecipe" exact element={<EditRecipe />} />
+            <Route path="/friendsList" exact element={<FriendsList />} />
+            <Route path="/profile" exact element={<Profile userData = {userData}/>} />
+            <Route path="/addIngredient" exact element={<AddIngredient />} /> {/*remove before production*/}
+          </Routes>
+        </main>
+      </div>
     </BrowserRouter>
   )
 }

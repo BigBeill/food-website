@@ -107,7 +107,7 @@ function editRecipe () {
             <textarea
             type="text" 
             id="description"
-            rows="12"
+            rows="9"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             placeholder="Describe your recipe" />

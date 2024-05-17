@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from 'react'
-import '../styles/login.css'
 
 function Login(){
   const errorRef = useRef()

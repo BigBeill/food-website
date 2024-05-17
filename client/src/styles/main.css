@@ -20,14 +20,18 @@ body {
   width:100%;
   margin: 0rem;
   padding: 0rem;
-  gap:1rem;
+}
+
+header{
+  width: 100%;
+  height: 6rem;
 }
 
 main{
   margin: 0rem;
   padding: 0rem;
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh - 6rem);
   overflow-x: hidden;
 }
 
