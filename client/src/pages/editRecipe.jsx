@@ -84,8 +84,6 @@ function editRecipe () {
     }
   }
 
-  console.log(ingredientList)
-
   return(
     <>
     <div className='formTypeA'>
@@ -129,6 +127,13 @@ function editRecipe () {
         {/* div for user to input recipe ingredients */}
         <div>
           <h2>Ingredients</h2>
+          <ul>
+          {ingredientList.map((ingredient, index) => (
+              <li key={index}>
+                {ingredient.amount} {ingredient.unit} of {ingredient.name}
+              </li>
+            ))}
+          </ul>
           <div className='newIngredientDiv'>
             <h3>New Ingredient</h3>
             <input 

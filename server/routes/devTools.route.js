@@ -15,7 +15,7 @@ const ingredients = mongoConnection.models.ingredient
 
 // if arguments are not provided:
 //   name, unitType, calories, protein, fat, carbohydrates, sodium, fiber: no recipe will be saved
-router.post('/addIngredient', (req, res) => {
+router.post('/addIngredient', async (req, res) => {
   console.log("/devTools/addIngredient post request triggered...")
   const newIngredient = new ingredients ({
     name: req.body.name,
@@ -28,14 +28,22 @@ router.post('/addIngredient', (req, res) => {
     fiber: req.body.fiber,
   })
 
+  console.log(newIngredient)
   var missingData = false
-  for (const key in ingredientData) {
-    if (ingredientData[key].length == 0) {
-      missingData = true
-    }
-  }
+  if (newIngredient.name.length == 0) { missingData = true}
+  if (newIngredient.unitType.length == 0) { missingData = true}
+  if (newIngredient.calories.length == 0) { missingData = true}
+  if (newIngredient.protein.length == 0) { missingData = true}
+  if (newIngredient.fat.length == 0) { missingData = true}
+  if (newIngredient.carbohydrates.length == 0) { missingData = true}
+  if (newIngredient.sodium.length == 0) { missingData = true}
+  if (newIngredient.fiber.length == 0) { missingData = true}
+  console.log(missingData)
 
-  if (!missingData){
+  var result = await ingredients.find({name: req.body.name})
+  console.log(result)
+
+  if (!missingData && result.length == 0){
     newIngredient.save()
     .then((ingredient) => {console.log(ingredient)})
   }

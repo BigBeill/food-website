@@ -11,7 +11,7 @@ function Register() {
   const [errorMessage, setErrorMessage] = useState("")
 
   useEffect(() => {
-    import('./loginImage.css')
+    import('../styles/loginImage.css')
   }, [])
 
   useEffect(() => {

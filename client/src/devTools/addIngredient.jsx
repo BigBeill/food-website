@@ -59,8 +59,10 @@ function DevToolsRouter(){
       <div className='textInput'>
         <label>unitType</label> 
         <select onChange={(event) => setUnitType(event.target.value)}>
-          <option>Grams</option>
-          <option>Milliliters</option>
+          <option>grams</option>
+          <option>milliliters</option>
+          <option>cups</option>
+          <option>none</option>
         </select>
       </div>
 

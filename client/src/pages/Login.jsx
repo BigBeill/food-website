@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
-import './login.css'
+import '../styles/login.css'
 
 function Login(){
   const errorRef = useRef()
@@ -9,7 +9,7 @@ function Login(){
   const [errorMessage, setErrorMessage] = useState("")
 
   useEffect(() => {
-    import('./loginImage.css')
+    import('../styles/loginImage.css')
   }, [])
 
   useEffect(() => {
