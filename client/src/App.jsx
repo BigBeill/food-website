@@ -5,7 +5,8 @@ import Login from './pages/Login'
 import Home from './pages/Home'
 import Register from './pages/Register'
 import Profile from './pages/Profile'
-import EditRecipe from './pages/editRecipe'
+import EditRecipe from './pages/EditRecipe'
+import FriendsList from './pages/FriendsList'
 import AddIngredient from './devTools/addIngredient'
 
 function App() {
@@ -25,17 +26,18 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className='splitSpace background'>
-        <Nav userData = {userData}/>
+      <Nav userData = {userData}/>
+      <main>
         <Routes>
           <Route path="/" exact element={<Home />} />
           <Route path="/login" exact element={<Login />} />
           <Route path="/register" exact element={<Register />} />
-          <Route path="/profile" exact element={<Profile />} />
           <Route path="/editRecipe" exact element={<EditRecipe />} />
+          <Route path="/friendsList" exact element={<FriendsList />} />
+          <Route path="/profile" exact element={<Profile userData = {userData}/>} />
           <Route path="/addIngredient" exact element={<AddIngredient />} /> {/*remove before production*/}
         </Routes>
-      </div>
+      </main>
     </BrowserRouter>
   )
 }

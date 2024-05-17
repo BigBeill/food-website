@@ -130,7 +130,12 @@ function editRecipe () {
           <ul>
           {ingredientList.map((ingredient, index) => (
               <li key={index}>
-                {ingredient.amount} {ingredient.unit} of {ingredient.name}
+                {ingredient.amount} {ingredient.unit} of {ingredient.name} 
+                <button onClick={() => {
+                  var newList = [...ingredientList]
+                  newList.splice(index, 1)
+                  setIngredientList(newList)
+                }}> - </button>
               </li>
             ))}
           </ul>
@@ -168,6 +173,11 @@ function editRecipe () {
               <>
               <h4>Step {index + 1}</h4>
               <p>{instruction}</p>
+              <button onClick={() => {
+                  var newList = [...instructionList]
+                  newList.splice(index, 1)
+                  setInstructionList(newList)
+              }}> - </button>
               </>
             ))}
           </div>

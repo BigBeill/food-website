@@ -20,6 +20,21 @@ router.get('/userInfo', (req, res) => {
     res.end(JSON.stringify(data))
 })
 
+// takes 2 arguments from url:
+    // searchterm: string
+    // amount: int
+router.get('/findUsers', async (req, res) => {
+    const searchterm = req.query.searchterm || ""
+    const amount = parseInt(req.query.amount) || 30
+
+    const data = await ingredients.find(
+        { name: {$regex: new RegExp(searchterm, 'i')} },
+        { name:1}
+    ).limit(amount)
+
+    res.end(JSON.stringify(data))
+})
+
 
 
 // ------------ User Post Routes ------------
