@@ -1,5 +1,4 @@
-import React, {useEffect, useState} from 'react'
-import {Link} from 'react-router-dom'
+import React from 'react'
 import '../styles/nav.css'
 
 function Nav(data) {
@@ -16,7 +15,7 @@ function Nav(data) {
             <a href="/index">Search</a>
 
             {   
-                data.userData.length != 0 ?
+                data.userData._id != "" ?
                 <>
 
                 <h3>Your Recipes</h3>

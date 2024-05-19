@@ -15,13 +15,16 @@ function App() {
     fetchUserData()
   }, [])
 
-  const [userData, setUserData] = useState ([])
+  const [userData, setUserData] = useState ({})
 
   const fetchUserData = async() => {
-      await fetch('server/user/userInfo')
-      .then(response => response.json())
-      .then(data => {setUserData([data])})
-      .catch(error => {console.error("No user found", error);})
+    await fetch('server/user/userInfo')
+    .then(response => response.json())
+    .then(data => {setUserData(data)})
+    .catch(error => {
+      console.error("No user found", error) 
+      setUserData({_id: "", username: ""})
+    })
   }
 
   return (
@@ -36,7 +39,7 @@ function App() {
             <Route path="/register" exact element={<Register />} />
             <Route path="/editRecipe" exact element={<EditRecipe />} />
             <Route path="/friendsList" exact element={<FriendsList />} />
-            <Route path="/profile" exact element={<Profile userData = {userData}/>} />
+            <Route path="/profile" exact element={<Profile userData = {userData} />} />
             <Route path="/addIngredient" exact element={<AddIngredient />} /> {/*remove before production*/}
           </Routes>
         </main>
