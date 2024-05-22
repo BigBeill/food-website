@@ -2,7 +2,6 @@ const router = require("express").Router()
 const mongoConnection = require('../config/connectMongo') 
 const recipes = mongoConnection.models.recipe
 const recipeSchema = require("../schemas/recipe")
-const ingredientSchema = require("../schemas/ingredient")
 const ingredients = require("../schemas/ingredient")
 
 // ------------ recipe get routes ------------
@@ -21,13 +20,21 @@ const ingredients = require("../schemas/ingredient")
 //   amount: assume amount is 20
 router.get('/publicRecipes', async (req, res) => {
     console.log("recipe/publicRecipes get request triggered...")
-    data = await recipes.find()
-    res.end(JSON.stringify(data))
+    const name = req.query.name || '';
+    const amount = parseInt(req.query.amount, 10) || 20;
+
+    try {
+        let query = {}
+        if (name != '') { query = { name: {$regex: new RegExp(name, 'i')}}}
+        const data = await recipes.find(query).limit(amount)
+        res.end(JSON.stringify(data))
+    } catch {
+        console.error("Error fetching recipes:", error);
+        res.status(500).json({ message: "Server error occurred." });
+    }
 })
 
 
-
-// STILL WORKING ON THIS ROUTE, DISCRIPTION DOES NOT YET MATCH OUTPUT
 
 // takes 2 arguments from url: 
 //   name: string
@@ -47,7 +54,7 @@ router.get('/findIngredient', async (req, res) => {
 
     try {
         // Check if name was provided; if not, return an empty array
-        if (!name) {
+        if (name == '') {
             return res.status(400).json({ message: "Name parameter is required." });
         }
 
@@ -56,7 +63,6 @@ router.get('/findIngredient', async (req, res) => {
             { name: {$regex: new RegExp(name, 'i')} },
             { name:1}
         ).limit(amount)
-        console.log(data)
         res.end(JSON.stringify(data));
     } catch (error) {
         console.error("Error fetching ingredients:", error);

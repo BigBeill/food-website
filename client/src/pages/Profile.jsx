@@ -8,8 +8,12 @@ function Profile(data) {
   }
 
   return(
-    <div className='profile'>
-      <UserPin userData = {userData}/>
+    <div className='profile splitSpace'>
+      <UserPin userData = {data}/>
+      <div className='buttonDiv'>
+        <button>edit account -&gt; </button>
+        <button>logout -&gt; </button>
+      </div>
     </div>
   )
 }
