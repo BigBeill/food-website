@@ -27,7 +27,6 @@ function ActiveSearchBar(data) {
         {options.map((option) => {
           return(
             <button
-            id={option._id}
             value={option.name}
             type='button'
             key={option._id}

@@ -6,84 +6,65 @@ function editRecipe () {
   const [description, setDescription] = useState("")
 
   const [ingredientList, setIngredientList] = useState([])
-  const [newIngredient, setNewIngredient] = useState({name: "", _id: "", unit: "", amount: ""})
+  const [newIngredient, setNewIngredient] = useState({name:"", _id:"", unitType:[], unit:"", amount:""})
   const [dropdownOptions, setDropdownOptions] = useState([])
+  const [unitsAvailable, setUnitsAvailable] = useState({hidden:true, units:[]})
 
   const [instructionList, setInstructionList] = useState([])
   const [newInstruction, setNewInstruction] = useState("")
-  
-  const defaultUnits = [
-    {full: 'milliliters', short: 'mL'},
-    {full: 'liters', short: 'L'},
-    {full: 'teaspoons', short: 'tsp'},
-    {full: 'tablespoons', short: 'tbsp'},
-    {full: 'cups', short: 'c'},
-    {full: 'grams', short: 'g'},
-    {full: 'ounces', short: 'oz'},
-  ]
 
-  function fetchIngredientData(ingredientName, amount = 5) {
-    const url = `server/recipe/findIngredient?name=${encodeURIComponent(ingredientName)}&amount=${amount}`;
-    fetch(url)
+  function fetchDropdownOptions(ingredientName, amount = 5) {
+    fetch(`server/recipe/findIngredient?name=${encodeURIComponent(ingredientName)}&amount=${amount}`)
     .then(response => response.json())
-    .then(data => {
-      setDropdownOptions(data);
-    })
-    .catch(error => {
-      console.error("Error fetching Recipes:", error);
-    });
+    .then(data => {setDropdownOptions(data)})
+    .catch(error => {console.error("Error fetching Recipes:", error)});
   }
 
   function ingredientNameChange(event) {
     if(event.type == "change"){ // text input was changed
-      setNewIngredient({...newIngredient, name: event.target.value, _id: ""});
-      if (event.target.value.length > 0) {  // Optionally, trigger the fetch only if the input length is sufficient
-        fetchIngredientData(event.target.value);
-      } else {
-        setDropdownOptions([])
-      }
+      setNewIngredient({...newIngredient, name: event.target.value, _id: ""})
+      setUnitsAvailable({hidden:true, units:[]})
+
+      // Optionally, trigger the fetch only if the input length is sufficient
+      if (event.target.value.length > 0) { fetchDropdownOptions(event.target.value) } 
+      else { setDropdownOptions([]) }
+
     } else if(event.type == "click") { // button was clicked
-      setNewIngredient({...newIngredient, name: event.target.value, _id: event.target.id})
+      // find the option that was clicked inside dropdownOptions
+      let optionData
+      dropdownOptions.forEach(option => {
+        if (option.name == event.target.value) { optionData = option }
+      })
+
+      // set all relavent data
+      setNewIngredient({...newIngredient, name:optionData.name, _id:optionData._id, unitType:optionData.unitType})
       setDropdownOptions([])
+      let units = []
+      if (optionData.unitType.includes('weight')) { units.push('grams', 'pounds', 'ounces') }
+      if (optionData.unitType.includes('physical')) { units.push('physical') }
+      if (optionData.unitType.includes('volume')) { units.push('liters', 'milliters', 'cups', 'tablespoons')}
+      setUnitsAvailable({hidden:false, units:units})
     }
   }
 
   function addIngredient() {
     //check for any missing data
-    if (newIngredient.name == "" || newIngredient.amount == "" || newIngredient.unit == ""){
-      return
-    } else if (newIngredient._id == ""){
-      // attempt to find newIngredient._id if missing
-      fetch (`server/recipe/findIngredient?name=${encodeURIComponent(newIngredient.name)}&amount=1`)
-      .then((response) => response.json())
-      .then((data) => {
-        const dataIngredient = data[0]
-        if (!dataIngredient){ return }
-        else if (newIngredient.name != dataIngredient.name){ return }
-        else { 
-          // if able to be resolved, add _id to new ingredient and post recipe
-          newIngredient._id = dataIngredient._id
-          setIngredientList((list) => {
-            return [...list, newIngredient]
-          })
-        }
-      })
-    } else {
-      //if no data is missing add ingredient to list of ingredients
-      setIngredientList((list) => {
-        return [...list, newIngredient]
-      })
-    }
+    if (newIngredient.name == "" || newIngredient.amount == "" || newIngredient.unit == "" || newIngredient._id == ""){ return } 
+
+    //if no data is missing add ingredient to list of ingredients
+    setIngredientList((list) => { return [...list, newIngredient] })
   }
 
   function addInstruction() {
     if (newInstruction != ""){
-      setInstructionList((list) => {
-        return [...list, newInstruction]
-      })
+      setInstructionList((list) => { return [...list, newInstruction] })
     }
   }
 
+
+
+
+  
   return(
     <>
     <div className='formTypeA'>
@@ -130,7 +111,7 @@ function editRecipe () {
           <ul>
           {ingredientList.map((ingredient, index) => (
               <li key={index}>
-                {ingredient.amount} {ingredient.unit} of {ingredient.name} 
+                <p>{ingredient.amount} {ingredient.unit!='physical' ?  ingredient.unit +' of' : '' } {ingredient.name}{ingredient.amount!=1 ? 's' : ''}</p> 
                 <button onClick={() => {
                   var newList = [...ingredientList]
                   newList.splice(index, 1)
@@ -142,16 +123,18 @@ function editRecipe () {
           <div className='newIngredientDiv'>
             <h3>New Ingredient</h3>
             <input 
+            className={unitsAvailable.hidden ? 'hidden' : ''} //hide input if needed
             type='number'
             value={newIngredient.amount}
             onChange={(event) => setNewIngredient({...newIngredient, amount: event.target.value})}
             placeholder='Amount'/>
             <select 
+            className={unitsAvailable.hidden ? 'hidden' : ''} //hide input if needed
             defaultValue={""}
             onChange={(event) => setNewIngredient({...newIngredient, unit: event.target.value})}>
               <option value="" disabled hidden>Units</option>
-              {defaultUnits.map((unit, index) => (
-                <option key={index}>{unit.full}</option>
+              {unitsAvailable.units.map((unit, index) => (
+                <option key={index}>{unit}</option>
               ))}
             </select>
             <ActiveSearchBar currentValue={newIngredient.name} options={dropdownOptions} eventHandler={ingredientNameChange} />

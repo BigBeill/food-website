@@ -61,7 +61,7 @@ router.get('/findIngredient', async (req, res) => {
         // Perform a search using a case-insensitive regex based on the 'name' parameter
         const data = await ingredients.find(
             { name: {$regex: new RegExp(name, 'i')} },
-            { name:1}
+            { name:1, unitType: 1}
         ).limit(amount)
         res.end(JSON.stringify(data));
     } catch (error) {
