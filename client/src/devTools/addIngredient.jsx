@@ -3,7 +3,13 @@ import React, { useRef, useState, useEffect } from 'react'
 
 function DevToolsRouter(){
   const [name, setName] = useState("")
-  const [unitType, setUnitType] = useState("Grams")
+  const [physical, setPhysical] = useState("")
+  const [volume, setVolume] = useState("")
+  const [unitType, setUnitType] = useState({
+    weight: false,
+    physical: false,
+    volume: false
+  })
   const [calories, setCalories] = useState("")
   const [protein, setProtein] = useState("")
   const [fat, setFat] = useState("")
@@ -14,7 +20,9 @@ function DevToolsRouter(){
   function addIngredientHandler() {
     const ingredientData = {
       name: name,
-      unitType: unitType,
+      physical: physical,
+      volume: volume,
+      unitType: [],
       calories: calories,
       protein: protein,
       fat: fat,
@@ -23,27 +31,34 @@ function DevToolsRouter(){
       fiber: fiber
     }
 
-    var missingData = false
-    for (const key in ingredientData) {
-      if (ingredientData[key].length == 0) {
-        missingData = true
-      }
-    }
+    if (unitType.weight) { ingredientData.unitType.push("weight")}
+    if (unitType.physical) { ingredientData.unitType.push("physical")}
+    if (unitType.volume) { ingredientData.unitType.push("volume")}
 
-    if (!missingData) {
-      const postRequest = {
-        method: 'POST',
-        headers: { 'Content-type': 'application/json; charset=UTF-8', },
-        body: JSON.stringify(ingredientData)
-      }
-      
-      fetch("server/devTools/addIngredient", postRequest)
-      .then(response => response.json())
-      .then(data => {
-        console.log(data)
-        window.location.reload()
-      })
+    console.log(ingredientData)
+
+    const postRequest = {
+      method: 'POST',
+      headers: { 'Content-type': 'application/json; charset=UTF-8', },
+      body: JSON.stringify(ingredientData)
     }
+    
+    fetch("server/devTools/addIngredient", postRequest)
+    .then(response => response.json())
+    .then(data => {
+      console.log(data)
+      window.location.reload()
+    })
+  }
+
+  function checkboxChange(event) {
+    const name = event.target.name
+    const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
+    setUnitType({
+      ...unitType,
+      [name]: value
+    });
+    
   }
 
   return (
@@ -57,13 +72,29 @@ function DevToolsRouter(){
       </div>
 
       <div className='textInput'>
-        <label>unitType</label> 
-        <select onChange={(event) => setUnitType(event.target.value)}>
-          <option>grams</option>
-          <option>milliliters</option>
-          <option>cups</option>
-          <option>none</option>
-        </select>
+        <label>physical</label> 
+        <input type="number" 
+        value={physical}
+        onChange={(event) => setPhysical(event.target.value)}/>
+      </div>
+
+      <div className='textInput'>
+        <label>volume</label> 
+        <input type="number" 
+        value={volume}
+        onChange={(event) => setVolume(event.target.value)}/>
+      </div>
+
+      <div>
+        <input type="checkbox" id="weight" name="weight" value="weight" 
+        checked={unitType.weight} onChange={checkboxChange}/>
+        <label htmlFor="weight">weight   </label>
+        <input type="checkbox" id="physical" name="physical" value="physical" 
+        checked={unitType.physical} onChange={checkboxChange}/>
+        <label htmlFor="physical">physical   </label>
+        <input type="checkbox" id="volume" name="volume" value="volume" 
+        checked={unitType.volume} onChange={checkboxChange}/>
+        <label htmlFor="volume">volume   </label>
       </div>
 
       <div className='textInput'>
