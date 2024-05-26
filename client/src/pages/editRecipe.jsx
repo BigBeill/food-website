@@ -78,6 +78,10 @@ function editRecipe () {
       ingredients: ingredientList,
       instructions: instructionList
     }
+
+    fetch("server/recipe/updateRecipe", postRequest)
+    .then(response => response.json())
+    .then(data => console.log(data))
   }
 
 
