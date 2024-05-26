@@ -40,7 +40,7 @@ function editRecipe () {
       setUnitsAvailable({hidden:true, units:[]})
 
       // Optionally, trigger the fetch only if the input length is sufficient
-      if (event.target.value.length > 3) { fetchDropdownOptions(event.target.value) } 
+      if (event.target.value.length >= 3) { fetchDropdownOptions(event.target.value) } 
       else { setDropdownOptions([]) }
 
     } else if(event.type == "click") { // button was clicked
