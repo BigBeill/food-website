@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import ActiveSearchBar from '../components/ActiveSearchBar'
 
 function editRecipe () {
+  const [recipeId, setRecipeId] = useState("")
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
 
@@ -12,6 +14,15 @@ function editRecipe () {
 
   const [instructionList, setInstructionList] = useState([])
   const [newInstruction, setNewInstruction] = useState("")
+
+  const location = useLocation()
+  const navigateTo = useNavigate()
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search)
+    const queryId = queryParams.get('recipe')
+    if (!queryId) { navigateTo("/editRecipe?recipe=new") }
+    else { setRecipeId(queryId) }
+  }, [])
 
   function fetchDropdownOptions(ingredientName, amount = 5) {
     fetch(`server/recipe/findIngredient?name=${encodeURIComponent(ingredientName)}&amount=${amount}`)
@@ -56,8 +67,16 @@ function editRecipe () {
   }
 
   function addInstruction() {
-    if (newInstruction != ""){
-      setInstructionList((list) => { return [...list, newInstruction] })
+    if (newInstruction != ""){ setInstructionList((list) => { return [...list, newInstruction] }) }
+  }
+
+  function submitForm() {
+    if (title == "" || description == "" || ingredientList.length == 0 || instructionList.length == 0){ return }
+    const recipeData = {
+      title: title,
+      description: description,
+      ingredients: ingredientList,
+      instructions: instructionList
     }
   }
 
@@ -182,6 +201,7 @@ function editRecipe () {
           </div>
         </div>
       </div>
+      <button onClick={submitForm}>submit</button>
     </div>
     </>
   )
