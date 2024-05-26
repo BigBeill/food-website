@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, json, useLocation, useNavigate } from 'react-router-dom';
 import ActiveSearchBar from '../components/ActiveSearchBar'
 
 function editRecipe () {
@@ -14,6 +14,9 @@ function editRecipe () {
 
   const [instructionList, setInstructionList] = useState([])
   const [newInstruction, setNewInstruction] = useState("")
+
+  const [chosenImage, setChosenImage] = useState("")
+  const imageOptions = ['🧀', '🥞', '🍗', '🍔','🍞', '🥯', '🥐','🥨','🍗','🥓','🥩','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🥚','🍳','🥘','🥣','🥗','🍿','🧂','🥫']
 
   const location = useLocation()
   const navigateTo = useNavigate()
@@ -71,12 +74,18 @@ function editRecipe () {
   }
 
   function submitForm() {
-    if (title == "" || description == "" || ingredientList.length == 0 || instructionList.length == 0){ return }
-    const recipeData = {
+    if (title == "" || description == "" || chosenImage == "" || ingredientList.length == 0 || instructionList.length == 0){ return }
+    const postRequest = {
+      method: 'POST',
+      headers: { 'Content-type': 'application/json; charset=UTF-8', },
+      body: JSON.stringify({
+      id: recipeId,
       title: title,
+      image: chosenImage,
       description: description,
       ingredients: ingredientList,
       instructions: instructionList
+      })
     }
 
     fetch("server/recipe/updateRecipe", postRequest)
@@ -121,6 +130,17 @@ function editRecipe () {
         {/* div for user to input recipe image */}
         <div>
           <h2>image</h2>
+          <label
+          htmlFor='image'
+          >image</label>
+          <select 
+          name='image'
+          defaultValue={""}>
+            <option value="" disabled hidden>choose image</option>
+            {imageOptions.map((image, index) => (
+              <option key={index}>{image}</option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -176,15 +196,15 @@ function editRecipe () {
           <h2>Instructions</h2>
           <div>
             {instructionList.map((instruction, index) => (
-              <>
+              <React.Fragment key={index}>
               <h4>Step {index + 1}</h4>
               <p>{instruction}</p>
               <button onClick={() => {
-                  var newList = [...instructionList]
-                  newList.splice(index, 1)
-                  setInstructionList(newList)
+                var newList = [...instructionList]
+                newList.splice(index, 1)
+                setInstructionList(newList)
               }}> - </button>
-              </>
+              </React.Fragment>
             ))}
           </div>
           <div className="textInput withButton">
