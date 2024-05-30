@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect} from 'react'
 import { Navigate, json, useLocation, useNavigate } from 'react-router-dom';
 import ActiveSearchBar from '../components/ActiveSearchBar'
 
@@ -51,7 +51,7 @@ function editRecipe () {
       })
 
       // set all relavent data
-      setNewIngredient({...newIngredient, name:optionData.name, _id:optionData._id, unitType:optionData.unitType})
+      setNewIngredient({name:optionData.name, _id:optionData._id, unitType:optionData.unitType, unit:"", amount:""})
       setDropdownOptions([])
       let units = []
       if (optionData.unitType.includes('weight')) { units.push('grams', 'pounds', 'ounces') }
@@ -67,10 +67,14 @@ function editRecipe () {
 
     //if no data is missing add ingredient to list of ingredients
     setIngredientList((list) => { return [...list, newIngredient] })
+    setNewIngredient({name:"", _id:"", unitType:[], unit:"", amount:""})
+    setUnitsAvailable({hidden:true, units:[]})
   }
 
   function addInstruction() {
-    if (newInstruction != ""){ setInstructionList((list) => { return [...list, newInstruction] }) }
+    if (newInstruction == ""){ return }
+    setInstructionList((list) => { return [...list, newInstruction] })
+    setNewInstruction("")
   }
 
   function submitForm() {
@@ -79,12 +83,12 @@ function editRecipe () {
       method: 'POST',
       headers: { 'Content-type': 'application/json; charset=UTF-8', },
       body: JSON.stringify({
-      id: recipeId,
-      title: title,
-      image: chosenImage,
-      description: description,
-      ingredients: ingredientList,
-      instructions: instructionList
+        _id: recipeId,
+        title: title,
+        description: description,
+        image: chosenImage,
+        ingredients: ingredientList,
+        instructions: instructionList
       })
     }
 
@@ -135,7 +139,8 @@ function editRecipe () {
           >image</label>
           <select 
           name='image'
-          defaultValue={""}>
+          value={chosenImage}
+          onChange={(event) => setChosenImage(event.target.value)}>
             <option value="" disabled hidden>choose image</option>
             {imageOptions.map((image, index) => (
               <option key={index}>{image}</option>
@@ -173,7 +178,7 @@ function editRecipe () {
             placeholder='Amount'/>
             <select 
             className={unitsAvailable.hidden ? 'hidden' : ''} //hide input if needed
-            defaultValue={""}
+            value={newIngredient.unit}
             onChange={(event) => setNewIngredient({...newIngredient, unit: event.target.value})}>
               <option value="" disabled hidden>Units</option>
               {unitsAvailable.units.map((unit, index) => (

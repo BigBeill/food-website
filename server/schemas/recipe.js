@@ -6,14 +6,20 @@ const recipeSchema = new mongoose.Schema({
     title: String,
     description: String,
     image: {type: String, enum: ['🧀', '🥞', '🍗', '🍔','🍞', '🥯', '🥐','🥨','🍗','🥓','🥩','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🥚','🍳','🥘','🥣','🥗','🍿','🧂','🥫']},
-    ingredients: [String],
+    ingredients: {
+        name: String,
+        unit: String,
+        amount: Number
+    },
     instructions: [String],
-    calories: Number,
-    protein: Number,
-    fat: Number,
-    carbohydrates: Number,
-    sodium: Number,
-    fiber: Number,
+    nutrition: {
+        calories: Number,
+        protein: Number,
+        fat: Number,
+        carbohydrates: Number,
+        sodium: Number,
+        fiber: Number,
+    }
 })
 
 module.exports = mongoose.model("recipe", recipeSchema)

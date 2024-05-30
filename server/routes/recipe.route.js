@@ -3,6 +3,7 @@ const mongoConnection = require('../config/connectMongo')
 const recipes = mongoConnection.models.recipe
 const recipeSchema = require("../schemas/recipe")
 const ingredients = require("../schemas/ingredient")
+const getNutrition = require("../library/unitConvertingUtils").getNutrition
 
 // ------------ recipe get routes ------------
 
@@ -73,6 +74,44 @@ router.get('/findIngredient', async (req, res) => {
 
 
 // ---------- recipe post routes ------------
+
+router.post('/updateRecipe', async(req, res) => {
+    console.log("recipe/updateRecipe post request triggered...")
+    if (!req.user) { 
+        res.end(JSON.stringify({ message: "user not signed in" }))
+        return 
+    }
+
+    const recipeData = {
+        owner: req.user._id,
+        title: req.body.title,
+        description: req.body.description,
+        image: req.body.image,
+        ingredients: req.body.ingredients,
+        instructions: req.body.instructions,
+        calories: 0,
+        protein: 0,
+        fat: 0,
+        carbohydrates: 0,
+        sodium: 0,
+        fiber: 0,
+    }
+
+    // go through all posible reasons the new recipe may be rejected
+    if (!recipeData.title || !recipeData.description || !recipeData.image || !recipeData.ingredients || !recipeData.instructions || !recipeData.ingredients.length == 0 || recipe.instructions.length == 0) { res.end(JSON.stringify({ message: "important data missing" }))}
+    if (recipeData.title.length < 3 || recipeData.title.length > 500) { res.end(JSON.stringify({message: "bad title length"}))}
+    if (recipeData.description.length < 5 || recipeData.description.length > 5000) { res.end(JSON.stringify({message: "bad description length"}))}
+    // make image requierments later
+    if (recipeData.ingredients.length < 50) { res.end(JSON.stringify({message: "too many ingredients"}))}
+    if (recipeData.instructions.length < 50) { res.end(JSON.stringify({message: "too many instructions"}))}
+
+    // go through every ingredient, make sure its data is inside database and calculate its nutrition value
+    for (const ingredient of recipeData.ingredients){
+        if (!ingredient._id) { res.end(JSON.stringify({message: "ingredient id missing"})) }
+        const nutritionData = getNutrition({name: ingredient.name, amount: ingredient.amount, unit: ingredient.unit})
+    }
+})
+
 
 
 module.exports = router
