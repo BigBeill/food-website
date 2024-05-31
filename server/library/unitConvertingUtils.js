@@ -1,6 +1,6 @@
 /* 
 expects a json file ingredient = {
-  name: string,
+  _id: string,
   amount: int,
   unit: string
 }
@@ -20,9 +20,9 @@ const ingredients = require("../schemas/ingredient")
 
 async function getNutrition(ingredient) {
   console.log("data")
-  const ingredientData = await ingredients.findOne({name: ingredient.name})
+  const ingredientData = await ingredients.findOne({_id: ingredient._id})
   
-  console.log("ingredient data ", ingredientData)
+  console.log("ingredient data: ", ingredientData)
 
   let multiplyer = 0
   if (ingredient.unit == "physical") { multiplyer = 1/ingredientData.physical}
@@ -38,7 +38,7 @@ async function getNutrition(ingredient) {
     fiber: ingredientData.fiber * multiplyer
   }
 
-  console.log("nutrition data for ", ingredient.amount, " ", ingredient.unit, " of ", ingredient.name, ": ", nutritionData)
+  console.log("nutrition data for ", ingredient.amount, " ", ingredient.unit, " of ", ingredientData.name, ": ", nutritionData)
   return nutritionData
 }
 

@@ -40,9 +40,18 @@ app.use(passport.session())
 app.use((req, res, next) => {
     res.locals.user = req.user
 
+    // log some general information to console for debugging
     console.log()
-    console.log(req.session)
-    console.log(req.user)
+    console.log()
+    console.log()
+    console.log("CALL TO SERVER RECEIVED!")
+    console.log()
+    console.log( req.session)
+    console.log("User", req.user)
+    console.log()
+    console.log("requested url:", req.url)
+    console.log("requested method:", req.method)
+    console.log()
 
     next()
 })

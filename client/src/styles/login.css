@@ -110,12 +110,3 @@
 .loginForm .checkboxInput input{
     accent-color: #34d399;
 }
-
-.loginForm .error {
-    margin: 0rem;
-    padding: .3rem;
-    padding-left: .9rem;
-    border: .1rem solid #991b1b;
-    border-radius: .3rem;
-    background-color: rgb(153, 27, 27, .5);
-}

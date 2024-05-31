@@ -1,11 +1,17 @@
-import React, { useState, useEffect} from 'react'
+import React, { useState, useEffect, useRef} from 'react'
 import { Navigate, json, useLocation, useNavigate } from 'react-router-dom';
 import ActiveSearchBar from '../components/ActiveSearchBar'
 
 function editRecipe () {
+  const errorRef = useRef()
+  const [errorMessage, setErrorMessage] = useState("")
+
   const [recipeId, setRecipeId] = useState("")
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
+
+  const [chosenImage, setChosenImage] = useState("")
+  const imageOptions = ['🧀', '🥞', '🍗', '🍔','🍞', '🥯', '🥐','🥨','🍗','🥓','🥩','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🥚','🍳','🥘','🥣','🥗','🍿','🧂','🥫']
 
   const [ingredientList, setIngredientList] = useState([])
   const [newIngredient, setNewIngredient] = useState({name:"", _id:"", unitType:[], unit:"", amount:""})
@@ -15,17 +21,19 @@ function editRecipe () {
   const [instructionList, setInstructionList] = useState([])
   const [newInstruction, setNewInstruction] = useState("")
 
-  const [chosenImage, setChosenImage] = useState("")
-  const imageOptions = ['🧀', '🥞', '🍗', '🍔','🍞', '🥯', '🥐','🥨','🍗','🥓','🥩','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🥚','🍳','🥘','🥣','🥗','🍿','🧂','🥫']
-
   const location = useLocation()
   const navigateTo = useNavigate()
+
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search)
     const queryId = queryParams.get('recipe')
     if (!queryId) { navigateTo("/editRecipe?recipe=new") }
     else { setRecipeId(queryId) }
   }, [])
+
+  useEffect(() => {
+    setErrorMessage("")
+  }, [title, description, chosenImage, ingredientList, instructionList])
 
   function fetchDropdownOptions(ingredientName, amount = 5) {
     fetch(`server/recipe/findIngredient?name=${encodeURIComponent(ingredientName)}&amount=${amount}`)
@@ -68,7 +76,7 @@ function editRecipe () {
     let unitString = newIngredient.unit
     if (unitString.charAt(unitString.length - 1) == "s") { unitString = unitString.slice(0, -1) }
     //if no data is missing add ingredient to list of ingredients
-    setIngredientList((list) => { return [...list, {...newIngredient, unit: unitString}] })
+    setIngredientList((list) => { return [...list, {...newIngredient, unit: unitString}]})
     setNewIngredient({name:"", _id:"", unitType:[], unit:"", amount:""})
     setUnitsAvailable({hidden:true, units:[]})
   }
@@ -96,7 +104,10 @@ function editRecipe () {
 
     fetch("server/recipe/updateRecipe", postRequest)
     .then(response => response.json())
-    .then(data => console.log(data))
+    .then(data => {
+      if (data.message != "success") { setErrorMessage("Server rejected recipe. Reason:" + data.message)}
+      else {location.assign('/')}
+    })
   }
 
 
@@ -234,6 +245,8 @@ function editRecipe () {
         </div>
       </div>
       <button onClick={submitForm}>submit</button>
+
+      <p ref={errorRef} className={errorMessage ? "error" : "hidden"} area-live="assertive">{errorMessage}</p>
     </div>
     </>
   )

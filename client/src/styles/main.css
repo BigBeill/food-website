@@ -105,3 +105,12 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+.error {
+  margin: 0rem;
+  padding: .3rem;
+  padding-left: .9rem;
+  border: .1rem solid #991b1b;
+  border-radius: .3rem;
+  background-color: rgb(153, 27, 27, .5);
+}

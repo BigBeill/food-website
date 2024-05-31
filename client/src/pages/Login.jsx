@@ -38,7 +38,6 @@ function Login(){
       })
     }
   }
-  //location.assign('/')
 
   return(
     <>

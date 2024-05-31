@@ -75,14 +75,39 @@ router.get('/findIngredient', async (req, res) => {
 
 // ---------- recipe post routes ------------
 
+
+
+// takes 5 arguments from body
+//   _id: recipeId,
+//   title: string
+//   description: string
+//   image: string
+//   ingredients: [{_id: string, name: string, unit: string, amount: number}]
+//   instructions: [string]
+
+// route will:
+//   take data in the body and store it in recipeData (json object)
+//   go through every ingredient and calculate its nutriton data
+//   save total of all nutrition data in 
 router.post('/updateRecipe', async(req, res) => {
-    console.log("recipe/updateRecipe post request triggered...")
+    console.log("recipe/updateRecipe post request received")
+    console.log()
+    console.log("required information")
+    console.log("   _id:", req.body._id)
+    console.log("   title:", req.body.title)
+    console.log("   description:", req.body.description)
+    console.log("   image:", req.body.image)
+    console.log("   ingredients:", req.body.ingredients)
+    console.log("   instructions:", req.body.instructions)
+    console.log()
+
     if (!req.user) { 
+        console.log("user not signed in, ending recipe/updateRecipe request")
         res.end(JSON.stringify({ message: "user not signed in" }))
         return 
     }
 
-    const recipeData = {
+    let recipeData = {
         owner: req.user._id,
         title: req.body.title,
         description: req.body.description,
@@ -98,24 +123,78 @@ router.post('/updateRecipe', async(req, res) => {
     }
 
     // go through all posible reasons the new recipe may be rejected
-    if (!recipeData.title || !recipeData.description || !recipeData.image || !recipeData.ingredients || !recipeData.instructions || !recipeData.ingredients.length == 0 || recipe.instructions.length == 0) { res.end(JSON.stringify({ message: "important data missing" })); return }
-    if (recipeData.title.length < 3 || recipeData.title.length > 500) { res.end(JSON.stringify({message: "bad title length"})); return }
-    if (recipeData.description.length < 5 || recipeData.description.length > 5000) { res.end(JSON.stringify({message: "bad description length"})); return }
-    // make image requierments later
-    if (recipeData.ingredients.length < 50) { res.end(JSON.stringify({message: "too many ingredients"})); return }
-    if (recipeData.instructions.length < 50) { res.end(JSON.stringify({message: "too many instructions"})); return }
-
-    // go through every ingredient, make sure its data is inside database and calculate its nutrition value
-    for (const ingredient of recipeData.ingredients){
-        if (!ingredient._id) { res.end(JSON.stringify({message: "ingredient id missing"})); return }
-        const nutritionData = await getNutrition({name: ingredient.name, amount: ingredient.amount, unit: ingredient.unit})
-        recipeData.calories += nutritionData.calories
-        recipeData.protein += nutritionData.protein
-        recipeData.fat += nutritionData.fat
-        recipeData.carbohydrates += nutritionData.carbohydrates
-        recipeData.sodium += nutritionData.sodium
-        recipeData.fiber += nutritionData.fiber
+    console.log("checking for bad data")
+    if (!recipeData.title || !recipeData.description || !recipeData.image || !recipeData.ingredients || !recipeData.instructions || recipeData.ingredients.length == 0 || recipeData.instructions.length == 0) { 
+        console.log("important data missing, ending recipe/updateRecipe request")
+        res.end(JSON.stringify({ message: "important data missing" }))
+        return 
     }
+    if (recipeData.title.length < 3 || recipeData.title.length > 100) { 
+        console.log("bad title length (must be between 3 and 100 characters), ending recipe/updateRecipe request")
+        res.end(JSON.stringify({message: "bad title length"}))
+        return 
+    }
+    if (recipeData.description.length < 3 || recipeData.description.length > 3000) {
+        console.log("bad description length (must be between 3 and 3000 characters), ending recipe/updateRecipe request")
+        res.end(JSON.stringify({message: "bad description length"}))
+        return 
+    }
+    // make image requierments later
+    if (recipeData.ingredients.length > 50) { 
+        console.log("too many ingredients (must be less than 50), ending recipe/updateRecipe request")
+        res.end(JSON.stringify({message: "too many ingredients"}))
+        return 
+    }
+    if (recipeData.instructions.length > 50) {
+        console.log("too many instructions (must be less than 50), ending recipe/updateRecipe request")
+        res.end(JSON.stringify({message: "too many instructions"}))
+        return 
+    }
+
+    // go through every ingredient, make sure data is valid
+    for (const ingredient of recipeData.ingredients){
+        if (!ingredient._id || !ingredient.name || !ingredient.unit || !ingredient.amount) {
+            console.log("issue with ingredient:", ingredient)
+            console.log("important data missing (must have _id, name, unit, and amount field), ending recipe/updateRecipe request")
+            res.end(JSON.stringify({message: "ingredient id missing"}))
+            return
+        }
+    }
+
+    // go through every instruction, make sure data is valid
+    for (const instruction of recipeData.instructions){
+        if (instruction.length < 3 || instruction.length > 300){
+            console.log("bad instruction length (must be between 3 and 300 character), ending recipe/updateRecipe request")
+            res.end(JSON.stringify({message: "bad instruction length"}))
+            return
+        }
+    }
+
+    console.log("data accepted")
+
+    console.log("going through each ingredient to calculate total recipe nutrition value")
+    for (const ingredient of recipeData.ingredients){
+
+        try{ 
+            const nutritionData = await getNutrition({_id: ingredient._id, amount: ingredient.amount, unit: ingredient.unit}) 
+            console.log("calculated nutrition value for ingredient", ingredient._id + ":", nutritionData )
+            recipeData.calories += nutritionData.calories
+            recipeData.protein += nutritionData.protein
+            recipeData.fat += nutritionData.fat
+            recipeData.carbohydrates += nutritionData.carbohydrates
+            recipeData.sodium += nutritionData.sodium
+            recipeData.fiber += nutritionData.fiber
+        }
+        catch{ 
+            console.log("issue with ingredient:", ingredient)
+            console.log("unable to calculate nutrition data for ingredient, ending recipe/updateRecipe request")
+            res.end(JSON.stringify({message: "unable to calculate nutrition value of: " + ingredient.name}))
+            return 
+        }
+        
+    }
+    console.log("total recipe nutrition value calculated")
+    console.log("compleated recipe data:", recipeData)
 })
 
 
