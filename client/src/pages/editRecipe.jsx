@@ -56,7 +56,7 @@ function editRecipe () {
       let units = []
       if (optionData.unitType.includes('weight')) { units.push('grams', 'pounds', 'ounces') }
       if (optionData.unitType.includes('physical')) { units.push('physical') }
-      if (optionData.unitType.includes('volume')) { units.push('liters', 'milliters', 'cups', 'tablespoons')}
+      if (optionData.unitType.includes('volume')) { units.push('liters', 'millimeters', 'cups', 'tablespoons') }
       setUnitsAvailable({hidden:false, units:units})
     }
   }
@@ -64,9 +64,11 @@ function editRecipe () {
   function addIngredient() {
     //check for any missing data
     if (newIngredient.name == "" || newIngredient.amount == "" || newIngredient.unit == "" || newIngredient._id == ""){ return } 
-
+    // remove the last letter from unit type if its an s
+    let unitString = newIngredient.unit
+    if (unitString.charAt(unitString.length - 1) == "s") { unitString = unitString.slice(0, -1) }
     //if no data is missing add ingredient to list of ingredients
-    setIngredientList((list) => { return [...list, newIngredient] })
+    setIngredientList((list) => { return [...list, {...newIngredient, unit: unitString}] })
     setNewIngredient({name:"", _id:"", unitType:[], unit:"", amount:""})
     setUnitsAvailable({hidden:true, units:[]})
   }
@@ -157,16 +159,17 @@ function editRecipe () {
         <div>
           <h2>Ingredients</h2>
           <ul>
-          {ingredientList.map((ingredient, index) => (
+          {ingredientList.map((ingredient, index) => {
+            if (ingredient.unit == 'physical') { return (
               <li key={index}>
-                <p>{ingredient.amount} {ingredient.unit!='physical' ?  ingredient.unit +' of' : '' } {ingredient.name}{ingredient.amount!=1 ? 's' : ''}</p> 
-                <button onClick={() => {
-                  var newList = [...ingredientList]
-                  newList.splice(index, 1)
-                  setIngredientList(newList)
-                }}> - </button>
+                <p>{ingredient.amount} {ingredient.name}{ingredient.amount!=1 ? 's' : ''}</p>
               </li>
-            ))}
+            )} else { return (
+              <li key={index}>
+                <p>{ingredient.amount} {ingredient.unit}{ingredient.amount != 1 ? 's' : ''} of {ingredient.name}</p>
+              </li>
+            )}
+          })}
           </ul>
           <div className='newIngredientDiv'>
             <h3>New Ingredient</h3>

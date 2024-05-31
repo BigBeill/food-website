@@ -1,4 +1,5 @@
 const router = require("express").Router()
+const { json } = require("express")
 const mongoConnection = require('../config/connectMongo') 
 const ingredients = mongoConnection.models.ingredient
 
@@ -31,7 +32,6 @@ router.post('/addIngredient', async (req, res) => {
     fiber: req.body.fiber,
   })
 
-  console.log(newIngredient)
   var missingData = false
   if (newIngredient.name.length == 0) { missingData = true}
   if (newIngredient.calories.length == 0) { missingData = true}
@@ -45,7 +45,10 @@ router.post('/addIngredient', async (req, res) => {
 
   if (!missingData && result.length == 0){
     newIngredient.save()
-    .then((ingredient) => {console.log(ingredient)})
+    .then((ingredient) => {
+      console.log(ingredient)
+      res.end(JSON.stringify({message: "success"}))
+    })
   }
 
   res.end()
