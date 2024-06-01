@@ -6,11 +6,12 @@ const recipeSchema = new mongoose.Schema({
     title: String,
     description: String,
     image: {type: String, enum: ['🧀', '🥞', '🍗', '🍔','🍞', '🥯', '🥐','🥨','🍗','🥓','🥩','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🥚','🍳','🥘','🥣','🥗','🍿','🧂','🥫']},
-    ingredients: {
+    ingredients: [{
+        _id: mongoose.SchemaTypes.ObjectId,
         name: String,
         unit: String,
         amount: Number
-    },
+    }],
     instructions: [String],
     nutrition: {
         calories: Number,

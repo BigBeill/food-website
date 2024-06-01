@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef} from 'react'
-import { Navigate, json, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ActiveSearchBar from '../components/ActiveSearchBar'
 
 function editRecipe () {
@@ -14,7 +14,7 @@ function editRecipe () {
   const imageOptions = ['🧀', '🥞', '🍗', '🍔','🍞', '🥯', '🥐','🥨','🍗','🥓','🥩','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🥚','🍳','🥘','🥣','🥗','🍿','🧂','🥫']
 
   const [ingredientList, setIngredientList] = useState([])
-  const [newIngredient, setNewIngredient] = useState({name:"", _id:"", unitType:[], unit:"", amount:""})
+  const [newIngredient, setNewIngredient] = useState({_id:"", name:"", unitType:[], unit:"", amount:""})
   const [dropdownOptions, setDropdownOptions] = useState([])
   const [unitsAvailable, setUnitsAvailable] = useState({hidden:true, units:[]})
 
@@ -22,12 +22,12 @@ function editRecipe () {
   const [newInstruction, setNewInstruction] = useState("")
 
   const location = useLocation()
-  const navigateTo = useNavigate()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search)
     const queryId = queryParams.get('recipe')
-    if (!queryId) { navigateTo("/editRecipe?recipe=new") }
+    if (!queryId) { navigate("/editRecipe?recipe=new") }
     else { setRecipeId(queryId) }
   }, [])
 
@@ -44,7 +44,7 @@ function editRecipe () {
 
   function ingredientNameChange(event) {
     if(event.type == "change"){ // text input was changed
-      setNewIngredient({...newIngredient, name: event.target.value, _id: ""})
+      setNewIngredient({...newIngredient, _id: "", name: event.target.value })
       setUnitsAvailable({hidden:true, units:[]})
 
       // Optionally, trigger the fetch only if the input length is sufficient
@@ -59,7 +59,7 @@ function editRecipe () {
       })
 
       // set all relavent data
-      setNewIngredient({name:optionData.name, _id:optionData._id, unitType:optionData.unitType, unit:"", amount:""})
+      setNewIngredient({_id:optionData._id, name:optionData.name, unitType:optionData.unitType, unit:"", amount:""})
       setDropdownOptions([])
       let units = []
       if (optionData.unitType.includes('weight')) { units.push('milligrams', 'grams', 'pounds', 'ounces') }
@@ -77,7 +77,7 @@ function editRecipe () {
     if (unitString.charAt(unitString.length - 1) == "s") { unitString = unitString.slice(0, -1) }
     //if no data is missing add ingredient to list of ingredients
     setIngredientList((list) => { return [...list, {...newIngredient, unit: unitString}]})
-    setNewIngredient({name:"", _id:"", unitType:[], unit:"", amount:""})
+    setNewIngredient({_id:"", name:"", unitType:[], unit:"", amount:""})
     setUnitsAvailable({hidden:true, units:[]})
   }
 
@@ -89,6 +89,8 @@ function editRecipe () {
 
   function submitForm() {
     if (title == "" || description == "" || chosenImage == "" || ingredientList.length == 0 || instructionList.length == 0){ return }
+    let newIngredientList = []
+    for (const ingredient of ingredientList){ newIngredientList.push( delete ingredient.unitType) }
     const postRequest = {
       method: 'POST',
       headers: { 'Content-type': 'application/json; charset=UTF-8', },
@@ -104,10 +106,10 @@ function editRecipe () {
 
     fetch("server/recipe/updateRecipe", postRequest)
     .then(response => response.json())
-    .then(data => {
-      if (data.message != "success") { setErrorMessage("Server rejected recipe. Reason: " + data.message)}
-      else {location.assign('/')}
-    })
+    .then((data => {
+      if (data.message == "success") { navigate("/")}
+      else {setErrorMessage(data.message)}
+    }))
   }
 
 

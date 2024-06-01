@@ -3,6 +3,7 @@ const mongoConnection = require('../config/connectMongo')
 const recipes = mongoConnection.models.recipe
 const recipeSchema = require("../schemas/recipe")
 const ingredients = require("../schemas/ingredient")
+const users = require("../schemas/user")
 const getNutrition = require("../library/unitConvertingUtils").getNutrition
 
 // ------------ recipe get routes ------------
@@ -73,6 +74,9 @@ router.get('/findIngredient', async (req, res) => {
 
 
 
+
+
+
 // ---------- recipe post routes ------------
 
 
@@ -127,6 +131,11 @@ router.post('/updateRecipe', async(req, res) => {
 
     // go through all posible reasons the new recipe may be rejected
     console.log("checking for bad data")
+    if (!req.body._id) { 
+        console.log("no recipe _id provided, ending recipe/updateRecipe request")
+        res.end(JSON.stringify({message: "bad recipe _id"}))
+        return 
+    }
     if (!recipeData.title || !recipeData.description || !recipeData.image || !recipeData.ingredients || !recipeData.instructions || recipeData.ingredients.length == 0 || recipeData.instructions.length == 0) { 
         console.log("important data missing, ending recipe/updateRecipe request")
         res.end(JSON.stringify({ message: "important data missing" }))
@@ -202,7 +211,45 @@ router.post('/updateRecipe', async(req, res) => {
     console.log("total recipe nutrition value calculated")
     console.log("compleated recipe data:", recipeData)
 
-    res.end(JSON.stringify({message: "success"}))
+    if (req.body._id == 'new') {
+        console.log("attempting to save new recipe")
+        try {
+            const newRecipe = new recipes(recipeData)
+            await newRecipe.save()
+            console.log("new recipe added successfully")
+            await users.updateOne({_id: req.user._id}, { $push: { ownedRecipes: newRecipe._id } })
+            console.log("new recipe added to users owned recipes collection")
+            console.log("post request finnished, ending recipe/updateRecipe request")
+            res.end(JSON.stringify({message: "success"}))
+            return
+        }
+        catch {
+            console.log("failed to save recipe, ending recipe/updateRecipe request")
+            res.end(JSON.stringify({message: "server issue"}))
+            return
+        }
+    } else {
+        console.log("attempting to update recipe with _id:", req.body._id)
+        try {
+            const oldRecipe = await recipes.findOne({ _id: req.body._id},{owner: 1})
+            if (oldRecipe.owner == req.user._id) {
+                console.log("recipe owner verified")
+                await recipes.updateOne( { _id: req.body._id}, { $set: recipeData } )
+                console.log("recipe ", req.body._id, " has been updated, ending recipe/updateRecipe request")
+                res.end(JSON.stringify({message: "success"}))
+                return
+            } else {
+                console.log("owner of recipe ", req.body._id, " is not currently signed in, ending recipe/updateRecipe request")
+                res.end(JSON.stringify({message: "server issue"}))
+                return
+            }
+        }
+        catch {
+            console.log("failed to save recipe, ending recipe/updateRecipe request")
+            res.end(JSON.stringify({message: "server issue"}))
+            return
+        }
+    }
 })
 
 
