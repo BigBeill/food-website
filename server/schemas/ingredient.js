@@ -3,8 +3,8 @@ const mongoose = require("mongoose")
 // all data inputed should be relavent to 1 gram
 const ingredientSchema = new mongoose.Schema({
   name: String,
-  physical: Number, // how much of this item would equal 1 gram
-  volume: Number, // how many liters of this item would equal 1 gram
+  physical: Number, // how many grams one unit of this item is worth
+  volume: Number, // how many grams one liter of this item is worth
   unitType: [{type: String, enum: ['physical', 'weight', 'volume']}],
   calories: Number,
   fat: Number,

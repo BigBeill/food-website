@@ -11,11 +11,14 @@ function DevToolsRouter(){
     volume: false
   })
   const [calories, setCalories] = useState("")
-  const [protein, setProtein] = useState("")
   const [fat, setFat] = useState("")
-  const [carbohydrates, setCarbohydrates] = useState("")
+  const [cholesterol, setCholesterol] = useState("")
   const [sodium, setSodium] = useState("")
+  const [potassium, setPotassium] = useState("")
+  const [carbohydrates, setCarbohydrates] = useState("")
   const [fiber, setFiber] = useState("")
+  const [sugar, setSugar] = useState("")
+  const [protein, setProtein] = useState("")
 
   function addIngredientHandler() {
     const ingredientData = {
@@ -24,11 +27,14 @@ function DevToolsRouter(){
       volume: volume,
       unitType: [],
       calories: calories,
-      protein: protein,
       fat: fat,
-      carbohydrates: carbohydrates,
+      cholesterol: cholesterol,
       sodium: sodium,
-      fiber: fiber
+      potassium: potassium,
+      carbohydrates: carbohydrates,
+      fiber: fiber,
+      sugar: sugar,
+      protein: protein
     }
 
     if (unitType.weight) { ingredientData.unitType.push("weight")}
@@ -47,7 +53,7 @@ function DevToolsRouter(){
     .then(response => response.json())
     .then(data => {
       console.log(data)
-      window.location.reload()
+      if(data.message == "success") {window.location.reload()}
     })
   }
 
@@ -105,13 +111,6 @@ function DevToolsRouter(){
       </div>
 
       <div className='textInput'>
-        <label>protein</label> 
-        <input type="number" 
-        value={protein}
-        onChange={(event) => setProtein(event.target.value)}/>
-      </div>
-
-      <div className='textInput'>
         <label>fat</label> 
         <input type="number" 
         value={fat}
@@ -119,10 +118,10 @@ function DevToolsRouter(){
       </div>
 
       <div className='textInput'>
-        <label>carbohydrates</label> 
+        <label>cholesterol</label> 
         <input type="number" 
-        value={carbohydrates}
-        onChange={(event) => setCarbohydrates(event.target.value)}/>
+        value={cholesterol}
+        onChange={(event) => setCholesterol(event.target.value)}/>
       </div>
 
       <div className='textInput'>
@@ -133,10 +132,38 @@ function DevToolsRouter(){
       </div>
 
       <div className='textInput'>
+        <label>potassium</label> 
+        <input type="number" 
+        value={potassium}
+        onChange={(event) => setPotassium(event.target.value)}/>
+      </div>
+
+      <div className='textInput'>
+        <label>carbohydrates</label> 
+        <input type="number" 
+        value={carbohydrates}
+        onChange={(event) => setCarbohydrates(event.target.value)}/>
+      </div>
+
+      <div className='textInput'>
         <label>fiber</label> 
         <input type="number" 
         value={fiber}
         onChange={(event) => setFiber(event.target.value)}/>
+      </div>
+
+      <div className='textInput'>
+        <label>sugar</label> 
+        <input type="number" 
+        value={sugar}
+        onChange={(event) => setSugar(event.target.value)}/>
+      </div>
+
+      <div className='textInput'>
+        <label>protein</label> 
+        <input type="number" 
+        value={protein}
+        onChange={(event) => setProtein(event.target.value)}/>
       </div>
 
       <div className='button'>

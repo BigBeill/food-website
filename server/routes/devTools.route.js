@@ -7,9 +7,9 @@ const ingredients = mongoConnection.models.ingredient
 
 // ---------- devTools post routes ------------
 
-// takes 10 arguments from body:
+// takes 13 arguments from body:
 //   name, unitType: string
-//   physical volume, calories, protein, fat, carbohydrates, sodium, fiber: int
+//   physical volume, calories, fat, cholesterol, sodium, potassium, carbohydrates, fiber, sugar, protein: int
 
 // route will:
 //   take all data provided and save as a new ingredient in database
@@ -59,6 +59,7 @@ router.post('/addIngredient', async (req, res) => {
     })
     } catch {
       res.end(JSON.stringify({message: "failed"}))
+      return
     }
   } else { 
     res.end(JSON.stringify({message: "failed"}))
