@@ -115,11 +115,14 @@ router.post('/updateRecipe', async(req, res) => {
         ingredients: req.body.ingredients,
         instructions: req.body.instructions,
         calories: 0,
-        protein: 0,
         fat: 0,
-        carbohydrates: 0,
+        cholesterol: 0,
         sodium: 0,
+        potassium: 0,
+        carbohydrates: 0,
         fiber: 0,
+        sugar: 0,
+        protein: 0,
     }
 
     // go through all posible reasons the new recipe may be rejected
@@ -178,11 +181,14 @@ router.post('/updateRecipe', async(req, res) => {
             const nutritionData = await getNutrition(ingredient._id, ingredient.amount, ingredient.unit) 
             console.log("calculated nutrition value for ingredient", ingredient._id + ":", nutritionData )
             recipeData.calories += nutritionData.calories
-            recipeData.protein += nutritionData.protein
             recipeData.fat += nutritionData.fat
-            recipeData.carbohydrates += nutritionData.carbohydrates
+            recipeData.cholesterol += nutritionData.cholesterol
             recipeData.sodium += nutritionData.sodium
+            recipeData.potassium += nutritionData.potassium
+            recipeData.carbohydrates += nutritionData.carbohydrates
             recipeData.fiber += nutritionData.fiber
+            recipeData.sugar += nutritionData.sugar
+            recipeData.protein += nutritionData.protein
         }
         catch (error){ 
             console.log("issue with ingredient: " +  ingredient + ". reason: " + error)

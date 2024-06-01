@@ -7,11 +7,14 @@ const ingredientSchema = new mongoose.Schema({
   volume: Number, // how many liters of this item would equal 1 gram
   unitType: [{type: String, enum: ['physical', 'weight', 'volume']}],
   calories: Number,
-  protein: Number,
   fat: Number,
-  carbohydrates: Number,
+  cholesterol: Number,
   sodium: Number,
+  potassium: Number,
+  carbohydrates: Number,
   fiber: Number,
+  sugar: Number,
+  protein: Number,
 })
 
 module.exports = mongoose.model("ingredient", ingredientSchema)

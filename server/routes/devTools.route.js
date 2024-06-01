@@ -25,33 +25,44 @@ router.post('/addIngredient', async (req, res) => {
     volume: req.body.volume,
     unitType: req.body.unitType,
     calories: req.body.calories,
-    protein: req.body.protein,
     fat: req.body.fat,
-    carbohydrates: req.body.carbohydrates,
+    cholesterol: req.body.cholesterol,
     sodium: req.body.sodium,
+    potassium: req.body.potassium,
+    carbohydrates: req.body.carbohydrates,
     fiber: req.body.fiber,
+    sugar: req.body.sugar,
+    protein: req.body.protein,
   })
 
   var missingData = false
   if (newIngredient.name.length == 0) { missingData = true}
   if (newIngredient.calories.length == 0) { missingData = true}
-  if (newIngredient.protein.length == 0) { missingData = true}
   if (newIngredient.fat.length == 0) { missingData = true}
-  if (newIngredient.carbohydrates.length == 0) { missingData = true}
+  if (newIngredient.cholesterol.length == 0) { missingData = true}
   if (newIngredient.sodium.length == 0) { missingData = true}
+  if (newIngredient.potassium.length == 0) { missingData = true}
+  if (newIngredient.carbohydrates.length == 0) { missingData = true}
   if (newIngredient.fiber.length == 0) { missingData = true}
-
+  if (newIngredient.sugar.length == 0) { missingData = true}
+  if (newIngredient.protein.length == 0) { missingData = true}
+  
   var result = await ingredients.find({name: req.body.name})
 
   if (!missingData && result.length == 0){
+    try {
     newIngredient.save()
     .then((ingredient) => {
       console.log(ingredient)
       res.end(JSON.stringify({message: "success"}))
+      return
     })
+    } catch {
+      res.end(JSON.stringify({message: "failed"}))
+    }
+  } else { 
+    res.end(JSON.stringify({message: "failed"}))
   }
-
-  res.end()
 })
 
 module.exports = router

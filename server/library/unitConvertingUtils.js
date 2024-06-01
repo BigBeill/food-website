@@ -37,11 +37,14 @@ async function getNutrition(_id, amount, unit) {
 
   const nutritionData = {
     calories: ingredientData.calories * multiplyer,
-    protein: ingredientData.protein * multiplyer,
     fat: ingredientData.fat * multiplyer,
-    carbohydrates: ingredientData.carbohydrates * multiplyer,
+    cholesterol: ingredientData.cholesterol * multiplyer,
     sodium: ingredientData.sodium * multiplyer,
-    fiber: ingredientData.fiber * multiplyer
+    potassium: ingredientData.potassium * multiplyer,
+    carbohydrates: ingredientData.carbohydrates * multiplyer,
+    fiber: ingredientData.fiber * multiplyer,
+    sugar: ingredientData.sugar * multiplyer,
+    protein: ingredientData.protein * multiplyer,
   }
 
   return nutritionData
