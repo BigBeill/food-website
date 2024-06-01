@@ -170,13 +170,12 @@ router.post('/updateRecipe', async(req, res) => {
         }
     }
 
-    console.log("data accepted")
-
-    console.log("going through each ingredient to calculate total recipe nutrition value")
+    console.log("no bad data found. recipe data from client accepted")
+    console.log("calculating total recipe nutrition value (going through each ingredient)")
     for (const ingredient of recipeData.ingredients){
 
         try{ 
-            const nutritionData = await getNutrition({_id: ingredient._id, amount: ingredient.amount, unit: ingredient.unit}) 
+            const nutritionData = await getNutrition(ingredient._id, ingredient.amount, ingredient.unit) 
             console.log("calculated nutrition value for ingredient", ingredient._id + ":", nutritionData )
             recipeData.calories += nutritionData.calories
             recipeData.protein += nutritionData.protein
@@ -185,16 +184,19 @@ router.post('/updateRecipe', async(req, res) => {
             recipeData.sodium += nutritionData.sodium
             recipeData.fiber += nutritionData.fiber
         }
-        catch{ 
-            console.log("issue with ingredient:", ingredient)
+        catch (error){ 
+            console.log("issue with ingredient: " +  ingredient + ". reason: " + error)
             console.log("unable to calculate nutrition data for ingredient, ending recipe/updateRecipe request")
             res.end(JSON.stringify({message: "unable to calculate nutrition value of: " + ingredient.name}))
             return 
         }
         
     }
+
     console.log("total recipe nutrition value calculated")
     console.log("compleated recipe data:", recipeData)
+
+    res.end(JSON.stringify({message: "success"}))
 })
 
 

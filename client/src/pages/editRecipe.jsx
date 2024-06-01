@@ -62,7 +62,7 @@ function editRecipe () {
       setNewIngredient({name:optionData.name, _id:optionData._id, unitType:optionData.unitType, unit:"", amount:""})
       setDropdownOptions([])
       let units = []
-      if (optionData.unitType.includes('weight')) { units.push('grams', 'pounds', 'ounces') }
+      if (optionData.unitType.includes('weight')) { units.push('milligrams', 'grams', 'pounds', 'ounces') }
       if (optionData.unitType.includes('physical')) { units.push('physical') }
       if (optionData.unitType.includes('volume')) { units.push('liters', 'millimeters', 'cups', 'tablespoons') }
       setUnitsAvailable({hidden:false, units:units})
@@ -105,7 +105,7 @@ function editRecipe () {
     fetch("server/recipe/updateRecipe", postRequest)
     .then(response => response.json())
     .then(data => {
-      if (data.message != "success") { setErrorMessage("Server rejected recipe. Reason:" + data.message)}
+      if (data.message != "success") { setErrorMessage("Server rejected recipe. Reason: " + data.message)}
       else {location.assign('/')}
     })
   }
