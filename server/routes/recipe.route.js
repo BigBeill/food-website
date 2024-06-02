@@ -6,9 +6,14 @@ const ingredients = require("../schemas/ingredient")
 const users = require("../schemas/user")
 const getNutrition = require("../library/unitConvertingUtils").getNutrition
 
+
+
+
+
+
 // ------------ recipe get routes ------------
 
-// STILL WORKING ON THIS ROUTE, DISCRIPTION DOES NOT YET MATCH OUTPUT
+
 
 // takes 2 arguments from url:
 //   name: string
@@ -20,7 +25,7 @@ const getNutrition = require("../library/unitConvertingUtils").getNutrition
 // if arguments are not provided:
 //   name: return recipes with any title
 //   amount: assume amount is 20
-router.get('/publicRecipes', async (req, res) => {
+router.get('/findRecipes', async (req, res) => {
     console.log("recipe/publicRecipes get request triggered...")
     const name = req.query.name || '';
     const amount = parseInt(req.query.amount, 10) || 20;
@@ -200,7 +205,7 @@ router.post('/updateRecipe', async(req, res) => {
             recipeData.protein += nutritionData.protein
         }
         catch (error){ 
-            console.log("issue with ingredient: " +  ingredient + ". reason: " + error)
+            console.log("issue with ingredient: " +  ingredient.name + ". reason: " + error)
             console.log("unable to calculate nutrition data for ingredient, ending recipe/updateRecipe request")
             res.end(JSON.stringify({message: "unable to calculate nutrition value of: " + ingredient.name}))
             return 

@@ -31,7 +31,7 @@ async function getNutrition(_id, amount, unit) {
   else if (unit == "liter") { multiplyer = ingredientData.volume * amount }
   else if (unit == "teaspoon") { multiplyer = 0.00492892 * ingredientData.volume * amount }
   else if (unit == "tablespoon") { multiplyer = 0.0147868 * ingredientData.volume * amount }
-  else if (unit == "cups") { multiplyer = 0.24 * ingredientData.volume * amount }
+  else if (unit == "cup") { multiplyer = 0.24 * ingredientData.volume * amount }
 
   else{ throw "given unit not recognized by getNutrition" }
 

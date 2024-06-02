@@ -11,7 +11,7 @@ function Home() {
   const [recipes, setRecipes] = useState([]);
 
   const fetchRecipeData = async() => {
-    await fetch('server/recipe/publicRecipes')
+    await fetch('server/recipe/findRecipes')
     .then(response => response.json())
     .then(data => {
       const flattenedRecipes = data.flat();
