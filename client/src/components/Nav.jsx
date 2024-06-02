@@ -19,7 +19,7 @@ function Nav(data) {
                 <>
 
                 <h3>Your Recipes</h3>
-                <a href="/index">Personal</a>
+                <a href="/recipeBook">Personal</a>
                 <a href="/index">Saved</a>
                 <a href="/editRecipe?recipe=new">New Recipe</a>
 
