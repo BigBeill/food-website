@@ -41,16 +41,17 @@ app.use((req, res, next) => {
     res.locals.user = req.user
 
     // log some general information to console for debugging
+    console.log("\n\n\n\n\n");
+    console.log("\x1b[31m%s\x1b[0m", "CALL TO SERVER RECEIVED!")
     console.log()
-    console.log()
-    console.log()
-    console.log("CALL TO SERVER RECEIVED!")
-    console.log()
-    console.log( req.session)
-    console.log("User", req.user)
-    console.log()
-    console.log("requested url:", req.url)
-    console.log("requested method:", req.method)
+    console.log("active session:", !!req.session)
+    console.log("active user:", !!req.user)
+    if (req.user) { 
+        console.log("   username = " + "\x1b[32m%s\x1b[0m", req.user.username)
+        console.log("        _id =", req.user._id)
+    }
+    console.log("requested url: " + "\x1b[36m%s\x1b[0m", req.url)
+    console.log("requested method: "+ "\x1b[36m%s\x1b[0m", req.method)
     console.log()
 
     next()

@@ -201,7 +201,7 @@ function editRecipe () {
                 <option key={index}>{unit}</option>
               ))}
             </select>
-            <ActiveSearchBar currentValue={newIngredient.name} options={dropdownOptions} eventHandler={ingredientNameChange} />
+            {ActiveSearchBar(newIngredient.name, dropdownOptions, ingredientNameChange)}
             
           </div>
           <button

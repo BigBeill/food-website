@@ -6,7 +6,6 @@ import Home from './pages/Home'
 import Register from './pages/Register'
 import Profile from './pages/Profile'
 import EditRecipe from './pages/EditRecipe'
-import RecipeBook from './pages/RecipeBook'
 import FriendsList from './pages/FriendsList'
 import AddIngredient from './devTools/addIngredient'
 
@@ -39,7 +38,6 @@ function App() {
             <Route path="/login" exact element={<Login />} />
             <Route path="/register" exact element={<Register />} />
             <Route path="/editRecipe" exact element={<EditRecipe />} />
-            <Route path='/recipeBook' exact element={<RecipeBook />}/>
             <Route path="/friendsList" exact element={<FriendsList />} />
             <Route path="/profile" exact element={<Profile userData = {userData} />} />
             <Route path="/addIngredient" exact element={<AddIngredient />} /> {/*remove before production*/}

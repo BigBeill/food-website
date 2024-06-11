@@ -46,62 +46,6 @@ h3 {
 
 
 
-/* ------------ openNotebook css ------------ */
-
-.openNotebook {
-  position: absolute;
-  display: flex;
-  gap: .6rem;
-  padding: 3rem 6rem;
-  width: calc(100% - 12rem);
-  height: calc(100% - 6rem);
-  max-width: 75rem;
-  left: 50%;
-  transform: translate(-50%, 0%);
-}
-
-.openNotebook > .notebookPage {
-  width: 100%;
-  height: calc(100% - .3rem);
-  background-color: #f6eee3;
-  box-shadow: 0.09rem 0.09rem 0.3rem #2C1A1D;
-}
-
-.openNotebook > .notebookPage:first-child {
-  margin-top: .3rem;
-  border-radius: 2.5rem .15rem .15rem 2.5rem;
-}
-
-.openNotebook > .notebookPage:last-child {
-  border-radius: .15rem 2.5rem 2.5rem .15rem;
-}
-
-.openNotebook > .notebookSpine {
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%, 0%);
-  height: calc(100% - 6rem);
-}
-
-.notebookRecipe {
-  margin: .9rem 1.2rem 1.2rem 1.2rem;
-  width: calc(100% - 3.6rem );
-  height: 12rem;
-  border-top: .12rem solid #797979;
-  border-bottom: .12rem solid #797979;
-}
-
-.openNotebook > .notebookPage:first-child .notebookRecipe{
-  margin: .9rem 2.4rem 0rem 1.2rem;
-}
-
-.notebookRecipe h4 {
-  font-weight: 400;
-  color: #575757;
-}
-
-
-
 /* ------------ other css ------------ */
 
 .hidden{

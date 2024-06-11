@@ -123,15 +123,17 @@ router.post('/updateRecipe', async(req, res) => {
         image: req.body.image,
         ingredients: req.body.ingredients,
         instructions: req.body.instructions,
-        calories: 0,
-        fat: 0,
-        cholesterol: 0,
-        sodium: 0,
-        potassium: 0,
-        carbohydrates: 0,
-        fiber: 0,
-        sugar: 0,
-        protein: 0,
+        nutrition:{
+            calories: 0,
+            fat: 0,
+            cholesterol: 0,
+            sodium: 0,
+            potassium: 0,
+            carbohydrates: 0,
+            fiber: 0,
+            sugar: 0,
+            protein: 0,
+        }
     }
 
     // go through all posible reasons the new recipe may be rejected
@@ -194,15 +196,15 @@ router.post('/updateRecipe', async(req, res) => {
         try{ 
             const nutritionData = await getNutrition(ingredient._id, ingredient.amount, ingredient.unit) 
             console.log("calculated nutrition value for ingredient", ingredient._id + ":", nutritionData )
-            recipeData.calories += nutritionData.calories
-            recipeData.fat += nutritionData.fat
-            recipeData.cholesterol += nutritionData.cholesterol
-            recipeData.sodium += nutritionData.sodium
-            recipeData.potassium += nutritionData.potassium
-            recipeData.carbohydrates += nutritionData.carbohydrates
-            recipeData.fiber += nutritionData.fiber
-            recipeData.sugar += nutritionData.sugar
-            recipeData.protein += nutritionData.protein
+            recipeData.nutrition.calories += nutritionData.calories
+            recipeData.nutrition.fat += nutritionData.fat
+            recipeData.nutrition.cholesterol += nutritionData.cholesterol
+            recipeData.nutrition.sodium += nutritionData.sodium
+            recipeData.nutrition.potassium += nutritionData.potassium
+            recipeData.nutrition.carbohydrates += nutritionData.carbohydrates
+            recipeData.nutrition.fiber += nutritionData.fiber
+            recipeData.nutrition.sugar += nutritionData.sugar
+            recipeData.nutrition.protein += nutritionData.protein
         }
         catch (error){ 
             console.log("issue with ingredient: " +  ingredient.name + ". reason: " + error)
