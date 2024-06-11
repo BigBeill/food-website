@@ -15,10 +15,31 @@ const ingredients = mongoConnection.models.ingredient
 //   take all data provided and save as a new ingredient in database
 
 // if arguments are not provided:
-//   name, unitType, calories, protein, fat, carbohydrates, sodium, fiber: no recipe will be saved
+//   name, unitType, calories, fat, cholesterol, sodium, potassium, carbohydrates, fiber, sugar, protein: no recipe will be saved
 //   physical, volume
 router.post('/addIngredient', async (req, res) => {
-  console.log("/devTools/addIngredient post request triggered...")
+
+  // print to console all data route will be useing
+  console.log("\x1b[36m%s\x1b[0m", "devTools/addIngredient", "post request received")
+  console.log()
+  console.log("required information")
+  console.log("            name:", req.body.name)
+  console.log("        unitType:", req.body.unitType)
+  console.log("        calories:", req.body.calories)
+  console.log("             fat:", req.body.fat)
+  console.log("     cholesterol:", req.body.cholesterol)
+  console.log("          sodium:", req.body.sodium)
+  console.log("       potassium:", req.body.potassium)
+  console.log("   carbohydrates:", req.body.carbohydrates)
+  console.log("           fiber:", req.body.fiber)
+  console.log("           sugar:", req.body.sugar)
+  console.log("         protein:", req.body.protein)
+  console.log()
+  console.log("optional information")
+  console.log("        physcial:", req.body.physical)
+  console.log("          volume:", req.body.volume)
+  console.log()
+
   const newIngredient = new ingredients ({
     name: req.body.name,
     physical: req.body.physical,
@@ -35,6 +56,7 @@ router.post('/addIngredient', async (req, res) => {
     protein: req.body.protein,
   })
 
+  console.log("checking for bad data")
   var missingData = false
   if (newIngredient.name.length == 0) { missingData = true}
   if (newIngredient.calories.length == 0) { missingData = true}
@@ -46,23 +68,35 @@ router.post('/addIngredient', async (req, res) => {
   if (newIngredient.fiber.length == 0) { missingData = true}
   if (newIngredient.sugar.length == 0) { missingData = true}
   if (newIngredient.protein.length == 0) { missingData = true}
-  
-  var result = await ingredients.find({name: req.body.name})
 
-  if (!missingData && result.length == 0){
-    try {
-    newIngredient.save()
-    .then((ingredient) => {
-      console.log(ingredient)
-      res.end(JSON.stringify({message: "success"}))
-      return
-    })
-    } catch {
-      res.end(JSON.stringify({message: "failed"}))
-      return
-    }
-  } else { 
+  if (missingData) {
+    console.log("important data missing, ending devTools/addIngredient request")
     res.end(JSON.stringify({message: "failed"}))
+    return
+  }
+  
+  console.log("checking database for ingredient")
+  var result = await ingredients.find({name: req.body.name})
+  if (!result.length == 0){
+    console.log("ingredient already exists, ending devTools/addIngredient request")
+    res.end(JSON.stringify({message: "failed"}))
+    return
+  }
+
+  console.log("no bad data found")
+  console.log("attempting to save ingredient in database: ")
+  console.log(newIngredient)
+  try {
+  newIngredient.save()
+  .then(() => {
+    console.log("new ingredint saved, ending devTools/addIngredient request")
+    res.end(JSON.stringify({message: "success"}))
+    return
+  })
+  } catch {
+    console.log("server failed to save new ingredint, ending devTools/addIngredient request")
+    res.end(JSON.stringify({message: "failed"}))
+    return
   }
 })
 
