@@ -1,11 +1,10 @@
 /* css for navBar */
-.pageContainer{
-  display:flex;
-  flex-direction:row;
-}
 
 nav{
-  padding:1rem;
+  position: absolute;
+  z-index: 1;
+  height: 100vh;
+  padding: 0rem .9rem;
   top: 0;
   width: 12rem;
   border-right: 0.3rem solid var(--base-color);
@@ -13,67 +12,18 @@ nav{
   display: flex;
   flex-direction: column;
   background-color: #ffffff;
-}
 
-nav > h3{
-  font-weight: 500;
-}
-
-.mainDiv{
-  display:block;
-  padding:2rem;
-  padding-top:0;
-    width: auto;
-    height: auto;
-}
-
-.thumbButton{
-  position: fixed;
-  bottom: 2.4rem;
-  left: -3.6rem;
-  width: 3.6rem;
-  height: 3.6rem;
-  background-color: var(--base-color);
-  border-radius: 0rem .45rem .45rem 0rem;
-  box-shadow: none;
-}
-
-@media only screen and (max-width: 720px) {
-  
- nav{
-   left: -12.3rem;
-   box-shadow: none;
-   transition: all 0.3s ease-in-out;
- }
- 
- nav.open{
-   left: 0;
-   box-shadow: 0.06rem 0.06rem 0.15rem #2C1A1D;
- }
- 
-  .mainDiv{
-    padding: .3rem;
-    width: auto;
+  h3{
+    font-weight: 500;
   }
-  
-  .thumbButton{
-    left: 0;
-    box-shadow: 0.06rem 0.06rem 0.15rem #2C1A1D;
-    transition: all 0.3s ease-in-out;
-  }
-  
-  nav.open .thumbButton{
-    left: 12.3rem;
-  }
-}
 
-nav .logo{
+  .logo{
     margin-top: .9rem;
     margin-left: .3rem;
     margin-right: .3rem;
-}
+  }
 
-nav a, nav button{
+  a, button {
     margin-left: 1.5rem;
     padding: .3rem;
     padding-left: .6rem;
@@ -85,14 +35,45 @@ nav a, nav button{
     color: #2C1A1D;
     text-decoration: none;
     transition: all 0.03s ease-in-out;
-}
 
-nav a:hover, nav button:hover{
-    margin-left: 1.5rem;
-    padding: .3rem;
-    padding-left: .9rem;
-    color: #2C1A1D;
-    text-decoration: none;
-    text-shadow: 0.3px 0px 0px #2C1A1D;
-    cursor: pointer;
+    &:hover {
+      margin-left: 1.5rem;
+      padding: .3rem;
+      padding-left: .9rem;
+      color: #2C1A1D;
+      text-decoration: none;
+      text-shadow: 0.3px 0px 0px #2C1A1D;
+      cursor: pointer;
+    }
+  }
+
+  .navButton {
+    position: absolute;
+    display: none;
+    left: 13.8rem;
+    width: 1.5rem;
+    height: 3rem;
+    background-color: var(--base-color);
+    box-shadow: 0.06rem 0.06rem 0.15rem #2C1A1D;
+    top: 50%;
+    transform: translate(0%, -50%);
+    border-radius: 0rem .9rem .9rem 0rem;
+  }
+  
+  @media (max-width: 93rem) {
+    margin-left: -13.8rem;
+
+    .navButton{
+      display: inline;
+
+      &:hover{
+        cursor: pointer;
+      }
+    }
+
+    &.open{
+      margin-left: 0rem;
+      
+    }
+  }
 }

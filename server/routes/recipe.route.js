@@ -26,7 +26,7 @@ const getNutrition = require("../library/unitConvertingUtils").getNutrition
 //   name: return recipes with any title
 //   amount: assume amount is 20
 router.get('/findRecipes', async (req, res) => {
-    console.log("recipe/publicRecipes get request triggered...")
+    console.log("recipe/publicRecipes get request received")
     const name = req.query.name || '';
     const amount = parseInt(req.query.amount, 10) || 20;
 
@@ -54,7 +54,7 @@ router.get('/findRecipes', async (req, res) => {
 //   name: nothing will be returned
 //   amount: assume amount is 5
 router.get('/findIngredient', async (req, res) => {
-    console.log("recipe/findIngredient get request triggered...")
+    console.log("recipe/findIngredient get request received")
 
     const name = req.query.name || '';
     const amount = parseInt(req.query.amount, 10) || 5;

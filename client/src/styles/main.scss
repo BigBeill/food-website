@@ -16,24 +16,24 @@ body {
 }
 
 #root{
-  display: flex;
   width:100%;
   margin: 0rem;
   padding: 0rem;
-}
-
-header{
-  width: 100%;
-  height: 6rem;
 }
 
 main{
   position: relative;
   margin: 0rem;
   padding: 0rem;
-  width: 100%;
-  min-height: calc(100vh - 6rem);
+  margin-left: 14.1rem;
+  width: calc(100% - 14.1rem);
+  min-height: 100vh;
   overflow-x: hidden;
+
+  @media (max-width: 93rem) {
+    margin-left: .3rem;
+    width: calc(100% - .3rem);
+  }
 }
 
 h3 {

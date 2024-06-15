@@ -1,9 +1,16 @@
-import React from 'react'
+import React, { useState, useEffect, useRef} from 'react'
 
 function Nav(data) {
+    const [open, setOpen] = useState(false);
+    
+    function openNav() {
+        console.log("button clicked")
+        setOpen(!open)
+    }
+
     return(
         <>
-        <nav className="navBar" id="navBar">
+        <nav className={`navBar ${open ? 'open' : ''}`} id="navBar">
 
             <img className="logo" src="/BigBeill-logo_black.png" alt="Beill Greenhouse Logo" />
 
@@ -36,6 +43,8 @@ function Nav(data) {
                 
                 </>
             }
+
+            <div className='navButton' onClick={openNav}/>
 
         </nav>
         </>

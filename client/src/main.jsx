@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
-import './styles/main.css'
+import './styles/main.scss'
 import './styles/nav.scss'
 import './styles/forms.css'
 import './styles/pins.css'

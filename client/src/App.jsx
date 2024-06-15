@@ -30,8 +30,6 @@ function App() {
   return (
     <BrowserRouter>
       <Nav userData = {userData}/>
-      <div style={{width:"100%"}}>
-        <header></header>
         <main>
           <Routes>
             <Route path="/" exact element={<Home />} />
@@ -43,7 +41,6 @@ function App() {
             <Route path="/addIngredient" exact element={<AddIngredient />} /> {/*remove before production*/}
           </Routes>
         </main>
-      </div>
     </BrowserRouter>
   )
 }

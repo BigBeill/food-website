@@ -1,12 +1,10 @@
 .openNotebook {
-
   position: absolute;
   display: flex;
+  margin: 3rem 0rem;
   gap: .6rem;
-  padding: 3rem 6rem;
-  width: calc(100% - 12rem);
+  width: 75rem;
   height: calc(100% - 6rem);
-  max-width: 75rem;
   left: 50%;
   transform: translate(-50%, 0%);
 
@@ -77,6 +75,6 @@
     position: absolute;
     left: 50%;
     transform: translate(-50%, 0%);
-    height: calc(100% - 6rem);
+    height: 100%;
   }
 }

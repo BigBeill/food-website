@@ -15,7 +15,7 @@ const users = require('../schemas/user')
 // route will:
 //   return data for user that is currently logged in
 router.get('/userInfo', (req, res) => {
-    console.log("user/userInfo get request triggered...")
+    console.log("user/userInfo get request received")
     data = req.user
     res.end(JSON.stringify(data))
 })
@@ -50,7 +50,7 @@ router.get('/findUsers', async (req, res) => {
 // if arguments are not provided:
 //   username, password: login will fail and error will be returned
 router.post('/login', (req, res, next) => {
-    console.log("user/login post request triggered...")
+    console.log("user/login post request received")
 
     passport.authenticate('local', (error, user, info) => {
         if (error) {return res.end(JSON.stringify(error))}
@@ -76,7 +76,7 @@ router.post('/login', (req, res, next) => {
 // if arguments not provided:
 //   username, email, password: route will fail to create new user
 router.post('/register', async (req, res) => {
-    console.log("user/register post request triggered...")
+    console.log("user/register post request received")
 
     //make sure no data is missing
     if (!req.body.username) { res.end(JSON.stringify({message: "noUsername"}))}
@@ -119,7 +119,7 @@ router.post('/register', async (req, res) => {
 //   logout current user
 //   return error data or {message: "success"}
 router.post('/logout', (req, res) => {
-    console.log("user/logout post request triggered...")
+    console.log("user/logout post request received")
     req.logout( (error) => {
         if (error) {res.end(error)}
         else {res.end(JSON.stringify({message: "success"}))}
