@@ -42,11 +42,14 @@ function RecipeTitle({title}) {
   </div>)
 }
 
-function recipeBook(recipeList) {
+
+
+function recipeBook({recipeList}) {
+  const [displayRight, setDisplayRight] = useState(false)
 
   return(
-    <div className='openNotebook'>
-      <div className='notebookPage'>
+    <div className={`openNotebook ${displayRight ? 'displayRight' : ''}`}>
+      <div className='notebookPage' onClick={() => setDisplayRight(false)}>
 
         <div className='recipeContainer'>
          {recipeList.map((recipe, index) => (
@@ -59,7 +62,7 @@ function recipeBook(recipeList) {
 
       </div>
       <img className="notebookSpine" src="/notebookSpine.png" alt="notebookSpine" />
-      <div className='notebookPage'>
+      <div className='notebookPage' onClick={() => setDisplayRight(true)}>
          
       </div>
     </div>

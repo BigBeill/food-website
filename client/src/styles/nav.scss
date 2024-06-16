@@ -62,6 +62,7 @@ nav{
   
   @media (max-width: 93rem) {
     margin-left: -13.8rem;
+    transition: margin-left .3s ease-in-out ;
 
     .navButton{
       display: inline;

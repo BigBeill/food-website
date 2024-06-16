@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import Pin from '../components/pin'
 import RecipeBook from '../components/RecipeBook'
 
 function Home() {
-  import('./Home.css')
 
   useEffect(() => {
     fetchRecipeData()
@@ -22,7 +20,7 @@ function Home() {
     return <p className="softText">no owned recipes</p>
   }
   else {
-    return RecipeBook(recipes)
+    return (<RecipeBook recipeList={recipes}/>)
   }
 }
 

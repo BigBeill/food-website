@@ -1,11 +1,11 @@
 .openNotebook {
   position: absolute;
   display: flex;
-  margin: 3rem 0rem;
+  margin: 3rem 1.5rem;
   gap: .6rem;
   width: 75rem;
   height: calc(100% - 6rem);
-  left: 50%;
+  left: calc(50% - 1.5rem);
   transform: translate(-50%, 0%);
 
   .notebookPage {
@@ -76,5 +76,18 @@
     left: 50%;
     transform: translate(-50%, 0%);
     height: 100%;
+  }
+
+  @media (max-width: 78rem) {
+    
+    margin-left: 1.5rem;
+    left: 0%;
+    transform: translate(0%, 0%);
+    transition: margin-left .3s ease-in-out;
+
+    &.displayRight{
+      margin-left: calc(100% - 76.5rem);
+    }
+
   }
 }

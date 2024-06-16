@@ -49,7 +49,7 @@ h3 {
 /* ------------ other css ------------ */
 
 .hidden{
-display: none;
+  display: none;
 }
 
 .centred, .centered{
@@ -71,9 +71,9 @@ display: none;
 }
 
 @media only screen and (max-width: 720px) {
-.splitSpace{
-  display: inline;
-}
+  .splitSpace{
+    display: inline;
+  }
 }
 
 .displayData{
