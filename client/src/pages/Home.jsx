@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import RecipeBook from '../components/RecipeBook'
+import RecipeBook from './RecipeBook'
 
 function Home() {
 

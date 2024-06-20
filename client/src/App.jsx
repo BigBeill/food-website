@@ -8,6 +8,7 @@ import Profile from './pages/Profile'
 import EditRecipe from './pages/EditRecipe'
 import FriendsList from './pages/FriendsList'
 import AddIngredient from './devTools/addIngredient'
+import NewEditRecipe from './pages/NewEditRecipe'
 
 function App() {
 
@@ -39,6 +40,7 @@ function App() {
             <Route path="/friendsList" exact element={<FriendsList />} />
             <Route path="/profile" exact element={<Profile userData = {userData} />} />
             <Route path="/addIngredient" exact element={<AddIngredient />} /> {/*remove before production*/}
+            <Route path="/newEditRecipe" exact element={<NewEditRecipe />} /> {/*remove before production*/}
           </Routes>
         </main>
     </BrowserRouter>

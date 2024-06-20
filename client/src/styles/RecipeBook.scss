@@ -1,93 +1,43 @@
-.openNotebook {
-  position: absolute;
+
+.notebookRecipe {
   display: flex;
-  margin: 3rem 1.5rem;
-  gap: .6rem;
-  width: 75rem;
-  height: calc(100% - 6rem);
-  left: calc(50% - 1.5rem);
-  transform: translate(-50%, 0%);
+  width: 100%;
+  height: 12rem;
+  border-top: .12rem solid #797979;
+  border-bottom: .12rem solid #797979;
 
-  .notebookPage {
-    width: calc(50% - .3rem);
-    height: calc(100% - .3rem);
-    background-color: #f6eee3;
-    box-shadow: 0.09rem 0.09rem 0.3rem #2C1A1D;
-
-    &:first-child {
-      margin-top: .3rem;
-      border-radius: 2.5rem .15rem .15rem 2.5rem;
-
-      .recipeContainer {
-        margin: .9rem 2.4rem 0rem 1.2rem;
-      }
-    }
-
-    &:last-child {
-      border-radius: .15rem 2.5rem 2.5rem .15rem;
-    }
-
-    .notebookRecipe {
-      display: flex;
-      width: 100%;
-      height: 12rem;
-      border-top: .12rem solid #797979;
-      border-bottom: .12rem solid #797979;
-
-      .recipeTitle {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: .9rem .3rem .9rem 0rem;
-        width: calc(100% - 12rem);
-      }
-
-      h4 {
-        margin: 0rem;
-        font-weight: 500;
-        font-size: 2rem;
-        color: #575757;
-        width: 100%;
-      }
-
-      .image {
-        margin: 0rem;
-        box-sizing: border-box;
-        width: 12rem;
-        height: 12rem;
-        font-size: 8rem;
-        border: .12rem solid #797979;
-      }
-
-      &:hover{
-        cursor: pointer;
-        transform: translateX(-.3rem);
-        transition: .06s;
-
-        h4 {
-          color: #4a4a4a;
-        }
-      }
-    }
+  .recipeTitle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: .9rem .3rem .9rem 0rem;
+    width: calc(100% - 12rem);
   }
 
-  .notebookSpine {
-    position: absolute;
-    left: 50%;
-    transform: translate(-50%, 0%);
-    height: 100%;
+  h4 {
+    margin: 0rem;
+    font-weight: 500;
+    font-size: 2rem;
+    color: #575757;
+    width: 100%;
   }
 
-  @media (max-width: 78rem) {
-    
-    margin-left: 1.5rem;
-    left: 0%;
-    transform: translate(0%, 0%);
-    transition: margin-left .3s ease-in-out;
+  .image {
+    margin: 0rem;
+    box-sizing: border-box;
+    width: 12rem;
+    height: 12rem;
+    font-size: 8rem;
+    border: .12rem solid #797979;
+  }
 
-    &.displayRight{
-      margin-left: calc(100% - 76.5rem);
+  &:hover{
+    cursor: pointer;
+    transform: translateX(-.3rem);
+    transition: .06s;
+
+    h4 {
+      color: #4a4a4a;
     }
-
   }
 }
