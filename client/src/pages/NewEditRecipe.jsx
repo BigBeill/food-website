@@ -13,7 +13,10 @@ function newEditRecipe () {
       </div>
       <img className="notebookSpine" src="/notebookSpine.png" alt="notebookSpine" />
       <div className='notebookPage' onClick={() => setDisplayRight(true)}>
-      
+
+        <label for="userImage"> Recipe Image </label>
+        <input name="userImage" type="file"/>
+
       </div>
     </div>
   )

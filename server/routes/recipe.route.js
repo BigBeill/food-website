@@ -4,6 +4,7 @@ const recipes = mongoConnection.models.recipe
 const recipeSchema = require("../schemas/recipe")
 const ingredients = require("../schemas/ingredient")
 const users = require("../schemas/user")
+const { response } = require("express")
 const getNutrition = require("../library/unitConvertingUtils").getNutrition
 
 
@@ -15,30 +16,57 @@ const getNutrition = require("../library/unitConvertingUtils").getNutrition
 
 
 
+// description:
+//   returns a list of title and image data for recipes with simialar title to title provided
+
 // takes 2 arguments from url:
-//   name: string
+//   title: string
 //   amount: int
 
-// route will:
-//   return list of max size {amount}, containing the information on recipes with a similer title to {name}
+// return:
+//   list of max size {amount}, containing {title, image} information on recipes with a similer title to {name}
 
-// if arguments are not provided:
+// if missing:
 //   name: return recipes with any title
 //   amount: assume amount is 20
 router.get('/findRecipes', async (req, res) => {
-    console.log("recipe/publicRecipes get request received")
-    const name = req.query.name || '';
+
+    const title = req.query.title || '';
     const amount = parseInt(req.query.amount, 10) || 20;
 
     try {
         let query = {}
-        if (name != '') { query = { name: {$regex: new RegExp(name, 'i')}}}
+        if (title != '') { query = { title: {$regex: new RegExp(title, 'i')}}}
         const data = await recipes.find(query).limit(amount)
         res.end(JSON.stringify(data))
     } catch {
-        console.error("Error fetching recipes:", error);
-        res.status(500).json({ message: "Server error occurred." });
+        res.status(500).json({ message: "failed to collect recipes from database" });
     }
+})
+
+
+
+// description:
+//   returns all data associated for recipe with provided _id
+
+// takes 1 argument from url:
+//   _id: _id
+
+// return:
+//   compleated recipe schema for recipe with provided _id
+
+// if missing:
+//   _id: throw error
+router.get('/recipeData', async (req,res) => {
+    const _id = req.query._id
+
+    if (!_id) { return res.status(500).json({ message: "_id not provided" }) }
+
+    try {
+        recipes.findOne({ _id:_id })
+        .then(data => { return res.end(data) })
+    } 
+    catch { return res.status(500).json({ message: "database failed to find recipe with _id:", _id }) }
 })
 
 
