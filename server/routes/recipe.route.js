@@ -4,7 +4,6 @@ const recipes = mongoConnection.models.recipe
 const recipeSchema = require("../schemas/recipe")
 const ingredients = require("../schemas/ingredient")
 const users = require("../schemas/user")
-const { response } = require("express")
 const getNutrition = require("../library/unitConvertingUtils").getNutrition
 
 
@@ -188,28 +187,6 @@ router.post('/updateRecipe', async(req, res) => {
             return res.status(200).json({ response: 'recipe updated', newObject: updatedRecipe})
         }
         catch { return res.status(500).json( {error: 'failed to update recipe in database', failedObject: recipeData } )}
-    }
-
-    {
-        try {
-            const oldRecipe = await recipes.findOne({ _id: req.body._id},{owner: 1})
-            if (oldRecipe.owner == req.user._id) {
-                console.log("recipe owner verified")
-                await recipes.updateOne( { _id: req.body._id}, { $set: recipeData } )
-                console.log("recipe ", req.body._id, " has been updated, ending recipe/updateRecipe request")
-                res.end(JSON.stringify({message: "success"}))
-                return
-            } else {
-                console.log("owner of recipe ", req.body._id, " is not currently signed in, ending recipe/updateRecipe request")
-                res.end(JSON.stringify({message: "server issue"}))
-                return
-            }
-        }
-        catch {
-            console.log("failed to save recipe, ending recipe/updateRecipe request")
-            res.end(JSON.stringify({message: "server issue"}))
-            return
-        }
     }
 })
 
