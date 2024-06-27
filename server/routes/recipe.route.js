@@ -16,14 +16,14 @@ const getNutrition = require("../library/unitConvertingUtils").getNutrition
 
 
 // description:
-//   returns a list of title and image data for recipes with simialar title to title provided
+//   returns a list of title and image data for recipes with similar title to title provided
 
 // takes 2 arguments from url:
 //   title: string
 //   amount: int
 
 // return:
-//   list of max size {amount}, containing {title, image} information on recipes with a similer title to {name}
+//   list of max size {amount}, containing {title, image} information on recipes with a similar title to {name}
 
 // if missing:
 //   name: return recipes with any title
@@ -52,7 +52,7 @@ router.get('/findRecipes', async (req, res) => {
 //   _id: _id
 
 // return:
-//   compleated recipe schema for recipe with provided _id
+//   completed recipe schema for recipe with provided _id
 
 // if missing:
 //   _id: throw error
@@ -75,7 +75,7 @@ router.get('/recipeData', async (req,res) => {
 //   amount: int
 
 // route will:
-//   return a list of max size {amount}, containing the name of ingredients in database with a similer name to the {name} given in body
+//   return a list of max size {amount}, containing the name of ingredients in database with a similar name to the {name} given in body
 
 // if arguments are not provided:
 //   name: nothing will be returned
@@ -186,7 +186,7 @@ router.post('/updateRecipe', async(req, res) => {
             const updatedRecipe = await recipes.updateOne( { _id: req.body._id}, { $set: recipeData } )
             return res.status(200).json({ response: 'recipe updated', newObject: updatedRecipe})
         }
-        catch { return res.status(500).json( {error: 'failed to update recipe in database', failedObject: recipeData } )}
+        catch { return res.status(500).json({error: 'failed to update recipe in database', failedObject: recipeData }) }
     }
 })
 
