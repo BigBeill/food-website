@@ -119,30 +119,39 @@ router.get('/findIngredient', async (req, res) => {
 //   title: string
 //   description: string
 //   image: string
-//   ingredients: [{_id: string, name: string, unit: string, amount: number}]
+//   ingredients: [{_id: string, unit: string, amount: number}]
 //   instructions: [string]
 
 // route will:
 //   take data in the body and store it in recipeData (json object)
-//   go through every ingredient and calculate its nutriton data
+//   go through every ingredient and calculate its nutrition data
 //   save total of all nutrition data in 
 router.post('/updateRecipe', async(req, res) => {
-    console.log("recipe/updateRecipe post request received")
-    console.log()
-    console.log("required information")
-    console.log("   _id:", req.body._id)
-    console.log("   title:", req.body.title)
-    console.log("   description:", req.body.description)
-    console.log("   image:", req.body.image)
-    console.log("   ingredients:", req.body.ingredients)
-    console.log("   instructions:", req.body.instructions)
-    console.log()
 
-    if (!req.user) { 
-        console.log("user not signed in, ending recipe/updateRecipe request")
-        res.end(JSON.stringify({ message: "user not signed in" }))
-        return 
+    { // check for any missing or invalid data (400 errors).
+        if (!req.body._id) { return res.status(400).json({ error: 'body is missing _id field' }) }
+        if (!req.body.title) { return res.status(400).json({ error: 'body is missing title field' }) }
+        if (!req.body.description) { return res.status(400).json({ error: 'body is missing description field' }) }
+        if (!req.body.image) { return res.status(400).json({ error: 'body is missing image field' }) }
+        if (!req.body.ingredients) { return res.status(400).json({ error: 'body is missing ingredients field' }) }
+        if (!req.body.instruction) { return res.status(400).json({ error: 'body is missing instructions field' }) }
+        if (req.body.title.length < 3 || recipeData.title.length > 100) { return res.status(400).json({ error: 'title field must be between 3 and 100 characters' }) }
+        if (req.body.description.length < 3 || recipeData.description.length > 3000) { return res.status(400).json({ error: 'description field must be between 3 and 3000 characters' }) }
+        // make image requirements later
+        if (req.body.ingredients.length > 50) { return res.status(400).json({ error: 'ingredients field must have less than 50 ingredients' }) }
+        if (req.body.instructions.length > 50) { return res.status(400).json({ error: 'instructions field must have less than 50 instructions' }) }
+        for (const ingredient of req.body.ingredients){
+            if (!ingredient._id) { return res.status(400).json({ error: 'ingredient missing _id field' }) }
+            if (!ingredient.unit) { return res.status(400).json({ error: 'ingredient missing unit field' }) }
+            if (!ingredient.amount) { return res.status(400).json({ error: 'ingredient missing amount field'}) }
+        } 
+        for (const instruction of recipeData.instructions){
+            if (instruction.length < 3 || instruction.length > 300){ return res.status(400).json({ error: 'instructions must be between 3 and 300 characters in length' }) }
+        }
     }
+
+    // make sure a user is signed in
+    if (!req.user) { return res.status(401).json({ error: 'user not signed in' }) }
 
     let recipeData = {
         owner: req.user._id,
@@ -151,120 +160,37 @@ router.post('/updateRecipe', async(req, res) => {
         image: req.body.image,
         ingredients: req.body.ingredients,
         instructions: req.body.instructions,
-        nutrition:{
-            calories: 0,
-            fat: 0,
-            cholesterol: 0,
-            sodium: 0,
-            potassium: 0,
-            carbohydrates: 0,
-            fiber: 0,
-            sugar: 0,
-            protein: 0,
-        }
+        nutrition: {}
     }
 
-    // go through all posible reasons the new recipe may be rejected
-    console.log("checking for bad data")
-    if (!req.body._id) { 
-        console.log("no recipe _id provided, ending recipe/updateRecipe request")
-        res.end(JSON.stringify({message: "bad recipe _id"}))
-        return 
-    }
-    if (!recipeData.title || !recipeData.description || !recipeData.image || !recipeData.ingredients || !recipeData.instructions || recipeData.ingredients.length == 0 || recipeData.instructions.length == 0) { 
-        console.log("important data missing, ending recipe/updateRecipe request")
-        res.end(JSON.stringify({ message: "important data missing" }))
-        return 
-    }
-    if (recipeData.title.length < 3 || recipeData.title.length > 100) { 
-        console.log("bad title length (must be between 3 and 100 characters), ending recipe/updateRecipe request")
-        res.end(JSON.stringify({message: "bad title length"}))
-        return 
-    }
-    if (recipeData.description.length < 3 || recipeData.description.length > 3000) {
-        console.log("bad description length (must be between 3 and 3000 characters), ending recipe/updateRecipe request")
-        res.end(JSON.stringify({message: "bad description length"}))
-        return 
-    }
-    // make image requierments later
-    if (recipeData.ingredients.length > 50) { 
-        console.log("too many ingredients (must be less than 50), ending recipe/updateRecipe request")
-        res.end(JSON.stringify({message: "too many ingredients"}))
-        return 
-    }
-    if (recipeData.instructions.length > 50) {
-        console.log("too many instructions (must be less than 50), ending recipe/updateRecipe request")
-        res.end(JSON.stringify({message: "too many instructions"}))
-        return 
-    }
+    // get nutrition data for recipe
+    try { recipeData.nutrition = await getNutrition(recipeData.ingredients) }
+    catch { return res.status(500).json({ error: 'server failed to calculate nutrition data for recipe' }) }
 
-    // go through every ingredient, make sure data is valid
-    for (const ingredient of recipeData.ingredients){
-        if (!ingredient._id || !ingredient.name || !ingredient.unit || !ingredient.amount) {
-            console.log("issue with ingredient:", ingredient)
-            console.log("important data missing (must have _id, name, unit, and amount field), ending recipe/updateRecipe request")
-            res.end(JSON.stringify({message: "ingredient id missing"}))
-            return
-        }
-    }
-
-    // go through every instruction, make sure data is valid
-    for (const instruction of recipeData.instructions){
-        if (instruction.length < 3 || instruction.length > 300){
-            console.log("bad instruction length (must be between 3 and 300 character), ending recipe/updateRecipe request")
-            res.end(JSON.stringify({message: "bad instruction length"}))
-            return
-        }
-    }
-
-    console.log("no bad data found. recipe data from client accepted")
-    console.log("calculating total recipe nutrition value (going through each ingredient)")
-    for (const ingredient of recipeData.ingredients){
-
-        try{ 
-            const nutritionData = await getNutrition(ingredient._id, ingredient.amount, ingredient.unit) 
-            console.log("calculated nutrition value for ingredient", ingredient._id + ":", nutritionData )
-            recipeData.nutrition.calories += nutritionData.calories
-            recipeData.nutrition.fat += nutritionData.fat
-            recipeData.nutrition.cholesterol += nutritionData.cholesterol
-            recipeData.nutrition.sodium += nutritionData.sodium
-            recipeData.nutrition.potassium += nutritionData.potassium
-            recipeData.nutrition.carbohydrates += nutritionData.carbohydrates
-            recipeData.nutrition.fiber += nutritionData.fiber
-            recipeData.nutrition.sugar += nutritionData.sugar
-            recipeData.nutrition.protein += nutritionData.protein
-        }
-        catch (error){ 
-            console.log("issue with ingredient: " +  ingredient.name + ". reason: " + error)
-            console.log("unable to calculate nutrition data for ingredient, ending recipe/updateRecipe request")
-            res.end(JSON.stringify({message: "unable to calculate nutrition value of: " + ingredient.name}))
-            return 
-        }
-        
-    }
-
-    console.log("total recipe nutrition value calculated")
-    console.log("compleated recipe data:", recipeData)
-
+    // save recipe to server
     if (req.body._id == 'new') {
-        console.log("attempting to save new recipe")
         try {
             const newRecipe = new recipes(recipeData)
             await newRecipe.save()
-            console.log("new recipe added successfully")
             await users.updateOne({_id: req.user._id}, { $push: { ownedRecipes: newRecipe._id } })
-            console.log("new recipe added to users owned recipes collection")
-            console.log("post request finnished, ending recipe/updateRecipe request")
-            res.end(JSON.stringify({message: "success"}))
-            return
+            return res.status(201).json({ response: 'new recipe created', newObject: newRecipe })
         }
-        catch {
-            console.log("failed to save recipe, ending recipe/updateRecipe request")
-            res.end(JSON.stringify({message: "server issue"}))
-            return
+        catch { return res.status(500).json({error: 'failed to save new recipe in database', failedObject: recipeData }) }
+    } 
+    else {
+        try {
+            const oldRecipe = await recipes.findOne( {_id: req.body._id}, {owner: 1} )
+            if (oldRecipe.owner != req.user._id) { return res.status(403).json({ error: 'current user does not own requested recipe' }) }
+        } 
+        catch { return res.status(500).json({ error: 'could not verify recipe owner with database' }) }
+        try {
+            const updatedRecipe = await recipes.updateOne( { _id: req.body._id}, { $set: recipeData } )
+            return res.status(200).json({ response: 'recipe updated', newObject: updatedRecipe})
         }
-    } else {
-        console.log("attempting to update recipe with _id:", req.body._id)
+        catch { return res.status(500).json( {error: 'failed to update recipe in database', failedObject: recipeData } )}
+    }
+
+    {
         try {
             const oldRecipe = await recipes.findOne({ _id: req.body._id},{owner: 1})
             if (oldRecipe.owner == req.user._id) {
