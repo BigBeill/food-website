@@ -13,6 +13,8 @@
     "client": "vite"
   },
   "dependencies": {
+    "@fortawesome/free-solid-svg-icons": "^6.5.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "http-proxy-middleware": "^2.0.6",
     "node-sass": "^9.0.0",
     "react": "^18.2.0",

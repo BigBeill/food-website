@@ -1,24 +1,71 @@
-import React, { useState, useEffect, useRef} from 'react'
+import React, { useState, useEffect, useRef, Component} from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import ActiveSearchBar from '../components/ActiveSearchBar'
+import NoteBook from '../components/NoteBook';
 
 function newEditRecipe () {
   const [displayRight, setDisplayRight] = useState(false)
+  const [textBox, setTextBox] = useState('test')
 
-  return(
-    <div className={`notebook ${displayRight ? 'displayRight' : ''}`}>
-      <div className='notebookPage' onClick={() => setDisplayRight(false)}> 
-        <h1>Edit Your Recipe</h1>
+  const pageList = [
+    {
+      name: Page1,
+      props: {
+        text: textBox
+      }
+    },
+    { 
+      name: Page2,
+      props: {
+        
+      }
+    },
+    { 
+      name: Page3,
+      props: {
+        
+      }
+    },
+    { 
+      name: Page4,
+      props: {
+        
+      }
+    },
+  ]
 
-      </div>
-      <img className="notebookSpine" src="/notebookSpine.png" alt="notebookSpine" />
-      <div className='notebookPage' onClick={() => setDisplayRight(true)}>
+  return <NoteBook pageList={pageList}/>
+}
 
-        <label for="userImage"> Recipe Image </label>
-        <input name="userImage" type="file"/>
+function Page1 ({text}) {
+  return (
+    <>
+      <p>page one {text}</p>
+    </>
+  )
+}
 
-      </div>
-    </div>
+function Page2 () {
+  return (
+    <>
+      <p>page two</p>
+    </>
+  )
+}
+
+function Page3 () {
+  return (
+    <>
+      <p>page three</p>
+    </>
+  )
+}
+
+function Page4 () {
+  return (
+    <>
+      <p>page four</p>
+    </>
   )
 }
 
