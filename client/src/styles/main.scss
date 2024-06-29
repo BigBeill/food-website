@@ -57,11 +57,11 @@ h3 {
 
   position: absolute;
   display: flex;
-  margin: 1.5rem 1.5rem;
+  margin: .3rem 1.5rem;
   padding: 3rem, 3rem, 3rem, 3rem;
   gap: .6rem;
   width: 75rem;
-  height: calc(100% - 3rem);
+  height: calc(100% - 1.8rem);
   left: calc(50% - 1.5rem);
   transform: translate(-50%, 0%);
 
@@ -73,14 +73,12 @@ h3 {
 
     &:first-child {
       margin-top: .3rem;
+      padding: .9rem 2.4rem 0rem 1.2rem;
       border-radius: 2.5rem .15rem .15rem 2.5rem;
-
-      .recipeContainer {
-        margin: .9rem 2.4rem 0rem 1.2rem;
-      }
     }
 
     &:last-child {
+      padding: .9rem 1.2rem 0rem 2.4rem;
       border-radius: .15rem 2.5rem 2.5rem .15rem;
     }
 
@@ -105,6 +103,28 @@ h3 {
     }
 
   }
+
+  .arrowIcon {
+    background-color: transparent;
+    position: absolute;
+    bottom: 0;
+    height: 4.5rem;
+    width: 6rem;
+    
+    :hover {
+      cursor: pointer;
+    }
+
+    &.right{
+      right: 0;
+    }
+
+    .arrow{
+      height: 100%;
+      color: $darkTextColor;
+    }
+  }
+
 
   h1{
     margin: 3rem 3rem 3rem 3rem;

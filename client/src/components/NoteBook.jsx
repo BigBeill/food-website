@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, Component} from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faArrowRight, prefix } from '@fortawesome/free-solid-svg-icons';
 
 /*
 using notebook component:
@@ -50,20 +50,28 @@ order of json files in the pageList array will decide the order pages appear on 
 
 export default function noteBook ({pageList}) {
   const [displayRight, setDisplayRight] = useState(false)
-  const [pageNumber, setPageNumber] = useState(1)
-  const FirstPage = pageList[pageNumber - 1]
-  const SecondPage = pageList[pageNumber]
+  const [pageNumber, setPageNumber] = useState(0)
+  const FirstPage = pageList[pageNumber]
+  const SecondPage = pageList[pageNumber + 1]
+
+  function previousPage() {
+    if (pageNumber > 0) { setPageNumber(pageNumber - 2) }
+  }
+
+  function nextPage(){
+    if (pageNumber + 2 < pageList.length) { setPageNumber(pageNumber + 2) }
+  }
 
   return(
     <div className={`notebook ${displayRight ? 'displayRight' : ''}`}>
       <div className='notebookPage' onClick={() => setDisplayRight(false)}>
         <FirstPage.name {...FirstPage.props}/> 
-        <FontAwesomeIcon icon={faArrowLeft} className='arrowIcon'/>
+        <div className='arrowIcon left'><FontAwesomeIcon icon={faArrowLeft} className='arrow' onClick={() => previousPage()} /></div>
       </div>
       <img className="notebookSpine" src="/notebookSpine.png" alt="notebookSpine" />
       <div className='notebookPage' onClick={() => setDisplayRight(true)}>
-        <SecondPage.name />
-        <FontAwesomeIcon icon={faArrowRight} className='arrowIcon'/>
+        <SecondPage.name {...SecondPage.props}/>
+        <div className='arrowIcon right'><FontAwesomeIcon icon={faArrowRight} className='arrow' onClick={() => nextPage()}/></div>
       </div>
     </div>
   )
