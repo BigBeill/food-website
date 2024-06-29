@@ -64,6 +64,7 @@ h3 {
   height: calc(100% - 1.8rem);
   left: calc(50% - 1.5rem);
   transform: translate(-50%, 0%);
+  color: $normalTextColor;
 
   .notebookPage {
     width: calc(50% - .3rem);

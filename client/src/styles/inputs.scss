@@ -1,0 +1,110 @@
+.notebook{
+  $darkText: #4a4a4a;
+
+  .textInput {
+    width: 100%;
+    margin-bottom: 1.8rem;
+    padding: 0rem .3rem;
+
+    label {
+      display: inline-block;
+      width: 100%;
+      margin-bottom: .18rem;
+      font-size: 1.8rem;
+      color: $darkText;
+    }
+
+    input, textarea {
+      box-sizing: border-box;
+      width: calc(100% - 9rem);
+      margin: 0rem 4.5rem;
+      padding: .03rem .48rem;
+      background-color: #f6eee3;
+      border: none;
+      font-size: 1.2rem;
+      color: $darkText;
+
+      &:focus{
+        outline: none;
+      }
+
+    }
+
+    input {
+      border-bottom: 1px solid $darkText;
+    }
+
+    textarea {
+      border-left: 1px solid $darkText;
+      border-right: 1px solid $darkText;
+      margin-top: .3rem;
+      padding-top: .3rem;
+      resize: none;
+    }
+
+    &.center {
+      text-align: center;
+      input {
+        text-align: center;
+      }
+    }
+
+    &.extraBottom {
+      margin-bottom: 3rem;
+    }
+
+
+  }
+}
+
+
+
+
+
+
+/*
+
+.formTypeA .textInput.withButton input, .formTypeA .textInput.withButton textarea{
+  width: calc(100% - 3.6rem);
+}
+
+.formTypeA .textInput.withButton button {
+  vertical-align: top;
+  margin: 0rem;
+  margin-top: 2.4rem;
+  margin-left: 0.6rem;
+  box-sizing: border-box;
+  width: 3rem;
+  height: 1.5rem;
+}
+
+.formTypeA input:focus, .formTypeA textarea:focus{
+  outline-color: #065F46;
+}
+
+.formTypeA .newIngredientDiv {
+  padding: .3rem;
+}
+
+.formTypeA .newIngredientDiv input, .formTypeA .newIngredientDiv select{
+  box-sizing: border-box;
+  padding: .48rem;
+  background-color: #e5e5e5;
+  border: none;
+  border-radius: .15rem;
+}
+
+.formTypeA .newIngredientDiv input{
+  margin-right: .3rem;
+  width: calc(35% - .15rem)
+}
+
+.formTypeA .newIngredientDiv select{
+  width: calc(65% - .15rem);
+}
+
+.formTypeA .newIngredientDiv .activeSearchBar input{
+  margin-top: .3rem;
+  width: 100%;
+}
+*/

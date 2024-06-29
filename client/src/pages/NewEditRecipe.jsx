@@ -1,23 +1,33 @@
 import React, { useState, useEffect, useRef, Component} from 'react'
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import ActiveSearchBar from '../components/ActiveSearchBar'
 import NoteBook from '../components/NoteBook';
+import editRecipe from './EditRecipe';
 
-function newEditRecipe () {
-  const [displayRight, setDisplayRight] = useState(false)
-  const [textBox, setTextBox] = useState('test')
+function newEditRecipe ({userData}) {
+  if (userData._id == ""){ return <Navigate to='/login' />}
 
+  const [searchParams] = useSearchParams()
+  const recipeId = searchParams.get('recipeId')
+
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [image, setImage] = useState('');
+
+  
   const pageList = [
     {
-      name: Page1,
+      name: GeneralInfo,
       props: {
-        text: textBox
+        newRecipe: !recipeId,
+        title: [title, setTitle],
+        description: [description, setDescription]
       }
     },
     { 
-      name: Page2,
+      name: RecipeImage,
       props: {
-        
+        image: [image, setImage]
       }
     },
     { 
@@ -37,18 +47,34 @@ function newEditRecipe () {
   return <NoteBook pageList={pageList}/>
 }
 
-function Page1 ({text}) {
+function GeneralInfo ({newRecipe, title, description}) {
   return (
     <>
-      <p>page one {text}</p>
+      <h1>{newRecipe ? 'New Recipe' : 'Edit Recipe'}</h1>
+
+      <div className='textInput center extraBottom'>
+        <label htmlFor='title'>Title</label>
+        <input id='title' type='text' value={title[0]} onChange={(event) => title[1](event.target.value)} placeholder='give your recipe a title'/>
+      </div>
+
+      <div className='textInput center'>
+        <label htmlFor='description'>Description</label>
+        <textarea id='description' rows="9" value={description[0]} onChange={(event) => description[1](event.target.value)} placeholder='describe your recipe' />
+      </div>
     </>
   )
 }
 
-function Page2 () {
+function RecipeImage ({image}) {
+  const imageOptions = ['🧀', '🥞', '🍗', '🍔','🍞', '🥯', '🥐','🥨','🍗','🥓','🥩','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🥚','🍳','🥘','🥣','🥗','🍿','🧂','🥫']
   return (
     <>
       <p>page two</p>
+      <label htmlFor='image'>image</label>
+      <select id='image' value={image[0]} onChange={(event) => image[1](event.target.value)}>
+        <option value="" disabled hidden>choose image</option>
+        {imageOptions.map((option, index) => ( <option key={index}>{option}</option> ))}
+      </select>
     </>
   )
 }

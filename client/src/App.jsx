@@ -38,9 +38,9 @@ function App() {
             <Route path="/register" exact element={<Register />} />
             <Route path="/editRecipe" exact element={<EditRecipe />} />
             <Route path="/friendsList" exact element={<FriendsList />} />
-            <Route path="/profile" exact element={<Profile userData = {userData} />} />
+            <Route path="/profile" exact element={<Profile userData={userData} />} />
             <Route path="/addIngredient" exact element={<AddIngredient />} /> {/*remove before production*/}
-            <Route path="/newEditRecipe" exact element={<NewEditRecipe />} /> {/*remove before production*/}
+            <Route path="/newEditRecipe" exact element={<NewEditRecipe userData={userData}/>} /> {/*remove before production*/}
           </Routes>
         </main>
     </BrowserRouter>
