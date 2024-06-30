@@ -10,10 +10,28 @@ function newEditRecipe ({userData}) {
   const [searchParams] = useSearchParams()
   const recipeId = searchParams.get('recipeId')
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [image, setImage] = useState('');
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [image, setImage] = useState('')
 
+  const [instructionList, setInstructionList] = useState([])
+
+  useEffect (() => {
+    fetch('server/recipe/recipeData?_id=' + recipeId)
+    .then ((response) => {
+      console.log(response)
+      if (!response.ok) { throw new Error('Network response was not ok') }
+      return response.json()
+    })
+    .then ((data) => {
+      const recipeData = data.schema
+      setTitle(recipeData.title)
+      setDescription(recipeData.description)
+      setImage(recipeData.image)
+      setInstructionList(recipeData.instructions)
+    })
+    .catch((error) => { console.error(error.message) })
+  },[])
   
   const pageList = [
     {
@@ -21,13 +39,13 @@ function newEditRecipe ({userData}) {
       props: {
         newRecipe: !recipeId,
         title: [title, setTitle],
-        description: [description, setDescription]
+        description: [description, setDescription],
       }
     },
     { 
       name: RecipeImage,
       props: {
-        image: [image, setImage]
+        image: [image, setImage],
       }
     },
     { 
@@ -39,7 +57,7 @@ function newEditRecipe ({userData}) {
     { 
       name: Page4,
       props: {
-        
+        instructionList: [instructionList, setInstructionList],
       }
     },
   ]
@@ -82,15 +100,38 @@ function RecipeImage ({image}) {
 function Page3 () {
   return (
     <>
-      <p>page three</p>
+      <div className='halfVerticalSpace'>
+        <h2>Recipe Ingredients</h2>
+
+      </div>
+      <div className='textInput'>
+        <label>New Instruction</label>
+        <input  placeholder='add ingredient'/>
+      </div>
     </>
   )
 }
 
-function Page4 () {
+function Page4 ({instructionList}) {
+  const [newInstruction, setNewInstruction] = useState('')
+
+  function addInstruction() {
+    if(newInstruction.length != 0){
+      instructionList[1]((list) => {return [...list, newInstruction]})
+      setNewInstruction('')
+    }
+  }
+
   return (
     <>
-      <p>page four</p>
+      <div className='halfVerticalSpace'>
+        <h2>Recipe Instructions</h2>
+      </div>
+      <div className='textInput'>
+        <label htmlFor='newInstruction'>New Instruction</label>
+        <textarea id="newInstruction" rows='6' value={newInstruction} onChange={(event) => {setNewInstruction(event.target.value)}} placeholder='add a new instruction'/>
+      </div>
+      <button onClick={addInstruction()}>Add Instruction</button>
     </>
   )
 }

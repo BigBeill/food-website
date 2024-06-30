@@ -132,6 +132,10 @@ h3 {
     color: $darkTextColor;
     text-decoration: underline #065F46;
   }
+
+  h2{
+    margin-left: .9rem;
+  }
 }
 
 
@@ -205,4 +209,9 @@ input[type=number] {
   border: .1rem solid #991b1b;
   border-radius: .3rem;
   background-color: rgb(153, 27, 27, .5);
+}
+
+.halfVerticalSpace {
+  width: 100%;
+  height: 50%;
 }
