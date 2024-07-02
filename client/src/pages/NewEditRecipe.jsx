@@ -24,6 +24,7 @@ function newEditRecipe ({userData}) {
       return response.json()
     })
     .then ((data) => {
+      console.log(data)
       const recipeData = data.schema
       setTitle(recipeData.title)
       setDescription(recipeData.description)
@@ -32,64 +33,68 @@ function newEditRecipe ({userData}) {
     })
     .catch((error) => { console.error(error.message) })
   },[])
-  
+
   const pageList = [
     {
       name: GeneralInfo,
       props: {
         newRecipe: !recipeId,
-        title: [title, setTitle],
-        description: [description, setDescription],
+        title: title,
+        setTitle: setTitle,
+        description: description, 
+        setDescription: setDescription,
       }
     },
     { 
-      name: RecipeImage,
+      name: ImagePage,
       props: {
-        image: [image, setImage],
+        image: image,
+        setImage: setImage,
       }
     },
     { 
-      name: Page3,
+      name: IngredientPage,
       props: {
         
       }
     },
     { 
-      name: Page4,
+      name: InstructionPage,
       props: {
-        instructionList: [instructionList, setInstructionList],
+        instructionList: instructionList,
+        setInstructionList: setInstructionList
       }
     },
   ]
 
-  return <NoteBook pageList={pageList}/>
+  return <NoteBook pageList={pageList} />
 }
 
-function GeneralInfo ({newRecipe, title, description}) {
+function GeneralInfo ({newRecipe, title, setTitle, description, setDescription}) {
   return (
     <>
       <h1>{newRecipe ? 'New Recipe' : 'Edit Recipe'}</h1>
 
       <div className='textInput center extraBottom'>
         <label htmlFor='title'>Title</label>
-        <input id='title' type='text' value={title[0]} onChange={(event) => title[1](event.target.value)} placeholder='give your recipe a title'/>
+        <input id='title' type='text' value={title} onChange={(event) => setTitle(event.target.value)} placeholder='give your recipe a title'/>
       </div>
 
       <div className='textInput center'>
         <label htmlFor='description'>Description</label>
-        <textarea id='description' rows="9" value={description[0]} onChange={(event) => description[1](event.target.value)} placeholder='describe your recipe' />
+        <textarea id='description' rows="9" value={description} onChange={(event) => setDescription(event.target.value)} placeholder='describe your recipe' />
       </div>
     </>
   )
 }
 
-function RecipeImage ({image}) {
+function ImagePage ({image, setImage}) {
   const imageOptions = ['🧀', '🥞', '🍗', '🍔','🍞', '🥯', '🥐','🥨','🍗','🥓','🥩','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🥚','🍳','🥘','🥣','🥗','🍿','🧂','🥫']
   return (
     <>
       <p>page two</p>
       <label htmlFor='image'>image</label>
-      <select id='image' value={image[0]} onChange={(event) => image[1](event.target.value)}>
+      <select id='image' value={image} onChange={(event) => setImage(event.target.value)}>
         <option value="" disabled hidden>choose image</option>
         {imageOptions.map((option, index) => ( <option key={index}>{option}</option> ))}
       </select>
@@ -97,7 +102,7 @@ function RecipeImage ({image}) {
   )
 }
 
-function Page3 () {
+function IngredientPage () {
   return (
     <>
       <div className='halfVerticalSpace'>
@@ -112,27 +117,33 @@ function Page3 () {
   )
 }
 
-function Page4 ({instructionList}) {
+function InstructionPage ({instructionList, setInstructionList}) {
   const [newInstruction, setNewInstruction] = useState('')
 
   function addInstruction() {
     if(newInstruction.length != 0){
-      instructionList[1]((list) => {return [...list, newInstruction]})
+      setInstructionList((list) => {return [...list, newInstruction]})
       setNewInstruction('')
     }
   }
 
   return (
-    <>
-      <div className='halfVerticalSpace'>
+    <div className='pageContent'>
         <h2>Recipe Instructions</h2>
-      </div>
+        <div className='listContents'>
+          { instructionList.map((instruction, index) => (
+            <React.Fragment key={index}>
+              <h4>Step {index + 1}</h4>
+              <p>{instruction}</p>
+            </React.Fragment>
+          ))}
+        </div>
       <div className='textInput'>
         <label htmlFor='newInstruction'>New Instruction</label>
         <textarea id="newInstruction" rows='6' value={newInstruction} onChange={(event) => {setNewInstruction(event.target.value)}} placeholder='add a new instruction'/>
       </div>
       <button onClick={addInstruction()}>Add Instruction</button>
-    </>
+    </div>
   )
 }
 

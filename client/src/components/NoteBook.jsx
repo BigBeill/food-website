@@ -65,12 +65,12 @@ export default function noteBook ({pageList}) {
   return(
     <div className={`notebook ${displayRight ? 'displayRight' : ''}`}>
       <div className='notebookPage' onClick={() => setDisplayRight(false)}>
-        <FirstPage.name {...FirstPage.props}/> 
+        <FirstPage.name {...FirstPage.props} /> 
         <div className='arrowIcon left'><FontAwesomeIcon icon={faArrowLeft} className='arrow' onClick={() => previousPage()} /></div>
       </div>
       <img className="notebookSpine" src="/notebookSpine.png" alt="notebookSpine" />
       <div className='notebookPage' onClick={() => setDisplayRight(true)}>
-        <SecondPage.name {...SecondPage.props}/>
+        <SecondPage.name {...SecondPage.props} />
         <div className='arrowIcon right'><FontAwesomeIcon icon={faArrowRight} className='arrow' onClick={() => nextPage()}/></div>
       </div>
     </div>
