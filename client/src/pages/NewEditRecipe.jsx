@@ -5,7 +5,7 @@ import NoteBook from '../components/NoteBook';
 import editRecipe from './EditRecipe';
 
 function newEditRecipe ({userData}) {
-  if (userData._id == ""){ return <Navigate to='/login' />}
+  //if (userData._id == ""){ return <Navigate to='/login' />}
 
   const [searchParams] = useSearchParams()
   const recipeId = searchParams.get('recipeId')
@@ -36,7 +36,7 @@ function newEditRecipe ({userData}) {
 
   const pageList = [
     {
-      name: GeneralInfo,
+      name: GeneralInfoPage,
       props: {
         newRecipe: !recipeId,
         title: title,
@@ -70,7 +70,7 @@ function newEditRecipe ({userData}) {
   return <NoteBook pageList={pageList} />
 }
 
-function GeneralInfo ({newRecipe, title, setTitle, description, setDescription}) {
+function GeneralInfoPage ({newRecipe, title, setTitle, description, setDescription}) {
   return (
     <>
       <h1>{newRecipe ? 'New Recipe' : 'Edit Recipe'}</h1>
@@ -121,6 +121,7 @@ function InstructionPage ({instructionList, setInstructionList}) {
   const [newInstruction, setNewInstruction] = useState('')
 
   function addInstruction() {
+    console.log('test')
     if(newInstruction.length != 0){
       setInstructionList((list) => {return [...list, newInstruction]})
       setNewInstruction('')
@@ -142,7 +143,7 @@ function InstructionPage ({instructionList, setInstructionList}) {
         <label htmlFor='newInstruction'>New Instruction</label>
         <textarea id="newInstruction" rows='6' value={newInstruction} onChange={(event) => {setNewInstruction(event.target.value)}} placeholder='add a new instruction'/>
       </div>
-      <button onClick={addInstruction()}>Add Instruction</button>
+      <button onClick={() => addInstruction()}>Add Instruction</button>
     </div>
   )
 }
