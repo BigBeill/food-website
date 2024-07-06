@@ -9,7 +9,6 @@ import './styles/RecipeBook.scss'
 import './styles/inputs.scss'
 
 //component specific scss
-import './styles/componentSpecific/clickAndDragList.scss'
 import './styles/componentSpecific/nav.scss'
 import './styles/componentSpecific/notebook.scss'
 

@@ -137,7 +137,7 @@ function InstructionPage ({instructionList, setInstructionList}) {
   function addInstruction() {
     console.log('test')
     if(newInstruction.length != 0){
-      setInstructionList((list) => {return [...list, neInstruction]})
+      setInstructionList((list) => {return [...list, newInstruction]})
       setNewInstruction('')
     }
   }
