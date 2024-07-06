@@ -9,7 +9,6 @@ list = [{
 
 export default function ClickAndDragList({list}) {
 
-
   if (typeof list[0] == 'string') {
     return (
       <ul className="clickAndDragList">
