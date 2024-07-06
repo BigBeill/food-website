@@ -70,7 +70,7 @@ export default function noteBook ({pageList}) {
       </div>
       <img className="notebookSpine" src="/notebookSpine.png" alt="notebookSpine" />
       <div className='notebookPage' onClick={() => setDisplayRight(true)}>
-        <SecondPage.name {...SecondPage.props} />
+        {SecondPage ? (<SecondPage.name {...SecondPage.props} />) : null}
         <div className='arrowIcon right'><FontAwesomeIcon icon={faArrowRight} className='arrow' onClick={() => nextPage()}/></div>
       </div>
     </div>
