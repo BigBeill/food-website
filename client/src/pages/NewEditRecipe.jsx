@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, Component} from 'react'
-import { useLocation, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams, Navigate } from 'react-router-dom'
 import ActiveSearchBar from '../components/ActiveSearchBar'
-import NoteBook from '../components/NoteBook';
-import ClickAndDragList from '../components/ClickAndDragList';
+import NoteBook from '../components/NoteBook'
+import { Reorder } from 'framer-motion'
 
 function newEditRecipe ({userData}) {
   //if (userData._id == ""){ return <Navigate to='/login' />}
@@ -17,13 +17,17 @@ function newEditRecipe ({userData}) {
   const [instructionList, setInstructionList] = useState(['test1','test2','test3'])
 
   useEffect (() => {
+    console.log('test')
+  }, [instructionList])
+
+  useEffect (() => {
+    console.log('connecting to server')
     fetch('server/recipe/recipeData?_id=' + recipeId)
     .then ((response) => {
       console.log(response)
       if (!response.ok) { throw new Error('Network response was not ok') }
       return response.json()
     })
-    
     .then ((data) => {
       console.log(data)
       const recipeData = data.schema
@@ -120,22 +124,8 @@ function IngredientPage () {
 
 function InstructionPage ({instructionList, setInstructionList}) {
   const [newInstruction, setNewInstruction] = useState('')
-  const [reformatedList, setReformatedList] = useState([])
-
-  useEffect (() => {
-    let list = []
-    instructionList.forEach((content, index) => {
-      const listContent = {
-        title: "Step " + (index + 1),
-        content: content
-      }
-      list.push(listContent)
-    })
-    setReformatedList(list)
-  },[instructionList])
 
   function addInstruction() {
-    console.log('test')
     if(newInstruction.length != 0){
       setInstructionList((list) => {return [...list, newInstruction]})
       setNewInstruction('')
@@ -145,8 +135,14 @@ function InstructionPage ({instructionList, setInstructionList}) {
   return (
     <div className='pageContent'>
         <h2>Recipe Instructions</h2>
-
-        <ClickAndDragList list={reformatedList} setList={setReformatedList}/>
+        <Reorder.Group className='reorderList' axis='y' values={instructionList} onReorder={setInstructionList}>
+          {instructionList.map((item, index) => (
+            <Reorder.Item key={item} value={item}>
+              <h4>Step {index + 1}</h4>
+              <p>{item}</p>
+            </Reorder.Item>
+          ))}
+        </Reorder.Group>
 
       <div className='textInput'>
         <label htmlFor='newInstruction'>New Instruction</label>
