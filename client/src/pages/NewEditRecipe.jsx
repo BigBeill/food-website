@@ -14,29 +14,36 @@ function newEditRecipe ({userData}) {
   const [description, setDescription] = useState('')
   const [image, setImage] = useState('')
 
-  const [instructionList, setInstructionList] = useState(['test1','test2','test3'])
+  const [instructionList, setInstructionList] = useState([{id:0, content:'test1'},{id:1, content:'test2'},{id:2, content:'test3'}])
 
   useEffect (() => {
-    console.log('test')
-  }, [instructionList])
+    if (recipeId) {
+      fetch('server/recipe/recipeData?_id=' + recipeId)
+      .then ((response) => {
+        console.log(response)
+        if (!response.ok) { throw new Error('Network response was not ok') }
+        return response.json()
+      })
+      .then ((data) => {
+        console.log(data)
+        const recipeData = data.schema
+        setTitle(recipeData.title)
+        setDescription(recipeData.description)
+        setImage(recipeData.image)
 
-  useEffect (() => {
-    console.log('connecting to server')
-    fetch('server/recipe/recipeData?_id=' + recipeId)
-    .then ((response) => {
-      console.log(response)
-      if (!response.ok) { throw new Error('Network response was not ok') }
-      return response.json()
-    })
-    .then ((data) => {
-      console.log(data)
-      const recipeData = data.schema
-      setTitle(recipeData.title)
-      setDescription(recipeData.description)
-      setImage(recipeData.image)
-      setInstructionList(recipeData.instructions)
-    })
-    .catch((error) => { console.error(error.message) })
+        let instructions = []
+        let id = 0;
+        recipeData.instructions.forEach((item) => {
+          instructions.push({
+            id: id,
+            content: item
+          })
+          id++
+        })
+        setInstructionList(instructions)
+      })
+      .catch((error) => { console.error(error.message) })
+    }
   },[])
 
   const pageList = [
@@ -125,15 +132,12 @@ function IngredientPage () {
 function InstructionPage ({instructionList, setInstructionList}) {
   const [newInstruction, setNewInstruction] = useState('')
 
-  const [idList, setIdList] = useState([])
-
-  useEffect(() => {
-    
-  })
-
   function addInstruction() {
     if(newInstruction.length != 0){
-      setInstructionList((list) => {return [...list, newInstruction]})
+      setInstructionList((list) => {return [...list, {
+        id: list.length,
+        content: newInstruction
+      }]})
       setNewInstruction('')
     }
   }
@@ -143,9 +147,9 @@ function InstructionPage ({instructionList, setInstructionList}) {
         <h2>Recipe Instructions</h2>
         <Reorder.Group className='reorderList' axis='y' values={instructionList} onReorder={setInstructionList}>
           {instructionList.map((item, index) => (
-            <Reorder.Item key={item} value={item}>
+            <Reorder.Item key={item.id} value={item}>
               <h4>Step {index + 1}</h4>
-              <p>{item}</p>
+              <p>{item.content}</p>
             </Reorder.Item>
           ))}
         </Reorder.Group>
