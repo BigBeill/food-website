@@ -125,6 +125,12 @@ function IngredientPage () {
 function InstructionPage ({instructionList, setInstructionList}) {
   const [newInstruction, setNewInstruction] = useState('')
 
+  const [idList, setIdList] = useState([])
+
+  useEffect(() => {
+    
+  })
+
   function addInstruction() {
     if(newInstruction.length != 0){
       setInstructionList((list) => {return [...list, newInstruction]})
