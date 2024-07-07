@@ -4,7 +4,7 @@ import ActiveSearchBar from '../components/ActiveSearchBar'
 import NoteBook from '../components/NoteBook'
 import { Reorder } from 'framer-motion'
 
-function newEditRecipe ({userData}) {
+function NewEditRecipe ({userData}) {
   //if (userData._id == ""){ return <Navigate to='/login' />}
 
   const [searchParams] = useSearchParams()
@@ -163,4 +163,4 @@ function InstructionPage ({instructionList, setInstructionList}) {
   )
 }
 
-export default newEditRecipe
+export default NewEditRecipe
