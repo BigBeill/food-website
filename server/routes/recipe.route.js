@@ -63,7 +63,6 @@ router.get('/recipeData', async (req,res) => {
 
     try {
         const data = await recipes.findOne({ _id:_id })
-        console.log(data)
         if (!data) { return res.status(404).json({ error: "recipe with _id does not exist in database"})}
         else { return res.status(200).json({schema: data}) }
     } 
