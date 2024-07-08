@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-// all data inputed should be relavent to 1 gram
+// all data imputed should be relevant to 1 gram
 const ingredientSchema = new mongoose.Schema({
   name: String,
   physical: Number, // how many grams one unit of this item is worth

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, Component} from 'react'
 import { useLocation, useNavigate, useSearchParams, Navigate } from 'react-router-dom'
 import ActiveSearchBar from '../components/ActiveSearchBar'
 import NoteBook from '../components/NoteBook'
-import { Reorder } from 'framer-motion'
+import { Reorder, animateVisualElement } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPen } from '@fortawesome/free-solid-svg-icons';
 
@@ -18,7 +18,7 @@ function NewEditRecipe ({userData}) {
 
   const [ingredientList, setIngredientList] = useState([])
 
-  const [instructionList, setInstructionList] = useState([{id:0, content:'test1'},{id:1, content:'test2'},{id:2, content:'test3'}])
+  const [instructionList, setInstructionList] = useState([])
 
   useEffect (() => {
     if (recipeId) {
@@ -131,6 +131,12 @@ function ImagePage ({image, setImage}) {
 }
 
 function IngredientPage ({ingredientList, setIngredientList}) {
+  const baseUnits = ['physical', 'milligrams', 'grams', 'pounds', 'ounces', 'liters', 'millimeters', 'cups', 'tablespoons']
+
+  const [newIngredient, setNewIngredient] = useState({})
+  const [availableId, setAvailableId] = useState(ingredientList.length)
+  const [unitsAvailable, setUnitsAvailable] = useState(baseUnits)
+
   return (
     <div className='pageContent'>
       <h2>Recipe Ingredients</h2>
@@ -145,10 +151,18 @@ function IngredientPage ({ingredientList, setIngredientList}) {
           </Reorder.Item>
         ))}
       </Reorder.Group>
-
-      <div className='textInput'>
+      <div className='textInput shared'>
         <label>New Ingredient</label>
-        <input  placeholder='add ingredient'/>
+        <div className='inputs'>
+          <input type='number' value={newIngredient.amount} onChange={(event) => setNewIngredient({...newIngredient, amount: event.target.value})} placeholder='Amount'/>
+          <select value={newIngredient.unit} onChange={(event) => setNewIngredient({...newIngredient, unit: event.target.value})}>
+            <option value="" disabled hidden>Units</option>
+            {unitsAvailable.map((unit, index) => (
+              <option key={index}>{unit}</option>
+            ))}
+          </select>
+          <input className='main' placeholder='add ingredient'/>
+        </div>
       </div>
     </div>
   )
@@ -156,28 +170,22 @@ function IngredientPage ({ingredientList, setIngredientList}) {
 
 function InstructionPage ({instructionList, setInstructionList}) {
   const [newInstruction, setNewInstruction] = useState('')
+  const [availableId, setAvailableId] = useState(instructionList.length)
 
   function addInstruction() {
     if(newInstruction.length != 0){
       setInstructionList((list) => {return [...list, {
-        id: list.length,
+        id: availableId,
         content: newInstruction
       }]})
+      setAvailableId(availableId+1)
       setNewInstruction('')
     }
   }
 
   function removeInstruction(index){
     let tempArray = instructionList.slice()
-    console.log(tempArray)
-    const holdId = tempArray[index].id
     tempArray.splice(index, 1)
-    for (let item of tempArray){
-      if (item.id == tempArray.length){
-        item.id = holdId
-        break
-      }
-    }
     setInstructionList(tempArray)
   }
 
