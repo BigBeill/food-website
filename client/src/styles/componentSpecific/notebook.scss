@@ -90,8 +90,27 @@
     height: 100%;
     overflow-x: hidden;
     overflow-y: scroll;
-    &.notList {
+    &.noMargin {
       padding: 0rem;
+    }
+
+    .listItem{
+      display: flex;
+      .itemContent {
+        width: 100%;
+      }
+      .itemOptions{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: .6rem;
+        margin: 0rem .3rem;
+        width: 1.2rem;
+
+        &.extraMargin{
+          margin-top: 1.5rem;
+        }
+      }
     }
   }
 
@@ -106,6 +125,7 @@
   }
 
   h4{
+    margin-top: 1.2rem;
     margin-bottom: .3rem;
   }
 

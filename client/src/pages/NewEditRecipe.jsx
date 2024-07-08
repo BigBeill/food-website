@@ -3,6 +3,8 @@ import { useLocation, useNavigate, useSearchParams, Navigate } from 'react-route
 import ActiveSearchBar from '../components/ActiveSearchBar'
 import NoteBook from '../components/NoteBook'
 import { Reorder } from 'framer-motion'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash, faPen } from '@fortawesome/free-solid-svg-icons';
 
 function NewEditRecipe ({userData}) {
   //if (userData._id == ""){ return <Navigate to='/login' />}
@@ -165,14 +167,34 @@ function InstructionPage ({instructionList, setInstructionList}) {
     }
   }
 
+  function removeInstruction(index){
+    let tempArray = instructionList.slice()
+    console.log(tempArray)
+    const holdId = tempArray[index].id
+    tempArray.splice(index, 1)
+    for (let item of tempArray){
+      if (item.id == tempArray.length){
+        item.id = holdId
+        break
+      }
+    }
+    setInstructionList(tempArray)
+  }
+
   return (
     <div className='pageContent'>
       <h2>Recipe Instructions</h2>
-      <Reorder.Group className='reorderList notList' axis='y' values={instructionList} onReorder={setInstructionList}>
+      <Reorder.Group className='reorderList noMargin' axis='y' values={instructionList} onReorder={setInstructionList}>
         {instructionList.map((item, index) => (
-          <Reorder.Item key={item.id} value={item}>
-            <h4>Step {index + 1}</h4>
-            <p>{item.content}</p>
+          <Reorder.Item key={item.id} value={item} className='listItem'>
+            <div className='itemContent'>
+              <h4>Step {index + 1} </h4>
+              <p>{item.content}</p>
+            </div>
+            <div className='itemOptions extraMargin'>
+              <FontAwesomeIcon icon={faTrash} style={{color: "#575757",}} onClick={() => removeInstruction(index)} />
+              <FontAwesomeIcon icon={faPen} style={{color: "#575757",}} />
+            </div>
           </Reorder.Item>
         ))}
       </Reorder.Group>
