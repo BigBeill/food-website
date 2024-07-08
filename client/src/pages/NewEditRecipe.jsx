@@ -14,6 +14,8 @@ function NewEditRecipe ({userData}) {
   const [description, setDescription] = useState('')
   const [image, setImage] = useState('')
 
+  const [ingredientList, setIngredientList] = useState([])
+
   const [instructionList, setInstructionList] = useState([{id:0, content:'test1'},{id:1, content:'test2'},{id:2, content:'test3'}])
 
   useEffect (() => {
@@ -31,16 +33,27 @@ function NewEditRecipe ({userData}) {
         setDescription(recipeData.description)
         setImage(recipeData.image)
 
-        let instructions = []
-        let id = 0;
-        recipeData.instructions.forEach((item) => {
-          instructions.push({
+        let tempArray = []
+        let id = 0
+        recipeData.ingredients.forEach((item) => {
+          tempArray.push({
             id: id,
             content: item
           })
           id++
         })
-        setInstructionList(instructions)
+        setIngredientList(tempArray)
+
+        tempArray = []
+        id = 0
+        recipeData.instructions.forEach((item) => {
+          tempArray.push({
+            id: id,
+            content: item
+          })
+          id++
+        })
+        setInstructionList(tempArray)
       })
       .catch((error) => { console.error(error.message) })
     }
@@ -67,7 +80,8 @@ function NewEditRecipe ({userData}) {
     { 
       name: IngredientPage,
       props: {
-        
+        ingredientList: ingredientList,
+        setIngredientList: setIngredientList
       }
     },
     { 
@@ -114,18 +128,27 @@ function ImagePage ({image, setImage}) {
   )
 }
 
-function IngredientPage () {
+function IngredientPage ({ingredientList, setIngredientList}) {
   return (
-    <>
-      <div className='halfVerticalSpace'>
-        <h2>Recipe Ingredients</h2>
+    <div className='pageContent'>
+      <h2>Recipe Ingredients</h2>
+      <Reorder.Group className='reorderList' axis='y' values={ingredientList} onReorder={setIngredientList}>
+        {ingredientList.map((item) => (
+          <Reorder.Item key={item.id} value={item}>
+            {(item.content.unit == 'physical') ? (
+              <p>{item.content.amount} {item.content.name}{item.content.amount!=1 ? 's' : ''}</p>
+            ):(
+            <p>{item.content.amount} {item.content.unit}{item.content.amount != 1 ? 's' : ''} of {item.content.name}</p>
+            )}
+          </Reorder.Item>
+        ))}
+      </Reorder.Group>
 
-      </div>
       <div className='textInput'>
-        <label>New Instruction</label>
+        <label>New Ingredient</label>
         <input  placeholder='add ingredient'/>
       </div>
-    </>
+    </div>
   )
 }
 
@@ -144,15 +167,15 @@ function InstructionPage ({instructionList, setInstructionList}) {
 
   return (
     <div className='pageContent'>
-        <h2>Recipe Instructions</h2>
-        <Reorder.Group className='reorderList' axis='y' values={instructionList} onReorder={setInstructionList}>
-          {instructionList.map((item, index) => (
-            <Reorder.Item key={item.id} value={item}>
-              <h4>Step {index + 1}</h4>
-              <p>{item.content}</p>
-            </Reorder.Item>
-          ))}
-        </Reorder.Group>
+      <h2>Recipe Instructions</h2>
+      <Reorder.Group className='reorderList notList' axis='y' values={instructionList} onReorder={setInstructionList}>
+        {instructionList.map((item, index) => (
+          <Reorder.Item key={item.id} value={item}>
+            <h4>Step {index + 1}</h4>
+            <p>{item.content}</p>
+          </Reorder.Item>
+        ))}
+      </Reorder.Group>
 
       <div className='textInput'>
         <label htmlFor='newInstruction'>New Instruction</label>

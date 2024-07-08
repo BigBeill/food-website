@@ -87,11 +87,12 @@
 
   .reorderList {
     margin: 0rem;
-    padding: 0rem;
     height: 100%;
     overflow-x: hidden;
     overflow-y: scroll;
-    padding: 0rem;
+    &.notList {
+      padding: 0rem;
+    }
   }
 
   h1{
