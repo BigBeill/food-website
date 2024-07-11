@@ -10,6 +10,9 @@ import FriendsList from './pages/FriendsList'
 import AddIngredient from './devTools/addIngredient'
 import NewEditRecipe from './pages/NewEditRecipe'
 
+import Layout from './Layout'
+import { routes } from './routes'
+
 function App() {
 
   useEffect(() => {
@@ -30,19 +33,13 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Nav userData = {userData}/>
-        <main>
-          <Routes>
-            <Route path="/" exact element={<Home />} />
-            <Route path="/login" exact element={<Login />} />
-            <Route path="/register" exact element={<Register />} />
-            <Route path="/editRecipe" exact element={<EditRecipe />} />
-            <Route path="/friendsList" exact element={<FriendsList />} />
-            <Route path="/profile" exact element={<Profile userData={userData} />} />
-            <Route path="/addIngredient" exact element={<AddIngredient />} /> {/*remove before production*/}
-            <Route path="/newEditRecipe" exact element={<NewEditRecipe userData={userData}/>} /> {/*remove before production*/}
-          </Routes>
-        </main>
+      <Routes>
+        <Route element={<Layout userData={userData}/>}>
+          {routes.map((route) => (
+            <Route key={route.path} path={route.path} element={route.element} />
+          ))}
+        </Route>
+      </Routes>
     </BrowserRouter>
   )
 }

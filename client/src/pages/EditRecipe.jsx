@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef} from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import ActiveSearchBar from '../components/ActiveSearchBar'
 
-function editRecipe () {
+function EditRecipe () {
   const errorRef = useRef()
   const [errorMessage, setErrorMessage] = useState("")
 
@@ -254,4 +254,4 @@ function editRecipe () {
   )
 }
 
-export default editRecipe
+export default EditRecipe

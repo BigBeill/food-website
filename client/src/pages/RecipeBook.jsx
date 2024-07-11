@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import GrowingText from '../components/growingText'
 
-function recipeBook({recipeList}) {
+function RecipeBook({recipeList}) {
   const titleContainer = useRef(null)
   const [displayRight, setDisplayRight] = useState(false)
 
@@ -29,4 +29,4 @@ function recipeBook({recipeList}) {
   )
 }
 
-export default recipeBook
+export default RecipeBook
