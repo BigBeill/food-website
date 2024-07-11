@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef} from 'react'
+import { NavLink } from "react-router-dom";
 
 function Nav(data) {
     const [open, setOpen] = useState(false);
@@ -16,30 +17,30 @@ function Nav(data) {
 
 
             <h3>Find Recipes</h3>
-            <a href="/">Public</a>
-            <a href="/index">Following</a>
-            <a href="/index">Search</a>
+            <NavLink className="navLink" to="/">Public</NavLink>
+            <NavLink className="navLink" to="/index">Following</NavLink>
+            <NavLink className="navLink" to="/index">Search</NavLink>
 
             {   
                 data.userData._id != "" ?
                 <>
 
                 <h3>Your Recipes</h3>
-                <a href="/recipeBook">Personal</a>
-                <a href="/index">Saved</a>
-                <a href="/editRecipe?recipe=new">New Recipe</a>
+                <NavLink className="navLink" to="/recipeBook">Personal</NavLink>
+                <NavLink className="navLink" to="/index">Saved</NavLink>
+                <NavLink className="navLink" to="/editRecipe?recipe=new">New Recipe</NavLink>
 
                 <h3>Social</h3>
-                <a href="/friendsList">Friends</a>
+                <NavLink className="navLink" to="/friendsList">Friends</NavLink>
 
                 <h3>Account</h3>
-                <a href="/profile">Profile</a>
+                <NavLink className="navLink" to="/profile">Profile</NavLink>
                 
                 </> : <>
                 
                 <h3>Account</h3>
-                <a href="/login">Login</a>
-                <a href="/register">Create Account</a>
+                <NavLink className="navLink" to="/login">Login</NavLink>
+                <NavLink className="navLink" to="/register">Create Account</NavLink>
                 
                 </>
             }
