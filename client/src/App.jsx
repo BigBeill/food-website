@@ -12,10 +12,10 @@ function App() {
 
   const [userData, setUserData] = useState ({})
 
-  const fetchUserData = async() => {
-    await fetch('server/user/userInfo')
+  function fetchUserData() {
+    fetch('/server/user/userInfo')
     .then(response => response.json())
-    .then(data => {setUserData(data)})
+    .then(setUserData)
     .catch(error => {
       console.error("No user found", error) 
       setUserData({_id: "", username: ""})

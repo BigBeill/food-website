@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef} from 'react'
 import { NavLink } from "react-router-dom";
 
-function Nav(data) {
+function Nav({userData}) {
     const [open, setOpen] = useState(false);
     
     function openNav() {
-        console.log("button clicked")
         setOpen(!open)
     }
 
@@ -22,7 +21,7 @@ function Nav(data) {
             <NavLink className="navLink" to="/index">Search</NavLink>
 
             {   
-                data.userData._id != "" ?
+                userData._id != "" ?
                 <>
 
                 <h3>Your Recipes</h3>

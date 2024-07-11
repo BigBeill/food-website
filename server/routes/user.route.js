@@ -15,20 +15,19 @@ const users = require('../schemas/user')
 // route will:
 //   return data for user that is currently logged in
 router.get('/userInfo', (req, res) => {
-    console.log("user/userInfo get request received")
     data = req.user
     res.end(JSON.stringify(data))
 })
 
 // takes 2 arguments from url:
-    // searchterm: string
+    // searchTerm: string
     // amount: int
 router.get('/findUsers', async (req, res) => {
-    const searchterm = req.query.searchterm || ""
+    const searchTerm = req.query.searchTerm || ""
     const amount = parseInt(req.query.amount) || 30
 
     const data = await ingredients.find(
-        { name: {$regex: new RegExp(searchterm, 'i')} },
+        { name: {$regex: new RegExp(searchTerm, 'i')} },
         { name:1}
     ).limit(amount)
 

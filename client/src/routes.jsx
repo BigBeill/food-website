@@ -5,10 +5,11 @@ import FriendsList from './pages/FriendsList'
 import Login from './pages/Login'
 import NewEditRecipe from './pages/NewEditRecipe'
 import Profile from './pages/Profile'
-import RecipeBook from "./pages/RecipeBook"
 import Register from './pages/Register'
 
 import AddIngredient from './devTools/addIngredient'
+
+import NotFound from './pages/NotFound'
 
 export const routes = [
   {
@@ -40,15 +41,15 @@ export const routes = [
     element:<Profile />,
   },
   {
-    path:'/recipeBook',
-    element:<RecipeBook />,
-  },
-  {
     path:'/register',
     element:<Register />,
   },
   {
     path:'/addIngredient',
     element:<AddIngredient />,
+  },
+  {
+    path:'*',
+    element:<NotFound />,
   }
 ]
