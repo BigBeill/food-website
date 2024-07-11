@@ -56,6 +56,33 @@
     &.extraBottom {
       margin-bottom: 3rem;
     }
+
+    &.shared .inputs{
+      display: flex;
+      gap: .6rem;
+      margin: 0rem 4.5rem;
+
+      input, select{
+        margin: 0rem;
+        width: 5.4rem;
+        background-color: transparent;
+        border: none;
+        border-bottom: 1px solid $darkText;
+        color: #4a4a4a;
+
+        &.mainInput{
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  option{
+    color: #575757;
+
+    &.light{
+      color: #4a4a4a;
+    }
   }
 
   button{

@@ -133,9 +133,13 @@ function ImagePage ({image, setImage}) {
 function IngredientPage ({ingredientList, setIngredientList}) {
   const baseUnits = ['physical', 'milligrams', 'grams', 'pounds', 'ounces', 'liters', 'millimeters', 'cups', 'tablespoons']
 
-  const [newIngredient, setNewIngredient] = useState({})
+  const [newIngredient, setNewIngredient] = useState({_id:"", name:"", unitType:[], unit:"", amount:""})
   const [availableId, setAvailableId] = useState(ingredientList.length)
   const [unitsAvailable, setUnitsAvailable] = useState(baseUnits)
+
+  function addIngredient () {
+
+  }
 
   return (
     <div className='pageContent'>
@@ -156,14 +160,15 @@ function IngredientPage ({ingredientList, setIngredientList}) {
         <div className='inputs'>
           <input type='number' value={newIngredient.amount} onChange={(event) => setNewIngredient({...newIngredient, amount: event.target.value})} placeholder='Amount'/>
           <select value={newIngredient.unit} onChange={(event) => setNewIngredient({...newIngredient, unit: event.target.value})}>
-            <option value="" disabled hidden>Units</option>
+            <option value="" disabled hidden className='light'>Units</option>
             {unitsAvailable.map((unit, index) => (
               <option key={index}>{unit}</option>
             ))}
           </select>
-          <input className='main' placeholder='add ingredient'/>
+          <input className='mainInput' placeholder='add ingredient'/>
         </div>
       </div>
+      <button onClick={() => addIngredient()}>Add Ingredient</button>
     </div>
   )
 }
