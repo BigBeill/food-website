@@ -12,7 +12,8 @@ function Register() {
   const [errorMessage, setErrorMessage] = useState("")
 
   useEffect(() => {
-    import('../styles/loginImage.css')
+    document.body.classList.add('loginBackground')
+    return () => { document.body.classList.remove('page-background') }
   }, [])
 
   useEffect(() => {

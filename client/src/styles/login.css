@@ -110,3 +110,7 @@
 .loginForm .checkboxInput input{
     accent-color: #34d399;
 }
+
+.loginBackground {
+    background-image: url('/loginBackground.jpg');
+}

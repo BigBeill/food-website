@@ -6,13 +6,14 @@
   font-family: 'Coolvetica', sans-serif;
   background-color: #f5f8fa;
   --base-color: #065F46;
-  background-image: url('/woodBackground.jpg');
-  background-size: 120rem;
 }
 
 body {
   margin:0;
   padding:0;
+  background-image: url('/woodBackground.jpg');
+  background-size: cover;
+  background-position: center;
 }
 
 #root{
