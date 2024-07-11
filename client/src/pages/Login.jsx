@@ -10,7 +10,7 @@ function Login() {
 
   useEffect(() => {
     document.body.classList.add('loginBackground')
-    return () => { document.body.classList.remove('page-background') }
+    return () => { document.body.classList.remove('loginBackground') }
   }, [])
 
   useEffect(() => {
