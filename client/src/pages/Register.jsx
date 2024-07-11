@@ -24,7 +24,7 @@ function Register() {
     if (!username) { setErrorMessage("no username given") }
     else if (!email) { setErrorMessage("no email given") }
     else if (!passwordOne) { setErrorMessage("no password given") }
-    else if (passwordOne != passwordTwo) { setErrorMessage("passwords dont match") }
+    else if (passwordOne != passwordTwo) { setErrorMessage("passwords don't match") }
     else {
 
       const postRequest = {
@@ -49,7 +49,7 @@ function Register() {
 
   return (
     <>
-      {/* css for loginForm and resgisterForm will be the same */}
+      {/* css for loginForm and registerForm will be the same */}
       <div className='loginForm' id="registerForm">
         <h1>Create Account</h1>
 
