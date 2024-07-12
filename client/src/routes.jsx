@@ -33,7 +33,7 @@ export const routes = [
     element:<Login />,
   },
   {
-    path:'/newEditRecipe/:recipeId',
+    path:'/newEditRecipe',
     element:<NewEditRecipe />,
   },
   {

@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useRef, Component} from 'react'
-import { useLocation, useNavigate, useSearchParams, Navigate } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { useSearchParams, Navigate } from 'react-router-dom'
 import ActiveSearchBar from '../components/ActiveSearchBar'
 import NoteBook from '../components/NoteBook'
-import { Reorder, animateVisualElement } from 'framer-motion'
+import { Reorder } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPen } from '@fortawesome/free-solid-svg-icons';
+import { assignIds } from '../tools/general'
 
 function NewEditRecipe ({userData}) {
-  //if (userData._id == ""){ return <Navigate to='/login' />}
+  if (userData && userData._id == ""){ return <Navigate to='/login' />}
 
   const [searchParams] = useSearchParams()
   const recipeId = searchParams.get('recipeId')
@@ -22,40 +23,15 @@ function NewEditRecipe ({userData}) {
 
   useEffect (() => {
     if (recipeId) {
-      fetch('server/recipe/recipeData?_id=' + recipeId)
-      .then ((response) => {
-        console.log(response)
-        if (!response.ok) { throw new Error('Network response was not ok') }
-        return response.json()
-      })
-      .then ((data) => {
-        console.log(data)
+      fetch('/server/recipe/recipeData?_id=' + recipeId)
+      .then (response => response.json())
+      .then (data => {
         const recipeData = data.schema
         setTitle(recipeData.title)
         setDescription(recipeData.description)
         setImage(recipeData.image)
-
-        let tempArray = []
-        let id = 0
-        recipeData.ingredients.forEach((item) => {
-          tempArray.push({
-            id: id,
-            content: item
-          })
-          id++
-        })
-        setIngredientList(tempArray)
-
-        tempArray = []
-        id = 0
-        recipeData.instructions.forEach((item) => {
-          tempArray.push({
-            id: id,
-            content: item
-          })
-          id++
-        })
-        setInstructionList(tempArray)
+        setIngredientList(assignIds(recipeData.ingredients))
+        setInstructionList(assignIds(recipeData.instructions))
       })
       .catch((error) => { console.error(error.message) })
     }
