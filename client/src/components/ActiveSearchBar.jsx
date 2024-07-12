@@ -13,7 +13,7 @@ returned div className: activeSearchBar
   ul: list of all the options available to user
 */
 
-function ActiveSearchBar(currentValue, options, eventHandler) {
+function ActiveSearchBar({ currentValue, options, eventHandler }) {
   return (
     <div className="activeSearchBar">
       <input 

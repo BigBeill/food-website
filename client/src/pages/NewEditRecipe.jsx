@@ -5,6 +5,7 @@ import NoteBook from '../components/NoteBook'
 import { Reorder } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPen } from '@fortawesome/free-solid-svg-icons';
+import { faCircleXmark } from '@fortawesome/free-regular-svg-icons';
 import { assignIds } from '../tools/general'
 
 function NewEditRecipe ({userData}) {
@@ -22,6 +23,7 @@ function NewEditRecipe ({userData}) {
   const [instructionList, setInstructionList] = useState([])
 
   useEffect (() => {
+    // if recipe exists, populate this page with recipes data from server
     if (recipeId) {
       fetch('/server/recipe/recipeData?_id=' + recipeId)
       .then (response => response.json())
@@ -36,6 +38,10 @@ function NewEditRecipe ({userData}) {
       .catch((error) => { console.error(error.message) })
     }
   },[])
+
+  function submitRecipe(){
+    console.log(submittingRecipe)
+  }
 
   const pageList = [
     {
@@ -109,25 +115,87 @@ function ImagePage ({image, setImage}) {
 function IngredientPage ({ingredientList, setIngredientList}) {
   const baseUnits = ['physical', 'milligrams', 'grams', 'pounds', 'ounces', 'liters', 'millimeters', 'cups', 'tablespoons']
 
-  const [newIngredient, setNewIngredient] = useState({_id:"", name:"", unitType:[], unit:"", amount:""})
-  const [availableId, setAvailableId] = useState(ingredientList.length)
+  const [newIngredient, setNewIngredient] = useState({_id:"", name:"", unit:"", amount:""})
   const [unitsAvailable, setUnitsAvailable] = useState(baseUnits)
+  const [ingredientsAvailable, setIngredientsAvailable] = useState([])
+  const [availableId, setAvailableId] = useState(ingredientList.length)
 
   function addIngredient () {
+    //make sure important information is provided
+    if(!newIngredient.name || !newIngredient.unit || !newIngredient.amount) { return }
+    else if (!newIngredient._id) {
+      // if _id is not known, attempt to find it in the database by name
+      fetch(`/server/recipe/getIngredient?name=${newIngredient.name}`)
+      .then(response => response.json())
+      .then(data => {
+        //if ingredient with name found, make sure data lines up with know information
+        if (!data) { return }
+        let units = []
+        if (data.unitType.includes('weight')) { units.push('milligrams', 'grams', 'pounds', 'ounces') }
+        if (data.unitType.includes('physical')) { units.push('physical') }
+        if (data.unitType.includes('volume')) { units.push('liters', 'millimeters', 'cups', 'tablespoons') }
+        if (!units.includes(newIngredient.unit)) { return }
+        // if nothing is incorrect, save _id
+        setNewIngredient({...newIngredient, _id:data._id})
+      })
+      .catch(error => {console.error("Error fetching ingredient:", error)});
+      
+      // if _id id still unknown, end function
+      if (!newIngredient._id) {return}
+    }
 
+    // save new ingredient to ingredientList
+    setIngredientList(list => [...list, {
+      id: availableId,
+      content: newIngredient
+    }])
+    setAvailableId(availableId+1)
+    setNewIngredient({_id:"", name:"", unit:"", amount:""})
+  }
+
+  function removeIngredient (index) {
+    let tempArray = ingredientList.slice()
+    tempArray.splice(index, 1)
+    setIngredientList(tempArray)
+  }
+
+  function ingredientNameChange(value) {
+    setNewIngredient({...newIngredient, _id:'', name:value})
+    setUnitsAvailable(baseUnits)
+    if (value.length >= 3) {
+      fetch(`server/recipe/findIngredient?name=${value}&amount=5`)
+      .then(response => response.json())
+      .then(setIngredientsAvailable)
+      .catch(error => {console.error("Error fetching ingredients:", error)});
+    }
+    else { setIngredientsAvailable([]) }
+  }
+
+  function ingredientSelected (name, _id, unitType) {
+    let units = []
+    if (unitType.includes('weight')) { units.push('milligrams', 'grams', 'pounds', 'ounces') }
+    if (unitType.includes('physical')) { units.push('physical') }
+    if (unitType.includes('volume')) { units.push('liters', 'millimeters', 'cups', 'tablespoons') }
+    setNewIngredient({...newIngredient, _id:_id, name:name})
+    setUnitsAvailable(units)
   }
 
   return (
     <div className='pageContent'>
       <h2>Recipe Ingredients</h2>
       <Reorder.Group className='reorderList' axis='y' values={ingredientList} onReorder={setIngredientList}>
-        {ingredientList.map((item) => (
-          <Reorder.Item key={item.id} value={item}>
-            {(item.content.unit == 'physical') ? (
-              <p>{item.content.amount} {item.content.name}{item.content.amount!=1 ? 's' : ''}</p>
-            ):(
-            <p>{item.content.amount} {item.content.unit}{item.content.amount != 1 ? 's' : ''} of {item.content.name}</p>
-            )}
+        {ingredientList.map((item, index) => (
+          <Reorder.Item key={item.id} value={item} className='listItem'>
+            <div className='itemOptions'>
+              <FontAwesomeIcon icon={faCircleXmark} style={{color: "#575757",}} onClick={() => removeIngredient(index)} />
+            </div>
+            <div className='itemContent'>
+              {(item.content.unit == 'physical') ? (
+                <p>{item.content.amount} {item.content.name}{item.content.amount!=1 ? 's' : ''}</p>
+              ):(
+              <p>{item.content.amount} {item.content.unit}{item.content.amount != 1 ? 's' : ''} of {item.content.name}</p>
+              )}
+            </div>
           </Reorder.Item>
         ))}
       </Reorder.Group>
@@ -141,7 +209,14 @@ function IngredientPage ({ingredientList, setIngredientList}) {
               <option key={index}>{unit}</option>
             ))}
           </select>
-          <input className='mainInput' placeholder='add ingredient'/>
+          <div className='activeSearchBar'>
+            <input type='text' className='mainInput' value={newIngredient.name} onChange={(event) => ingredientNameChange(event.target.value)} placeholder='Ingredient Name'/>
+            <ul>
+              {ingredientsAvailable.map(ingredient => (
+                <button key={ingredient._id} type='button' value={ingredient.name} onClick={(event) => ingredientSelected(ingredient.name, ingredient._id, ingredient.unitType)}> {ingredient.name} </button>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
       <button onClick={() => addIngredient()}>Add Ingredient</button>
@@ -155,10 +230,10 @@ function InstructionPage ({instructionList, setInstructionList}) {
 
   function addInstruction() {
     if(newInstruction.length != 0){
-      setInstructionList((list) => {return [...list, {
+      setInstructionList(list => [...list, {
         id: availableId,
         content: newInstruction
-      }]})
+      }])
       setAvailableId(availableId+1)
       setNewInstruction('')
     }

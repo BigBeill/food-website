@@ -83,8 +83,6 @@ router.get('/recipeData', async (req,res) => {
 //   name: nothing will be returned
 //   amount: assume amount is 5
 router.get('/findIngredient', async (req, res) => {
-    console.log("recipe/findIngredient get request received")
-
     const name = req.query.name || '';
     const amount = parseInt(req.query.amount, 10) || 5;
 
@@ -104,6 +102,22 @@ router.get('/findIngredient', async (req, res) => {
         console.error("Error fetching ingredients:", error);
         res.status(500).json({ message: "Server error occurred." });
     }
+})
+
+router.get('/getIngredient', async (req, res) => {
+    const _id = req.query.amount || ''
+    const name = req.query.name || ''
+
+    if (_id){
+        const data = await ingredients.findOne({_id: _id})
+        return res.status(200).json(data)
+    }
+    else if (name){
+        const data = await ingredients.findOne({name: name})
+        return res.status(200).json(data)
+    }
+    
+    return res.status(400).json({error: "no parameters provided"})
 })
 
 
