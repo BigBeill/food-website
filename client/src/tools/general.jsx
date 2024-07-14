@@ -10,3 +10,9 @@ export function assignIds(array){
   })
   return list
 }
+
+export function removeIds(array){
+  let list = []
+  array.forEach(item => list.push(item.content))
+  return list
+}

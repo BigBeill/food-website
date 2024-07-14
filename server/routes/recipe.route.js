@@ -127,6 +127,11 @@ router.get('/getIngredient', async (req, res) => {
 
 // ---------- recipe post routes ------------
 
+function missingRecipeData (recipeData){
+    if (!recipeData.title) { return {status:true, reason:"missing title field"} }
+    if (!recipeData.description) { return {status:false, reason:"missing description field" } }
+}
+
 
 
 // takes 5 arguments from body
@@ -143,8 +148,9 @@ router.get('/getIngredient', async (req, res) => {
 //   save total of all nutrition data in 
 router.post('/updateRecipe', async(req, res) => {
 
+    missingRecipeData(req.body)
+
     { // check for any missing or invalid data (400 errors).
-        if (!req.body._id) { return res.status(400).json({ error: 'body is missing _id field' }) }
         if (!req.body.title) { return res.status(400).json({ error: 'body is missing title field' }) }
         if (!req.body.description) { return res.status(400).json({ error: 'body is missing description field' }) }
         if (!req.body.image) { return res.status(400).json({ error: 'body is missing image field' }) }
@@ -183,7 +189,7 @@ router.post('/updateRecipe', async(req, res) => {
     catch { return res.status(500).json({ error: 'server failed to calculate nutrition data for recipe' }) }
 
     // save recipe to server
-    if (req.body._id == 'new') {
+    if (!req.body._id) {
         try {
             const newRecipe = new recipes(recipeData)
             await newRecipe.save()

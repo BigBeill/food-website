@@ -6,9 +6,9 @@ import { Reorder } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPen } from '@fortawesome/free-solid-svg-icons';
 import { faCircleXmark } from '@fortawesome/free-regular-svg-icons';
-import { assignIds } from '../tools/general'
+import { assignIds, removeIds } from '../tools/general'
 
-function NewEditRecipe ({userData}) {
+export default function NewEditRecipe ({userData}) {
   if (userData && userData._id == ""){ return <Navigate to='/login' />}
 
   const [searchParams] = useSearchParams()
@@ -40,7 +40,15 @@ function NewEditRecipe ({userData}) {
   },[])
 
   function submitRecipe(){
-    console.log(submittingRecipe)
+    const recipeData = {
+      id: recipeId,
+      title: title,
+      description: description,
+      image: image,
+      ingredients: removeIds(ingredientList),
+      instructions: removeIds(instructionList)
+    }
+    fetch('/server/recipe/updateRecipe')
   }
 
   const pageList = [
@@ -75,6 +83,12 @@ function NewEditRecipe ({userData}) {
         setInstructionList: setInstructionList
       }
     },
+    {
+      name: SubmissionPage,
+      props: {
+        submitRecipe: submitRecipe
+      }
+    }
   ]
 
   return <NoteBook pageList={pageList} />
@@ -272,4 +286,11 @@ function InstructionPage ({instructionList, setInstructionList}) {
   )
 }
 
-export default NewEditRecipe
+function SubmissionPage({submitRecipe}) {
+  return (
+    <>
+      <h2>Save Recipe</h2>
+      <button onClick={() => submitRecipe()}>Save recipe</button>
+    </>
+  )
+}
