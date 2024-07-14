@@ -15,11 +15,14 @@ const recipeSchema = new mongoose.Schema({
     instructions: [String],
     nutrition: {
         calories: Number,
-        protein: Number,
         fat: Number,
-        carbohydrates: Number,
+        cholesterol: Number,
         sodium: Number,
+        potassium: Number,
+        carbohydrates: Number,
         fiber: Number,
+        sugar: Number,
+        protein: Number,
     }
 })
 
