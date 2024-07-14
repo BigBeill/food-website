@@ -1,0 +1,67 @@
+const mongoConnection = require('../config/connectMongo') 
+const { ObjectId } = require('mongodb');
+const getNutrition = require("./unitConvertingUtils").getNutrition
+
+function createRecipeSchema (recipe) {
+
+  return new Promise ((resolve, reject) => {
+
+    console.log("creating recipe schema:")
+
+    let schema = {
+      owner: recipe.owner,
+      title: recipe.title,
+      description: recipe.description,
+      image: recipe.image,
+      ingredients: recipe.ingredients,
+      instructions: recipe.instructions,
+    }
+    
+    let validData = {
+      owner: false,
+      title: false,
+      description: false,
+      image: false,
+      ingredients: false,
+      instructions: false
+    }
+  
+    if(schema.owner && ObjectId.isValid(schema.owner)) { validData.owner = true }
+    if(schema.title && schema.title.length >= 3 && schema.title.length <= 60) { validData.title = true }
+    if(schema.description && schema.description.length >= 10 && schema.description.length <= 200) { validData.description = true }
+    if(schema.image) { validData.image = true }
+    
+    if(schema.ingredients && schema.ingredients >= 1 && schema.ingredients <= 100) {
+      try {
+        schema.nutrition = getNutrition(schema.ingredients)
+        validData.ingredients = true
+      }
+      catch (error) {
+        console.log("failed to collect nutrition data:", error)
+       }
+    }
+  
+    if(schema.instructions && schema.instructions.length >= 1 && schema.instructions.length <= 100) {
+      let key = true
+      schema.instructions.forEach(instruction => {
+        if (instruction.length < 3 || instruction.length > 300) {
+          key = false
+        }
+      })
+      validData.instructions = key
+    }
+
+    for (let index in validData) { 
+      if (!validData[index]) { 
+        console.log("failed to create recipe schema:", validData)
+        reject("invalid data provided:", validData)
+        return 
+      } 
+    }
+
+    console.log("successfully created recipe schema:", schema)
+    resolve(schema)
+  })
+}
+
+module.exports.createRecipeSchema = createRecipeSchema
