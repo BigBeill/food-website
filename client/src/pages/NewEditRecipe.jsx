@@ -40,15 +40,23 @@ export default function NewEditRecipe ({userData}) {
   },[])
 
   function submitRecipe(){
-    const recipeData = {
-      id: recipeId,
-      title: title,
-      description: description,
-      image: image,
-      ingredients: removeIds(ingredientList),
-      instructions: removeIds(instructionList)
+    console.log("submitting recipe")
+    let method
+    if (!recipeId) { method = 'POST' }
+    else { method = 'PUT' }
+
+    const serverRequest = {
+      method: method,
+      body: {
+        recipeId: recipeId,
+        title: title,
+        description: description,
+        image: image,
+        ingredients: removeIds(ingredientList),
+        instructions: removeIds(instructionList)
+      }
     }
-    fetch('/server/recipe/updateRecipe')
+    fetch('/server/recipe/recipe', serverRequest)
   }
 
   const pageList = [
