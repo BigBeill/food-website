@@ -27,7 +27,7 @@ function Nav({userData}) {
                 <h3>Your Recipes</h3>
                 <NavLink className="navLink" to="/recipeBook">Personal</NavLink>
                 <NavLink className="navLink" to="/index">Saved</NavLink>
-                <NavLink className="navLink" to="/editRecipe?recipe=new">New Recipe</NavLink>
+                <NavLink className="navLink" to="/editRecipe">New Recipe</NavLink>
 
                 <h3>Social</h3>
                 <NavLink className="navLink" to="/friendsList">Friends</NavLink>
