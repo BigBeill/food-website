@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useSearchParams, Navigate } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import NoteBook from '../components/NoteBook'
 import { Reorder } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,7 +8,9 @@ import { faCircleXmark } from '@fortawesome/free-regular-svg-icons';
 import { assignIds, removeIds } from '../tools/general'
 
 export default function NewEditRecipe ({userData}) {
-  if (userData && userData._id == ""){ return <Navigate to='/login' />}
+  const navigate = useNavigate()
+
+  if (userData && userData._id == ""){ return navigate('/login') }
 
   const [searchParams] = useSearchParams()
   const recipeId = searchParams.get('recipeId')
@@ -39,7 +41,6 @@ export default function NewEditRecipe ({userData}) {
   },[])
 
   function submitRecipe(){
-    console.log("submitting recipe")
     let method
     if (!recipeId) { method = 'POST' }
     else { method = 'PUT' }
@@ -57,6 +58,11 @@ export default function NewEditRecipe ({userData}) {
       })
     }
     fetch('/server/recipe/edit', serverRequest)
+    .then((response) => {
+      if (!response.ok) { throw new Error(`HTTP error, status: ${response.status}`) }
+      navigate('/') 
+    })
+    .catch((error) => { console.error('server failed to save recipe:', error) })
   }
 
   const pageList = [
@@ -199,7 +205,9 @@ function IngredientPage ({ingredientList, setIngredientList}) {
     if (unitType.includes('physical')) { units.push('physical') }
     if (unitType.includes('volume')) { units.push('liters', 'millimeters', 'cups', 'tablespoons') }
     setNewIngredient({...newIngredient, _id:_id, name:name})
+    if (!units.includes(newIngredient.unit)) { setNewIngredient({...newIngredient, unit:'' }) }
     setUnitsAvailable(units)
+    setIngredientsAvailable([])
   }
 
   return (
@@ -213,7 +221,7 @@ function IngredientPage ({ingredientList, setIngredientList}) {
             </div>
             <div className='itemContent'>
               {(item.content.unit == 'physical') ? (
-                <p>{item.content.amount} {item.content.name}{item.content.amount!=1 ? 's' : ''}</p>
+                <p>{item.content.amount} {item.content.name}{item.content.amount != 1 ? 's' : ''}</p>
               ):(
               <p>{item.content.amount} {item.content.unit}{item.content.amount != 1 ? 's' : ''} of {item.content.name}</p>
               )}
@@ -233,9 +241,9 @@ function IngredientPage ({ingredientList, setIngredientList}) {
           </select>
           <div className='activeSearchBar'>
             <input type='text' className='mainInput' value={newIngredient.name} onChange={(event) => ingredientNameChange(event.target.value)} placeholder='Ingredient Name'/>
-            <ul>
+            <ul className={`${ingredientsAvailable.length == 0 ? 'hidden' : ''}`}>
               {ingredientsAvailable.map(ingredient => (
-                <button key={ingredient._id} type='button' value={ingredient.name} onClick={(event) => ingredientSelected(ingredient.name, ingredient._id, ingredient.unitType)}> {ingredient.name} </button>
+                <li key={ingredient._id} type='button' value={ingredient.name} onClick={(event) => ingredientSelected(ingredient.name, ingredient._id, ingredient.unitType)}> {ingredient.name} </li>
               ))}
             </ul>
           </div>
