@@ -139,32 +139,53 @@ router.get('/getIngredient', async (req, res) => {
 //   go through every ingredient and calculate its nutrition data
 //   save total of all nutrition data in 
 
-router.all('/recipe', (req, res, next) => {
+router.all('/edit', (req, res, next) => {
 
     if(!req.user) { return res.status(401).json({ error: 'user not signed in' }) }
 
-    createRecipeSchema(req.body)
-    .then((response) => { 
+    const clientRecipeData = {
+        owner: req.user._id,
+        title: req.body.title,
+        description: req.body.description,
+        image: req.body.image,
+        ingredients: req.body.ingredients,
+        instructions: req.body.instructions
+    }
+
+    createRecipeSchema(clientRecipeData)
+    .then((response) => {
         req.recipeSchema = response
+        console.log("/edit middleware is done prepping the request, passing data to the endpoint")
         next()
     })
     .catch((error) => { return res.status(400).json({ error: error }) })
 })
 
-router.post('/recipe', (req, res) => {
+router.post('/edit', (req, res) => {
 
     // save recipe to server
-    new recipes(req.recipeSchema)
+    new recipes(req.recipeSchema).save()
     .then((newRecipe) => {
-        newRecipe.save()
         users.updateOne({_id: req.user._id}, { $push: { ownedRecipes: newRecipe._id } })
         return res.status(201).json({ response: 'new recipe created', newObject: newRecipe })
     })
-    .catch ((error) => { return res.status(500).json({error: 'failed to save new recipe in database:', error, failedObject: recipeData }) })
+    .catch ((error) => { return res.status(500).json({error: 'failed to save new recipe in database:' + error }) })
 })
 
-router.put('/recipe', (req, res) => {
-    console.log("testing:", req.recipeSchema)
+router.put('/edit', (req, res) => {
+
+    if (!req.body.id) { return res.status(400).json({ error: 'no recipe id provided' }) }
+
+    recipes.findOne({_id: req.body.id})
+    .then((recipe) => {
+
+        if (!recipe.owner == req.user) { return res.status(401).json({ error: 'current user is not the owner of the recipe' }) }
+
+        recipes.updateOne({_id: req.body.id}, {$set: req.recipeSchema})
+        .then(() => { return res.status(200).json({ message: 'recipe saved successfully' }) })
+        .catch(() => { return res.status(500).json({ error: 'failed to save the recipe' }) })
+    })
+    .catch ((error) => { return res.status(500).json({error: 'failed to find recipe in database:' + error }) })
 })
 
 

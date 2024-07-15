@@ -4,9 +4,9 @@ const getNutrition = require("./unitConvertingUtils").getNutrition
 
 function createRecipeSchema (recipe) {
 
-  return new Promise ((resolve, reject) => {
+  return new Promise ( async (resolve, reject) => {
 
-    console.log("creating recipe schema:")
+    console.log("creating recipe schema")
 
     let schema = {
       owner: recipe.owner,
@@ -31,9 +31,9 @@ function createRecipeSchema (recipe) {
     if(schema.description && schema.description.length >= 10 && schema.description.length <= 200) { validData.description = true }
     if(schema.image) { validData.image = true }
     
-    if(schema.ingredients && schema.ingredients >= 1 && schema.ingredients <= 100) {
+    if(schema.ingredients && schema.ingredients.length >= 1 && schema.ingredients.length <= 100) {
       try {
-        schema.nutrition = getNutrition(schema.ingredients)
+        schema.nutrition = await getNutrition(schema.ingredients) 
         validData.ingredients = true
       }
       catch (error) {
@@ -59,7 +59,7 @@ function createRecipeSchema (recipe) {
       } 
     }
 
-    console.log("successfully created recipe schema:", schema)
+    console.log("successfully created recipe schema.")
     resolve(schema)
   })
 }

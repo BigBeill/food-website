@@ -47,16 +47,17 @@ export default function NewEditRecipe ({userData}) {
 
     const serverRequest = {
       method: method,
-      body: {
-        recipeId: recipeId,
+      headers: { 'Content-type': 'application/json; charset=UTF-8', },
+      body: JSON.stringify({
+        id: recipeId,
         title: title,
         description: description,
         image: image,
         ingredients: removeIds(ingredientList),
         instructions: removeIds(instructionList)
-      }
+      })
     }
-    fetch('/server/recipe/recipe', serverRequest)
+    fetch('/server/recipe/edit', serverRequest)
   }
 
   const pageList = [
