@@ -3,7 +3,6 @@ import Home from './pages/Home'
 import EditRecipe from "./pages/EditRecipe"
 import FriendsList from './pages/FriendsList'
 import Login from './pages/Login'
-import NewEditRecipe from './pages/NewEditRecipe'
 import Profile from './pages/Profile'
 import Register from './pages/Register'
 
@@ -31,10 +30,6 @@ export const routes = [
   {
     path:'/login',
     element:<Login />,
-  },
-  {
-    path:'/newEditRecipe',
-    element:<NewEditRecipe />,
   },
   {
     path:'/profile',

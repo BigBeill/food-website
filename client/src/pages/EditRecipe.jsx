@@ -1,257 +1,305 @@
-import React, { useState, useEffect, useRef} from 'react'
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react'
+import { useSearchParams, Navigate } from 'react-router-dom'
 import ActiveSearchBar from '../components/ActiveSearchBar'
+import NoteBook from '../components/NoteBook'
+import { Reorder } from 'framer-motion'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash, faPen } from '@fortawesome/free-solid-svg-icons';
+import { faCircleXmark } from '@fortawesome/free-regular-svg-icons';
+import { assignIds, removeIds } from '../tools/general'
 
-function EditRecipe () {
-  const errorRef = useRef()
-  const [errorMessage, setErrorMessage] = useState("")
+export default function NewEditRecipe ({userData}) {
+  if (userData && userData._id == ""){ return <Navigate to='/login' />}
 
-  const [recipeId, setRecipeId] = useState("")
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
+  const [searchParams] = useSearchParams()
+  const recipeId = searchParams.get('recipeId')
 
-  const [chosenImage, setChosenImage] = useState("")
-  const imageOptions = ['🧀', '🥞', '🍗', '🍔','🍞', '🥯', '🥐','🥨','🍗','🥓','🥩','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🥚','🍳','🥘','🥣','🥗','🍿','🧂','🥫']
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [image, setImage] = useState('')
 
   const [ingredientList, setIngredientList] = useState([])
-  const [newIngredient, setNewIngredient] = useState({_id:"", name:"", unitType:[], unit:"", amount:""})
-  const [dropdownOptions, setDropdownOptions] = useState([])
-  const [unitsAvailable, setUnitsAvailable] = useState({hidden:true, units:[]})
 
   const [instructionList, setInstructionList] = useState([])
-  const [newInstruction, setNewInstruction] = useState("")
 
-  const location = useLocation()
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    const queryParams = new URLSearchParams(location.search)
-    const queryId = queryParams.get('recipe')
-    if (!queryId) { navigate("/editRecipe?recipe=new") }
-    else { setRecipeId(queryId) }
-  }, [])
-
-  useEffect(() => {
-    setErrorMessage("")
-  }, [title, description, chosenImage, ingredientList, instructionList])
-
-  function fetchDropdownOptions(ingredientName, amount = 5) {
-    fetch(`server/recipe/findIngredient?name=${encodeURIComponent(ingredientName)}&amount=${amount}`)
-    .then(response => response.json())
-    .then(data => {setDropdownOptions(data)})
-    .catch(error => {console.error("Error fetching Recipes:", error)});
-  }
-
-  function ingredientNameChange(event) {
-    if(event.type == "change"){ // text input was changed
-      setNewIngredient({...newIngredient, _id: "", name: event.target.value })
-      setUnitsAvailable({hidden:true, units:[]})
-
-      // Optionally, trigger the fetch only if the input length is sufficient
-      if (event.target.value.length >= 3) { fetchDropdownOptions(event.target.value) } 
-      else { setDropdownOptions([]) }
-
-    } else if(event.type == "click") { // button was clicked
-      // find the option that was clicked inside dropdownOptions
-      let optionData
-      dropdownOptions.forEach(option => {
-        if (option.name == event.target.value) { optionData = option }
+  useEffect (() => {
+    // if recipe exists, populate this page with recipes data from server
+    if (recipeId) {
+      fetch('/server/recipe/recipeData?_id=' + recipeId)
+      .then (response => response.json())
+      .then (data => {
+        const recipeData = data.schema
+        setTitle(recipeData.title)
+        setDescription(recipeData.description)
+        setImage(recipeData.image)
+        setIngredientList(assignIds(recipeData.ingredients))
+        setInstructionList(assignIds(recipeData.instructions))
       })
-
-      // set all relavent data
-      setNewIngredient({_id:optionData._id, name:optionData.name, unitType:optionData.unitType, unit:"", amount:""})
-      setDropdownOptions([])
-      let units = []
-      if (optionData.unitType.includes('weight')) { units.push('milligrams', 'grams', 'pounds', 'ounces') }
-      if (optionData.unitType.includes('physical')) { units.push('physical') }
-      if (optionData.unitType.includes('volume')) { units.push('liters', 'millimeters', 'cups', 'tablespoons') }
-      setUnitsAvailable({hidden:false, units:units})
+      .catch((error) => { console.error(error.message) })
     }
-  }
+  },[])
 
-  function addIngredient() {
-    //check for any missing data
-    if (newIngredient.name == "" || newIngredient.amount == "" || newIngredient.unit == "" || newIngredient._id == ""){ return } 
-    // remove the last letter from unit type if its an s
-    let unitString = newIngredient.unit
-    if (unitString.charAt(unitString.length - 1) == "s") { unitString = unitString.slice(0, -1) }
-    //if no data is missing add ingredient to list of ingredients
-    setIngredientList((list) => { return [...list, {...newIngredient, unit: unitString}]})
-    setNewIngredient({_id:"", name:"", unitType:[], unit:"", amount:""})
-    setUnitsAvailable({hidden:true, units:[]})
-  }
+  function submitRecipe(){
+    console.log("submitting recipe")
+    let method
+    if (!recipeId) { method = 'POST' }
+    else { method = 'PUT' }
 
-  function addInstruction() {
-    if (newInstruction == ""){ return }
-    setInstructionList((list) => { return [...list, newInstruction] })
-    setNewInstruction("")
-  }
-
-  function submitForm() {
-    if (title == "" || description == "" || chosenImage == "" || ingredientList.length == 0 || instructionList.length == 0){ return }
-    let newIngredientList = []
-    for (const ingredient of ingredientList){ newIngredientList.push( delete ingredient.unitType) }
-    const postRequest = {
-      method: 'POST',
+    const serverRequest = {
+      method: method,
       headers: { 'Content-type': 'application/json; charset=UTF-8', },
       body: JSON.stringify({
-        _id: recipeId,
+        id: recipeId,
         title: title,
         description: description,
-        image: chosenImage,
-        ingredients: ingredientList,
-        instructions: instructionList
+        image: image,
+        ingredients: removeIds(ingredientList),
+        instructions: removeIds(instructionList)
       })
     }
-
-    fetch("server/recipe/updateRecipe", postRequest)
-    .then(response => response.json())
-    .then((data => {
-      if (data.message == "success") { navigate("/")}
-      else {setErrorMessage(data.message)}
-    }))
+    fetch('/server/recipe/edit', serverRequest)
   }
 
+  const pageList = [
+    {
+      name: GeneralInfoPage,
+      props: {
+        newRecipe: !recipeId,
+        title: title,
+        setTitle: setTitle,
+        description: description, 
+        setDescription: setDescription,
+      }
+    },
+    { 
+      name: ImagePage,
+      props: {
+        image: image,
+        setImage: setImage,
+      }
+    },
+    { 
+      name: IngredientPage,
+      props: {
+        ingredientList: ingredientList,
+        setIngredientList: setIngredientList
+      }
+    },
+    { 
+      name: InstructionPage,
+      props: {
+        instructionList: instructionList,
+        setInstructionList: setInstructionList
+      }
+    },
+    {
+      name: SubmissionPage,
+      props: {
+        submitRecipe: submitRecipe
+      }
+    }
+  ]
 
+  return <NoteBook pageList={pageList} />
+}
 
-
-  
-  return(
+function GeneralInfoPage ({newRecipe, title, setTitle, description, setDescription}) {
+  return (
     <>
-    <div className='formTypeA'>
-      <h1>Your Recipe</h1>
+      <h1>{newRecipe ? 'New Recipe' : 'Edit Recipe'}</h1>
 
-      <div className='splitSpace'>
-        
-        {/*div for user to input recipe name and details*/}
-        <div>
-          <div className='textInput'>
-            <label htmlFor="title">Recipe Name</label>
-            <input 
-            type="text" 
-            id="title"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            placeholder="Name your recipe" />
-          </div>
-          <div className='textInput'>
-            <label htmlFor="description">Recipe Description</label>
-            <textarea
-            type="text" 
-            id="description"
-            rows="9"
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            placeholder="Describe your recipe" />
-          </div>
-        </div>
-
-        {/* div for user to input recipe image */}
-        <div>
-          <h2>image</h2>
-          <label
-          htmlFor='image'
-          >image</label>
-          <select 
-          name='image'
-          value={chosenImage}
-          onChange={(event) => setChosenImage(event.target.value)}>
-            <option value="" disabled hidden>choose image</option>
-            {imageOptions.map((image, index) => (
-              <option key={index}>{image}</option>
-            ))}
-          </select>
-        </div>
+      <div className='textInput center extraBottom'>
+        <label htmlFor='title'>Title</label>
+        <input id='title' type='text' value={title} onChange={(event) => setTitle(event.target.value)} placeholder='give your recipe a title'/>
       </div>
 
-
-
-      <div className='splitSpace'>
-
-        {/* div for user to input recipe ingredients */}
-        <div>
-          <h2>Ingredients</h2>
-          <ul>
-          {ingredientList.map((ingredient, index) => {
-            if (ingredient.unit == 'physical') { return (
-              <li key={index}>
-                <p>{ingredient.amount} {ingredient.name}{ingredient.amount!=1 ? 's' : ''}</p>
-              </li>
-            )} else { return (
-              <li key={index}>
-                <p>{ingredient.amount} {ingredient.unit}{ingredient.amount != 1 ? 's' : ''} of {ingredient.name}</p>
-              </li>
-            )}
-          })}
-          </ul>
-          <div className='newIngredientDiv'>
-            <h3>New Ingredient</h3>
-            <input 
-            className={unitsAvailable.hidden ? 'hidden' : ''} //hide input if needed
-            type='number'
-            value={newIngredient.amount}
-            onChange={(event) => setNewIngredient({...newIngredient, amount: event.target.value})}
-            placeholder='Amount'/>
-            <select 
-            className={unitsAvailable.hidden ? 'hidden' : ''} //hide input if needed
-            value={newIngredient.unit}
-            onChange={(event) => setNewIngredient({...newIngredient, unit: event.target.value})}>
-              <option value="" disabled hidden>Units</option>
-              {unitsAvailable.units.map((unit, index) => (
-                <option key={index}>{unit}</option>
-              ))}
-            </select>
-            {ActiveSearchBar(newIngredient.name, dropdownOptions, ingredientNameChange)}
-            
-          </div>
-          <button
-          name="addIngredient"
-          id="addIngredientButton"
-          className="addItemButton"
-          onClick={addIngredient}
-          >+</button>
-        </div>
-
-        {/* div for user to input recipe instructions */}
-        <div>
-          <h2>Instructions</h2>
-          <div>
-            {instructionList.map((instruction, index) => (
-              <React.Fragment key={index}>
-              <h4>Step {index + 1}</h4>
-              <p>{instruction}</p>
-              <button onClick={() => {
-                var newList = [...instructionList]
-                newList.splice(index, 1)
-                setInstructionList(newList)
-              }}> - </button>
-              </React.Fragment>
-            ))}
-          </div>
-          <div className="textInput withButton">
-            <label htmlFor="newInstruction"><h3>new step</h3></label>
-            <textarea
-            type="text" 
-            id="newInstruction"
-            rows="3"
-            value={newInstruction}
-            onChange={(event) => setNewInstruction(event.target.value)}
-            placeholder="Add instruction" />
-            <button
-            name="addInstruction"
-            id="addInstructionButton"
-            className="addItemButton"
-            onClick={addInstruction}
-            >+</button>
-          </div>
-        </div>
+      <div className='textInput center'>
+        <label htmlFor='description'>Description</label>
+        <textarea id='description' rows="9" value={description} onChange={(event) => setDescription(event.target.value)} placeholder='describe your recipe' />
       </div>
-      <button onClick={submitForm}>submit</button>
-
-      <p ref={errorRef} className={errorMessage ? "error" : "hidden"} area-live="assertive">{errorMessage}</p>
-    </div>
     </>
   )
 }
 
-export default EditRecipe
+function ImagePage ({image, setImage}) {
+  const imageOptions = ['🧀', '🥞', '🍗', '🍔','🍞', '🥯', '🥐','🥨','🍗','🥓','🥩','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🥚','🍳','🥘','🥣','🥗','🍿','🧂','🥫']
+  return (
+    <>
+      <p>page two</p>
+      <label htmlFor='image'>image</label>
+      <select id='image' value={image} onChange={(event) => setImage(event.target.value)}>
+        <option value="" disabled hidden>choose image</option>
+        {imageOptions.map((option, index) => ( <option key={index}>{option}</option> ))}
+      </select>
+    </>
+  )
+}
+
+function IngredientPage ({ingredientList, setIngredientList}) {
+  const baseUnits = ['physical', 'milligrams', 'grams', 'pounds', 'ounces', 'liters', 'millimeters', 'cups', 'tablespoons']
+
+  const [newIngredient, setNewIngredient] = useState({_id:"", name:"", unit:"", amount:""})
+  const [unitsAvailable, setUnitsAvailable] = useState(baseUnits)
+  const [ingredientsAvailable, setIngredientsAvailable] = useState([])
+  const [availableId, setAvailableId] = useState(ingredientList.length)
+
+  function addIngredient () {
+    //make sure important information is provided
+    if(!newIngredient.name || !newIngredient.unit || !newIngredient.amount) { return }
+    else if (!newIngredient._id) {
+      // if _id is not known, attempt to find it in the database by name
+      fetch(`/server/recipe/getIngredient?name=${newIngredient.name}`)
+      .then(response => response.json())
+      .then(data => {
+        //if ingredient with name found, make sure data lines up with know information
+        if (!data) { return }
+        let units = []
+        if (data.unitType.includes('weight')) { units.push('milligrams', 'grams', 'pounds', 'ounces') }
+        if (data.unitType.includes('physical')) { units.push('physical') }
+        if (data.unitType.includes('volume')) { units.push('liters', 'millimeters', 'cups', 'tablespoons') }
+        if (!units.includes(newIngredient.unit)) { return }
+        // if nothing is incorrect, save _id
+        setNewIngredient({...newIngredient, _id:data._id})
+      })
+      .catch(error => {console.error("Error fetching ingredient:", error)});
+      
+      // if _id id still unknown, end function
+      if (!newIngredient._id) {return}
+    }
+
+    // save new ingredient to ingredientList
+    setIngredientList(list => [...list, {
+      id: availableId,
+      content: newIngredient
+    }])
+    setAvailableId(availableId+1)
+    setNewIngredient({_id:"", name:"", unit:"", amount:""})
+  }
+
+  function removeIngredient (index) {
+    let tempArray = ingredientList.slice()
+    tempArray.splice(index, 1)
+    setIngredientList(tempArray)
+  }
+
+  function ingredientNameChange(value) {
+    setNewIngredient({...newIngredient, _id:'', name:value})
+    setUnitsAvailable(baseUnits)
+    if (value.length >= 3) {
+      fetch(`server/recipe/findIngredient?name=${value}&amount=5`)
+      .then(response => response.json())
+      .then(setIngredientsAvailable)
+      .catch(error => {console.error("Error fetching ingredients:", error)});
+    }
+    else { setIngredientsAvailable([]) }
+  }
+
+  function ingredientSelected (name, _id, unitType) {
+    let units = []
+    if (unitType.includes('weight')) { units.push('milligrams', 'grams', 'pounds', 'ounces') }
+    if (unitType.includes('physical')) { units.push('physical') }
+    if (unitType.includes('volume')) { units.push('liters', 'millimeters', 'cups', 'tablespoons') }
+    setNewIngredient({...newIngredient, _id:_id, name:name})
+    setUnitsAvailable(units)
+  }
+
+  return (
+    <div className='pageContent'>
+      <h2>Recipe Ingredients</h2>
+      <Reorder.Group className='reorderList' axis='y' values={ingredientList} onReorder={setIngredientList}>
+        {ingredientList.map((item, index) => (
+          <Reorder.Item key={item.id} value={item} className='listItem'>
+            <div className='itemOptions'>
+              <FontAwesomeIcon icon={faCircleXmark} style={{color: "#575757",}} onClick={() => removeIngredient(index)} />
+            </div>
+            <div className='itemContent'>
+              {(item.content.unit == 'physical') ? (
+                <p>{item.content.amount} {item.content.name}{item.content.amount!=1 ? 's' : ''}</p>
+              ):(
+              <p>{item.content.amount} {item.content.unit}{item.content.amount != 1 ? 's' : ''} of {item.content.name}</p>
+              )}
+            </div>
+          </Reorder.Item>
+        ))}
+      </Reorder.Group>
+      <div className='textInput shared'>
+        <label>New Ingredient</label>
+        <div className='inputs'>
+          <input type='number' value={newIngredient.amount} onChange={(event) => setNewIngredient({...newIngredient, amount: event.target.value})} placeholder='Amount'/>
+          <select value={newIngredient.unit} onChange={(event) => setNewIngredient({...newIngredient, unit: event.target.value})}>
+            <option value="" disabled hidden className='light'>Units</option>
+            {unitsAvailable.map((unit, index) => (
+              <option key={index}>{unit}</option>
+            ))}
+          </select>
+          <div className='activeSearchBar'>
+            <input type='text' className='mainInput' value={newIngredient.name} onChange={(event) => ingredientNameChange(event.target.value)} placeholder='Ingredient Name'/>
+            <ul>
+              {ingredientsAvailable.map(ingredient => (
+                <button key={ingredient._id} type='button' value={ingredient.name} onClick={(event) => ingredientSelected(ingredient.name, ingredient._id, ingredient.unitType)}> {ingredient.name} </button>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+      <button onClick={() => addIngredient()}>Add Ingredient</button>
+    </div>
+  )
+}
+
+function InstructionPage ({instructionList, setInstructionList}) {
+  const [newInstruction, setNewInstruction] = useState('')
+  const [availableId, setAvailableId] = useState(instructionList.length)
+
+  function addInstruction() {
+    if(newInstruction.length != 0){
+      setInstructionList(list => [...list, {
+        id: availableId,
+        content: newInstruction
+      }])
+      setAvailableId(availableId+1)
+      setNewInstruction('')
+    }
+  }
+
+  function removeInstruction(index){
+    let tempArray = instructionList.slice()
+    tempArray.splice(index, 1)
+    setInstructionList(tempArray)
+  }
+
+  return (
+    <div className='pageContent'>
+      <h2>Recipe Instructions</h2>
+      <Reorder.Group className='reorderList noMargin' axis='y' values={instructionList} onReorder={setInstructionList}>
+        {instructionList.map((item, index) => (
+          <Reorder.Item key={item.id} value={item} className='listItem'>
+            <div className='itemContent'>
+              <h4>Step {index + 1} </h4>
+              <p>{item.content}</p>
+            </div>
+            <div className='itemOptions extraMargin'>
+              <FontAwesomeIcon icon={faTrash} style={{color: "#575757",}} onClick={() => removeInstruction(index)} />
+              <FontAwesomeIcon icon={faPen} style={{color: "#575757",}} />
+            </div>
+          </Reorder.Item>
+        ))}
+      </Reorder.Group>
+
+      <div className='textInput'>
+        <label htmlFor='newInstruction'>New Instruction</label>
+        <textarea id="newInstruction" rows='6' value={newInstruction} onChange={(event) => {setNewInstruction(event.target.value)}} placeholder='add a new instruction'/>
+      </div>
+      <button onClick={() => addInstruction()}>Add Instruction</button>
+    </div>
+  )
+}
+
+function SubmissionPage({submitRecipe}) {
+  return (
+    <>
+      <h2>Save Recipe</h2>
+      <button onClick={() => submitRecipe()}>Save recipe</button>
+    </>
+  )
+}
