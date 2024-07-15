@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { useSearchParams, Navigate } from 'react-router-dom'
-import ActiveSearchBar from '../components/ActiveSearchBar'
 import NoteBook from '../components/NoteBook'
 import { Reorder } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
