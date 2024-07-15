@@ -77,10 +77,30 @@
   }
 
   .activeSearchBar {
+    position: relative;
     width: 100%;
 
     ul{
+      list-style-type: none;
       position: absolute;
+      bottom: 0;
+      right: 0;
+      margin: 0rem;
+      margin-bottom: 2rem;
+      padding: 0rem;
+      background-color: #f0e2d0;
+      border: 2px solid $darkText;
+      width: 100%;
+      max-width: 9rem;
+
+      li{
+        margin: 0rem;
+        border-bottom: 2px solid $darkText;
+        
+        &:hover{
+          cursor: pointer;
+        }
+      }
     }
   }
 
