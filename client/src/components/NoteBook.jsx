@@ -48,7 +48,7 @@ each json object should be setup as follows:
 order of json files in the pageList array will decide the order pages appear on the notebook
 */
 
-export default function noteBook ({pageList}) {
+export default function NoteBook ({pageList}) {
   const [displayRight, setDisplayRight] = useState(false)
   const [pageNumber, setPageNumber] = useState(0)
   const FirstPage = pageList[pageNumber]
