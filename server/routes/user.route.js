@@ -14,9 +14,9 @@ const users = require('../schemas/user')
 
 // route will:
 //   return data for user that is currently logged in
-router.get('/userInfo', (req, res) => {
-    data = req.user
-    res.end(JSON.stringify(data))
+router.get('/info', (req, res) => {
+    if (req.user) { return res.status(200).json( req.user ) }
+    else { return res.status(401).json({ error: 'user not signed in' }) }
 })
 
 // takes 2 arguments from url:

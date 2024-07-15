@@ -13,8 +13,11 @@ function App() {
   const [userData, setUserData] = useState ({})
 
   function fetchUserData() {
-    fetch('/server/user/userInfo')
-    .then(response => response.json())
+    fetch('/server/user/info')
+    .then((response) => {
+      if (!response.ok) { throw new Error (`HTTP error, status: ${response.status}`) }
+      return response.json()
+    })
     .then(setUserData)
     .catch(error => {
       console.error("No user found", error) 
