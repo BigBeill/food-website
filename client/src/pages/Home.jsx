@@ -1,10 +1,26 @@
 import React, { useEffect, useState } from 'react'
+import NoteBook from '../components/NoteBook'
 
-function Home() {
+export default function Home() {
 
-  return(
-    <h1>homePage</h1>
+  const pageList = [
+    {
+      name: MainPage,
+      props: {
+
+      }
+    }
+  ]
+
+  return <NoteBook pageList={pageList} />
+}
+
+function MainPage() {
+  return (
+    <h1>Public Recipes</h1>
   )
 }
 
-export default Home
+function DisplayRecipes(recipes) {
+
+}
