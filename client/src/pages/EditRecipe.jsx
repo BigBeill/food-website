@@ -149,20 +149,25 @@ function IngredientPage ({ingredientList, setIngredientList}) {
   const [availableId, setAvailableId] = useState(ingredientList.length)
 
   function addIngredient () {
-    //make sure important information is provided
+
+    //make sure important information about ingredient is provided
     if(!newIngredient.name || !newIngredient.unit || !newIngredient.amount) { return }
-    else if (!newIngredient._id) {
+
+    // make sure ingredient id is provided
+    if (!newIngredient._id) {
       // if _id is not known, attempt to find it in the database by name
       fetch(`/server/recipe/getIngredient?name=${newIngredient.name}`)
       .then(response => response.json())
       .then(data => {
-        //if ingredient with name found, make sure data lines up with know information
         if (!data) { return }
+
+        //make sure unit provided makes sense in context of found ingredient
         let units = []
         if (data.unitType.includes('weight')) { units.push('milligrams', 'grams', 'pounds', 'ounces') }
         if (data.unitType.includes('physical')) { units.push('physical') }
         if (data.unitType.includes('volume')) { units.push('liters', 'millimeters', 'cups', 'tablespoons') }
         if (!units.includes(newIngredient.unit)) { return }
+
         // if nothing is incorrect, save _id
         setNewIngredient({...newIngredient, _id:data._id})
       })
@@ -188,24 +193,31 @@ function IngredientPage ({ingredientList, setIngredientList}) {
   }
 
   function ingredientNameChange(value) {
+
     setNewIngredient({...newIngredient, _id:'', name:value})
     setUnitsAvailable(baseUnits)
-    if (value.length >= 3) {
-      fetch(`server/recipe/findIngredient?name=${value}&amount=5`)
-      .then(response => response.json())
-      .then(setIngredientsAvailable)
-      .catch(error => {console.error("Error fetching ingredients:", error)});
+
+    if (value.length < 3) { 
+      setIngredientsAvailable([])
+      return 
     }
-    else { setIngredientsAvailable([]) }
+
+    fetch(`server/recipe/findIngredient?name=${value}&amount=5`)
+    .then(response => response.json())
+    .then(setIngredientsAvailable)
+    .catch(error => {console.error("Error fetching ingredients:", error)});
   }
 
   function ingredientSelected (name, _id, unitType) {
+
     let units = []
     if (unitType.includes('weight')) { units.push('milligrams', 'grams', 'pounds', 'ounces') }
     if (unitType.includes('physical')) { units.push('physical') }
     if (unitType.includes('volume')) { units.push('liters', 'millimeters', 'cups', 'tablespoons') }
+
     setNewIngredient({...newIngredient, _id:_id, name:name})
     if (!units.includes(newIngredient.unit)) { setNewIngredient({...newIngredient, unit:'' }) }
+
     setUnitsAvailable(units)
     setIngredientsAvailable([])
   }
@@ -259,14 +271,15 @@ function InstructionPage ({instructionList, setInstructionList}) {
   const [availableId, setAvailableId] = useState(instructionList.length)
 
   function addInstruction() {
-    if(newInstruction.length != 0){
-      setInstructionList(list => [...list, {
-        id: availableId,
-        content: newInstruction
-      }])
-      setAvailableId(availableId+1)
-      setNewInstruction('')
-    }
+    if(newInstruction.length < 3) { return }
+
+    setInstructionList(list => [...list, {
+      id: availableId,
+      content: newInstruction
+    }])
+    
+    setAvailableId(availableId+1)
+    setNewInstruction('')
   }
 
   function removeInstruction(index){
