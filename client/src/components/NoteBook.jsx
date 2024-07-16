@@ -65,13 +65,17 @@ export default function NoteBook ({pageList}) {
   return(
     <div className={`notebook ${displayRight ? 'displayRight' : ''}`}>
       <div className='notebookPage' onClick={() => setDisplayRight(false)}>
-        <FirstPage.name {...FirstPage.props} /> 
-        <div className='arrowIcon left'><FontAwesomeIcon icon={faArrowLeft} className='arrow' onClick={() => previousPage()} /></div>
+        <div className='pageContent'> <FirstPage.name {...FirstPage.props} /> </div>
+        <div className='bottomArrows'> 
+          <div className='arrowContainer'><FontAwesomeIcon icon={faArrowLeft} onClick={() => previousPage()} /> </div>
+        </div>
       </div>
       <img className="notebookSpine" src="/notebookSpine.png" alt="notebookSpine" />
       <div className='notebookPage' onClick={() => setDisplayRight(true)}>
-        {SecondPage ? (<SecondPage.name {...SecondPage.props} />) : null}
-        <div className='arrowIcon right'><FontAwesomeIcon icon={faArrowRight} className='arrow' onClick={() => nextPage()}/></div>
+        <div className='pageContent'> {SecondPage ? (<SecondPage.name {...SecondPage.props} />) : null} </div>
+        <div className='bottomArrows'> 
+          <div className='arrowContainer right'><FontAwesomeIcon icon={faArrowRight} onClick={() => nextPage()}/> </div>
+        </div>
       </div>
     </div>
   )
