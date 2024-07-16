@@ -110,7 +110,7 @@ export default function NewEditRecipe ({userData}) {
 
 function GeneralInfoPage ({newRecipe, title, setTitle, description, setDescription}) {
   return (
-    <>
+    <div className='standardPage'>
       <h1>{newRecipe ? 'New Recipe' : 'Edit Recipe'}</h1>
 
       <div className='textInput center extraBottom'>
@@ -122,21 +122,21 @@ function GeneralInfoPage ({newRecipe, title, setTitle, description, setDescripti
         <label htmlFor='description'>Description</label>
         <textarea id='description' rows="9" value={description} onChange={(event) => setDescription(event.target.value)} placeholder='describe your recipe' />
       </div>
-    </>
+    </div>
   )
 }
 
 function ImagePage ({image, setImage}) {
   const imageOptions = ['🧀', '🥞', '🍗', '🍔','🍞', '🥯', '🥐','🥨','🍗','🥓','🥩','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🥚','🍳','🥘','🥣','🥗','🍿','🧂','🥫']
   return (
-    <>
+    <div className='standardPage'>
       <p>page two</p>
       <label htmlFor='image'>image</label>
       <select id='image' value={image} onChange={(event) => setImage(event.target.value)}>
         <option value="" disabled hidden>choose image</option>
         {imageOptions.map((option, index) => ( <option key={index}>{option}</option> ))}
       </select>
-    </>
+    </div>
   )
 }
 
@@ -211,9 +211,9 @@ function IngredientPage ({ingredientList, setIngredientList}) {
   }
 
   return (
-    <div className='pageContent'>
+    <div className='standardPage'>
       <h2>Recipe Ingredients</h2>
-      <Reorder.Group className='reorderList' axis='y' values={ingredientList} onReorder={setIngredientList}>
+      <Reorder.Group className='itemList' axis='y' values={ingredientList} onReorder={setIngredientList}>
         {ingredientList.map((item, index) => (
           <Reorder.Item key={item.id} value={item} className='listItem'>
             <div className='itemOptions'>
@@ -276,9 +276,9 @@ function InstructionPage ({instructionList, setInstructionList}) {
   }
 
   return (
-    <div className='pageContent'>
+    <div className='standardPage'>
       <h2>Recipe Instructions</h2>
-      <Reorder.Group className='reorderList noMargin' axis='y' values={instructionList} onReorder={setInstructionList}>
+      <Reorder.Group className='itemList noMargin' axis='y' values={instructionList} onReorder={setInstructionList}>
         {instructionList.map((item, index) => (
           <Reorder.Item key={item.id} value={item} className='listItem'>
             <div className='itemContent'>
