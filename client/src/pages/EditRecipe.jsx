@@ -26,15 +26,14 @@ export default function NewEditRecipe ({userData}) {
   useEffect (() => {
     // if recipe exists, populate this page with recipes data from server
     if (recipeId) {
-      fetch('/server/recipe/recipeData?_id=' + recipeId)
+      fetch('/server/recipe/data?_id=' + recipeId)
       .then (response => response.json())
       .then (data => {
-        const recipeData = data.schema
-        setTitle(recipeData.title)
-        setDescription(recipeData.description)
-        setImage(recipeData.image)
-        setIngredientList(assignIds(recipeData.ingredients))
-        setInstructionList(assignIds(recipeData.instructions))
+        setTitle(data.title)
+        setDescription(data.description)
+        setImage(data.image)
+        setIngredientList(assignIds(data.ingredients))
+        setInstructionList(assignIds(data.instructions))
       })
       .catch((error) => { console.error(error.message) })
     }
@@ -156,20 +155,21 @@ function IngredientPage ({ingredientList, setIngredientList}) {
     // make sure ingredient id is provided
     if (!newIngredient._id) {
       // if _id is not known, attempt to find it in the database by name
-      fetch(`/server/recipe/getIngredient?name=${newIngredient.name}`)
+      fetch(`/server/recipe/ingredient?name=${newIngredient.name}`)
       .then(response => response.json())
       .then(data => {
-        if (!data) { return }
+        const ingredient = data[0]
+        if (!ingredient) { return }
 
         //make sure unit provided makes sense in context of found ingredient
         let units = []
-        if (data.unitType.includes('weight')) { units.push('milligrams', 'grams', 'pounds', 'ounces') }
-        if (data.unitType.includes('physical')) { units.push('physical') }
-        if (data.unitType.includes('volume')) { units.push('liters', 'millimeters', 'cups', 'tablespoons') }
-        if (!units.includes(newIngredient.unit)) { return }
+        if (ingredient.unitType.includes('weight')) { units.push('milligrams', 'grams', 'pounds', 'ounces') }
+        if (ingredient.unitType.includes('physical')) { units.push('physical') }
+        if (ingredient.unitType.includes('volume')) { units.push('liters', 'millimeters', 'cups', 'tablespoons') }
+        if (!ingredient.includes(newIngredient.unit)) { return }
 
         // if nothing is incorrect, save _id
-        setNewIngredient({...newIngredient, _id:data._id})
+        setNewIngredient({...newIngredient, _id:ingredient._id})
       })
       .catch(error => {console.error("Error fetching ingredient:", error)});
       
@@ -202,7 +202,7 @@ function IngredientPage ({ingredientList, setIngredientList}) {
       return 
     }
 
-    fetch(`server/recipe/findIngredient?name=${value}&amount=5`)
+    fetch(`server/recipe/ingredient?name=${value}&amount=5`)
     .then(response => response.json())
     .then(setIngredientsAvailable)
     .catch(error => {console.error("Error fetching ingredients:", error)});
@@ -215,8 +215,8 @@ function IngredientPage ({ingredientList, setIngredientList}) {
     if (unitType.includes('physical')) { units.push('physical') }
     if (unitType.includes('volume')) { units.push('liters', 'millimeters', 'cups', 'tablespoons') }
 
-    setNewIngredient({...newIngredient, _id:_id, name:name})
-    if (!units.includes(newIngredient.unit)) { setNewIngredient({...newIngredient, unit:'' }) }
+    if (units.includes(newIngredient.unit)) { setNewIngredient({...newIngredient, _id:_id, name:name}) }
+    else { setNewIngredient({...newIngredient, _id:_id, name:name, unit:'' }) }
 
     setUnitsAvailable(units)
     setIngredientsAvailable([])

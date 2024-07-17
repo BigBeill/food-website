@@ -8,26 +8,49 @@ const createRecipeSchema = require("../library/validSchemaUtils").createRecipeSc
 
 
 
+/*
+------------ /data routes ------------
+
+One method type:
+    GET - returns recipe data
+
+Requires 1 argument from url:
+    id: mongoDB objectId (recipe id)
+
+Method 'GET' description:
+    finds all data in database associated with the recipe that has id matching req.query.id
+
+Method 'GET' returns:
+    json object containing recipe data
+*/
+
+router.get('/data', async (req,res) => {
+
+    const _id = req.query._id
+    if (!_id) { return res.status(400).json({ error: "_id not provided" }) }
+
+    try {
+        const data = await recipes.findOne({ _id:_id })
+        if (!data) { return res.status(404).json({ error: "recipe with _id does not exist in database"})}
+        else { return res.status(200).json(data) }
+    } 
+    catch { return res.status(500).json({ error: "database error finding recipe" }) }
+})
 
 
-// ------------ recipe get routes ------------
 
+/*
+---------- /list routes ------------
+One method type:
+    GET - returns recipe data
 
+Optionally takes 2 arguments from url:
+    name: string
+    amount: int (if missing then assume 1)
 
-// description:
-//   returns a list of title and image data for recipes with similar title to title provided
+*/
 
-// takes 2 arguments from url:
-//   title: string
-//   amount: int
-
-// return:
-//   list of max size {amount}, containing {title, image} information on recipes with a similar title to {name}
-
-// if missing:
-//   name: return recipes with any title
-//   amount: assume amount is 20
-router.get('/findRecipes', async (req, res) => {
+router.get('/list', async (req, res) => {
 
     const title = req.query.title || '';
     const amount = parseInt(req.query.amount, 10) || 20;
@@ -36,7 +59,7 @@ router.get('/findRecipes', async (req, res) => {
         let query = {}
         if (title != '') { query = { title: {$regex: new RegExp(title, 'i')}}}
         const data = await recipes.find(query).limit(amount)
-        res.end(JSON.stringify(data))
+        return res.status(200).json(data)
     } catch {
         res.status(500).json({ message: "failed to collect recipes from database" });
     }
@@ -44,100 +67,95 @@ router.get('/findRecipes', async (req, res) => {
 
 
 
-// description:
-//   returns all data associated for recipe with provided _id
+/*
+---------- /ingredient routes ------------
 
-// takes 1 argument from url:
-//   _id: _id
+One method type:
+    GET - returns a list of ingredients from the database
 
-// return:
-//   completed recipe schema for recipe with provided _id
+Optionally takes 3 arguments from url:
+    id: mongoDB objectId (ingredient id)
+    name: string
+    amount: int (if missing then assume 1)
 
-// if missing:
-//   _id: throw error
-router.get('/recipeData', async (req,res) => {
+Method 'GET' description:
+    two main paths the route will take:
+        path 1:
+            triggered by req.query.id being provided
+            return to client ingredient with id of req.body.id
+        path 2:
+            triggered by req.query.id not being provided
+            return to client a list of length req.body.amount with similar name to req.body.name (with any name if req.query.name is not provided)
 
-    const _id = req.query._id
-    if (!_id) { return res.status(400).json({ error: "_id not provided" }) }
+Method 'GET' returns:
+    list of json objects containing ingredient data
+*/
 
-    try {
-        const data = await recipes.findOne({ _id:_id })
-        if (!data) { return res.status(404).json({ error: "recipe with _id does not exist in database"})}
-        else { return res.status(200).json({schema: data}) }
-    } 
-    catch { return res.status(500).json({ error: "database error finding recipe" }) }
-
-})
-
-
-
-// takes 2 arguments from url: 
-//   name: string
-//   amount: int
-
-// route will:
-//   return a list of max size {amount}, containing the name of ingredients in database with a similar name to the {name} given in body
-
-// if arguments are not provided:
-//   name: nothing will be returned
-//   amount: assume amount is 5
-router.get('/findIngredient', async (req, res) => {
-    const name = req.query.name || '';
-    const amount = parseInt(req.query.amount, 10) || 5;
-
-    try {
-        // Check if name was provided; if not, return an empty array
-        if (name == '') {
-            return res.status(400).json({ message: "Name parameter is required." });
-        }
-
-        // Perform a search using a case-insensitive regex based on the 'name' parameter
-        const data = await ingredients.find(
-            { name: {$regex: new RegExp(name, 'i')} },
-            { name:1, unitType: 1}
-        ).limit(amount)
-        res.end(JSON.stringify(data));
-    } catch (error) {
-        console.error("Error fetching ingredients:", error);
-        res.status(500).json({ message: "Server error occurred." });
-    }
-})
-
-router.get('/getIngredient', async (req, res) => {
-    const _id = req.query.amount || ''
+router.get('/ingredient', async (req, res) => {
+    const id = req.query.id || ''
     const name = req.query.name || ''
+    const amount = parseInt(req.query.amount, 10) || 1
 
-    if (_id){
-        const data = await ingredients.findOne({_id: _id})
-        return res.status(200).json(data)
+    //path 1
+    if (id){
+        try {
+            const ingredientData = await ingredients.findOne({_id: _id})
+            return res.status(200).json(ingredientData)
+        }
+        catch { 
+            console.log('server failed to find ingredient with id:', id)
+            console.log('reason:', error)
+            res.status(500).json({ message: "Server error occurred." })
+        }
     }
-    else if (name){
-        const data = await ingredients.findOne({name: name})
-        return res.status(200).json(data)
+
+    //path 2
+    else {
+        try { 
+            const ingredientData = await ingredients.find( { name: {$regex: new RegExp(name, 'i')} } ).limit(amount)
+            return res.status(200).json(ingredientData)
+        } 
+        catch (error) {
+            console.log('server failed to find ingredient with name:', name)
+            console.log('reason:', error)
+            res.status(500).json({ message: "Server error occurred." })
+        }
     }
-    
-    return res.status(400).json({error: "no parameters provided"})
 })
 
 
 
+/*
+---------- /edit routes ------------
 
+Two Method types:
+    POST - saving new recipe
+    PUT - saving over existing recipe
 
+requires 5 arguments from body:
+    title: string
+    description: string
+    image: string
+    ingredients: [{_id: string, unit: string, amount: number}]
+    instructions: [string]
 
-// ---------- recipe post routes ------------
+method 'PUT' requires 1 additional argument from body:
+    id: mongoDB objectId (recipe id)
 
-// takes 5 arguments from body
-//   _id: recipeId,
-//   title: string
-//   description: string
-//   image: string
-//   ingredients: [{_id: string, unit: string, amount: number}]
-//   instructions: [string]
+Method 'ALL' description:
+    put relevant data from body into a json object
+    check the newly created recipe schema to make sure all data inserted into the object is valid and forms a completed recipe schema
+    if successful, store the approved recipe schema inside req.recipeSchema
 
-// route will:
-//   take data in the body and store it in recipeData (json object)
-//   go through every ingredient and calculate its nutrition data
-//   save total of all nutrition data in 
+Method 'POST' description:
+    save recipe schema to database.
+    add recipes Id to current users list of owned recipe
+
+Method 'PUT' description:
+    check to make sure the current user is the owner of the recipe with req.body.id as its id
+    use the json object in req.recipeSchema to save over the recipe with the id req.body.id
+*/
+
 
 router.all('/edit', (req, res, next) => {
 
