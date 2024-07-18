@@ -87,16 +87,20 @@ export default function NoteBook ({pageList}) {
   return(
     <div className={`notebook ${displayRight ? 'displayRight' : ''}`}>
       <div className='notebookPage' onClick={() => setDisplayRight(false)}>
-        <div className={`pageContent ${(displayRight && narrowScreen) ? 'shielded' : ''}`}> <FirstPage.name {...FirstPage.props} /> </div>
+        <div className={`pageContent ${(displayRight && narrowScreen) ? 'shielded' : ''}`}> {FirstPage ? (<FirstPage.name {...FirstPage.props} />) : null} </div>
         <div className='bottomArrows'> 
           <div className='arrowContainer'><FontAwesomeIcon icon={faArrowLeft} onClick={() => previousPage()} /> </div>
+          <p>{pageNumber+1}</p>
+          <div className='arrowContainer notIntractable'></div>
         </div>
       </div>
       <img className="notebookSpine" src="/notebookSpine.png" alt="notebookSpine" />
       <div className='notebookPage' onClick={() => setDisplayRight(true)}>
         <div className={`pageContent ${(!displayRight && narrowScreen) ? 'shielded' : ''}`}> {SecondPage ? (<SecondPage.name {...SecondPage.props} />) : null} </div>
         <div className='bottomArrows'> 
-          <div className='arrowContainer right'><FontAwesomeIcon icon={faArrowRight} onClick={() => nextPage()}/> </div>
+          <div className='arrowContainer notIntractable'></div>
+          <p>{pageNumber+2}</p>
+          <div className='arrowContainer'><FontAwesomeIcon icon={faArrowRight} onClick={() => nextPage()}/> </div>
         </div>
       </div>
     </div>

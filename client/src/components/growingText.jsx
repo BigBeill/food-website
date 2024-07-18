@@ -1,4 +1,4 @@
-// returns html&css for provided text with maximum posible size before overflowing parentDiv
+// returns html&css for provided text with maximum possible size before overflowing parentDiv
 
 import React, { useEffect, useRef, useState } from 'react';
 

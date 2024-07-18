@@ -110,9 +110,9 @@ input[type=number] {
 }
 
 .error {
-  margin: 0rem;
-  padding: .3rem;
-  padding-left: .9rem;
+  margin: 0rem !important;
+  padding: .3rem !important;
+  padding-left: .9rem !important;
   border: .1rem solid #991b1b;
   border-radius: .3rem;
   background-color: rgb(153, 27, 27, .5);
