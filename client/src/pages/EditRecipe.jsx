@@ -176,14 +176,27 @@ function IngredientPage ({ingredientList, setIngredientList}) {
       // if _id id still unknown, end function
       if (!newIngredient._id) {return}
     }
+    let unit = newIngredient.unit
+    console.log(unit)
+    if (unit[unit.length -1] == 's'){
+      console.log('removing the s')
+      unit = unit.slice(0, -1)
+    }
 
     // save new ingredient to ingredientList
     setIngredientList(list => [...list, {
       id: availableId,
-      content: newIngredient
+      content: {
+        _id: newIngredient._id,
+        name: newIngredient.name,
+        unit,
+        amount: newIngredient.amount
+      }
     }])
-    setAvailableId(availableId+1)
+    
     setNewIngredient({_id:"", name:"", unit:"", amount:""})
+    setAvailableId(availableId+1)
+    setUnitsAvailable(baseUnits)
   }
 
   function removeIngredient (index) {
