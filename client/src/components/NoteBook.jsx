@@ -49,10 +49,31 @@ order of json files in the pageList array will decide the order pages appear on 
 */
 
 export default function NoteBook ({pageList}) {
+
   const [displayRight, setDisplayRight] = useState(false)
+  const [narrowScreen, setNarrowScreen] = useState(false)
+
   const [pageNumber, setPageNumber] = useState(0)
   const FirstPage = pageList[pageNumber]
   const SecondPage = pageList[pageNumber + 1]
+
+  useEffect(() => {
+
+    function handleResize() {
+      const width = window.innerWidth
+      const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize)
+      const threshold = 78 * rootFontSize // 78rem
+
+      if (width < threshold) { setNarrowScreen(true) }
+      else { setNarrowScreen(false) }
+    }
+
+    handleResize()
+
+    window.addEventListener('resize', handleResize)
+    return () => { window.removeEventListener('resize', handleResize) }
+
+  }, [])
 
   function previousPage() {
     if (pageNumber > 0) { setPageNumber(pageNumber - 2) }
@@ -65,14 +86,14 @@ export default function NoteBook ({pageList}) {
   return(
     <div className={`notebook ${displayRight ? 'displayRight' : ''}`}>
       <div className='notebookPage' onClick={() => setDisplayRight(false)}>
-        <div className='pageContent'> <FirstPage.name {...FirstPage.props} /> </div>
+        <div className={`pageContent ${(displayRight && narrowScreen) ? 'shielded' : ''}`}> <FirstPage.name {...FirstPage.props} /> </div>
         <div className='bottomArrows'> 
           <div className='arrowContainer'><FontAwesomeIcon icon={faArrowLeft} onClick={() => previousPage()} /> </div>
         </div>
       </div>
       <img className="notebookSpine" src="/notebookSpine.png" alt="notebookSpine" />
       <div className='notebookPage' onClick={() => setDisplayRight(true)}>
-        <div className='pageContent'> {SecondPage ? (<SecondPage.name {...SecondPage.props} />) : null} </div>
+        <div className={`pageContent ${(!displayRight && narrowScreen) ? 'shielded' : ''}`}> {SecondPage ? (<SecondPage.name {...SecondPage.props} />) : null} </div>
         <div className='bottomArrows'> 
           <div className='arrowContainer right'><FontAwesomeIcon icon={faArrowRight} onClick={() => nextPage()}/> </div>
         </div>
