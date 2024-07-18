@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import NoteBook from '../components/NoteBook'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 
 export default function Home() {
 
   const [recipeName, setRecipeName] = useState('')
-  const [ingredients, setIngredients] = useState('')
+  const [ingredientList, setIngredientList] = useState('')
 
   const pageList = [
     {
       name: MainPage,
       props: {
-        recipeName: recipeName,
-        setRecipeName: setRecipeName
+        recipeName,
+        setRecipeName,
+        ingredientList,
+        setIngredientList
       }
     }
   ]
@@ -19,9 +23,13 @@ export default function Home() {
   return <NoteBook pageList={pageList} />
 }
 
-function MainPage({recipeName, setRecipeName}) {
+function MainPage({recipeName, setRecipeName, ingredientList, setIngredientList}) {
 
   const [newIngredient, setNewIngredient] = useState('')
+
+  function addIngredient() {
+
+  }
 
   return (
     <div className='standardPage'>
@@ -32,9 +40,14 @@ function MainPage({recipeName, setRecipeName}) {
         <input type='text' value={recipeName} onChange={(event) => setRecipeName(event.target.value)} placeholder='recipe name' />
       </div>
 
-      <div className='textInput'>
-        <label>Ingredients</label>
-        <input type='text' value={newIngredient} onChange={(event) => setNewIngredient(event.target.value)} placeholder='ingredient name' />
+      <div className='textInput sideButton'>
+        <div>
+          <label>Ingredients</label>
+          <input type='text' value={newIngredient} onChange={(event) => setNewIngredient(event.target.value)} placeholder='ingredient name' />
+        </div>
+        <div className='svgButtonContainer'>
+          <FontAwesomeIcon icon={faCircleCheck} onClick={() => { addIngredient() }}/>
+        </div>
       </div>
 
       <ul className='itemList'>

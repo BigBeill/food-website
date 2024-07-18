@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, Component} from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faArrowRight, prefix } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 /*
 using notebook component:
@@ -59,6 +59,7 @@ export default function NoteBook ({pageList}) {
 
   useEffect(() => {
 
+    // check if the screen is too small to support both pages of notebook at once
     function handleResize() {
       const width = window.innerWidth
       const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize)

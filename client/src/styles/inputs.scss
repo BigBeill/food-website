@@ -2,13 +2,22 @@
   $darkText: #4a4a4a;
 
   .textInput {
-    width: 100%;
-    margin-bottom: 1.8rem;
+    width: calc(100% - 9rem);
+    margin: 0rem 4.5rem 1.8rem 4.5rem;
+
+    &.sideButton{
+      display: flex;
+      gap: .6rem;
+
+      div:first-child {
+        width: 100%;
+      }
+    }
 
     label {
       display: inline-block;
-      width: 100%;
-      margin-left: 4.8rem;
+      width: calc(100% - .3rem);
+      margin-left: 0.3rem;
       margin-bottom: .36rem;
       font-size: 1.8rem;
       color: $darkText;
@@ -16,8 +25,7 @@
 
     input, textarea {
       box-sizing: border-box;
-      width: calc(100% - 9rem);
-      margin: 0rem 4.5rem;
+      width: 100%;
       padding: .03rem .48rem;
       background-color: #f6eee3;
       border: none;
@@ -128,5 +136,18 @@
       background-color: #575757;
       cursor: pointer;
     }
+  }
+}
+
+
+.svgButtonContainer{
+  margin-top: auto;
+
+  svg{
+    height: 1.5rem;
+  }
+
+  :hover {
+    cursor: pointer;
   }
 }
