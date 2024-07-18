@@ -6,19 +6,17 @@ import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 export default function Home() {
 
   const [recipeName, setRecipeName] = useState('')
-  const [ingredientList, setIngredientList] = useState('')
+  const [ingredientList, setIngredientList] = useState([])
 
-  const pageList = [
-    {
-      name: MainPage,
-      props: {
-        recipeName,
-        setRecipeName,
-        ingredientList,
-        setIngredientList
-      }
+  const pageList = [{
+    name: MainPage,
+    props: {
+      recipeName,
+      setRecipeName,
+      ingredientList,
+      setIngredientList
     }
-  ]
+  }]
 
   return <NoteBook pageList={pageList} />
 }
@@ -28,7 +26,10 @@ function MainPage({recipeName, setRecipeName, ingredientList, setIngredientList}
   const [newIngredient, setNewIngredient] = useState('')
 
   function addIngredient() {
+    if (!newIngredient) { return }
 
+    setIngredientList(list => [...list, newIngredient])
+    setNewIngredient('')
   }
 
   return (
@@ -51,7 +52,9 @@ function MainPage({recipeName, setRecipeName, ingredientList, setIngredientList}
       </div>
 
       <ul className='itemList'>
-
+        {ingredientList.map((item, index) => (
+          <li key={index}> {item} </li>
+        ))}
       </ul>
 
       <button> search </button>
@@ -59,6 +62,13 @@ function MainPage({recipeName, setRecipeName, ingredientList, setIngredientList}
   )
 }
 
-function DisplayRecipes(recipes) {
+function DisplayRecipes({recipes}) {
 
+  return(
+    <>
+      {recipes.map((item, index) => (
+        <p key={index}>{item.title}</p>
+      ))}
+    </>
+  )
 }
