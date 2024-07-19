@@ -75,16 +75,15 @@ router.post('/login', (req, res, next) => {
 // if arguments not provided:
 //   username, email, password: route will fail to create new user
 router.post('/register', async (req, res) => {
-    console.log("user/register post request received")
 
     //make sure no data is missing
-    if (!req.body.username) { res.end(JSON.stringify({message: "noUsername"}))}
-    if (!req.body.email) { res.end(JSON.stringify({message: "noEmail"}))}
-    if (!req.body.password) { res.end(JSON.stringify({message: "noPassword"}))}
+    if (!req.body.username) { return res.status(400).json({ error: "no username provided" })}
+    if (!req.body.email) { return res.status(400).json({ error: "no email provided" })}
+    if (!req.body.password) { return res.status(400).json({ error: "no password provided" })}
 
     //check if username is available
     var result = await users.find({username: req.body.username})
-    if (result.length != 0 ) { res.end(JSON.stringify({message: "takenUsername"}))}
+    if (result.length != 0 ) { return res.status(400).json({ error: "username already taken" })}
 
     // hash password
     const saltHash = genPassword(req.body.password)
@@ -94,6 +93,7 @@ router.post('/register', async (req, res) => {
     // create new user
     const newUser = new User({
         username: req.body.username,
+        email: req.body.email,
         hash: hash,
         salt: salt
     })
@@ -105,7 +105,7 @@ router.post('/register', async (req, res) => {
     .then((user) => {
         req.login(user, (error) => {
             if (error) { res.end(error)}
-            else { res.end(JSON.stringify({message: "success"}))}
+            else { res.status(201).json( {message: "success" })}
         })
     })
 })

@@ -38,11 +38,13 @@ function Register() {
       }
 
       fetch("server/user/register", postRequest)
-        .then(response => response.json())
-        .then(data => {
-          if (data.message == "badUser") { setErrorMessage("username taken") }
-          if (data.message == "badEmail") { setErrorMessage("email already used") }
-          if (data.message == "success") { location.assign('/') }
+        .then(response => {
+          if (!response.ok) { throw new error(response.json()) }
+          return response.json()
+        })
+        .then(data => { location.assign('/') })
+        .catch({
+          
         })
     }
   }
