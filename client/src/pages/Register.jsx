@@ -38,14 +38,16 @@ function Register() {
       }
 
       fetch("server/user/register", postRequest)
-        .then(response => {
-          if (!response.ok) { throw new error(response.json()) }
-          return response.json()
-        })
-        .then(data => { location.assign('/') })
-        .catch({
-          
-        })
+      .then(response => {
+        if (!response.ok) { throw response }
+        return response.json()
+      })
+      .then(data => { location.assign('/') })
+      .catch(error => {
+        console.error('user fetch request failed:', error)
+        error.json()
+        .then(message => setErrorMessage(message.error))
+      })
     }
   }
 
