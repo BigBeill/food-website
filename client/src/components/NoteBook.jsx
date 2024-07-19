@@ -48,12 +48,12 @@ each json object should be setup as follows:
 order of json files in the pageList array will decide the order pages appear on the notebook
 */
 
-export default function NoteBook ({pageList}) {
+export default function NoteBook ({pageList, parentPageNumber, RequestNewPage}) {
 
   const [displayRight, setDisplayRight] = useState(false)
   const [narrowScreen, setNarrowScreen] = useState(false)
 
-  const [pageNumber, setPageNumber] = useState(0)
+  const [pageNumber, setPageNumber] = useState(parentPageNumber || 0)
   const FirstPage = pageList[pageNumber]
   const SecondPage = pageList[pageNumber + 1]
 
@@ -77,11 +77,23 @@ export default function NoteBook ({pageList}) {
   }, [])
 
   function previousPage() {
-    if (pageNumber > 0) { setPageNumber(pageNumber - 2) }
+    if (parentPageNumber){
+      if ( pageNumber > parentPageNumber ) { setPageNumber( pageNumber - 2 ) }
+      else { RequestNewPage( pageNumber - 2 ) }
+    }
+    else {
+      if (pageNumber > 0) { setPageNumber(pageNumber - 2) }
+    }
   }
 
   function nextPage(){
-    if (pageNumber + 2 < pageList.length) { setPageNumber(pageNumber + 2) }
+    if (parentPageNumber) {
+      if (pageNumber + 2 < (pageList.length + parentPageNumber)) { setPageNumber(pageNumber + 2) }
+      else { RequestNewPage( pageNumber + 2 ) }
+    }
+    else {
+      if (pageNumber + 2 < pageList.length) { setPageNumber(pageNumber + 2) }
+    }
   }
 
   return(

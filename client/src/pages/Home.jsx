@@ -7,6 +7,11 @@ export default function Home() {
 
   const [recipeName, setRecipeName] = useState('')
   const [ingredientList, setIngredientList] = useState([])
+  const [pageNumber, setPageNumber] = useState(0)
+
+  useEffect(() => {
+
+  }, [pageNumber])
 
   const pageList = [{
     name: MainPage,
