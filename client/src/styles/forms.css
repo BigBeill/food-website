@@ -1,21 +1,21 @@
-.formTypeA{
+.formTypeA {
   margin: 1.5rem 9rem;
   padding: 3rem;
   background-color: #fafaf9;
   border-radius: 0.75rem;
-  box-shadow: 0.09rem 0.09rem 0.3rem #2C1A1D;
+  box-shadow: 0.09rem 0.09rem 0.3rem #2c1a1d;
 }
 
 .formTypeA .splitSpace > div {
   width: 100%;
 }
 
-.formTypeA h1{
-  text-decoration: underline #065F46;
+.formTypeA h1 {
+  text-decoration: underline #065f46;
   margin-top: 0rem;
 }
 
-.formTypeA h3{
+.formTypeA h3 {
   margin-top: 0.6rem;
   margin-left: 0rem;
 }
@@ -29,28 +29,30 @@
   margin: 0rem;
 }
 
-.formTypeA .textInput{
+.formTypeA .textInput {
   width: 100%;
-  padding-top: .3rem;
-  padding-bottom: .3rem;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
 }
 
-.formTypeA .textInput label{
+.formTypeA .textInput label {
   display: inline-block;
-  margin-bottom: .09rem;
+  margin-bottom: 0.09rem;
 }
 
-.formTypeA .textInput input, .formTypeA .textInput textarea{
+.formTypeA .textInput input,
+.formTypeA .textInput textarea {
   box-sizing: border-box;
   width: 100%;
-  padding: .48rem;
+  padding: 0.48rem;
   background-color: #e5e5e5;
   border: none;
-  border-radius: .15rem;
+  border-radius: 0.15rem;
   resize: none;
 }
 
-.formTypeA .textInput.withButton input, .formTypeA .textInput.withButton textarea{
+.formTypeA .textInput.withButton input,
+.formTypeA .textInput.withButton textarea {
   width: calc(100% - 3.6rem);
 }
 
@@ -64,43 +66,34 @@
   height: 1.5rem;
 }
 
-.formTypeA input:focus, .formTypeA textarea:focus{
-  outline-color: #065F46;
+.formTypeA input:focus,
+.formTypeA textarea:focus {
+  outline-color: #065f46;
 }
 
 .formTypeA .newIngredientDiv {
-  padding: .3rem;
+  padding: 0.3rem;
 }
 
-.formTypeA .newIngredientDiv input, .formTypeA .newIngredientDiv select{
+.formTypeA .newIngredientDiv input,
+.formTypeA .newIngredientDiv select {
   box-sizing: border-box;
-  padding: .48rem;
+  padding: 0.48rem;
   background-color: #e5e5e5;
   border: none;
-  border-radius: .15rem;
+  border-radius: 0.15rem;
 }
 
-.formTypeA .newIngredientDiv input{
-  margin-right: .3rem;
-  width: calc(35% - .15rem)
+.formTypeA .newIngredientDiv input {
+  margin-right: 0.3rem;
+  width: calc(35% - 0.15rem);
 }
 
-.formTypeA .newIngredientDiv select{
-  width: calc(65% - .15rem);
+.formTypeA .newIngredientDiv select {
+  width: calc(65% - 0.15rem);
 }
 
-.formTypeA .newIngredientDiv .activeSearchBar input{
-  margin-top: .3rem;
+.formTypeA .newIngredientDiv .activeSearchBar input {
+  margin-top: 0.3rem;
   width: 100%;
-}
-
-.profile {
-  margin: 1.5rem auto;
-  width: 18rem;
-}
-
-.profile .buttonDiv {
-  display: inline-block;
-  vertical-align: bottom;
-  height: 0%;
 }

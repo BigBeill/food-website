@@ -1,34 +1,37 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import UserPin from '../components/UserPin'
 
-function Profile(data) {
+function Profile() {
 
-  const handleLogout = () => {
-    const postRequest = {
-      method: 'POST'
-    }
-    fetch('server/user/logout', postRequest)
-      .then(response => response.json())
-      .then(data => {
-        console.log(data);
-        if (data.message == "success") { location.assign('/') }
+  // function to fetch user data from server
+  useEffect(() => {
+    fetchUserData()
+  }, [])
+
+  // state to store user data
+  const [userData, setUserData] = useState({})
+  // function to fetch user data from server
+  function fetchUserData() {
+    fetch('/server/user/info')
+      .then((response) => {
+        if (!response.ok) { throw new Error(`HTTP error, status: ${response.status}`) }
+        return response.json()
       })
+      .then(setUserData)
       .catch(error => {
-        console.error("unable to logout", error)
+        console.error("No user found", error)
+        setUserData({ _id: "", username: "", email: "" })
       })
-  };
+  }
+  // output user data for testing
+  console.log('userData', userData)
+
+
 
   return (
     <div className='profile splitSpace'>
-      <UserPin userData={data} />
-      <div className='buttonDiv'>
-        <button>edit account -&gt; </button>
-        <button
-          onClick={handleLogout}
-
-        >logout -&gt; </button>
-      </div>
-    </div>
+      <UserPin userData={userData} />
+    </div >
   )
 }
 
