@@ -10,7 +10,6 @@ import './styles/inputs.scss'
 
 //component specific scss
 import './styles/componentSpecific/nav.scss'
-import './styles/componentSpecific/notebook.scss'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
