@@ -1,6 +1,6 @@
 const router = require("express").Router()
 const mongoConnection = require('../config/connectMongo') 
-const postgreConnection = require('../config/postgres')
+const postgresConnection = require('../config/postgres')
 const recipes = mongoConnection.models.recipe
 const recipeSchema = require("../schemas/recipe")
 const ingredients = require("../schemas/ingredient")

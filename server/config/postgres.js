@@ -8,7 +8,7 @@ const postgresConnection = new Pool({
   port: 5432, // Default PostgreSQL port
 })
 
-postgreConnection.connect((error, client, release) => {
+postgresConnection.connect((error, client, release) => {
   if (error) { return console.error('Error acquiring client', error.stack); }
   console.log('Connected to PostgreSQL');
   release();
