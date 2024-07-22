@@ -76,6 +76,20 @@ export default function NoteBook ({pageList, parentPageNumber, RequestNewPage}) 
 
   }, [])
 
+  useEffect(() => {
+
+    // changes page if arrow key or a/d is pressed
+    function handleKeyDown(event) {
+      if (event.target.tagName == 'INPUT' || event.target.tagName == 'TEXTAREA'){ return }
+      if (event.key == 'a' || event.key == 'ArrowLeft') { previousPage() }
+      if (event.key == 'd' || event.key == 'ArrowRight') { nextPage() }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => { window.removeEventListener('keydown', handleKeyDown) }
+
+  }, [pageNumber])
+
   function previousPage() {
     if (parentPageNumber){
       if ( pageNumber > parentPageNumber ) { setPageNumber( pageNumber - 2 ) }
