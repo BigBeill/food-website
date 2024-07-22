@@ -1,0 +1,32 @@
+download PostgreSQL
+download notepad++
+download a CSV copy of the Canadian Nutrient File (CNF), 2015
+
+unzip the Canadian Nutrient File (CNF), 2015
+for each .csv file in notepad:
+	open in notepad++
+	convert encoding to UTF-8 (encoding -> Convert to UTF-8)
+	save
+
+open FOOD NAME in notepad++
+remove single quotes in entry with id 502917
+open YIELD AMOUNT in notepad++
+press ctrl+h and replace ",,,," with "" (nothing)
+open MEASURE NAME in notepad++
+press ctrl+h and replace ",," with "" (nothing)
+remove empty lines (Edit -> Line Operations -> Remove Emplty Lines)
+open REFUSE NAME in notepad++
+press ctrl+h and replace ",," with "" (nothing)
+remove empty lines (Edit -> Line Operations -> Remove Emplty Lines)
+save files
+
+
+
+
+
+open pgAdmin 4
+create a database called "Canadian Nutrient File"
+
+setup tables as shown in the Canadian Nutrient File documentation
+import there respective csv files
+

@@ -1,9 +1,11 @@
 const router = require("express").Router()
 const mongoConnection = require('../config/connectMongo') 
+const postgreConnection = require('../config/postgres')
 const recipes = mongoConnection.models.recipe
 const recipeSchema = require("../schemas/recipe")
 const ingredients = require("../schemas/ingredient")
 const users = require("../schemas/user")
+const { query } = require("express")
 const createRecipeSchema = require("../library/validSchemaUtils").createRecipeSchema
 
 
