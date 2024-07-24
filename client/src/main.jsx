@@ -8,8 +8,8 @@ import './styles/login.css'
 import './styles/RecipeBook.scss'
 import './styles/inputs.scss'
 
-//component specific scss
-import './styles/componentSpecific/nav.scss'
+//remove before production
+import './styles/testingStyles.scss'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

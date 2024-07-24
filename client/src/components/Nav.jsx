@@ -1,3 +1,5 @@
+import '../styles/componentSpecific/nav.scss'
+
 import React, { useState, useEffect, useRef} from 'react'
 import { NavLink } from "react-router-dom";
 
