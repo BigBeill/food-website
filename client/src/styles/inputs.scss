@@ -1,3 +1,10 @@
+button{
+  padding: .3rem .6rem;
+  font-size: 1.2rem;
+  border-radius: 3rem;
+}
+
+
 .notebook{
   $darkText: #4a4a4a;
 
@@ -122,19 +129,25 @@
   button{
     width: calc(100% - 9rem);
     margin: 0rem 4.5rem;
-    padding: .3rem .6rem;
     background-color: #f6eee3;
-    font-size: 1.2rem;
     color: $darkText;
     border: 2px solid $darkText;
-    border-radius: 3rem;
-    transition: .15s ease-in-out;
     
     &:hover{
       color: #f6eee3;
       background-color: #575757;
-      cursor: pointer;
     }
+  }
+}
+
+button{
+  padding: .3rem .6rem;
+  font-size: 1.2rem;
+  border-radius: 3rem;
+  transition: .15s ease-in-out;
+
+  &:hover{
+    cursor: pointer;
   }
 }
 
