@@ -5,14 +5,26 @@ import { NavLink } from "react-router-dom";
 
 function Nav({userData}) {
     const [open, setOpen] = useState(false);
+    const navRef = useRef(null);
     
     function openNav() {
-        setOpen(!open)
+        setOpen(!open);
     }
+
+    function handleOutsideClick(event) {
+        if (navRef.current && !navRef.current.contains(event.target)) {
+            setOpen(false);
+        }
+    }
+
+    useEffect(() => {
+        document.addEventListener("mousedown", handleOutsideClick);
+        return () => { document.removeEventListener("mousedown", handleOutsideClick); }
+    }, []);
 
     return(
         <>
-        <nav className={`navBar ${open ? 'open' : ''}`} id="navBar">
+        <nav ref={navRef} className={`navBar ${open ? 'open' : ''}`} id="navBar">
 
             <img className="logo" src="/BigBeill-logo_black.png" alt="Beill Greenhouse Logo" />
 
@@ -45,6 +57,9 @@ function Nav({userData}) {
                 
                 </>
             }
+
+            <h3>Info</h3>
+            <NavLink className="navLink" to="/ingredients">Ingredients List</NavLink>
 
             <div className='navButton' onClick={openNav}/>
 
