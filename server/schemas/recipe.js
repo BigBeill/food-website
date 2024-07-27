@@ -20,7 +20,7 @@ const recipeSchema = new mongoose.Schema({
         sodium: Number,
         potassium: Number,
         carbohydrates: Number,
-        fiber: Number,
+        fibre: Number,
         sugar: Number,
         protein: Number,
     }

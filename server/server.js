@@ -69,11 +69,14 @@ app.use('/server', (req, res, next) => {
     next()
 })
 
-const userRouter = require('./routes/user.route')
-app.use('/user', userRouter)
+const ingredientRouter = require('./routes/ingredient.route')
+app.use('/ingredient', ingredientRouter)
 
 const recipeRouter = require('./routes/recipe.route')
 app.use('/recipe', recipeRouter)
+
+const userRouter = require('./routes/user.route')
+app.use('/user', userRouter)
 
 const devToolsRouter = require('./routes/devTools.route')
 app.use('/devTools', devToolsRouter)

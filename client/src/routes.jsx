@@ -2,6 +2,7 @@ import Home from './pages/Home'
 
 import EditRecipe from "./pages/EditRecipe"
 import FriendsList from './pages/FriendsList'
+import Ingredients from './pages/Ingredients'
 import Login from './pages/Login'
 import Profile from './pages/Profile'
 import Register from './pages/Register'
@@ -42,6 +43,10 @@ export const routes = [
   {
     path:'/addIngredient',
     element:<AddIngredient />,
+  },
+  {
+    path: '/ingredients/:groupID?/:ingredientID?',
+    element: <Ingredients />
   },
   {
     path:'*',

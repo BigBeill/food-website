@@ -69,6 +69,44 @@ router.get('/list', async (req, res) => {
 
 
 
+
+
+
+/*
+---------- /paginatedList routes ------------
+*/
+
+router.get('/paginatedList', async (req, res) => {
+    
+    const page = parseInt(req.query.page)
+    const size = parseInt(req.query.size)
+    const number = parseInt(req.query.number) || 1
+
+    if (!page) { return res.status(400).json({ error: "page not provided" })}
+    if (!size) { return res.status(400).json({ error: "size not provided" })}
+
+    const skip = page * size
+
+    let pageList = []
+
+    try {
+        for (let index = 0; index <= number; index = 0) {
+            const recipeList = await ingredients.find().skip(skip + (size * index)).limit(size)
+            pageList.push(recipeList)
+        }
+    }
+    catch {
+        return res.status(500).json({ error: "server failed to find recipes" })
+    }
+
+    return res.status(200).json( pageList )
+})
+
+
+
+
+
+
 /*
 ---------- /ingredient routes ------------
 
