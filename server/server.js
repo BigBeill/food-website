@@ -1,20 +1,18 @@
 //External imports
 const express = require('express');
 const session = require ('express-session');
-
-// imports
 const bodyParser = require ('body-parser')
-const mongoConnection = require ('./config/connectMongo')
-const MongoStore = require('connect-mongo')(session)
 const passport = require('passport')
-const flash = require('connect-flash')
+const MongoStore = require('connect-mongo')(session)
+
+//Local imports
+const mongoConnection = require ('./config/connectMongo')
 
 //setup server
 const app = express()
 app.use(express.static('public'))
 app.use(bodyParser.urlencoded({limit: '10mb', extended: false}))
 app.use(express.json());
-app.use(flash())
 
 // setup sessionStore using mongo db
 const sessionStore = new MongoStore({
