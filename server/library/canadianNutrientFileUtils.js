@@ -27,11 +27,11 @@ function ingredientListNutrition (ingredientIDList) {
   })
 }
 
-function ingredientNutrition (ingredientID) {
+function ingredientNutrition (ingredientId) {
   return new Promise( async (resolve, reject) => {
     try {
 
-      const data = await postgresConnection.query(`SELECT nutrientid, nutrientvalue FROM nutrientamount WHERE foodid = ${ingredientID} AND nutrientid IN (203, 204, 205, 208, 269, 291, 306, 307, 601) ORDER BY nutrientid;`);
+      const data = await postgresConnection.query(`SELECT nutrientid, nutrientvalue FROM nutrientamount WHERE foodid = ${ingredientId} AND nutrientid IN (203, 204, 205, 208, 269, 291, 306, 307, 601) ORDER BY nutrientid;`);
       
       let nutritionData = data.rows
       if (nutritionData[0].nutrientid != 203) { nutritionData.splice(0, 0, 0); }
@@ -59,13 +59,35 @@ function ingredientNutrition (ingredientID) {
 
     }
     catch (error) {
-      console.log('failed to collect nutritional data from database for ingredient with id:', ingredientID);
-      console.log('error:', error)
+      console.log('failed to collect nutritional data from database for ingredient with id:', ingredientId);
+      console.log('error:', error);
       reject('failed to collect nutrient data from database');
     }
   })
+}
 
+function conversionValueList (ingredientId) {
+  return new Promise( async (resolve, reject) => {
+    const conversionData = await postgresConnection.query(`SELECT measureid, conversionfactorvalue FROM conversionfactor where foodid=${ingredientId}`);
 
+    let conversionOptions = [];
+    let value
+
+    for(const conversion of conversionData.rows){
+      const measureData = await postgresConnection.query(`SELECT measuredescription FROM measuredescription WHERE measureid=${conversion.measureid}`);
+
+      value = 0;
+      measureDescription = measureData.rows[0].measuredescription;
+
+      for (let index = 0; index < measureDescription.length; index++) {
+        if (measureDescription.index){
+
+        }
+      }
+
+    }
+     
+  })
 }
 
 module.exports = {

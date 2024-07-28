@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const postgresConnection = require('../config/postgres');
-const ingredientNutrition = require('../library/nutritionCalculator').ingredientNutrition;
+const ingredientNutrition = require('../library/canadianNutrientFileUtils').ingredientNutrition;
 
 router.get('/', (req, res) => {
   const foodGroupID = req.query.foodGroupId;
