@@ -7,8 +7,6 @@ import Login from './pages/Login'
 import Profile from './pages/Profile'
 import Register from './pages/Register'
 
-import AddIngredient from './devTools/addIngredient'
-
 import NotFound from './pages/NotFound'
 
 export const routes = [
@@ -39,10 +37,6 @@ export const routes = [
   {
     path:'/register',
     element:<Register />,
-  },
-  {
-    path:'/addIngredient',
-    element:<AddIngredient />,
   },
   {
     path: '/ingredients/:groupID?/:ingredientID?',
