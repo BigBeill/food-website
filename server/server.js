@@ -1,18 +1,16 @@
+//External imports
+const express = require('express');
+const session = require ('express-session');
+
 // imports
-const express = require('express')
-const expressLayouts = require('express-ejs-layouts')
 const bodyParser = require ('body-parser')
 const mongoConnection = require ('./config/connectMongo')
-const session = require ('express-session')
 const MongoStore = require('connect-mongo')(session)
 const passport = require('passport')
 const flash = require('connect-flash')
 
 //setup server
 const app = express()
-app.set('view engine', 'ejs')
-app.set('layout', 'layouts/layout')
-app.use(expressLayouts)
 app.use(express.static('public'))
 app.use(bodyParser.urlencoded({limit: '10mb', extended: false}))
 app.use(express.json());
@@ -23,6 +21,7 @@ const sessionStore = new MongoStore({
     mongooseConnection: mongoConnection,
     collection: 'session'
 })
+
 app.use(session({
     secret:'figure this out later',
     resave: false,
