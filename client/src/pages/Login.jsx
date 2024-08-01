@@ -1,8 +1,10 @@
 /* eslint-disable react/no-unknown-property */
 import React, { useRef, useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 function Login() {
   const errorRef = useRef()
+  const navigate = useNavigate()
 
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
@@ -34,13 +36,11 @@ function Login() {
       }
 
       fetch("server/user/login", postRequest)
-        .then(response => response.json())
-        .then(data => {
-          console.log(data)
-          if (data.message == "badUser") { setErrorMessage("Username not found") }
-          if (data.message == "badPass") { setErrorMessage("Password incorrect") }
-          if (data.message == "success") { location.assign('/') }
-        })
+      .then(response => {
+        if (!response.ok) { throw response.json(); }
+        return navigate('/');
+      })
+      .catch(data => setErrorMessage(data.error));
     }
   }
 

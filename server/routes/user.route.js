@@ -1,10 +1,10 @@
 const router = require("express").Router();
-const passport = require("passport");
 const genPassword = require("../library/passwordUtils").genPassword;
+const validPassword = require("../library/passwordUtils").validPassword;
 const mongoConnection = require("../config/connectMongo");
-const User = mongoConnection.models.user;
-const recipes = require("../schemas/recipe");
-const users = require("../schemas/user");
+const user = require("../models/user");
+const users = require("../models/user");
+const createToken = require("../config/jsonWebToken")
 
 // ------------ User Get Routes ------------
 
@@ -34,110 +34,53 @@ router.get("/findUsers", async (req, res) => {
   res.end(JSON.stringify(data));
 });
 
-// ------------ User Post Routes ------------
-
-// takes 2 arguments from body:
-//   username, password: string
-
-// route will:
-//   use passport local strategy to verify {username} and {password} are correct
-//   save user data in server
-//   return error data or {message: "success"}
-
-// if arguments are not provided:
-//   username, password: login will fail and error will be returned
-router.post("/login", (req, res, next) => {
-  console.log("user/login post request received");
-
-  passport.authenticate("local", (error, user, info) => {
-    if (error) {
-      return res.end(JSON.stringify(error));
-    }
-    if (!user) {
-      return res.end(JSON.stringify(info));
-    }
-    req.login(user, (error) => {
-      if (error) {
-        return res.end(error);
-      } else {
-        return res.end(JSON.stringify({ message: "success" }));
-      }
-    });
-  })(req, res, next);
-});
-
-// takes 3 arguments from body:
-//   username, email, password: string
-
-// route will:
-//   create a new user with data provided and save it in the database
-//   save user data to server and log new user in to the account
-//   if route fails to create new user, return {message: reason for failure}
-//   if successful return {message: "success"}
-
-// if arguments not provided:
-//   username, email, password: route will fail to create new user
 router.post("/register", async (req, res) => {
-  //make sure no data is missing
-  if (!req.body.username) {
-    return res.status(400).json({ error: "no username provided" });
-  }
-  if (!req.body.email) {
-    return res.status(400).json({ error: "no email provided" });
-  }
-  if (!req.body.password) {
-    return res.status(400).json({ error: "no password provided" });
-  }
+  const {username, email, password} = req.body;
 
-  //check if username is available
-  var result = await users.find({ username: req.body.username });
-  if (result.length != 0) {
-    return res.status(400).json({ error: "username already taken" });
-  }
+  //check for missing data
+  if (!username) { return res.status(400).json({ error: 'no username provided' }); }
+  if (!email) { return res.status(400).json({ error: 'no email provided' }); }
+  if (!password) { return res.status(400).json({ error: 'no password provided' }); }
 
-  // hash password
-  const saltHash = genPassword(req.body.password);
-  const salt = saltHash.salt;
-  const hash = saltHash.hash;
+  //make sure username isn't already taken
+  const searchUsername = await users.findOne({ username });
+  if (searchUsername) { return res.status(400).json({ error: 'username already taken' }); }
+  const searchEmail = await users.findOne({ email });
+  if (searchEmail) { return res.status(400).json({ error: 'email already taken' }) }
 
-  // create new user
-  const newUser = new User({
-    username: req.body.username,
-    email: req.body.email,
-    hash: hash,
-    salt: salt,
-  });
+  const hashedPassword = genPassword(password);
 
-  // add new user to database
-  newUser
-    .save()
-
-    // login new user
-    .then((user) => {
-      req.login(user, (error) => {
-        if (error) {
-          res.end(error);
-        } else {
-          res.status(201).json({ message: "success" });
-        }
-      });
-    });
-});
-
-// takes 0 arguments from body
-
-// route will:
-//   logout current user
-//   return error data or {message: "success"}
-router.post("/logout", (req, res) => {
-  console.log("user/logout post request received");
-  req.logout((error) => {
-    if (error) {
-      res.end(error);
-    } else {
-      res.end(JSON.stringify({ message: "success" }));
-    }
+  const newUser = { username, email, hash: hashedPassword.hash, salt: hashedPassword.salt }
+  new users(newUser).save()
+  .then(() => { 
+    console.log('new user created:', newUser)
+    const accessToken = createToken(user);
+    res.cookie("accessToken", accessToken, {
+      maxAge: 1000 * 60 * 60 * 24 * 7 // cookie will expire after 7 days
+    })
+    return res.status(200).json({ message: 'register successful'})
+  })
+  .catch((error) => {
+    console.log('failed to create new user:', newUser); 
+    console.log(error);
+    return res.status(500).json({ error: 'server failed to create new user' })
   });
 });
+
+router.post('/login', async (req, res) => {
+  const {username, password} = req.body;
+
+  const user = await users.findOne({ username }, { _id:1, username:1, email:1, hash:1, salt:1 });
+  console.log(user);
+  if (!user) { return res.status(400).json({ error: 'username not found' }); }
+  if (!validPassword(password, user.hash, user.salt)) { return res.status(400).json({ error: 'incorrect password' }) }
+
+  const accessToken = createToken(user);
+  res.cookie("accessToken", accessToken, {
+    maxAge: 1000 * 60 * 60 * 24 * 7 // cookie will expire after 7 days
+  })
+
+  return res.status(200).json({ message: 'login successful'})
+})
 
 module.exports = router;

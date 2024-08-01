@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const ingredient = require('./ingredient')
 
 const recipeSchema = new mongoose.Schema({
     owner: mongoose.SchemaTypes.ObjectId,
