@@ -3,13 +3,10 @@ require('dotenv').config();
 
 function createToken(user) {
   
-  const accessToken = sign(
-    { _id: user._id, username: user.username}, 
-    process.env.SESSION_SECRET,
-    { expiresIn: '30d' }
-  );
+  const accessToken = sign( {_id: user._id, username: user.username}, process.env.SESSION_SECRET, { expiresIn: '15m' } );
+  const refreshToken = sign( {_id: user._id, username: user.username}, process.env.SESSION_SECRET );
 
-  return accessToken;
+  return {accessToken, refreshToken};
 }
 
 module.exports = createToken;
