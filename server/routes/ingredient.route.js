@@ -30,6 +30,12 @@ router.get('/details', async (req, res) => {
   return res.status(200).json(ingredientData);
 });
 
+router.get('/list', async (req, res) => {
+  const foodName = req.query.foodName || '';
+  const limit = parseInt(req.query.limit) || 1;
+  const listData = await postgresConnection.query(`select * from foodname where name like '%' || ${foodName} || '%' limit ${limit}`);
+})
+
 router.get('/groups', (req, res) => {
   postgresConnection.query('select * from foodgroup')
   .then(data => res.status(200).json(data.rows));

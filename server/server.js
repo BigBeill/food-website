@@ -30,9 +30,6 @@ app.use('/recipe', recipeRouter)
 const userRouter = require('./routes/user.route')
 app.use('/user', userRouter)
 
-const devToolsRouter = require('./routes/devTools.route')
-app.use('/devTools', devToolsRouter)
-
 //listen to port
 const PORT = 4000
 app.listen(PORT, () => {console.log("Server started on port " + PORT)})

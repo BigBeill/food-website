@@ -1,6 +1,5 @@
 const mongoConnection = require('../config/connectMongo') 
 const { ObjectId } = require('mongodb');
-const getNutrition = require("./unitConvertingUtils").getNutrition
 
 function createRecipeSchema (recipe) {
 

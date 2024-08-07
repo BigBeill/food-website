@@ -1,10 +1,8 @@
 const router = require("express").Router()
 const mongoConnection = require('../config/connectMongo') 
 const postgresConnection = require('../config/postgres')
-const recipes = mongoConnection.models.recipe
-const recipeSchema = require("../schemas/recipe")
-const ingredients = require("../schemas/ingredient")
-const users = require("../schemas/user")
+const recipes = require("../models/recipe")
+const users = require("../models/user")
 const { query } = require("express")
 const createRecipeSchema = require("../library/validSchemaUtils").createRecipeSchema
 
@@ -104,64 +102,6 @@ router.get('/paginatedList', async (req, res) => {
 
 
 
-
-
-
-/*
----------- /ingredient routes ------------
-
-One method type:
-    GET - returns a list of ingredients from the database
-
-Optionally takes 3 arguments from url:
-    id: mongoDB objectId (ingredient id)
-    name: string
-    amount: int (if missing then assume 1)
-
-Method 'GET' description:
-    two main paths the route will take:
-        path 1:
-            triggered by req.query.id being provided
-            return to client ingredient with id of req.body.id
-        path 2:
-            triggered by req.query.id not being provided
-            return to client a list of length req.body.amount with similar name to req.body.name (with any name if req.query.name is not provided)
-
-Method 'GET' returns:
-    list of json objects containing ingredient data
-*/
-
-router.get('/ingredient', async (req, res) => {
-    const id = req.query.id || ''
-    const name = req.query.name || ''
-    const amount = parseInt(req.query.amount, 10) || 1
-
-    //path 1
-    if (id){
-        try {
-            const ingredientData = await ingredients.findOne({_id: _id})
-            return res.status(200).json(ingredientData)
-        }
-        catch { 
-            console.log('server failed to find ingredient with id:', id)
-            console.log('reason:', error)
-            res.status(500).json({ message: "Server error occurred." })
-        }
-    }
-
-    //path 2
-    else {
-        try { 
-            const ingredientData = await ingredients.find( { name: {$regex: new RegExp(name, 'i')} } ).limit(amount)
-            return res.status(200).json(ingredientData)
-        } 
-        catch (error) {
-            console.log('server failed to find ingredient with name:', name)
-            console.log('reason:', error)
-            res.status(500).json({ message: "Server error occurred." })
-        }
-    }
-})
 
 
 
