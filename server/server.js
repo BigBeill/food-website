@@ -1,10 +1,8 @@
 //External imports
 const express = require('express');
-const session = require ('express-session');
 const bodyParser = require ('body-parser');
-const passport = require('passport');
-const MongoStore = require('connect-mongo')(session);
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 //Local imports
 const mongoConnection = require ('./config/connectMongo');
@@ -12,6 +10,7 @@ const validateToken = require ('./middleware/auth/validateToken')
 
 //setup server
 const app = express()
+app.use(cors());
 app.use(express.static('public'))
 app.use(bodyParser.urlencoded({limit: '10mb', extended: false}))
 app.use(express.json());

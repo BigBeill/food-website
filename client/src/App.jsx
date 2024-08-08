@@ -1,29 +1,35 @@
 import React, { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import axios from './api/axios'
 
 import Layout from './Layout'
 import { routes } from './routes'
 
 function App() {
-
-  useEffect(() => {
-    fetchUserData()
-  }, [])
-
   const [userData, setUserData] = useState ({})
 
-  function fetchUserData() {
-    fetch('/server/user/info')
-    .then((response) => {
-      if (!response.ok) { throw new Error (`HTTP error, status: ${response.status}`) }
-      return response.json()
-    })
-    .then(setUserData)
-    .catch(error => {
-      console.error("No user found", error) 
-      setUserData({_id: "", username: ""})
-    })
+  async function getUser({isMounted, controller}) {
+    try {
+      const response = await axios.get('/user/info', {
+        signal: controller.signal
+      });
+      console.log(response.data);
+    } catch(error){
+      console.error(error);
+    }
   }
+
+  useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    getUser({isMounted, controller})
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    }
+  },[]);
 
   return (
     <BrowserRouter>
