@@ -1,0 +1,123 @@
+download PostgreSQL
+
+open pgAdmin 4
+create a database called "Canadian Nutrient File"
+
+paste this query into the Canadian Nutrient File database:
+
+CREATE TABLE foodname (
+	foodid numeric,
+	foodcode numeric,
+    	foodgroupid numeric,
+	foodsourceid numeric,
+	fooddescription text,
+	fooddescriptionf text,
+	fooddateofentry date,
+	fooddateofpublication date,
+	countrycode numeric,
+	scientificname text
+);
+
+CREATE TABLE nutrientamount (
+	foodid numeric,
+    	nutrientnameid numeric,
+    	nutrientvalue numeric,
+	standarderror numeric,
+	numberofobservations numeric,
+	nutrientsourceid numeric,
+	nutrientdateentry date
+);
+
+CREATE TABLE conversionfactor (
+	foodid numeric,
+	measureid numeric,
+	conversionfactorvalue numeric,
+	conversionfactordateofentry date
+);
+
+CREATE TABLE refuseamount (
+	foodid numeric,
+	refuseid numeric,
+	refuseamount numeric,
+	refusedateofentry date
+);
+
+CREATE TABLE yieldamount (
+	foodid numeric,
+	yieldid numeric,
+	yieldamount numeric,
+	yielddateofentry date
+);
+
+CREATE TABLE foodgroup (
+	foodgroupid numeric,
+	foodgroupcode numeric,
+	foodgroupname text,
+	foodgroupnamef text
+);
+
+CREATE TABLE foodsource (
+	foodsourceid numeric,
+	foodsourcecode numeric,
+	foodsourcedescription text,
+	foodsourcedescriptionf text
+);
+
+CREATE TABLE nutrientname (
+	nutrientnameid numeric,
+	nutrientcode numeric,
+	nutrientsymbol text,
+	unit text,
+	nutrientname text,
+	nutrientnamef text,
+	tagname text,
+	nutrientdecimals numeric
+);
+
+CREATE TABLE nutrientsource (
+	nutrientsourceid numeric,
+	nutrientsourcecode numeric,
+	nutrientdescription text,
+	nutrientdescriptionf text
+);
+
+CREATE TABLE measurename (
+	measureid numeric,
+	measurename text,
+	measurenamef text
+);
+
+CREATE TABLE refusename (
+	refuseid numeric,
+	refusename text,
+	refusenamef text
+);
+
+CREATE TABLE yieldname (
+	yieldid numeric,
+	yieldname text,
+	yieldnamef text
+);
+
+
+
+
+
+
+
+upload .csv files respectivly
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

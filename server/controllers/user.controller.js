@@ -99,7 +99,7 @@ exports.refresh = async (req, res) => {
     if (validToken && validToken._id == databaseToken.user) {
       const tokens = createToken({ _id: validToken._id, username: validToken.username });
       res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
-      res.status(200).json({ message: "new access token sent" })
+      return res.status(200).json({ message: "new access token sent" })
     }
   } catch (error) {
     console.error('error validating refresh token:', refreshToken);
