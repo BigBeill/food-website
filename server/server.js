@@ -6,11 +6,23 @@ const cors = require('cors');
 
 //Local imports
 const mongoConnection = require ('./config/connectMongo');
-const validateToken = require ('./middleware/auth/validateToken')
+const validateToken = require ('./middleware/auth/validateToken');
+
+// define server settings
+const corsOptions = {
+   origin: function (origin, callback) {
+      if (origin && origin.startsWith('http://localhost')) {
+         callback(null, true);
+      } else {
+         callback(new Error('Not allowed by CORS'));
+      }
+   },
+   credentials: true
+};
 
 //setup server
-const app = express()
-app.use(cors());
+const app = express();
+app.use(cors(corsOptions));
 app.use(express.static('public'))
 app.use(bodyParser.urlencoded({limit: '10mb', extended: false}))
 app.use(express.json());

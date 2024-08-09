@@ -24,14 +24,11 @@ exports.register = async (req, res) => {
 
   const hashedPassword = genPassword(password);
 
-  const newUser = { username, email, hash: hashedPassword.hash, salt: hashedPassword.salt }
-
+  // save user to database
   try {
+    const newUser = { username, email, hash: hashedPassword.hash, salt: hashedPassword.salt }
     await new users(newUser).save()
     console.log('new user created:', newUser)
-    const tokens = createToken(newUser);
-    res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
-    res.cookie("refreshToken", tokens.refreshToken, { maxAge: cookieAge }); 
   } 
   catch(error){
     console.log('failed to create new user:', newUser); 
@@ -39,20 +36,22 @@ exports.register = async (req, res) => {
     return res.status(500).json({ error: 'server failed to create new user' })
   }
 
+  // send cookies to client
   try { 
+    const tokens = createToken(newUser);
     await new refreshTokens({
       user: user._id,
       token: tokens.refreshToken
-    })
-    .save(); 
+    }).save(); 
+    res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
+    res.cookie("refreshToken", tokens.refreshToken, { maxAge: cookieAge }); 
+    return res.status(200).json({ message: 'register successful'})
   }
   catch (error){
     console.error("error saving refresh token for user:", user);
     console.error(error);
     return res.status(500).json({ error: "server issue while saving refresh token" });
   }
-
-  return res.status(200).json({ message: 'register successful'})
 }
 
 
@@ -60,28 +59,27 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   const {username, password} = req.body;
 
+  // make sure data provided is valid
   const user = await users.findOne({ username }, { _id:1, username:1, email:1, hash:1, salt:1 });
   if (!user) { return res.status(400).json({ error: 'username not found' }); }
   if (!validPassword(password, user.hash, user.salt)) { return res.status(400).json({ error: 'incorrect password' }) }
 
-  const tokens = createToken(user);
-  res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
-  res.cookie("refreshToken", tokens.refreshToken, { maxAge: cookieAge });
-
+  // return cookies to client
   try { 
+    const tokens = createToken(user);
     await new refreshTokens({
       user: user._id,
       token: tokens.refreshToken
-    })
-    .save(); 
+    }).save();
+    res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
+    res.cookie("refreshToken", tokens.refreshToken, { maxAge: cookieAge });
+    return res.status(200).json({ message: "user Signed in"}) 
   }
   catch (error){
     console.error("error saving refresh token for user:", user);
     console.error(error);
     return res.status(500).json({ error: "server issue while saving refresh token" });
   }
-
-  return res.status(200).json({ message: "user Signed in"})
 }
 
 

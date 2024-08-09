@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import axios from './api/axios'
+import axios from './api/axios';
 
 import Layout from './Layout'
 import { routes } from './routes'
@@ -8,27 +8,19 @@ import { routes } from './routes'
 function App() {
   const [userData, setUserData] = useState ({})
 
-  async function getUser({isMounted, controller}) {
-    try {
-      const response = await axios.get('/user/info', {
-        signal: controller.signal
-      });
-      console.log(response.data);
-    } catch(error){
-      console.error(error);
-    }
-  }
-
   useEffect(() => {
-    let isMounted = true;
-    const controller = new AbortController();
 
-    getUser({isMounted, controller})
+    localStorage.setItem("test", "testing");
 
-    return () => {
-      isMounted = false;
-      controller.abort();
-    }
+    axios.get(`user/info`)
+    .then(response => {
+      setUserData(response.data);
+    })
+    .catch((error) => {
+      console.error(error);
+      setUserData({_id: "", username: ""});
+    });
+
   },[]);
 
   return (
