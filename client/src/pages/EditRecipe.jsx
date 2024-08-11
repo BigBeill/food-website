@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import { useSearchParams, useNavigate } from 'react-router-dom'
+import React, { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import axios from '../api/axios';
 import NoteBook from '../components/NoteBook'
 import { Reorder } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,20 +9,20 @@ import { faCircleXmark } from '@fortawesome/free-regular-svg-icons';
 import { assignIds, removeIds } from '../tools/general'
 
 export default function NewEditRecipe ({userData}) {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   if (userData && userData._id == ""){ return navigate('/login') }
 
-  const [searchParams] = useSearchParams()
-  const recipeId = searchParams.get('recipeId')
+  const [searchParams] = useSearchParams();
+  const recipeId = searchParams.get('recipeId');
 
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [image, setImage] = useState('')
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [image, setImage] = useState('');
 
-  const [ingredientList, setIngredientList] = useState([])
+  const [ingredientList, setIngredientList] = useState([]);
 
-  const [instructionList, setInstructionList] = useState([])
+  const [instructionList, setInstructionList] = useState([]);
 
   useEffect (() => {
     // if recipe exists, populate this page with recipes data from server
@@ -69,37 +70,37 @@ export default function NewEditRecipe ({userData}) {
       name: GeneralInfoPage,
       props: {
         newRecipe: !recipeId,
-        title: title,
-        setTitle: setTitle,
-        description: description, 
-        setDescription: setDescription,
+        title,
+        setTitle,
+        description, 
+        setDescription,
       }
     },
     { 
       name: ImagePage,
       props: {
-        image: image,
-        setImage: setImage,
+        image,
+        setImage,
       }
     },
     { 
       name: IngredientPage,
       props: {
-        ingredientList: ingredientList,
-        setIngredientList: setIngredientList
+        ingredientList,
+        setIngredientList
       }
     },
     { 
       name: InstructionPage,
       props: {
-        instructionList: instructionList,
-        setInstructionList: setInstructionList
+        instructionList,
+        setInstructionList
       }
     },
     {
       name: SubmissionPage,
       props: {
-        submitRecipe: submitRecipe
+        submitRecipe
       }
     }
   ]
@@ -146,7 +147,7 @@ function IngredientPage ({ingredientList, setIngredientList}) {
   const [unitsAvailable, setUnitsAvailable] = useState(baseUnits)
   const [ingredientsAvailable, setIngredientsAvailable] = useState([])
   const [availableId, setAvailableId] = useState(ingredientList.length)
-
+  
   function updateNewIngredientName (value) {
     setNewIngredient({...newIngredient, name: value})
     if (newIngredient.name.length >= 3) { searchIngredients(value) }

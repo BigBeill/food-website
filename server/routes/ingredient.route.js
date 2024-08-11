@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const postgresConnection = require('../config/postgres');
-const ingredientNutrition = require('../library/canadianNutrientFileUtils').ingredientNutrition;
+const { ingredientNutrition, conversionFactorList } = require('../library/canadianNutrientFileUtils');
 
 router.get('/', (req, res) => {
   const foodGroupID = req.query.foodGroupId;
@@ -9,24 +9,22 @@ router.get('/', (req, res) => {
 });
 
 router.get('/details', async (req, res) => {
-  let ingredientData = {};
-
   const foodId = req.query.foodId;
-  ingredientData.id = foodId;
 
+  let ingredientData = { id: foodId };
+
+  // get ingredient name from database
   const ingredientName = await postgresConnection.query(`select fooddescription from foodname where foodid=${foodId}`);
   ingredientData.name = ingredientName.rows[0].fooddescription;
 
+  // get ingredients nutritional value (per 100 grams)
   ingredientData.nutrition = await ingredientNutrition(foodId);
 
-  const conversionData = await postgresConnection.query(`select measureid, ConversionFactorValue from conversionfactor where foodid=${foodId} `);
-  let conversionInfo = conversionData.rows;
-  for (let conversion of conversionInfo){
-    const measureDescription = await postgresConnection.query(`select measuredescription from measurename where measureid=${conversion.measureid}`);
-    conversion.measureDescription = measureDescription.rows[0].measuredescription;
-  }
-  ingredientData.conversionInfo = conversionInfo;
+  console.log("setting conversion values")
+  // get all possible conversion values for ingredient
+  ingredientData.conversionFactors = await conversionFactorList(foodId);
 
+  console.log("sending response");
   return res.status(200).json(ingredientData);
 });
 

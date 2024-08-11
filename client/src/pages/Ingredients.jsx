@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import { useParams, useNavigate } from 'react-router-dom';
+import axios from '../api/axios';
 
 export default function Ingredients () {
   const params = useParams();
@@ -37,9 +38,9 @@ function GroupList({clickHandler}) {
   const [groupList, setGroupList] = useState([]);
 
   useEffect(() => {
-    fetch('/server/ingredient/groups')
-    .then(response => response.json())
-    .then(setGroupList);
+    axios.get(`ingredient/groups`)
+    .then(response => setGroupList(response.data) )
+    .catch(error => console.error(error));
   },[]);
 
   return (
@@ -55,9 +56,9 @@ function IngredientList({groupID, clickHandler}) {
   const [ingredientList, setIngredientList] = useState([])
 
   useEffect(() => {
-    fetch(`/server/ingredient/?foodGroupId=${groupID}`)
-    .then(response => response.json())
-    .then(setIngredientList);
+    axios.get(`ingredient/?foodGroupId=${groupID}`)
+    .then(response => setIngredientList(response.data))
+    .catch(error => console.error(error));
   },[])
 
   return (
@@ -75,9 +76,12 @@ function IngredientDetails({ingredientID}) {
   console.log(ingredientData)
   
   useEffect(() => {
-    fetch(`/server/ingredient/details/?foodId=${ingredientID}`)
-    .then(response => response.json())
-    .then(setIngredientData);
+    axios.get(`ingredient/details/?foodId=${ingredientID}`)
+    .then(response => { 
+      console.log(response.data); 
+      setIngredientData(response.data)
+    })
+    .catch(error => console.error(error));
   },[]);
 
   if (Object.keys(ingredientData).length == 0) { return <p>loading page</p> }
