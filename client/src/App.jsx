@@ -10,11 +10,8 @@ function App() {
 
   useEffect(() => {
 
-    localStorage.setItem("test", "testing");
-
     axios({ method:'get', url:`user/info` })
     .then(response => { 
-      console.log(response)
       setUserData(response) 
     })
     .catch((error) => {

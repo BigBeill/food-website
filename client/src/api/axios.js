@@ -20,7 +20,6 @@ const axiosInstance =  axios.create({
 });
 
 function checkAccessToken() {
-   console.log('checking if access token is valid');
    try {
       const accessToken = cookies.get('accessToken');
       if (!accessToken) return false;
@@ -35,26 +34,25 @@ function checkAccessToken() {
 }
 
 export default async function sendRequest( configuration ) {
+   return new Promise(async (resolve, reject) => {
 
-   // if refresh token exists and client needs a new access use the refresh api
-   try {
-      if(cookies.get('refreshToken') && !checkAccessToken()) await axiosInstance.post(`user/refresh`); // get new access token
-   }
-   catch (error) {
-      console.error('failed to fetch refresh token');
-      throw error;
-   }
+      // if refresh token exists and client needs a new access use the refresh api
+      try {
+         if(cookies.get('refreshToken') && !checkAccessToken()) await axiosInstance.post(`user/refresh`); // get new access token
+      }
+      catch (error) {
+         console.error('failed to fetch refresh token');
+         return reject(error);
+      }
 
-
-   try {
-      console.log('calling api:', configuration)
-      // process the request
-      const response = axiosInstance( configuration );
-      return response.data;
-   }
-   catch (error) {
-      console.error('issue processing request')
-      throw error;
-   }
-
+      try {
+         // process the request
+         const response = await axiosInstance( configuration );
+         return resolve(response.data)
+      }
+      catch (error) {
+         console.error('issue processing request');
+         return reject(error);
+      }
+   })
 }
