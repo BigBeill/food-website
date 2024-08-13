@@ -1,6 +1,7 @@
 const router = require("express").Router();
+const ingredientController = require("../controllers/ingredient.controller")
 const postgresConnection = require('../config/postgres');
-const { ingredientNutrition, conversionFactorList } = require('../library/canadianNutrientFileUtils');
+const { ingredientNutrition, conversionFactorList, ingredientListNutrition } = require('../library/canadianNutrientFileUtils');
 
 router.get('/', (req, res) => {
   const foodGroupID = req.query.foodGroupId;
@@ -34,9 +35,6 @@ router.get('/list', async (req, res) => {
   const listData = await postgresConnection.query(`select * from foodname where name like '%' || ${foodName} || '%' limit ${limit}`);
 })
 
-router.get('/groups', (req, res) => {
-  postgresConnection.query('select * from foodgroup')
-  .then(data => res.status(200).json(data.rows));
-});
+router.get('/groups', ingredientController.groups);
 
 module.exports = router;

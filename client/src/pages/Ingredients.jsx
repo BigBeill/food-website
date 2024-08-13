@@ -38,8 +38,11 @@ function GroupList({clickHandler}) {
   const [groupList, setGroupList] = useState([]);
 
   useEffect(() => {
-    axios.get(`ingredient/groups`)
-    .then(response => setGroupList(response.data) )
+    axios({ method: 'get', url:`ingredient/groups` })
+    .then(response => {
+      console.log(response);
+      setGroupList(response)
+    })
     .catch(error => console.error(error));
   },[]);
 
@@ -56,8 +59,8 @@ function IngredientList({groupID, clickHandler}) {
   const [ingredientList, setIngredientList] = useState([])
 
   useEffect(() => {
-    axios.get(`ingredient/?foodGroupId=${groupID}`)
-    .then(response => setIngredientList(response.data))
+    axios({ method: 'get', url:`ingredient/?foodGroupId=${groupID}` })
+    .then(setIngredientList)
     .catch(error => console.error(error));
   },[])
 
@@ -76,10 +79,10 @@ function IngredientDetails({ingredientID}) {
   console.log(ingredientData)
   
   useEffect(() => {
-    axios.get(`ingredient/details/?foodId=${ingredientID}`)
+    axios({ method: 'get', url:`ingredient/details/?foodId=${ingredientID}` })
     .then(response => { 
-      console.log(response.data); 
-      setIngredientData(response.data)
+      console.log(response); 
+      setIngredientData(response);
     })
     .catch(error => console.error(error));
   },[]);
