@@ -1,4 +1,4 @@
-const {verify} = require("jsonwebtoken");
+const { verify } = require("jsonwebtoken");
 require('dotenv').config();
 
 function validateToken(req, res, next) {

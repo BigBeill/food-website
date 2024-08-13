@@ -2,6 +2,7 @@ const users = require("../models/user");
 const refreshTokens = require("../models/refreshToken");
 const validPassword = require("../library/passwordUtils").validPassword;
 const createToken = require("../config/jsonWebToken");
+const { verify } = require("jsonwebtoken");
 require('dotenv').config();
 
 // the max age of all cookies created by this controller
@@ -100,9 +101,9 @@ exports.refresh = async (req, res) => {
       return res.status(200).json({ message: "new access token sent" })
     }
   } catch (error) {
-    console.error('error validating refresh token:', refreshToken);
+    console.error('error creating new access token:', refreshToken);
     console.error(error);
-    return res.status(403).json({ error: "could not validate refresh token"})
+    return res.status(403).json({ error: "could not create new access token"})
   }
 
 }

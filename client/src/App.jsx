@@ -12,9 +12,10 @@ function App() {
 
     localStorage.setItem("test", "testing");
 
-    axios.get(`user/info`)
-    .then(response => {
-      setUserData(response.data);
+    axios({ method:'get', url:`user/info` })
+    .then(response => { 
+      console.log(response)
+      setUserData(response) 
     })
     .catch((error) => {
       console.error(error);
