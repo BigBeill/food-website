@@ -1,5 +1,5 @@
 const postgresConnection = require('../config/postgres');
-
+const { ingredientNutrition, conversionFactorList, ingredientListNutrition } = require('../library/canadianNutrientFileUtils');
 
 
 
