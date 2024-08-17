@@ -3,12 +3,6 @@ const ingredientController = require("../controllers/ingredient.controller")
 const postgresConnection = require('../config/postgres');
 const { ingredientNutrition, conversionFactorList, ingredientListNutrition } = require('../library/canadianNutrientFileUtils');
 
-router.get('/', (req, res) => {
-  const foodGroupID = req.query.foodGroupId;
-  postgresConnection.query(`select * from foodname where foodgroupid=${foodGroupID}`)
-  .then(data => res.status(200).json(data.rows));
-});
-
 router.get('/details', async (req, res) => {
   const foodId = req.query.foodId;
 
@@ -29,11 +23,7 @@ router.get('/details', async (req, res) => {
   return res.status(200).json(ingredientData);
 });
 
-router.get('/list', async (req, res) => {
-  const foodName = req.query.foodName || '';
-  const limit = parseInt(req.query.limit) || 1;
-  const listData = await postgresConnection.query(`select * from foodname where name like '%' || ${foodName} || '%' limit ${limit}`);
-})
+router.get('/list', ingredientController.list);
 
 router.get('/groups', ingredientController.groups);
 

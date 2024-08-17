@@ -22,10 +22,10 @@ const corsOptions = {
 
 //setup server
 const app = express();
-app.use((req, res, next) => { console.log("\n\n\n\n\n" + "\x1b[31m%s\x1b[0m", "CALL TO SERVER RECEIVED!"); next(); })
+app.use((req, res, next) => { console.log("\n\n\n\n\n" + "\x1b[31m%s\x1b[0m", "CALL TO SERVER RECEIVED!"); next(); });
 app.use(cors(corsOptions));
-app.use(express.static('public'))
-app.use(bodyParser.urlencoded({limit: '10mb', extended: false}))
+app.use(express.static('public'));
+app.use(bodyParser.urlencoded({limit: '10mb', extended: false}));
 app.use(express.json());
 app.use(cookieParser());
 app.use(validateToken);

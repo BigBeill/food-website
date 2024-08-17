@@ -142,7 +142,7 @@ function ImagePage ({image, setImage}) {
 
 function IngredientPage ({ingredientList, setIngredientList}) {
   const baseUnits = ['physical', 'milligrams', 'grams', 'pounds', 'ounces', 'liters', 'millimeters', 'cups', 'tablespoons']
-
+ 
   const [newIngredient, setNewIngredient] = useState({_id:"", name:"", unit:"", amount:""})
   const [unitsAvailable, setUnitsAvailable] = useState(baseUnits)
   const [ingredientsAvailable, setIngredientsAvailable] = useState([])
@@ -153,10 +153,18 @@ function IngredientPage ({ingredientList, setIngredientList}) {
     if (newIngredient.name.length >= 3) { searchIngredients(value) }
   }
 
+  //fetch up to 10 ingredients from database that have similar names to value given
   function searchIngredients (value) { 
-    fetch(`/server/ingredients/list?name=${value}&limit=10`)
-    .then(response => response.json())
+    axios({ method: 'get', url:`ingredient/list?foodDescription=${value}&limit=10` })
     .then(setIngredientsAvailable)
+    .catch(error => { console.error('unable to fetch ingredients:', error); });
+  }
+
+  function ingredientSelected (foodId, foodDescription) {
+    axios({ method: 'get', url:`ingredient/details?foodId=${foodId}`})
+    .then(response => {
+
+    })
   }
 
   function removeIngredient (index) {
@@ -168,6 +176,8 @@ function IngredientPage ({ingredientList, setIngredientList}) {
   return (
     <div className='standardPage'>
       <h2>Recipe Ingredients</h2>
+
+      {/* ingredients list */}
       <Reorder.Group className='itemList' axis='y' values={ingredientList} onReorder={setIngredientList}>
         {ingredientList.map((item, index) => (
           <Reorder.Item key={item.id} value={item} className='listItem'>
@@ -184,6 +194,8 @@ function IngredientPage ({ingredientList, setIngredientList}) {
           </Reorder.Item>
         ))}
       </Reorder.Group>
+
+      {/* add new ingredient section */}
       <div className='textInput shared'>
         <label>New Ingredient</label>
         <div className='inputs'>
@@ -194,17 +206,18 @@ function IngredientPage ({ingredientList, setIngredientList}) {
               <option key={index}>{unit}</option>
             ))}
           </select>
-          <div className='activeSearchBar'>
+          <div className='activeSearchBar'> {/* ingredient search bar */}
             <input type='text' className='mainInput' value={newIngredient.name} onChange={(event) => {updateNewIngredientName(event.target.value)}} placeholder='Ingredient Name'/>
             <ul className={`${ingredientsAvailable.length == 0 ? 'hidden' : ''}`}>
               {ingredientsAvailable.map(ingredient => (
-                <li key={ingredient._id} type='button' value={ingredient.name} onClick={(event) => ingredientSelected(ingredient.name, ingredient._id, ingredient.unitType)}> {ingredient.name} </li>
+                <li key={ingredient.foodid} onClick={() => ingredientSelected(ingredient.foodid, ingredient.fooddescription)}> {ingredient.fooddescription} </li>
               ))}
             </ul>
           </div>
         </div>
       </div>
       <button onClick={() => addIngredient()}>Add Ingredient</button>
+
     </div>
   )
 }

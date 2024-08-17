@@ -10,7 +10,6 @@ function logGeneralData (req, res, next) {
   
   console.log();
   console.log("time of request: "+ "\x1b[35m%s\x1b[0m", formattedTime);
-  console.log("active session:", !!req.session);
   console.log("active user:", !!req.user);
   if (req.user) { 
     console.log("   username = " + "\x1b[32m%s\x1b[0m", req.user.username);
