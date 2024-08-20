@@ -1,32 +1,16 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 import UserPin from '../components/UserPin'
 
-function Profile() {
-
-  // function to fetch user data from server
-  useEffect(() => {
-    fetchUserData()
-  }, [])
-
-  // state to store user data
-  const [userData, setUserData] = useState({})
-  // function to fetch user data from server
-  function fetchUserData() {
-    fetch('/server/user/info')
-      .then((response) => {
-        if (!response.ok) { throw new Error(`HTTP error, status: ${response.status}`) }
-        return response.json()
-      })
-      .then(setUserData)
-      .catch(error => {
-        console.error("No user found", error)
-        setUserData({ _id: "", username: "", email: "" })
-      })
-  }
-  // output user data for testing
-  console.log('userData', userData)
-
-
+function Profile({userData}) {
+  const navigate = useNavigate();
+  console.log("profile:", userData)
+  
+  //some placeholder text while page is waiting for user data to be collected
+  if (!userData.collected) return(<p>collecting user data</p>);
+  
+  //make sure user is signed in before trying to render there profile
+  if (!userData._id) navigate('/login');
 
   return (
     <div className='profile splitSpace'>

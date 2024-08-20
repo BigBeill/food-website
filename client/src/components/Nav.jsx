@@ -7,16 +7,19 @@ function Nav({userData}) {
     const [open, setOpen] = useState(false);
     const navRef = useRef(null);
     
+    // open/close the nav bar whenever the handle on the side of the nav panel is clicked
     function openNav() {
         setOpen(!open);
     }
 
+    // close the nav bar whenever the user clicks outside of it
     function handleOutsideClick(event) {
         if (navRef.current && !navRef.current.contains(event.target)) {
             setOpen(false);
         }
     }
 
+    // detect a click outside the nav bar
     useEffect(() => {
         document.addEventListener("mousedown", handleOutsideClick);
         return () => { document.removeEventListener("mousedown", handleOutsideClick); }
@@ -35,7 +38,7 @@ function Nav({userData}) {
             <NavLink className="navLink" to="/index">Search</NavLink>
 
             {   
-                userData._id != "" ?
+                userData._id ?
                 <>
 
                 <h3>Your Recipes</h3>
