@@ -7,7 +7,7 @@ export default function Layout({userData}){
       <header />
       <Nav userData={userData}/>
       <main>
-        <Outlet />
+        <Outlet context={{ userData }}/>
       </main>
     </>
   )
