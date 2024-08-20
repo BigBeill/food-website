@@ -107,3 +107,14 @@ exports.refresh = async (req, res) => {
   }
 
 }
+
+
+
+
+
+
+exports.logout = async (req, res) => {
+  res.clearCookie('accessToken');
+  res.clearCookie('refreshToken');
+  res.status(200).json({ message: "cookies removed" })
+}

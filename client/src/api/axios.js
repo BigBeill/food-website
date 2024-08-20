@@ -47,11 +47,13 @@ export default async function sendRequest( configuration ) {
 
       try {
          // process the request
+         console.log("sending request to server:", configuration)
          const response = await axiosInstance( configuration );
-         return resolve(response.data)
+         console.log("response from server:", response)
+         return resolve(response.data);
       }
       catch (error) {
-         console.error('issue processing request');
+         console.error('issue processing request:', error);
          return reject(error);
       }
    })

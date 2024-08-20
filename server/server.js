@@ -42,6 +42,9 @@ app.use('/recipe', recipeRouter)
 const userRouter = require('./routes/user.route')
 app.use('/user', userRouter)
 
+const errorHandler = require('./middleware/debugging/errorHandler');
+app.use(errorHandler);
+
 //listen to port
 const PORT = 4000
 app.listen(PORT, () => {console.log("Server started on port " + PORT)})
