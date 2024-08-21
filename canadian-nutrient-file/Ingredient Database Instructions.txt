@@ -20,7 +20,7 @@ CREATE TABLE foodname (
 
 CREATE TABLE nutrientamount (
 	foodid numeric,
-    	nutrientnameid numeric,
+    	nutrientid numeric,
     	nutrientvalue numeric,
 	standarderror numeric,
 	numberofobservations numeric,
@@ -83,8 +83,8 @@ CREATE TABLE nutrientsource (
 
 CREATE TABLE measurename (
 	measureid numeric,
-	measurename text,
-	measurenamef text
+	measuredescription text,
+	measuredescriptionf text
 );
 
 CREATE TABLE refusename (
