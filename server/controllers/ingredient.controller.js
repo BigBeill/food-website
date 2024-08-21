@@ -5,15 +5,16 @@ const { ingredientNutrition, conversionFactorList, ingredientListNutrition } = r
 
 
 
+
 exports.details = async (req, res) => {
    const foodId = req.query.foodId;
    if (!foodId) return res.status(400).json({ error:'foodId not provided' })
 
-   let ingredientData = { id: foodId };
+   let ingredientData = { foodId };
 
    // get ingredient name from database
    const ingredientName = await postgresConnection.query(`select fooddescription from foodname where foodid=${foodId}`);
-   ingredientData.name = ingredientName.rows[0].fooddescription;
+   ingredientData.foodDescription = ingredientName.rows[0].fooddescription;
 
    // get ingredients nutritional value (per 100 grams)
    ingredientData.nutrition = await ingredientNutrition(foodId);

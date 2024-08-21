@@ -40,7 +40,6 @@ function GroupList({clickHandler}) {
   useEffect(() => {
     axios({ method: 'get', url:`ingredient/groups` })
     .then(response => {
-      console.log(response);
       setGroupList(response)
     })
     .catch(error => console.error(error));
@@ -76,12 +75,10 @@ function IngredientList({groupID, clickHandler}) {
 function IngredientDetails({ingredientID}) {
   const [ingredientData, setIngredientData] = useState({});
   const [amount, setAmount] = useState({value: 100, unit: 'g'});
-  console.log(ingredientData)
   
   useEffect(() => {
     axios({ method: 'get', url:`ingredient/details/?foodId=${ingredientID}` })
     .then(response => { 
-      console.log(response); 
       setIngredientData(response);
     })
     .catch(error => console.error(error));
