@@ -1,6 +1,6 @@
 const users = require("../models/user");
 const refreshTokens = require("../models/refreshToken");
-const validPassword = require("../library/passwordUtils").validPassword;
+const { validPassword, genPassword } = require("../library/passwordUtils");
 const createToken = require("../config/jsonWebToken");
 const { verify } = require("jsonwebtoken");
 require("dotenv").config();
@@ -33,39 +33,38 @@ exports.register = async (req, res) => {
   }
 
   const hashedPassword = genPassword(password);
+  const newUser = {
+    username,
+    email,
+    hash: hashedPassword.hash,
+    salt: hashedPassword.salt,
+  };
+  let savedUser;
 
   // save user to database
   try {
-    const newUser = {
-      username,
-      email,
-      hash: hashedPassword.hash,
-      salt: hashedPassword.salt,
-    };
-    await new users(newUser).save();
+    savedUser = await new users(newUser).save();
     console.log("new user created:", newUser);
   } catch (error) {
     console.log("failed to create new user:", newUser);
-    console.log(error);
+    console.error(error);
     return res.status(500).json({ error: "server failed to create new user" });
   }
 
   // send cookies to client
   try {
-    const tokens = createToken(newUser);
+    const tokens = createToken(savedUser);
     await new refreshTokens({
-      user: user._id,
+      user: savedUser._id,
       token: tokens.refreshToken,
     }).save();
     res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
     res.cookie("refreshToken", tokens.refreshToken, { maxAge: cookieAge });
     return res.status(200).json({ message: "register successful" });
   } catch (error) {
-    console.error("error saving refresh token for user:", user);
+    console.log("error saving refresh token for user:", savedUser);
     console.error(error);
-    return res
-      .status(500)
-      .json({ error: "server issue while saving refresh token" });
+    return res.status(500).json({ error: "server issue while saving refresh token" });
   }
 };
 
