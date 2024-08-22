@@ -1,12 +1,28 @@
-const {sign} = require("jsonwebtoken");
-require('dotenv').config();
+const { sign } = require("jsonwebtoken");
+require("dotenv").config();
 
 function createToken(user) {
-  
-  const accessToken = sign( {_id: user._id, username: user.username}, process.env.SESSION_SECRET, { expiresIn: '15m' } );
-  const refreshToken = sign( {_id: user._id, username: user.username}, process.env.SESSION_SECRET );
+  const accessToken = sign(
+    {
+      _id: user._id,
+      email: user.email,
+      bio: user.bio,
+      username: user.username,
+    },
+    process.env.SESSION_SECRET,
+    { expiresIn: "15m" }
+  );
+  const refreshToken = sign(
+    {
+      _id: user._id,
+      email: user.email,
+      bio: user.bio,
+      username: user.username,
+    },
+    process.env.SESSION_SECRET
+  );
 
-  return {accessToken, refreshToken};
+  return { accessToken, refreshToken };
 }
 
 module.exports = createToken;

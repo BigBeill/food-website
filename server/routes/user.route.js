@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const userController = require("../controllers/user.controller")
+const userController = require("../controllers/user.controller");
 
 // ------------ User Get Routes ------------
 
@@ -9,6 +9,7 @@ const userController = require("../controllers/user.controller")
 //   return data for user that is currently logged in
 router.get("/info", (req, res) => {
   if (req.user) {
+    console.log(req.user);
     return res.status(200).json(req.user);
   } else {
     return res.status(401).json({ error: "user not signed in" });
@@ -29,16 +30,14 @@ router.get("/findUsers", async (req, res) => {
   res.end(JSON.stringify(data));
 });
 
-
-
 router.post("/register", userController.register);
 
-router.post('/login', userController.login);
+router.post("/login", userController.login);
 
-router.post('/refresh', userController.refresh);
+router.post("/refresh", userController.refresh);
 
-router.post('/logout', userController.logout);
+router.post("/logout", userController.logout);
 
-
+router.post("/updateAccount", userController.updateAccount);
 
 module.exports = router;
