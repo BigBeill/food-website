@@ -528,15 +528,15 @@ MeasureID,MeasureDescription,MeasureDescriptionF
 982,250ml small curd,250ml petit caillé
 983,250ml unpacked,250ml non pressé
 987,175g,175g
-988,"250ml, sifted","250ml, tamisé"
-989,"15ml, sifted","15ml, tamisé"
+988,250ml sifted,250ml tamisé
+989,15ml sifted,15ml tamisé
 990,50g,50g
-991,"250ml, chopped","250ml, haché"
+991,250ml chopped,250ml haché
 992,1 jumbo egg,1 oeuf jumbo
-994,"250ml, diced","250ml, en dés"
-995,"250ml, shredded","250ml, filamenté"
-996,"250ml, melted","250ml, fondu"
-997,"250ml, crumbled","250ml, émietté"
+994,250ml diced,250ml en dés
+995,250ml shredded,250ml filamenté
+996,250ml melted,"250ml, fondu"
+997,250ml crumbled,"250ml, émietté"
 998,1 creamer,1 godelet
 999,250ml whipped,250ml fouetté
 1000,250ml fluid (yields 2 cups whipped),250ml liquide (donne 2 tasses fouettée)

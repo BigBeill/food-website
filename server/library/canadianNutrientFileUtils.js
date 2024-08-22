@@ -20,8 +20,9 @@ function ingredientListNutrition (ingredientIDList) {
 
       resolve(totalNutrients)
     }
-    catch{
+    catch (error) {
       console.log('failed to collect nutrient data for list:', ingredientIDList);
+      console.error(error)
       reject('failed to collect nutrient data from database');
     }
   })
@@ -74,7 +75,7 @@ function conversionFactorList (ingredientId) {
     // get a list of all possible conversions from database
     const conversionData = await postgresConnection.query(`SELECT measureid, conversionfactorvalue FROM conversionfactor where foodid=${ingredientId}`);
 
-    let value, denominator, slashFound, unitStart;
+    let value, denominator, slashFound, unitStart, measureDescription;
     for(const conversion of conversionData.rows){
       value = "";
       denominator = "";
@@ -104,6 +105,20 @@ function conversionFactorList (ingredientId) {
         if(denominator) value = value/parseInt(denominator);
 
         conversionOptions.push({ measureId: conversion.measureid, unit: measureDescription.slice(unitStart), value: conversion.conversionfactorvalue / value, });
+      }
+    }
+
+    // remove any duplicate entries
+    for (let i = conversionOptions.length - 1;  i >= 0; i--) {
+      console.log("unit:", conversionOptions[i].unit)
+      if (conversionOptions[i].unit == 'g') { conversionOptions.splice(i, 1); }
+      else {
+        for(let j = i-1; j >=0; j--) {
+          if (conversionOptions[i].unit == conversionOptions[j].unit) {
+            conversionOptions.splice(j, 1);
+            j--;
+          }
+        }
       }
     }
 

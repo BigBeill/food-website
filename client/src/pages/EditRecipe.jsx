@@ -157,7 +157,7 @@ function ImagePage ({image, setImage}) {
 
 function IngredientPage ({ingredientList, setIngredientList}) {
  
-  const [newIngredient, setNewIngredient] = useState({foodId:"", foodDescription:"", unit:"", amount:""})
+  const [newIngredient, setNewIngredient] = useState({foodId:"", foodDescription:"", measureId:"", unit:"", amount:""})
   const [conversionFactorsAvailable, setConversionFactorsAvailable] = useState([{ measureId: '1489', unit: 'g' }])
   const [ingredientsAvailable, setIngredientsAvailable] = useState([])
   const [availableId, setAvailableId] = useState(ingredientList.length)
@@ -178,12 +178,18 @@ function IngredientPage ({ingredientList, setIngredientList}) {
   function ingredientSelected (foodId) {
     axios({ method: 'get', url:`ingredient/details?foodId=${foodId}`})
     .then(response => {
-      console.log(response);
       setNewIngredient({ ...newIngredient, foodId, foodDescription: response.foodDescription });
       setConversionFactorsAvailable([ ...response.conversionFactors, { measureId: '1489', unit: 'g' } ]);
-    })
+    });
 
     setIngredientsAvailable([]);
+  }
+
+  function addIngredient () {
+    if (!newIngredient.foodId || !newIngredient.unit || !newIngredient.amount) return
+    setIngredientList([...ingredientList, {id: availableId, content: newIngredient} ]);
+    setAvailableId( availableId+1 );
+    setNewIngredient({foodId:"", foodDescription:"", unit:"", amount:""});
   }
 
   function removeIngredient (index) {
@@ -219,10 +225,10 @@ function IngredientPage ({ingredientList, setIngredientList}) {
         <label>New Ingredient</label>
         <div className='inputs'>
           <input type='number' value={newIngredient.amount} onChange={(event) => setNewIngredient({...newIngredient, amount: event.target.value})} placeholder='Amount'/>
-          <select value={newIngredient.unit} onChange={(event) => setNewIngredient({...newIngredient, unit: event.target.value})}>
+          <select value={newIngredient.unit} onChange={(event) => setNewIngredient({...newIngredient, measureId: event.target.id, unit: event.target.value})}>
             <option value="" disabled hidden className='light'>Units</option>
             {conversionFactorsAvailable.map((conversionFactor, index) => (
-              <option key={index}>{conversionFactor.unit}</option>
+              <option key={index} id={conversionFactor.measureId}>{conversionFactor.unit}</option>
             ))}
           </select>
           <div className='activeSearchBar'> {/* ingredient search bar */}
