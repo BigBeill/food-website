@@ -2,7 +2,6 @@ const users = require("../models/user");
 const refreshTokens = require("../models/refreshToken");
 const { validPassword, genPassword } = require("../library/passwordUtils");
 const createToken = require("../config/jsonWebToken");
-const genPassword = require("../library/passwordUtils").genPassword;
 const { verify } = require("jsonwebtoken");
 require("dotenv").config();
 
