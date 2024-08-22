@@ -20,8 +20,9 @@ function ingredientListNutrition (ingredientIDList) {
 
       resolve(totalNutrients)
     }
-    catch{
+    catch (error) {
       console.log('failed to collect nutrient data for list:', ingredientIDList);
+      console.error(error)
       reject('failed to collect nutrient data from database');
     }
   })
@@ -35,15 +36,15 @@ function ingredientNutrition (ingredientId) {
       
       // if any data is missing, set it to 0
       let nutritionData = data.rows;
-      if (nutritionData[0].nutrientid != 203) { nutritionData.splice(0, 0, { nutrientid: '203', nutrientvalue: '0' } ); }
-      if (nutritionData[1].nutrientid != 204) { nutritionData.splice(1, 0, { nutrientid: '204', nutrientvalue: '0' } ); }
-      if (nutritionData[2].nutrientid != 205) { nutritionData.splice(2, 0, { nutrientid: '205', nutrientvalue: '0' } ); }
-      if (nutritionData[3].nutrientid != 208) { nutritionData.splice(3, 0, { nutrientid: '208', nutrientvalue: '0' } ); }
-      if (nutritionData[4].nutrientid != 269) { nutritionData.splice(4, 0, { nutrientid: '269', nutrientvalue: '0' } ); }
-      if (nutritionData[5].nutrientid != 291) { nutritionData.splice(5, 0, { nutrientid: '291', nutrientvalue: '0' } ); }
-      if (nutritionData[6].nutrientid != 306) { nutritionData.splice(6, 0, { nutrientid: '306', nutrientvalue: '0' } ); }
-      if (nutritionData[7].nutrientid != 307) { nutritionData.splice(7, 0, { nutrientid: '307', nutrientvalue: '0' } ); }
-      if (nutritionData[8].nutrientid != 601) { nutritionData.splice(8, 0, { nutrientid: '601', nutrientvalue: '0' } ); }
+      if (nutritionData[0].nutrientid != 203) nutritionData.splice(0, 0, { nutrientid: '203', nutrientvalue: '0' } );
+      if (nutritionData[1].nutrientid != 204) nutritionData.splice(1, 0, { nutrientid: '204', nutrientvalue: '0' } );
+      if (nutritionData[2].nutrientid != 205) nutritionData.splice(2, 0, { nutrientid: '205', nutrientvalue: '0' } );
+      if (nutritionData[3].nutrientid != 208) nutritionData.splice(3, 0, { nutrientid: '208', nutrientvalue: '0' } );
+      if (nutritionData[4].nutrientid != 269) nutritionData.splice(4, 0, { nutrientid: '269', nutrientvalue: '0' } );
+      if (nutritionData[5].nutrientid != 291) nutritionData.splice(5, 0, { nutrientid: '291', nutrientvalue: '0' } );
+      if (nutritionData[6].nutrientid != 306) nutritionData.splice(6, 0, { nutrientid: '306', nutrientvalue: '0' } );
+      if (nutritionData[7].nutrientid != 307) nutritionData.splice(7, 0, { nutrientid: '307', nutrientvalue: '0' } );
+      if (!nutritionData[8]) nutritionData.splice(8, 0, { nutrientid: '601', nutrientvalue: '0' } );
 
       const nutrients = {
         calories: nutritionData[3].nutrientvalue,
@@ -61,7 +62,7 @@ function ingredientNutrition (ingredientId) {
     }
     catch (error) {
       console.log('failed to collect nutritional data from database for ingredient with id:', ingredientId);
-      console.log('error:', error);
+      console.error('error:', error);
       reject('failed to collect nutrient data from database');
     }
   })
@@ -74,7 +75,7 @@ function conversionFactorList (ingredientId) {
     // get a list of all possible conversions from database
     const conversionData = await postgresConnection.query(`SELECT measureid, conversionfactorvalue FROM conversionfactor where foodid=${ingredientId}`);
 
-    let value, denominator, slashFound, unitStart;
+    let value, denominator, slashFound, unitStart, measureDescription;
     for(const conversion of conversionData.rows){
       value = "";
       denominator = "";
@@ -104,6 +105,20 @@ function conversionFactorList (ingredientId) {
         if(denominator) value = value/parseInt(denominator);
 
         conversionOptions.push({ measureId: conversion.measureid, unit: measureDescription.slice(unitStart), value: conversion.conversionfactorvalue / value, });
+      }
+    }
+
+    // remove any duplicate entries
+    for (let i = conversionOptions.length - 1;  i >= 0; i--) {
+      console.log("unit:", conversionOptions[i].unit)
+      if (conversionOptions[i].unit == 'g') { conversionOptions.splice(i, 1); }
+      else {
+        for(let j = i-1; j >=0; j--) {
+          if (conversionOptions[i].unit == conversionOptions[j].unit) {
+            conversionOptions.splice(j, 1);
+            j--;
+          }
+        }
       }
     }
 

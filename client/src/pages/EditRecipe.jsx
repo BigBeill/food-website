@@ -108,6 +108,11 @@ export default function NewEditRecipe ({userData}) {
   return <NoteBook pageList={pageList} />
 }
 
+
+
+
+
+
 function GeneralInfoPage ({newRecipe, title, setTitle, description, setDescription}) {
   return (
     <div className='standardPage'>
@@ -126,6 +131,11 @@ function GeneralInfoPage ({newRecipe, title, setTitle, description, setDescripti
   )
 }
 
+
+
+
+
+
 function ImagePage ({image, setImage}) {
   const imageOptions = ['🧀', '🥞', '🍗', '🍔','🍞', '🥯', '🥐','🥨','🍗','🥓','🥩','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🥚','🍳','🥘','🥣','🥗','🍿','🧂','🥫']
   return (
@@ -140,17 +150,22 @@ function ImagePage ({image, setImage}) {
   )
 }
 
+
+
+
+
+
 function IngredientPage ({ingredientList, setIngredientList}) {
-  const baseUnits = ['physical', 'milligrams', 'grams', 'pounds', 'ounces', 'liters', 'millimeters', 'cups', 'tablespoons']
  
-  const [newIngredient, setNewIngredient] = useState({_id:"", name:"", unit:"", amount:""})
-  const [unitsAvailable, setUnitsAvailable] = useState(baseUnits)
+  const [newIngredient, setNewIngredient] = useState({foodId:"", foodDescription:"", measureId:"", unit:"", amount:""})
+  const [conversionFactorsAvailable, setConversionFactorsAvailable] = useState([{ measureId: '1489', unit: 'g' }])
   const [ingredientsAvailable, setIngredientsAvailable] = useState([])
   const [availableId, setAvailableId] = useState(ingredientList.length)
   
   function updateNewIngredientName (value) {
-    setNewIngredient({...newIngredient, name: value})
-    if (newIngredient.name.length >= 3) { searchIngredients(value) }
+    setNewIngredient({...newIngredient, foodId:"", foodDescription: value});
+    if (value.length >= 3) searchIngredients(value);
+    else setIngredientsAvailable([]);
   }
 
   //fetch up to 10 ingredients from database that have similar names to value given
@@ -160,11 +175,21 @@ function IngredientPage ({ingredientList, setIngredientList}) {
     .catch(error => { console.error('unable to fetch ingredients:', error); });
   }
 
-  function ingredientSelected (foodId, foodDescription) {
+  function ingredientSelected (foodId) {
     axios({ method: 'get', url:`ingredient/details?foodId=${foodId}`})
     .then(response => {
+      setNewIngredient({ ...newIngredient, foodId, foodDescription: response.foodDescription });
+      setConversionFactorsAvailable([ ...response.conversionFactors, { measureId: '1489', unit: 'g' } ]);
+    });
 
-    })
+    setIngredientsAvailable([]);
+  }
+
+  function addIngredient () {
+    if (!newIngredient.foodId || !newIngredient.unit || !newIngredient.amount) return
+    setIngredientList([...ingredientList, {id: availableId, content: newIngredient} ]);
+    setAvailableId( availableId+1 );
+    setNewIngredient({foodId:"", foodDescription:"", unit:"", amount:""});
   }
 
   function removeIngredient (index) {
@@ -200,17 +225,17 @@ function IngredientPage ({ingredientList, setIngredientList}) {
         <label>New Ingredient</label>
         <div className='inputs'>
           <input type='number' value={newIngredient.amount} onChange={(event) => setNewIngredient({...newIngredient, amount: event.target.value})} placeholder='Amount'/>
-          <select value={newIngredient.unit} onChange={(event) => setNewIngredient({...newIngredient, unit: event.target.value})}>
+          <select value={newIngredient.unit} onChange={(event) => setNewIngredient({...newIngredient, measureId: event.target.id, unit: event.target.value})}>
             <option value="" disabled hidden className='light'>Units</option>
-            {unitsAvailable.map((unit, index) => (
-              <option key={index}>{unit}</option>
+            {conversionFactorsAvailable.map((conversionFactor, index) => (
+              <option key={index} id={conversionFactor.measureId}>{conversionFactor.unit}</option>
             ))}
           </select>
           <div className='activeSearchBar'> {/* ingredient search bar */}
-            <input type='text' className='mainInput' value={newIngredient.name} onChange={(event) => {updateNewIngredientName(event.target.value)}} placeholder='Ingredient Name'/>
+            <input type='text' className='mainInput' value={newIngredient.foodDescription} onChange={(event) => {updateNewIngredientName(event.target.value)}} placeholder='Ingredient Name'/>
             <ul className={`${ingredientsAvailable.length == 0 ? 'hidden' : ''}`}>
               {ingredientsAvailable.map(ingredient => (
-                <li key={ingredient.foodid} onClick={() => ingredientSelected(ingredient.foodid, ingredient.fooddescription)}> {ingredient.fooddescription} </li>
+                <li key={ingredient.foodid} onClick={() => ingredientSelected(ingredient.foodid)}> {ingredient.fooddescription} </li>
               ))}
             </ul>
           </div>
@@ -221,6 +246,11 @@ function IngredientPage ({ingredientList, setIngredientList}) {
     </div>
   )
 }
+
+
+
+
+
 
 function InstructionPage ({instructionList, setInstructionList}) {
   const [newInstruction, setNewInstruction] = useState('')
@@ -270,6 +300,11 @@ function InstructionPage ({instructionList, setInstructionList}) {
     </div>
   )
 }
+
+
+
+
+
 
 function SubmissionPage({submitRecipe}) {
   return (

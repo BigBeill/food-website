@@ -33,7 +33,7 @@ function checkAccessToken() {
    }
 }
 
-export default async function sendRequest( configuration ) {
+export default async function sendRequest( configuration, body ) {
    return new Promise(async (resolve, reject) => {
 
       // if refresh token exists and client needs a new access use the refresh api
@@ -47,9 +47,7 @@ export default async function sendRequest( configuration ) {
 
       try {
          // process the request
-         console.log("sending request to server:", configuration)
-         const response = await axiosInstance( configuration );
-         console.log("response from server:", response)
+         const response = await axiosInstance( configuration, body );
          return resolve(response.data);
       }
       catch (error) {

@@ -37,7 +37,7 @@ function Profile() {
         <div className="splitSpace">
           <UserPin userData={userData} />
           <div className="profileButtons">
-            <button>edit account -&gt; </button>
+            {/* <button>edit account -&t; </button> */}
             <button
               onClick={handleLogout}
 

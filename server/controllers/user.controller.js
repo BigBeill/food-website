@@ -2,6 +2,7 @@ const users = require("../models/user");
 const refreshTokens = require("../models/refreshToken");
 const { validPassword, genPassword } = require("../library/passwordUtils");
 const createToken = require("../config/jsonWebToken");
+const genPassword = require("../library/passwordUtils").genPassword;
 const { verify } = require("jsonwebtoken");
 require("dotenv").config();
 
@@ -74,7 +75,7 @@ exports.login = async (req, res) => {
   // make sure data provided is valid
   const user = await users.findOne(
     { username },
-    { _id: 1, username: 1, email: 1, hash: 1, salt: 1 }
+    { _id: 1, username: 1, email: 1, bio: 1, hash: 1, salt: 1 }
   );
   if (!user) {
     return res.status(400).json({ error: "username not found" });
@@ -132,4 +133,33 @@ exports.logout = async (req, res) => {
   res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
   res.status(200).json({ message: "success" });
+};
+
+exports.updateAccount = (req, res) => {
+  const { username, email, bio } = req.body;
+  //make sure username or email isn't already taken
+  if (username && users.findOne({ username })) {
+    return res.status(400).json({ error: "username already taken" });
+  }
+  if (email && users.findOne({ email })) {
+    return res.status(400).json({ error: "email already taken" });
+  }
+  // save user to database
+  users
+    .updateOne(
+      { _id: req.user._id },
+      {
+        $set: {
+          email: email,
+          username: username,
+          bio: bio,
+        },
+      }
+    )
+    .then((result) => {
+      // TODO : HERE
+      // MAC: I need the json token to update here so that after refreshing the page the profile will accurately display the *updated* user data
+      // currently after updating the user data it updates in the database but then after refreshing the page your changes are gone and dont come back until you logout and back in refreshing the token.
+      res.send(JSON.stringify({ message: "success", result: result }));
+    });
 };
