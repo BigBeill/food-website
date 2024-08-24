@@ -6,6 +6,9 @@ import axios from '../api/axios';
 const response = await axios({
    method: 'get',
    url: 'user/id'
+   data:{
+      //anything you want included in the body
+   }
 });
 */
 
@@ -33,7 +36,7 @@ function checkAccessToken() {
    }
 }
 
-export default async function sendRequest( configuration, body ) {
+export default async function sendRequest( configuration) {
    return new Promise(async (resolve, reject) => {
 
       // if refresh token exists and client needs a new access use the refresh api
@@ -47,12 +50,12 @@ export default async function sendRequest( configuration, body ) {
 
       try {
          // process the request
-         const response = await axiosInstance( configuration, body );
+         const response = await axiosInstance( configuration);
          return resolve(response.data);
       }
       catch (error) {
          console.error('issue processing request:', error);
-         return reject(error);
+         return reject(error.response.data);
       }
    })
 }

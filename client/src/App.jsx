@@ -22,8 +22,7 @@ function App() {
           collected: true
         });
       })
-      .catch((error) => {
-        console.error(error);
+      .catch(() => {
         setUserData({ collected: true });
       });
 

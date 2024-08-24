@@ -12,25 +12,16 @@ exports.register = async (req, res) => {
   const { username, email, password } = req.body;
 
   // check for missing data
-  if (!username) {
-    return res.status(400).json({ error: "no username provided" });
-  }
-  if (!email) {
-    return res.status(400).json({ error: "no email provided" });
-  }
-  if (!password) {
-    return res.status(400).json({ error: "no password provided" });
-  }
+  if (!username) return res.status(400).json({ error: "no username provided" });
+  if (!email) return res.status(400).json({ error: "no email provided" });
+  if (!password) return res.status(400).json({ error: "no password provided" });
 
   //make sure username or email isn't already taken
   const searchUsername = await users.findOne({ username });
-  if (searchUsername) {
-    return res.status(400).json({ error: "username already taken" });
-  }
+  if (searchUsername) return res.status(400).json({ error: "username already taken" });
+
   const searchEmail = await users.findOne({ email });
-  if (searchEmail) {
-    return res.status(400).json({ error: "email already taken" });
-  }
+  if (searchEmail) return res.status(400).json({ error: "email already taken" });
 
   const hashedPassword = genPassword(password);
   const newUser = {
@@ -96,9 +87,7 @@ exports.login = async (req, res) => {
   } catch (error) {
     console.error("error saving refresh token for user:", user);
     console.error(error);
-    return res
-      .status(500)
-      .json({ error: "server issue while saving refresh token" });
+    return res.status(500).json({ error: "server issue while saving refresh token" });
   }
 };
 

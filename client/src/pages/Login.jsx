@@ -1,5 +1,6 @@
 /* eslint-disable react/no-unknown-property */
 import React, { useRef, useState, useEffect } from 'react'
+import axios from '../api/axios'
 
 function Login() {
   const errorRef = useRef()
@@ -21,27 +22,15 @@ function Login() {
   function attemptLogin() {
 
 
-    if (!username) { setErrorMessage("no username given") }
-    else if (!password) { setErrorMessage("no password given") }
-    else {
-      const postRequest = {
-        method: 'POST',
-        headers: { 'Content-type': 'application/json; charset=UTF-8', },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-        })
-      }
-
-      fetch("server/user/login", postRequest)
-      .then(response => {
-        if (response.ok) { window.location.href = '/'; }
-        else { return response.json(); }
-      })
-      .then(data => {
-        if (data) { setErrorMessage(data.error); }
-      });
+    if (!username) setErrorMessage("no username given")
+    if (!password) return setErrorMessage("no password given")
+    const axiosBody = {
+      username,
+      password
     }
+    axios({method: 'post', url: 'user/login', data: axiosBody})
+    .then(() => { window.location.href = '/' })
+    .catch(response => { setErrorMessage(response.error) });
   }
 
   return (
