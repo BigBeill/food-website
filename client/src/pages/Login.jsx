@@ -1,9 +1,11 @@
 /* eslint-disable react/no-unknown-property */
 import React, { useRef, useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom';
 import axios from '../api/axios'
 
 function Login() {
   const errorRef = useRef()
+  const navigate = useNavigate();
 
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
@@ -21,15 +23,12 @@ function Login() {
 
   function attemptLogin() {
 
+    if (!username) return setErrorMessage("no username given");
+    if (!password) return setErrorMessage("no password given");
 
-    if (!username) setErrorMessage("no username given")
-    if (!password) return setErrorMessage("no password given")
-    const axiosBody = {
-      username,
-      password
-    }
-    axios({method: 'post', url: 'user/login', data: axiosBody})
-    .then(() => { window.location.href = '/' })
+    const userData = { username, password };
+    axios({method: 'post', url: 'user/login', data: userData})
+    .then(() => { navigate('/'); })
     .catch(response => { setErrorMessage(response.error) });
   }
 

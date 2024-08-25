@@ -27,42 +27,35 @@ export default function NewEditRecipe ({userData}) {
   useEffect (() => {
     // if recipe exists, populate this page with recipes data from server
     if (recipeId) {
-      fetch('/server/recipe/data?_id=' + recipeId)
-      .then (response => response.json())
-      .then (data => {
-        setTitle(data.title)
-        setDescription(data.description)
-        setImage(data.image)
-        setIngredientList(assignIds(data.ingredients))
-        setInstructionList(assignIds(data.instructions))
+      axios({ method:'get', url:`recipe/data?_id=${recipeId}` })
+      .then (response => {
+        setTitle(response.title);
+        setDescription(response.description);
+        setImage(response.image);
+        setIngredientList(assignIds(response.ingredients));
+        setInstructionList(assignIds(response.instructions));
       })
-      .catch((error) => { console.error(error.message) })
+      .catch(console.error);
     }
   },[])
 
   function submitRecipe(){
     let method
-    if (!recipeId) { method = 'POST' }
-    else { method = 'PUT' }
+    if (!recipeId) { method = 'posts' }
+    else { method = 'put' }
 
-    const serverRequest = {
-      method: method,
-      headers: { 'Content-type': 'application/json; charset=UTF-8', },
-      body: JSON.stringify({
-        id: recipeId,
-        title: title,
-        description: description,
-        image: image,
-        ingredients: removeIds(ingredientList),
-        instructions: removeIds(instructionList)
-      })
+    const recipeData = {
+      id: recipeId,
+      title: title,
+      description: description,
+      image: image,
+      ingredients: removeIds(ingredientList),
+      instructions: removeIds(instructionList)
     }
-    fetch('/server/recipe/edit', serverRequest)
-    .then((response) => {
-      if (!response.ok) { throw new Error(`HTTP error, status: ${response.status}`) }
-      navigate('/') 
-    })
-    .catch((error) => { console.error('server failed to save recipe:', error) })
+
+    axios({ method:method, url:'recipe/edit', data: recipeData })
+    .then(() => { navigate('/'); })
+    .catch(console.error);
   }
 
   const pageList = [

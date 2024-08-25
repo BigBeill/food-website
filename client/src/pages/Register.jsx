@@ -20,31 +20,30 @@ function Register() {
   }, [username, email, passwordOne, passwordTwo])
 
   function attemptRegister() {
-    if (!username) { setErrorMessage("no username given") }
-    else if (!email) { setErrorMessage("no email given") }
-    else if (!passwordOne) { setErrorMessage("no password given") }
-    else if (passwordOne != passwordTwo) { setErrorMessage("passwords don't match") }
-    else {
 
-      const postRequest = {
-        method: 'POST',
-        headers: { 'Content-type': 'application/json; charset=UTF-8', },
-        body: JSON.stringify({
-          username: username,
-          email: email,
-          password: passwordOne,
-        })
-      }
+    if (!username) return setErrorMessage("no username given");
+    if (!email) return setErrorMessage("no email given");
+    if (!passwordOne) return setErrorMessage("no password given");
+    if (passwordOne != passwordTwo) return setErrorMessage("passwords don't match");
 
-      fetch("server/user/register", postRequest)
-      .then(response => {
-        if (response.ok) { window.location.href = '/';  }
-        else { return response.json(); }
-      })
-      .then(data => {
-        if(data) { setErrorMessage(data.error); }
+    const postRequest = {
+      method: 'POST',
+      headers: { 'Content-type': 'application/json; charset=UTF-8', },
+      body: JSON.stringify({
+        username: username,
+        email: email,
+        password: passwordOne,
       })
     }
+
+    fetch("server/user/register", postRequest)
+    .then(response => {
+      if (response.ok) { window.location.href = '/';  }
+      else { return response.json(); }
+    })
+    .then(data => {
+      if(data) { setErrorMessage(data.error); }
+    })
   }
 
   return (
