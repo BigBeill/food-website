@@ -1,8 +1,10 @@
-/* eslint-disable react/no-unknown-property */
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from '../api/axios';
 
 function Register() {
   const errorRef = useRef();
+  const navigate = useNavigate();
 
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
@@ -26,24 +28,10 @@ function Register() {
     if (!passwordOne) return setErrorMessage("no password given");
     if (passwordOne != passwordTwo) return setErrorMessage("passwords don't match");
 
-    const postRequest = {
-      method: 'POST',
-      headers: { 'Content-type': 'application/json; charset=UTF-8', },
-      body: JSON.stringify({
-        username: username,
-        email: email,
-        password: passwordOne,
-      })
-    }
-
-    fetch("server/user/register", postRequest)
-    .then(response => {
-      if (response.ok) { window.location.href = '/';  }
-      else { return response.json(); }
-    })
-    .then(data => {
-      if(data) { setErrorMessage(data.error); }
-    })
+    const userData = { username, email, password:passwordOne };
+    axios({ method:'post', url:'user/register', data: userData })
+    .then(() => { navigate('/'); })
+    .catch(response => { setErrorMessage(response.error); });
   }
 
   return (
