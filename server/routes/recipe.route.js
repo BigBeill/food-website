@@ -1,8 +1,6 @@
 const router = require("express").Router();
 const recipeController = require("../controllers/recipe.controller");
-const recipes = require("../models/recipe")
-const users = require("../models/user")
-const createRecipeSchema = require("../library/validSchemaUtils").createRecipeSchema
+const recipes = require("../models/recipe");
 
 
 
