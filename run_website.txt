@@ -3,9 +3,7 @@
 REM change file path and save as .bat
 
 cd C:\Users\your_file_path\git_repository\client
-npm run client
+start cmd /k "npm run client"
 
-start cmd /k "cd ../server"
-npm run server
-
-pause
+cd ../server
+start cmd /k "npm run server"
