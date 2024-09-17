@@ -28,7 +28,10 @@ function Login() {
 
     const userData = { username, password };
     axios({method: 'post', url: 'user/login', data: userData})
-    .then(() => { navigate('/'); })
+    .then(() => { 
+      navigate('/');
+      window.location.reload();
+    })
     .catch(response => { setErrorMessage(response.error) });
   }
 

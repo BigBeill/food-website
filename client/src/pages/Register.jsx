@@ -30,7 +30,10 @@ function Register() {
 
     const userData = { username, email, password:passwordOne };
     axios({ method:'post', url:'user/register', data: userData })
-    .then(() => { navigate('/'); })
+    .then(() => { 
+      navigate('/');
+      window.location.reload();
+    })
     .catch(response => { setErrorMessage(response.error); });
   }
 

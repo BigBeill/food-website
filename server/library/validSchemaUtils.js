@@ -47,9 +47,9 @@ function createRecipeSchema (recipe) {
     //check for any missing data (reject promise if found)
     for (let index in validData) { 
       if (!validData[index]) { 
-        console.log("failed to create recipe schema:", validData)
-        reject("invalid data provided:", validData)
-        return 
+        console.log("failed to create recipe schema:", validData);
+        reject("invalid data provided:", validData);
+        return;
       }
     }
 
@@ -59,13 +59,14 @@ function createRecipeSchema (recipe) {
       validData.ingredients = true;
     }
     catch (error) {
-      console.log("failed to collect nutrition data:", error);
+      console.error("failed to collect nutrition data:", error);
       reject("Issue getting nutrition value for ingredients:", schema.ingredients);
       return;
     }
 
     //if no data is missing, return schema
-    console.log("successfully created recipe schema.");
+    console.log("successfully created recipe schema...");
+    console.log(schema);
     resolve(schema);
   })
 }

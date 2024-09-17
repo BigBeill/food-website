@@ -206,7 +206,7 @@ function IngredientPage ({ingredientList, setIngredientList}) {
               {(item.content.unit == 'physical') ? (
                 <p>{item.content.amount} {item.content.name}{item.content.amount != 1 ? 's' : ''}</p>
               ):(
-              <p>{item.content.amount} {item.content.unit}{item.content.amount != 1 ? 's' : ''} of {item.content.name}</p>
+              <p>{item.content.amount} {item.content.unit}{item.content.amount != 1 ? 's' : ''} of {item.content.foodDescription}</p>
               )}
             </div>
           </Reorder.Item>

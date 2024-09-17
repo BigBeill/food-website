@@ -110,13 +110,12 @@ function conversionFactorList (ingredientId) {
 
     // remove any duplicate entries
     for (let i = conversionOptions.length - 1;  i >= 0; i--) {
-      console.log("unit:", conversionOptions[i].unit)
-      if (conversionOptions[i].unit == 'g') { conversionOptions.splice(i, 1); }
+      if (conversionOptions[i].unit == 'g') conversionOptions.splice(i, 1);
       else {
         for(let j = i-1; j >=0; j--) {
           if (conversionOptions[i].unit == conversionOptions[j].unit) {
             conversionOptions.splice(j, 1);
-            j--;
+            i--;
           }
         }
       }
