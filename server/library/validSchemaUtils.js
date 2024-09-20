@@ -2,7 +2,7 @@ const mongoConnection = require('../config/connectMongo')
 const { ObjectId } = require('mongodb');
 const { ingredientListNutrition } = require('./canadianNutrientFileUtils')
 
-function createRecipeSchema (recipe) {
+function createRecipeSchema (recipe, userId) {
 
   return new Promise ( async (resolve, reject) => {
 
@@ -10,7 +10,7 @@ function createRecipeSchema (recipe) {
 
     // create schema
     let schema = {
-      owner: recipe.owner,
+      owner: userId,
       title: recipe.title,
       description: recipe.description,
       image: recipe.image,
@@ -48,7 +48,7 @@ function createRecipeSchema (recipe) {
     for (let index in validData) { 
       if (!validData[index]) { 
         console.log("failed to create recipe schema:", validData);
-        reject("invalid data provided:", validData);
+        reject({status: 400, error: "recipe is missing valid " + index + " field." });
         return;
       }
     }

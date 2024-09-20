@@ -24,7 +24,7 @@ exports.packageIncoming = async (req, res, next) => {
    const { title, description, image, ingredients, instructions } = req.body;
    const clientRecipeData = { title, description, image, ingredients, instructions };
 
-   createRecipeSchema(clientRecipeData)
+   createRecipeSchema(clientRecipeData, req.user._id)
    .then(response => {
       req.recipeSchema = response;
       next();

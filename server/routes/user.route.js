@@ -8,12 +8,8 @@ const userController = require("../controllers/user.controller");
 // route will:
 //   return data for user that is currently logged in
 router.get("/info", (req, res) => {
-  if (req.user) {
-    console.log(req.user);
-    return res.status(200).json(req.user);
-  } else {
-    return res.status(401).json({ error: "user not signed in" });
-  }
+  if (req.user) return res.status(200).json(req.user);
+  else return res.status(401).json({ error: "user not signed in" });
 });
 
 // takes 2 arguments from url:

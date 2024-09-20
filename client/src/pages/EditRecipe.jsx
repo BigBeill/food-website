@@ -41,7 +41,7 @@ export default function NewEditRecipe ({userData}) {
 
   function submitRecipe(){
     let method
-    if (!recipeId) { method = 'posts' }
+    if (!recipeId) { method = 'post' }
     else { method = 'put' }
 
     const recipeData = {

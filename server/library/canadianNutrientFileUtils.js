@@ -125,6 +125,8 @@ function conversionFactorList (ingredientId) {
   });
 }
 
-module.exports.ingredientNutrition = ingredientNutrition;
-module.exports.ingredientListNutrition = ingredientListNutrition;
-module.exports.conversionFactorList = conversionFactorList;
+module.exports = {
+  ingredientNutrition,
+  ingredientListNutrition,
+  conversionFactorList
+}
