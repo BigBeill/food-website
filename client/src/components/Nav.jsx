@@ -33,36 +33,36 @@ function Nav({userData}) {
 
 
             <h3>Find Recipes</h3>
-            <NavLink className="navLink" to="/">Public</NavLink>
-            <NavLink className="navLink" to="/index">Following</NavLink>
-            <NavLink className="navLink" to="/index">Search</NavLink>
+            <NavLink className="navLink" to="/" onClick={() => setOpen(false)}>Public</NavLink>
+            <NavLink className="navLink" to="/index" onClick={() => setOpen(false)}>Following</NavLink>
+            <NavLink className="navLink" to="/index" onClick={() => setOpen(false)}>Search</NavLink>
 
             {   
                 userData._id ?
                 <>
 
                 <h3>Your Recipes</h3>
-                <NavLink className="navLink" to="/recipeBook">Personal</NavLink>
-                <NavLink className="navLink" to="/index">Saved</NavLink>
-                <NavLink className="navLink" to="/editRecipe">New Recipe</NavLink>
+                <NavLink className="navLink" to="/recipeBook" onClick={() => setOpen(false)}>Personal</NavLink>
+                <NavLink className="navLink" to="/index" onClick={() => setOpen(false)}>Saved</NavLink>
+                <NavLink className="navLink" to="/editRecipe" onClick={() => setOpen(false)}>New Recipe</NavLink>
 
                 <h3>Social</h3>
-                <NavLink className="navLink" to="/friendsList">Friends</NavLink>
+                <NavLink className="navLink" to="/friendsList" onClick={() => setOpen(false)}>Friends</NavLink>
 
                 <h3>Account</h3>
-                <NavLink className="navLink" to="/profile">Profile</NavLink>
+                <NavLink className="navLink" to="/profile" onClick={() => setOpen(false)}>Profile</NavLink>
                 
                 </> : <>
                 
                 <h3>Account</h3>
-                <NavLink className="navLink" to="/login">Login</NavLink>
-                <NavLink className="navLink" to="/register">Create Account</NavLink>
+                <NavLink className="navLink" to="/login" onClick={() => setOpen(false)}>Login</NavLink>
+                <NavLink className="navLink" to="/register" onClick={() => setOpen(false)}>Create Account</NavLink>
                 
                 </>
             }
 
             <h3>Info</h3>
-            <NavLink className="navLink" to="/ingredients">Ingredients List</NavLink>
+            <NavLink className="navLink" to="/ingredients" onClick={() => setOpen(false)}>Ingredients List</NavLink>
 
             <div className='navButton' onClick={openNav}/>
 
