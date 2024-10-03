@@ -2,6 +2,25 @@ const mongoConnection = require('../config/connectMongo')
 const { ObjectId } = require('mongodb');
 const { ingredientListNutrition } = require('./canadianNutrientFileUtils')
 
+
+
+/*
+takes recipe information, makes sure all information provided is valid, and adds nutritional information 
+
+expected input:
+  recipe = {
+    title: string,
+    description: string,
+    image: string,
+    ingredients: [{
+      foodId: int;
+      measureId: int,
+      amount: int
+    }],
+    instructions: [ string ]
+  }
+  userId = int
+*/
 function createRecipeSchema (recipe, userId) {
 
   return new Promise ( async (resolve, reject) => {

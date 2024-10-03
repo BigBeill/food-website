@@ -17,7 +17,7 @@ exports.details = async (req, res) => {
    ingredientData.foodDescription = ingredientName.rows[0].fooddescription;
 
    // get ingredients nutritional value (per 100 grams)
-   ingredientData.nutrition = await ingredientNutrition(foodId);
+   ingredientData.nutrition = await ingredientNutrition({foodId});
 
    // get all possible conversion values for ingredient
    ingredientData.conversionFactors = await conversionFactorList(foodId);

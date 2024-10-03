@@ -1,12 +1,27 @@
 const postgresConnection = require('../config/postgres');
 
+/*
+accepts a list of ingredients and calculates there nutritional value
+
+expected input:
+
+  ingredientList = [
+    ingredient: {
+      foodId: int
+      measureId: int
+      amount: int
+    }
+  ]
+*/
+
 function ingredientListNutrition (ingredientList) {
   return new Promise( async (resolve, reject) => {
     try {
       let totalNutrients = { calories: 0, fat: 0, cholesterol: 0, sodium: 0, potassium: 0, carbohydrates: 0, fibre: 0, sugar: 0, protein: 0 };
 
       for (const ingredient of ingredientList) {
-        const nutritionData = await ingredientNutrition(ingredient.foodId);
+        const nutritionData = await ingredientNutrition(ingredient);
+
         totalNutrients.calories += nutritionData.calories;
         totalNutrients.fat += nutritionData.fat;
         totalNutrients.cholesterol += nutritionData.cholesterol;
@@ -28,103 +43,164 @@ function ingredientListNutrition (ingredientList) {
   })
 }
 
-function ingredientNutrition (ingredientId) {
+/*
+accepts an ingredient and calculates its nutritional value
+
+expected input: 
+  ingredient = {
+    foodId: int
+    measureId: int (optional: assume measurement is 100g if none provided)
+    amount: int (optional assuming measureId is not provided, otherwise required)
+  }
+*/
+function ingredientNutrition (ingredient) {
   return new Promise( async (resolve, reject) => {
+    let nutrients;
+    console.log(ingredient)
+
+    // collect base ingredient nutrition value (100g)
     try {
 
       const query = `SELECT nutrientid, nutrientvalue FROM nutrientamount WHERE foodid = $1 AND nutrientid IN (203, 204, 205, 208, 269, 291, 306, 307, 601) ORDER BY nutrientid;`;
-      const values = [ingredientId];
+      const values = [ingredient.foodId];
       const data = await postgresConnection.query(query, values);
+      let nutritionData = data.rows;
 
       // if any data is missing, set it to 0
-      let nutritionData = data.rows;
-      if (nutritionData[0].nutrientid != 203) nutritionData.splice(0, 0, { nutrientid: '203', nutrientvalue: '0' } );
-      if (nutritionData[1].nutrientid != 204) nutritionData.splice(1, 0, { nutrientid: '204', nutrientvalue: '0' } );
-      if (nutritionData[2].nutrientid != 205) nutritionData.splice(2, 0, { nutrientid: '205', nutrientvalue: '0' } );
-      if (nutritionData[3].nutrientid != 208) nutritionData.splice(3, 0, { nutrientid: '208', nutrientvalue: '0' } );
-      if (nutritionData[4].nutrientid != 269) nutritionData.splice(4, 0, { nutrientid: '269', nutrientvalue: '0' } );
-      if (nutritionData[5].nutrientid != 291) nutritionData.splice(5, 0, { nutrientid: '291', nutrientvalue: '0' } );
-      if (nutritionData[6].nutrientid != 306) nutritionData.splice(6, 0, { nutrientid: '306', nutrientvalue: '0' } );
-      if (nutritionData[7].nutrientid != 307) nutritionData.splice(7, 0, { nutrientid: '307', nutrientvalue: '0' } );
-      if (!nutritionData[8]) nutritionData.splice(8, 0, { nutrientid: '601', nutrientvalue: '0' } );
-
-      const nutrients = {
-        calories: nutritionData[3].nutrientvalue,
-        fat: nutritionData[1].nutrientvalue,
-        cholesterol: nutritionData[8].nutrientvalue,
-        sodium: nutritionData[7].nutrientvalue,
-        potassium: nutritionData[6].nutrientvalue,
-        carbohydrates: nutritionData[2].nutrientvalue,
-        fibre: nutritionData[5].nutrientvalue,
-        sugar: nutritionData[4].nutrientvalue,
-        protein: nutritionData[0].nutrientvalue
+      {
+        if (nutritionData[0].nutrientid != 203) nutritionData.splice(0, 0, { nutrientid: '203', nutrientvalue: '0' } );
+        if (nutritionData[1].nutrientid != 204) nutritionData.splice(1, 0, { nutrientid: '204', nutrientvalue: '0' } );
+        if (nutritionData[2].nutrientid != 205) nutritionData.splice(2, 0, { nutrientid: '205', nutrientvalue: '0' } );
+        if (nutritionData[3].nutrientid != 208) nutritionData.splice(3, 0, { nutrientid: '208', nutrientvalue: '0' } );
+        if (nutritionData[4].nutrientid != 269) nutritionData.splice(4, 0, { nutrientid: '269', nutrientvalue: '0' } );
+        if (nutritionData[5].nutrientid != 291) nutritionData.splice(5, 0, { nutrientid: '291', nutrientvalue: '0' } );
+        if (nutritionData[6].nutrientid != 306) nutritionData.splice(6, 0, { nutrientid: '306', nutrientvalue: '0' } );
+        if (nutritionData[7].nutrientid != 307) nutritionData.splice(7, 0, { nutrientid: '307', nutrientvalue: '0' } );
+        if (!nutritionData[8]) nutritionData.splice(8, 0, { nutrientid: '601', nutrientvalue: '0' } );
       }
-      resolve(nutrients);
+
+      // put all values into a json file as parseInts
+      nutrients = {
+        calories: parseInt(nutritionData[3].nutrientvalue),
+        fat: parseInt(nutritionData[1].nutrientvalue),
+        cholesterol: parseInt(nutritionData[8].nutrientvalue),
+        sodium: parseInt(nutritionData[7].nutrientvalue),
+        potassium: parseInt(nutritionData[6].nutrientvalue),
+        carbohydrates: parseInt(nutritionData[2].nutrientvalue),
+        fibre: parseInt(nutritionData[5].nutrientvalue),
+        sugar: parseInt(nutritionData[4].nutrientvalue),
+        protein: parseInt(nutritionData[0].nutrientvalue)
+      }
 
     }
     catch (error) {
-      console.log('failed to collect nutritional data from database for ingredient with id:', ingredientId);
+      console.log('failed to collect nutritional data from database for ingredient:', ingredient);
       console.error('error:', error);
       reject('failed to collect nutrient data from database');
     }
+
+    // if measureId is provided, calculate nutrition value after applying conversions
+    try {
+      if (ingredient.measureId){
+        //get the standard conversion rate for item
+        const query = `SELECT conversionfactorvalue FROM conversionfactor WHERE foodid = $1 AND measureid = $2 LIMIT 1`;
+        const values = [ingredient.foodId, ingredient.measureId];
+        const data = await postgresConnection.query(query, values);
+        let conversionFactorValue = parseInt(data.rows[0]);
+
+        // apply conversionFactorValue to each item in nutrition
+        for (let item in nutrition) {
+          nutrients[item] = (nutrients[item]/100) * conversionFactorValue * ingredient.amount;
+        }
+      }
+    }
+    catch (error) {
+      console.log('failed to convert nutritional value for ingredient:', ingredient);
+      console.error('error:', error);
+      reject('failed to convert nutritional value');
+    }
+
+    resolve(nutrients);
   })
 }
 
 function conversionFactorList (ingredientId) {
   return new Promise( async (resolve, reject) => {
-    let conversionOptions = [];
- 
-    // get a list of all possible conversions from database
-    const conversionData = await postgresConnection.query(`SELECT measureid, conversionfactorvalue FROM conversionfactor where foodid=${ingredientId}`);
+    // accumulate a list of every posable conversion and there values for provided ingredient
+    try {
+      let conversionOptions = [];
+  
+      // get a list of all possible conversions from database
+      const conversionData = await postgresConnection.query(`SELECT measureid, conversionfactorvalue FROM conversionfactor where foodid=${ingredientId}`);
 
-    let value, denominator, slashFound, unitStart, measureDescription;
-    for(const conversion of conversionData.rows){
-      value = "";
-      denominator = "";
-      slashFound = false;
-      unitStart = 0;
+      //go though all items in list of possible conversions and collect more detailed information
+      for(const conversion of conversionData.rows){
+        // get more detailed information about conversion from database
+        const query = `SELECT measuredescription FROM measurename WHERE measureid = $1 LIMIT 1`;
+        const values = [conversion.measureId];
+        const data = await postgresConnection.query(query, values);
 
-
-      const measureData = await postgresConnection.query(`SELECT measuredescription FROM measurename WHERE measureid=${conversion.measureid}`);
-      if (measureData.rows[0]){
-        measureDescription = measureData.rows[0].measuredescription;
-
-        // go through each character in the string until final number is found
-        for (let i = 0; i < measureDescription.length; i++) {
-          if ( (!isNaN(measureDescription[i]) && measureDescription[i].trim() !== '') || measureDescription[i] == ".") {
-            if(!slashFound) value += measureDescription[i];
-            else denominator += measureDescription[i];
-          } 
-          else if (measureDescription[i] == "/") slashFound = true;
-          else{
-            if (measureDescription[i] == " ") unitStart = i + 1;
-            else unitStart = i;
-            break;
-          }
+        // if conversion is found add to conversionOptions arrays
+        if (data.rows[0]){
+          const brokenString = breakupMeasureDescription(data.rows[0].measuredescription);
+          conversionOptions.push({ measureId: conversion.measureid, unit: brokenString.string, value: conversion.conversionfactorvalue / brokenString.integer, });
         }
-
-        value = parseInt(value);
-        if(denominator) value = value/parseInt(denominator);
-
-        conversionOptions.push({ measureId: conversion.measureid, unit: measureDescription.slice(unitStart), value: conversion.conversionfactorvalue / value, });
       }
-    }
 
-    // remove any duplicate entries
-    for (let i = conversionOptions.length - 1;  i >= 0; i--) {
-      if (conversionOptions[i].unit == 'g') conversionOptions.splice(i, 1);
-      else {
-        for(let j = i-1; j >=0; j--) {
-          if (conversionOptions[i].unit == conversionOptions[j].unit) {
-            conversionOptions.splice(j, 1);
-            i--;
+      // remove any duplicate entries from conversionOptions array
+      for (let i = conversionOptions.length - 1;  i >= 0; i--) {
+        if (conversionOptions[i].unit == 'g') conversionOptions.splice(i, 1);
+        else {
+          for(let j = i-1; j >=0; j--) {
+            if (conversionOptions[i].unit == conversionOptions[j].unit) {
+              conversionOptions.splice(j, 1);
+              i--;
+            }
           }
         }
       }
-    }
 
     resolve (conversionOptions);
+    }
+    catch (error) {
+      console.error("error:", error);
+      reject('failed to collect conversion information from database');
+    }
   });
+}
+
+/*
+accepts a string starting with a number and breaks it into an int and string
+example:
+  input: "12345 testing"
+  output: { 12345, "testing" }
+*/
+function breakupMeasureDescription(measureDescription) {
+  let integer = "";
+  let denominator = "";
+  let slashFound = false;
+  let unitStart = 0;
+
+  // go through each number in the string until a character is found
+  for (let i = 0; i < measureDescription.length; i++) {
+    if ( (!isNaN(measureDescription[i]) && measureDescription[i].trim() !== '') || measureDescription[i] == ".") {
+      if(!slashFound) integer += measureDescription[i];
+      else denominator += measureDescription[i];
+    } 
+    else if (measureDescription[i] == "/") slashFound = true;
+    else{
+      if (measureDescription[i] == " ") unitStart = i + 1;
+      else unitStart = i;
+      break;
+    }
+  }
+
+  integer = parseInt(integer);
+  if(denominator) integer = integer/parseInt(denominator);
+
+  const string =  measureDescription.slice(unitStart);
+
+  return { integer, string }
 }
 
 module.exports = {
