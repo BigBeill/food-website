@@ -1,19 +1,19 @@
 const postgresConnection = require('../config/postgres');
 
-function ingredientListNutrition (ingredientIDList) {
+function ingredientListNutrition (ingredientList) {
   return new Promise( async (resolve, reject) => {
     try {
       let totalNutrients = { calories: 0, fat: 0, cholesterol: 0, sodium: 0, potassium: 0, carbohydrates: 0, fibre: 0, sugar: 0, protein: 0 };
 
-      for (const ingredientID of ingredientIDList) {
-        const nutritionData = await ingredientNutrition(ingredientID);
+      for (const ingredient of ingredientList) {
+        const nutritionData = await ingredientNutrition(ingredient.foodId);
         totalNutrients.calories += nutritionData.calories;
         totalNutrients.fat += nutritionData.fat;
         totalNutrients.cholesterol += nutritionData.cholesterol;
         totalNutrients.sodium += nutritionData.sodium;
         totalNutrients.potassium += nutritionData.potassium;
         totalNutrients.carbohydrates += nutritionData.carbohydrates;
-        totalNutrients.fibre += nutritionData.fiber;
+        totalNutrients.fibre += nutritionData.fibre;
         totalNutrients.sugar += nutritionData.sugar;
         totalNutrients.protein += nutritionData.protein;
       };
@@ -32,8 +32,10 @@ function ingredientNutrition (ingredientId) {
   return new Promise( async (resolve, reject) => {
     try {
 
-      const data = await postgresConnection.query(`SELECT nutrientid, nutrientvalue FROM nutrientamount WHERE foodid = ${ingredientId} AND nutrientid IN (203, 204, 205, 208, 269, 291, 306, 307, 601) ORDER BY nutrientid;`);
-      
+      const query = `SELECT nutrientid, nutrientvalue FROM nutrientamount WHERE foodid = $1 AND nutrientid IN (203, 204, 205, 208, 269, 291, 306, 307, 601) ORDER BY nutrientid;`;
+      const values = [ingredientId];
+      const data = await postgresConnection.query(query, values);
+
       // if any data is missing, set it to 0
       let nutritionData = data.rows;
       if (nutritionData[0].nutrientid != 203) nutritionData.splice(0, 0, { nutrientid: '203', nutrientvalue: '0' } );

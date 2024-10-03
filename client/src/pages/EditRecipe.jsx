@@ -149,7 +149,7 @@ function ImagePage ({image, setImage}) {
 
 
 function IngredientPage ({ingredientList, setIngredientList}) {
- 
+
   const [newIngredient, setNewIngredient] = useState({foodId:"", foodDescription:"", measureId:"", unit:"", amount:""})
   const [conversionFactorsAvailable, setConversionFactorsAvailable] = useState([{ measureId: '1489', unit: 'g' }])
   const [ingredientsAvailable, setIngredientsAvailable] = useState([])
@@ -171,7 +171,7 @@ function IngredientPage ({ingredientList, setIngredientList}) {
   function ingredientSelected (foodId) {
     axios({ method: 'get', url:`ingredient/details?foodId=${foodId}`})
     .then(response => {
-      setNewIngredient({ ...newIngredient, foodId, foodDescription: response.foodDescription });
+      setNewIngredient({ ...newIngredient, foodId, foodDescription: response.foodDescription});
       setConversionFactorsAvailable([ ...response.conversionFactors, { measureId: '1489', unit: 'g' } ]);
     });
 
@@ -218,7 +218,7 @@ function IngredientPage ({ingredientList, setIngredientList}) {
         <label>New Ingredient</label>
         <div className='inputs'>
           <input type='number' value={newIngredient.amount} onChange={(event) => setNewIngredient({...newIngredient, amount: event.target.value})} placeholder='Amount'/>
-          <select value={newIngredient.unit} onChange={(event) => setNewIngredient({...newIngredient, measureId: event.target.id, unit: event.target.value})}>
+          <select value={newIngredient.unit} onChange={(event) => setNewIngredient({...newIngredient, measureId: event.target.options[event.target.selectedIndex].id, unit: event.target.value})} >
             <option value="" disabled hidden className='light'>Units</option>
             {conversionFactorsAvailable.map((conversionFactor, index) => (
               <option key={index} id={conversionFactor.measureId}>{conversionFactor.unit}</option>

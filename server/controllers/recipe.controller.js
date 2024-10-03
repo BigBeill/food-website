@@ -1,5 +1,6 @@
 const { createRecipeSchema } = require("../library/validSchemaUtils");
 const recipes = require("../models/recipe");
+const users = require("../models/user");
 
 exports.data = async (req, res) => {
    const _id = req.query._id
@@ -54,6 +55,7 @@ exports.add = async (req, res) => {
       return res.status(201).json({ response: 'new recipe created', newObject: newRecipe });
    })
    .catch ((error) => { 
+      console.error(error);
       return res.status(500).json({error: 'failed to save new recipe in database:' + error });
    });
 }

@@ -32,8 +32,19 @@ function createRecipeSchema (recipe, userId) {
     if(schema.title && schema.title.length >= 3 && schema.title.length <= 60) validData.title = true;
     if(schema.description && schema.description.length >= 10 && schema.description.length <= 200) validData.description = true;
     if(schema.image) validData.image = true;
-    if(schema.ingredients && schema.ingredients.length >= 1 && schema.ingredients.length <= 100) validData.ingredients = true;
 
+    //make sure all provided ingredients are valid
+    if(schema.ingredients && schema.ingredients.length >= 1 && schema.ingredients.length <= 100){
+      let key = true;
+      schema.ingredients.forEach(ingredient => {
+        if (!ingredient.foodId) key = false;
+        if (!ingredient.measureId) key = false;
+        if (!ingredient.amount) key = false;
+      })
+      validData.ingredients = key;
+    }
+
+    // make sure all provided instructions are valid
     if(schema.instructions && schema.instructions.length >= 1 && schema.instructions.length <= 100) {
       let key = true
       schema.instructions.forEach(instruction => {
