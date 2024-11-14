@@ -172,7 +172,7 @@ function IngredientPage ({ingredientList, setIngredientList}) {
     axios({ method: 'get', url:`ingredient/details?foodId=${foodId}`})
     .then(response => {
       setNewIngredient({ ...newIngredient, foodId, foodDescription: response.foodDescription});
-      setConversionFactorsAvailable([ ...response.conversionFactors, { measureId: '1489', unit: 'g' } ]);
+      setConversionFactorsAvailable([ ...response.conversionFactors, { measureId: '1455', unit: 'g' } ]);
     });
 
     setIngredientsAvailable([]);

@@ -7,15 +7,28 @@ expected input:
 
   ingredientList = [
     ingredient: {
-      foodId: int
-      measureId: int
+      foodId: int,
+      measureId: int,
       amount: int
     }
   ]
-*/
 
+returns:
+  {
+    calories: int,
+    fat: int,
+    cholesterol: int,
+    sodium: int,
+    potassium: int,
+    carbohydrates: int,
+    fibre: int,
+    sugar: int,
+    protein: int
+  }  
+*/
 function ingredientListNutrition (ingredientList) {
   return new Promise( async (resolve, reject) => {
+
     try {
       let totalNutrients = { calories: 0, fat: 0, cholesterol: 0, sodium: 0, potassium: 0, carbohydrates: 0, fibre: 0, sugar: 0, protein: 0 };
 
@@ -40,6 +53,7 @@ function ingredientListNutrition (ingredientList) {
       console.error(error)
       reject('failed to collect nutrient data from database');
     }
+
   })
 }
 
@@ -52,11 +66,23 @@ expected input:
     measureId: int (optional: assume measurement is 100g if none provided)
     amount: int (optional assuming measureId is not provided, otherwise required)
   }
+
+returns:
+  {
+    calories: int,
+    fat: int,
+    cholesterol: int,
+    sodium: int,
+    potassium: int,
+    carbohydrates: int,
+    fibre: int,
+    sugar: int,
+    protein: int
+  }
 */
 function ingredientNutrition (ingredient) {
   return new Promise( async (resolve, reject) => {
     let nutrients;
-    console.log(ingredient)
 
     // collect base ingredient nutrition value (100g)
     try {
@@ -102,16 +128,33 @@ function ingredientNutrition (ingredient) {
     // if measureId is provided, calculate nutrition value after applying conversions
     try {
       if (ingredient.measureId){
-        //get the standard conversion rate for item
-        const query = `SELECT conversionfactorvalue FROM conversionfactor WHERE foodid = $1 AND measureid = $2 LIMIT 1`;
-        const values = [ingredient.foodId, ingredient.measureId];
-        const data = await postgresConnection.query(query, values);
-        let conversionFactorValue = parseInt(data.rows[0]);
+        let conversionFactorValue;
+        const amount = parseInt(ingredient.amount)
+
+        //get the standard conversion rate for measureId
+        {
+          const query = `SELECT conversionfactorvalue FROM conversionfactor WHERE foodid = $1 AND measureid = $2 LIMIT 1`;
+          const values = [ingredient.foodId, ingredient.measureId];
+          const data = await postgresConnection.query(query, values);
+          conversionFactorValue = parseInt(data.rows[0].conversionfactorvalue);
+        }
+
+        //set conversionFactorValue to represent the conversion to one single unit
+        {
+          const query = `SELECT measuredescription FROM measurename WHERE measureid = $1 LIMIT 1`;
+          const values = [ingredient.measureId];
+          const data = await postgresConnection.query(query, values);
+          const brokenMeasureDescription = breakupMeasureDescription(data.rows[0].measuredescription);
+          conversionFactorValue = conversionFactorValue / brokenMeasureDescription.integer;
+        }
 
         // apply conversionFactorValue to each item in nutrition
-        for (let item in nutrition) {
-          nutrients[item] = (nutrients[item]/100) * conversionFactorValue * ingredient.amount;
+        for (let item in nutrients) {
+          console.log(nutrients[item]);
+          nutrients[item] = (nutrients[item]/100) * conversionFactorValue * amount;
+          console.log(nutrients[item]);
         }
+
       }
     }
     catch (error) {
@@ -124,17 +167,35 @@ function ingredientNutrition (ingredient) {
   })
 }
 
+
+/*
+accepts an ingredientId and returns a list of all possible that ingredient can be measured in and there conversion values.
+does not return grams as its assumed all ingredients can be measured in grams
+
+expected input:
+  ingredientId = int
+
+returns:
+  [{
+    measureId: int,
+    unit: string,
+    value: int
+  }]
+*/
 function conversionFactorList (ingredientId) {
   return new Promise( async (resolve, reject) => {
+
     // accumulate a list of every posable conversion and there values for provided ingredient
     try {
       let conversionOptions = [];
   
       // get a list of all possible conversions from database
-      const conversionData = await postgresConnection.query(`SELECT measureid, conversionfactorvalue FROM conversionfactor where foodid=${ingredientId}`);
+      const query = `SELECT measureid, conversionfactorvalue FROM conversionfactor WHERE foodid = $1`;
+      const values = [ingredientId];
+      const data = await postgresConnection.query(query, values);
 
       //go though all items in list of possible conversions and collect more detailed information
-      for(const conversion of conversionData.rows){
+      for(const conversion of data.rows){
         // get more detailed information about conversion from database
         const query = `SELECT measuredescription FROM measurename WHERE measureid = $1 LIMIT 1`;
         const values = [conversion.measureId];
@@ -166,6 +227,7 @@ function conversionFactorList (ingredientId) {
       console.error("error:", error);
       reject('failed to collect conversion information from database');
     }
+
   });
 }
 
@@ -176,6 +238,7 @@ example:
   output: { 12345, "testing" }
 */
 function breakupMeasureDescription(measureDescription) {
+  console.log(measureDescription)
   let integer = "";
   let denominator = "";
   let slashFound = false;
