@@ -66,14 +66,14 @@ exports.add = async (req, res) => {
 
 
 exports.update = async (req, res) => {
-   if (!req.body.id) return res.status(400).json({ error: 'no recipe id provided' });
+   if (!req.body._id) return res.status(400).json({ error: 'no recipe id provided' });
 
-   recipes.findOne({_id: req.body.id})
+   recipes.findOne({_id: req.body._id})
    .then((recipe) => {
 
       if (!recipe.owner == req.user) return res.status(401).json({ error: 'current user is not the owner of the recipe' });
 
-      recipes.updateOne({_id: req.body.id}, {$set: req.recipeSchema})
+      recipes.updateOne({_id: req.body._id}, {$set: req.recipeSchema})
       .then(() => { return res.status(200).json({ message: 'recipe saved successfully' }); })
       .catch(() => { return res.status(500).json({ error: 'failed to save the recipe' }); })
    })

@@ -9,26 +9,28 @@ import { faCircleXmark } from '@fortawesome/free-regular-svg-icons';
 import { assignIds, removeIds } from '../tools/general'
 
 export default function NewEditRecipe () {
-  
+
+  // define react hooks
   const navigate = useNavigate();
   const { userData } = useOutletContext();
   const [searchParams] = useSearchParams();
 
+  //get recipeId if in url
   const recipeId = searchParams.get('recipeId');
 
   // make sure current user is signed in, otherwise redirect to login
   if (userData._id == "") navigate('/login');
 
+  //define required useStates
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('');
-
   const [ingredientList, setIngredientList] = useState([]);
-
   const [instructionList, setInstructionList] = useState([]);
 
+  //run useEffect on page start
   useEffect (() => {
-    // if recipe exists, populate this page with recipes data from server
+    // if recipeId exists, populate the page with data from server for associated recipe
     if (recipeId) {
       axios({ method:'get', url:`recipe/data?_id=${recipeId}` })
       .then (response => {
@@ -42,13 +44,17 @@ export default function NewEditRecipe () {
     }
   },[])
 
+  //function for sending recipe changes to server
   function submitRecipe(){
-    let method
-    if (!recipeId) { method = 'post' }
-    else { method = 'put' }
 
+    //define what type of request is being sent to the server
+    let method
+    if (!recipeId) method = 'post';
+    else method = 'put';
+
+    //package relevant data into recipeData
     const recipeData = {
-      id: recipeId,
+      _id: recipeId,
       title: title,
       description: description,
       image: image,
@@ -56,11 +62,13 @@ export default function NewEditRecipe () {
       instructions: removeIds(instructionList)
     }
 
+    //send request to the server
     axios({ method:method, url:'recipe/edit', data: recipeData })
     .then(() => { navigate('/'); })
     .catch(console.error);
   }
 
+  // create pageList, a list of all function (plus associated variables) that are apart of the edit recipe page.
   const pageList = [
     {
       name: GeneralInfoPage,
@@ -101,6 +109,7 @@ export default function NewEditRecipe () {
     }
   ]
 
+  // call notebook and give it pageList
   return <NoteBook pageList={pageList} />
 }
 
@@ -153,6 +162,7 @@ function ImagePage ({image, setImage}) {
 
 function IngredientPage ({ingredientList, setIngredientList}) {
 
+  // define useStates
   const [newIngredient, setNewIngredient] = useState({foodId:"", foodDescription:"", measureId:"", unit:"", amount:""})
   const [conversionFactorsAvailable, setConversionFactorsAvailable] = useState([{ measureId: '1489', unit: 'g' }])
   const [ingredientsAvailable, setIngredientsAvailable] = useState([])

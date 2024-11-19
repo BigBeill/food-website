@@ -105,7 +105,7 @@ requires 5 arguments from body:
     instructions: [string]
 
 method 'PUT' requires 1 additional argument from body:
-    id: mongoDB objectId (recipe id)
+    _id: mongoDB objectId (recipe id)
 
 Method 'ALL' description:
     put relevant data from body into a json object
@@ -117,8 +117,8 @@ Method 'POST' description:
     add recipes Id to current users list of owned recipe
 
 Method 'PUT' description:
-    check to make sure the current user is the owner of the recipe with req.body.id as its id
-    use the json object in req.recipeSchema to save over the recipe with the id req.body.id
+    check to make sure the current user is the owner of the recipe with req.body._id as its id
+    use the json object in req.recipeSchema to save over the recipe with the id req.body._id
 */
 
 router.all('/edit', recipeController.packageIncoming);
