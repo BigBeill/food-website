@@ -3,12 +3,12 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import axios from './api/axios';
 
 import Layout from './Layout'
+import Loading from './components/Loading'
 import { routes } from './routes'
 
 function App() {
-  // userData should be passed down to all children
-  // userData.collected means client has received user data and if _id is still missing then the user is not signed in
-  const [userData, setUserData] = useState({ collected: false })
+  // userData is passed down to all children
+  const [userData, setUserData] = useState()
 
   useEffect(() => {
 
@@ -18,15 +18,17 @@ function App() {
           _id: response._id,
           username: response.username,
           email: response.email,
-          bio: response.bio,
-          collected: true
+          bio: response.bio
         });
       })
       .catch(() => {
-        setUserData({ collected: true });
+        setUserData({});
       });
 
   }, []);
+
+  //don't load the main page until userData has been collected
+  if (!userData) { return <Loading /> }
 
   return (
     <BrowserRouter>

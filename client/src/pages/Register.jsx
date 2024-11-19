@@ -1,10 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import axios from '../api/axios';
 
 function Register() {
   const errorRef = useRef();
   const navigate = useNavigate();
+  const { userData } = useOutletContext();
 
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
@@ -13,6 +14,7 @@ function Register() {
   const [errorMessage, setErrorMessage] = useState("")
 
   useEffect(() => {
+    if (userData._id) navigate('/profile');
     document.body.classList.add('loginBackground')
     return () => { document.body.classList.remove('loginBackground') }
   }, [])

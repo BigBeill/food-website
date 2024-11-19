@@ -13,7 +13,6 @@ function Profile() {
     const postRequest = {
       method: 'POST',
       url: 'server/user/logout',
-
     }
     axios(postRequest)
       .then(response => {
@@ -24,9 +23,6 @@ function Profile() {
         console.error("unable to logout", error)
       })
   };
-
-  //some placeholder text while page is waiting for user data to be collected
-  if (!userData.collected) return (<p>collecting user data</p>);
 
   //make sure user is signed in before trying to render there profile
   if (!userData._id) navigate('/login');

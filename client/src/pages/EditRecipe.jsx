@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, useOutletContext } from 'react-router-dom';
 import axios from '../api/axios';
 import NoteBook from '../components/NoteBook'
 import { Reorder } from 'framer-motion'
@@ -8,13 +8,16 @@ import { faTrash, faPen } from '@fortawesome/free-solid-svg-icons';
 import { faCircleXmark } from '@fortawesome/free-regular-svg-icons';
 import { assignIds, removeIds } from '../tools/general'
 
-export default function NewEditRecipe ({userData}) {
+export default function NewEditRecipe () {
+  
   const navigate = useNavigate();
-
-  if (userData && userData._id == ""){ return navigate('/login') }
-
+  const { userData } = useOutletContext();
   const [searchParams] = useSearchParams();
+
   const recipeId = searchParams.get('recipeId');
+
+  // make sure current user is signed in, otherwise redirect to login
+  if (userData._id == "") navigate('/login');
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');

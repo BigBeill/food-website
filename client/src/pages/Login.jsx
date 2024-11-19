@@ -1,17 +1,19 @@
 /* eslint-disable react/no-unknown-property */
 import React, { useRef, useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import axios from '../api/axios'
 
 function Login() {
   const errorRef = useRef()
   const navigate = useNavigate();
+  const { userData } = useOutletContext();
 
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
 
   useEffect(() => {
+    if (userData._id) navigate('/profile');
     document.body.classList.add('loginBackground')
     return () => { document.body.classList.remove('loginBackground') }
   }, [])
