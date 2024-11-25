@@ -25,7 +25,7 @@ parent component should be setup as follows:
     const pageList = [{}]
 
     //no html should appear in the parent
-    return <Notebook pageList={pageList} />
+    return <NoteBook pageList={pageList} />
   }
 
 child components are setup as normal components:

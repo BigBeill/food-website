@@ -26,14 +26,101 @@ router.get("/findUsers", async (req, res) => {
   res.end(JSON.stringify(data));
 });
 
-router.post("/register", userController.register);
+/*
+---------- /register route ------------
 
-router.post("/login", userController.login);
+Type:
+    POST - registers a new user
 
+Requires 3 arguments from body:
+    username: string
+    email: string
+    password: string
+
+Route description:
+    checks database for any data already being used by another account
+    encrypt password
+    create user profile and save in database
+    create json cookies
+    send json cookies to client
+*/
+router.post("/register", (req, res, next) => {
+  if(!req.body.username) return res.status(400).json({error: 'missing username field in body'});
+  if(!req.body.email) return res.status(400).json({error: 'missing email field in body'});
+  if(!req.body.password) return res.status(400).json({error: 'missing password field in body'});
+  next();
+}, userController.register);
+
+/*
+---------- /login route ------------
+
+Type:
+    POST - logs user in
+
+Requires 2 arguments from body:
+    username: string
+    password: string
+
+Route description:
+    get user data from database
+    encrypt password and compare to database
+    return json web token to client if valid password
+*/
+router.post("/login", (req, res, next) => {
+  if (!req.body.username) return res.status(400).json({error: 'missing username field in body'});
+  if (!req.body.password) return res.status(400).json({error: 'missing password field in body'});
+  next();
+}, userController.login);
+
+/*
+---------- /refresh route ------------
+
+Type: 
+    POST - gets a new user token
+
+Requires 0 arguments from body
+
+Route description:
+    check validity of refresh tokens saved in cookies
+    create and send new user token to client
+*/
 router.post("/refresh", userController.refresh);
 
+/*
+---------- /logout route ------------
+
+Type:
+    POST - logs user out
+
+Requires 0 arguments from body
+
+Route description:
+    removes cookies from clients local storage
+*/
 router.post("/logout", userController.logout);
 
-router.post("/updateAccount", userController.updateAccount);
+/*
+---------- /updateAccount route ------------
+
+Type:
+    POST - change user profile data saved in database
+
+Requires 2 arguments from body:
+    username: string
+    email: string
+
+Optionally takes 1 argument from body:
+    bio: string
+
+Route description:
+    make sure username and email doesn't already exist in database
+    update users profile data in database
+    create and send new cookies to client
+*/
+router.post("/updateAccount", (req, res, next) => {
+  if (!req.body.username) return res.status(400).json({error: 'missing username filed provided in body'});
+  if (!req.body.email) return res.status(400).json({error: 'missing email field provided in body'});
+  next();
+},userController.updateAccount);
 
 module.exports = router;

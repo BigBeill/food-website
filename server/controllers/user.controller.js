@@ -5,25 +5,30 @@ const createToken = require("../config/jsonWebToken");
 const { verify } = require("jsonwebtoken");
 require("dotenv").config();
 
+
+
+
+
+
+/*------CONTROLLERS FOR MANAGING USER AUTHENTICATION / ACCOUNT DETAILS------*/
+
 // the max age of all cookies created by this controller
 const cookieAge = 1000 * 60 * 60 * 24 * 30; // 30 days in milliseconds
 
 exports.register = async (req, res) => {
   const { username, email, password } = req.body;
 
-  // check for missing data
-  if (!username) return res.status(400).json({ error: "no username provided" });
-  if (!email) return res.status(400).json({ error: "no email provided" });
-  if (!password) return res.status(400).json({ error: "no password provided" });
-
-  //make sure username or email isn't already taken
+  // make sure username and email don't already exist in database
   const searchUsername = await users.findOne({ username });
   if (searchUsername) return res.status(400).json({ error: "username already taken" });
 
   const searchEmail = await users.findOne({ email });
   if (searchEmail) return res.status(400).json({ error: "email already taken" });
 
+  // hash password
   const hashedPassword = genPassword(password);
+
+  // create user
   const newUser = {
     username,
     email,
@@ -42,16 +47,17 @@ exports.register = async (req, res) => {
     return res.status(500).json({ error: "server failed to create new user" });
   }
 
-  // send cookies to client
+  // create and send cookies to client
   try {
+    // create tokens
     const tokens = createToken(savedUser);
-    await new refreshTokens({
-      user: savedUser._id,
-      token: tokens.refreshToken,
-    }).save();
+    // send tokens to database
+    await new refreshTokens({ user: savedUser._id, token: tokens.refreshToken })
+    .save();
+    // send cookies to client
     res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
     res.cookie("refreshToken", tokens.refreshToken, { maxAge: cookieAge });
-    return res.status(200).json({ message: "register successful" });
+    return res.status(200).json({ message: "account registered successfully" });
   } catch (error) {
     console.log("error saving refresh token for user:", savedUser);
     console.error(error);
@@ -62,32 +68,33 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   const { username, password } = req.body;
 
-  // make sure data provided is valid
+  // get user information from the server
   const user = await users.findOne(
     { username },
     { _id: 1, username: 1, email: 1, bio: 1, hash: 1, salt: 1 }
   );
-  if (!user) {
-    return res.status(400).json({ error: "username not found" });
-  }
-  if (!validPassword(password, user.hash, user.salt)) {
-    return res.status(400).json({ error: "incorrect password" });
-  }
 
-  // return cookies to client
+  // check if user exists
+  if (!user) return res.status(400).json({ error: "username not found" });
+
+  // check if password is correct
+  if (!validPassword(password, user.hash, user.salt)) return res.status(400).json({ error: "incorrect password" });
+
+  // create and return cookies to client
   try {
+    // create new tokens
     const tokens = createToken(user);
-    await new refreshTokens({
-      user: user._id,
-      token: tokens.refreshToken,
-    }).save();
+    // send refresh token to database
+    await new refreshTokens({ user: user._id, token: tokens.refreshToken })
+    .save();
+    //send tokens to client
     res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
     res.cookie("refreshToken", tokens.refreshToken, { maxAge: cookieAge });
     return res.status(200).json({ message: "user Signed in" });
   } catch (error) {
     console.error("error saving refresh token for user:", user);
     console.error(error);
-    return res.status(500).json({ error: "server issue while saving refresh token" });
+    return res.status(500).json({ error: "server failed to setup tokens" });
   }
 };
 
@@ -126,10 +133,10 @@ exports.logout = async (req, res) => {
 exports.updateAccount = (req, res) => {
   const { username, email, bio } = req.body;
   //make sure username or email isn't already taken
-  if (username && users.findOne({ username })) {
+  if (users.findOne({ username })) {
     return res.status(400).json({ error: "username already taken" });
   }
-  if (email && users.findOne({ email })) {
+  if (users.findOne({ email })) {
     return res.status(400).json({ error: "email already taken" });
   }
   // save user to database
@@ -145,9 +152,32 @@ exports.updateAccount = (req, res) => {
       }
     )
     .then((result) => {
-      // TODO : HERE
-      // MAC: I need the json token to update here so that after refreshing the page the profile will accurately display the *updated* user data
-      // currently after updating the user data it updates in the database but then after refreshing the page your changes are gone and dont come back until you logout and back in refreshing the token.
-      res.send(JSON.stringify({ message: "success", result: result }));
+      // ---------- FIX THIS HERE (GET DATA FROM RESULTS NOT SAVED USER) ----------- 
+      // create tokens
+      const tokens = createToken(savedUser);
+      // send tokens to database
+      new refreshTokens({ user: savedUser._id, token: tokens.refreshToken })
+      .save()
+      .then(() => {
+        // send cookies to client
+        res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
+        res.cookie("refreshToken", tokens.refreshToken, { maxAge: cookieAge });
+        return res.status(200).json({ message: "account registered successfully" });
+      })
     });
 };
+
+
+
+/*------CONTROLLERS FOR MANAGING USER INTERACTION WITH OTHER ACCOUNTS------*/
+
+exports.findUsers = async (req, res) => {
+  try {
+    const usersList = await users.find({ username: { $regex: req.body.searchName, $options: 'i' } });
+    return res.status(200).json({message: 'successfully created list of users', payload: usersList});
+  }
+  catch(error){
+    console.error(error);
+    return res.status(500).json({error: 'server failed to search database for user'});
+  }
+}

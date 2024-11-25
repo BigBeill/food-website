@@ -52,7 +52,7 @@ exports.add = async (req, res) => {
    .save()
    .then((newRecipe) => {
       users.updateOne({_id: req.user._id}, { $push: { ownedRecipes: newRecipe._id } });
-      return res.status(201).json({ response: 'new recipe created', newObject: newRecipe });
+      return res.status(201).json({ response: 'new recipe created' });
    })
    .catch ((error) => { 
       console.error(error);
