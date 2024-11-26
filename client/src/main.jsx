@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './styles/main.scss'
 import './styles/pins.css'
-import './styles/login.css'
+import './styles/login.scss'
 import './styles/RecipeBook.scss'
 import './styles/inputs.scss'
 
