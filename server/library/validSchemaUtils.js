@@ -78,7 +78,7 @@ function createRecipeSchema (recipe, userId) {
     for (let index in validData) { 
       if (!validData[index]) { 
         console.log("failed to create recipe schema:", validData);
-        reject({status: 400, error: "recipe is missing valid " + index + " field." });
+        reject({status: 400, message: "recipe is missing valid " + index + " field." });
         return;
       }
     }
@@ -89,8 +89,8 @@ function createRecipeSchema (recipe, userId) {
       validData.ingredients = true;
     }
     catch (error) {
-      console.error("failed to collect nutrition data:", error);
-      reject("Issue getting nutrition value for ingredients:", schema.ingredients);
+      console.error(error);
+      reject({status: 500, message: "server failed to calculate recipes nutritional value"});
       return;
     }
 

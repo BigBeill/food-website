@@ -35,44 +35,41 @@ exports.register = async (req, res) => {
     hash: hashedPassword.hash,
     salt: hashedPassword.salt,
   };
-  let savedUser;
 
-  // save user to database
-  try {
-    savedUser = await new users(newUser).save();
-    console.log("new user created:", newUser);
-  } catch (error) {
-    console.log("failed to create new user:", newUser);
+  // save new user to database
+  const savedUser = await new users(newUser)
+  .save()
+  .catch((error) => {
     console.error(error);
-    return res.status(500).json({ error: "server failed to create new user" });
-  }
+    return res.status(500).json({ message: "server failed to save new user to database" });
+  });
 
-  // create and send cookies to client
-  try {
-    // create tokens
-    const tokens = createToken(savedUser);
-    // send tokens to database
-    await new refreshTokens({ user: savedUser._id, token: tokens.refreshToken })
-    .save();
-    // send cookies to client
-    res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
-    res.cookie("refreshToken", tokens.refreshToken, { maxAge: cookieAge });
-    return res.status(200).json({ message: "account registered successfully" });
-  } catch (error) {
-    console.log("error saving refresh token for user:", savedUser);
+  // create tokens
+  const tokens = createToken(savedUser);
+
+  // save refresh token in database
+  await new refreshTokens({ user: savedUser._id, token: tokens.refreshToken })
+  .save()
+  .catch((error) => {
     console.error(error);
-    return res.status(500).json({ error: "server issue while saving refresh token" });
-  }
+    return res.status(500).json({ message: "server failed to save refresh token in database" })
+  });
+
+  // send cookies to client
+  res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
+  res.cookie("refreshToken", tokens.refreshToken, { maxAge: cookieAge });
+  return res.status(200).json({ message: "account registered successfully" });
 };
 
 exports.login = async (req, res) => {
   const { username, password } = req.body;
 
   // get user information from the server
-  const user = await users.findOne(
-    { username },
-    { _id: 1, username: 1, email: 1, bio: 1, hash: 1, salt: 1 }
-  );
+  const user = await users.findOne({ username }, { _id: 1, username: 1, email: 1, bio: 1, hash: 1, salt: 1 })
+  .catch((error) => {
+    console.error(error);
+    return res.status(500).json({ error: "server failed to search database for username" });
+  });
 
   // check if user exists
   if (!user) return res.status(400).json({ error: "username not found" });
@@ -80,22 +77,21 @@ exports.login = async (req, res) => {
   // check if password is correct
   if (!validPassword(password, user.hash, user.salt)) return res.status(400).json({ error: "incorrect password" });
 
-  // create and return cookies to client
-  try {
-    // create new tokens
-    const tokens = createToken(user);
-    // send refresh token to database
-    await new refreshTokens({ user: user._id, token: tokens.refreshToken })
-    .save();
-    //send tokens to client
-    res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
-    res.cookie("refreshToken", tokens.refreshToken, { maxAge: cookieAge });
-    return res.status(200).json({ message: "user Signed in" });
-  } catch (error) {
-    console.error("error saving refresh token for user:", user);
+  // create new refresh tokens
+  const tokens = createToken(user);
+
+  //save refresh tokens in database
+  await new refreshTokens({ user: user._id, token: tokens.refreshToken })
+  .save()
+  .catch((error) => {
     console.error(error);
-    return res.status(500).json({ error: "server failed to setup tokens" });
-  }
+    return res.status(500).catch({ error: "server failed to save tokens to database" });
+  });
+
+  // save tokens as cookies for client
+  res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
+  res.cookie("refreshToken", tokens.refreshToken, { maxAge: cookieAge });
+  return res.status(200).json({ message: "user Signed in" });
 };
 
 exports.refresh = async (req, res) => {
@@ -152,9 +148,8 @@ exports.updateAccount = (req, res) => {
       }
     )
     .then((result) => {
-      // ---------- FIX THIS HERE (GET DATA FROM RESULTS NOT SAVED USER) ----------- 
       // create tokens
-      const tokens = createToken(savedUser);
+      const tokens = createToken(result);
       // send tokens to database
       new refreshTokens({ user: savedUser._id, token: tokens.refreshToken })
       .save()
@@ -172,12 +167,16 @@ exports.updateAccount = (req, res) => {
 /*------CONTROLLERS FOR MANAGING USER INTERACTION WITH OTHER ACCOUNTS------*/
 
 exports.findUsers = async (req, res) => {
-  try {
-    const usersList = await users.find({ username: { $regex: req.body.searchName, $options: 'i' } });
-    return res.status(200).json({message: 'successfully created list of users', payload: usersList});
-  }
-  catch(error){
+  const { username, limit, skip } = req.body;
+  const regex = new RegExp(username, 'i');
+  const usersList = await collection.find({ name: { $regex: regex } })
+  .skip(skip)
+  .limit(limit)
+  .toArray()
+  .catch((error) => {
     console.error(error);
-    return res.status(500).json({error: 'server failed to search database for user'});
-  }
+    return res.status(500).json({ error: "failed to collect users from the database" });
+  });
+
+  return res.status(200).json({message: "List of users collected successfully", payload: usersList})
 }

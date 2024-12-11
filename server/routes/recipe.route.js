@@ -11,7 +11,7 @@ One method type:
     GET - returns recipe data
 
 Requires 1 argument from url:
-    id: mongoDB objectId (recipe id)
+    _id: mongoDB objectId (recipe id)
 
 Method 'GET' description:
     finds all data in database associated with the recipe that has id matching req.query.id
@@ -20,7 +20,10 @@ Method 'GET' returns:
     json object containing recipe data
 */
 
-router.get('/data', recipeController.data);
+router.get('/data', (req, res, next) =>{
+    if (!req.query._id) return res.status(400).json({error: "_id not provided"});
+    next();
+},recipeController.data);
 
 
 

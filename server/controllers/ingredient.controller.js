@@ -7,8 +7,7 @@ const { ingredientNutrition, conversionFactorList, ingredientListNutrition } = r
 
 
 exports.details = async (req, res) => {
-   const foodId = req.query.foodId;
-   if (!foodId) return res.status(400).json({ error:'foodId not provided' })
+   const { foodId } = req.query;
 
    let ingredientData = { foodId };
 
@@ -22,7 +21,7 @@ exports.details = async (req, res) => {
    // get all possible conversion values for ingredient
    ingredientData.conversionFactors = await conversionFactorList(foodId);
 
-   return res.status(200).json(ingredientData);
+   return res.status(200).json({message: "ingredient data collected from server", payload: ingredientData});
 }
 
 
@@ -61,7 +60,7 @@ exports.list = async (req, res) => {
    console.log('query:', query);
    console.log('values:', values);
    const data = await postgresConnection.query(query, values);
-   return res.status(200).json(data.rows);
+   return res.status(200).json({ message: "ingredient list collected from server", payload: data.rows });
 }
 
 
@@ -71,5 +70,5 @@ exports.list = async (req, res) => {
 
 exports.groups = async (req, res) => {
    const data = await postgresConnection.query('select * from foodgroup');
-   return (res.status(200).json(data.rows));
+   return (res.status(200).json({ message: "ingredient groups collected from server", payload: data.rows }));
 };

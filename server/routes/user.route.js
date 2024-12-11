@@ -8,23 +8,34 @@ const userController = require("../controllers/user.controller");
 // route will:
 //   return data for user that is currently logged in
 router.get("/info", (req, res) => {
-  if (req.user) return res.status(200).json(req.user);
-  else return res.status(401).json({ error: "user not signed in" });
+  if(!req.user)  return res.status(401).json({ error: "user not signed in" });
+  return res.status(200).json({ message: "signed in user data", payload: req.user });
 });
 
-// takes 2 arguments from url:
-// searchTerm: string
-// amount: int
-router.get("/findUsers", async (req, res) => {
-  const searchTerm = req.query.searchTerm || "";
-  const amount = parseInt(req.query.amount) || 30;
+/*
+---------- /findUser route ------------
 
-  const data = await ingredients
-    .find({ name: { $regex: new RegExp(searchTerm, "i") } }, { name: 1 })
-    .limit(amount);
+Type:
+    GET - get a list of users
 
-  res.end(JSON.stringify(data));
-});
+Requires 0 arguments from body:
+
+Optionally accepts 3 arguments from body:
+    username: string (assumed to be "")
+    limit: int (assumed to be 5)
+    skip: int (assumed to be 0)
+
+Route description:
+    gathers a list of users of size {limit} containing the string {username}
+    skip over the first {skip} results found
+    return list to client
+*/
+router.get("/findUsers", (req, res, next) => {
+    if (!req.body.username) req.body.username = "";
+    if (!req.body.limit) req.body.limit = 5;
+    if (!req.body.skip) req.body.skip = 0;
+    next();
+}, userController.findUsers);
 
 /*
 ---------- /register route ------------

@@ -39,7 +39,7 @@ function checkAccessToken() {
 export default async function sendRequest( configuration) {
    return new Promise(async (resolve, reject) => {
 
-      // if refresh token exists and client needs a new access use the refresh api
+      // if refresh token exists and client needs a new access token, use the refresh api
       try {
          if(cookies.get('refreshToken') && !checkAccessToken()) await axiosInstance.post(`user/refresh`); // get new access token
       }
@@ -50,8 +50,9 @@ export default async function sendRequest( configuration) {
 
       try {
          // process the request
-         const response = await axiosInstance( configuration);
-         return resolve(response.data);
+         const response = await axiosInstance(configuration);
+         console.log(response);
+         return resolve(response.data.payload);
       }
       catch (error) {
          console.error('issue processing request:', error);
