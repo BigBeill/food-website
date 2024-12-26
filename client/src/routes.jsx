@@ -6,6 +6,7 @@ import Ingredients from './pages/Ingredients'
 import Login from './pages/Login'
 import Profile from './pages/Profile'
 import Register from './pages/Register'
+import Admin from './pages/Admin'
 
 import NotFound from './pages/NotFound'
 
@@ -41,6 +42,10 @@ export const routes = [
   {
     path: '/ingredients/:groupID?/:ingredientID?',
     element: <Ingredients />
+  },
+  {
+    path: '/admin',
+    element: <Admin />
   },
   {
     path:'*',

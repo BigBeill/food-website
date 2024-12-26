@@ -33,6 +33,9 @@ app.use(validateToken);
 const logGeneralData = require('./middleware/debugging/logGeneralData')
 app.use(logGeneralData)
 
+const adminRouter = require('./routes/admin.route')
+app.use('/admin', adminRouter)
+
 const ingredientRouter = require('./routes/ingredient.route')
 app.use('/ingredient', ingredientRouter)
 
