@@ -29,13 +29,12 @@ Route description:
     gathers a list of users of size {limit} containing the string {username}
     skip over the first {skip} results found
     return list to client
+
+Returns:
+    array
 */
-router.get("/findUsers", (req, res, next) => {
-    if (!req.body.username) req.body.username = "";
-    if (!req.body.limit) req.body.limit = 5;
-    if (!req.body.skip) req.body.skip = 0;
-    next();
-}, userController.findUsers);
+
+router.get("/find", userController.find);
 
 /*
 ---------- /register route ------------
@@ -55,12 +54,7 @@ Route description:
     create json cookies
     send json cookies to client
 */
-router.post("/register", (req, res, next) => {
-  if(!req.body.username) return res.status(400).json({error: 'missing username field in body'});
-  if(!req.body.email) return res.status(400).json({error: 'missing email field in body'});
-  if(!req.body.password) return res.status(400).json({error: 'missing password field in body'});
-  next();
-}, userController.register);
+router.post("/register",  userController.register);
 
 /*
 ---------- /login route ------------
@@ -77,11 +71,7 @@ Route description:
     encrypt password and compare to database
     return json web token to client if valid password
 */
-router.post("/login", (req, res, next) => {
-  if (!req.body.username) return res.status(400).json({error: 'missing username field in body'});
-  if (!req.body.password) return res.status(400).json({error: 'missing password field in body'});
-  next();
-}, userController.login);
+router.post("/login", userController.login);
 
 /*
 ---------- /refresh route ------------
@@ -128,10 +118,6 @@ Route description:
     update users profile data in database
     create and send new cookies to client
 */
-router.post("/updateAccount", (req, res, next) => {
-  if (!req.body.username) return res.status(400).json({error: 'missing username filed provided in body'});
-  if (!req.body.email) return res.status(400).json({error: 'missing email field provided in body'});
-  next();
-},userController.updateAccount);
+router.post("/updateAccount", userController.updateAccount);
 
 module.exports = router;
