@@ -9,6 +9,9 @@ const { ingredientNutrition, conversionFactorList, ingredientListNutrition } = r
 exports.details = async (req, res) => {
    const { foodId } = req.query;
 
+   // check if foodId is provided
+   if (!req.query.foodId) return res.status(400).json({ error:'foodId not provided' });
+
    let ingredientData = { foodId };
 
    // get ingredient name from database

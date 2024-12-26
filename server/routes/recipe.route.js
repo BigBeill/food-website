@@ -20,10 +20,7 @@ Method 'GET' returns:
     json object containing recipe data
 */
 
-router.get('/data', (req, res, next) =>{
-    if (!req.query._id) return res.status(400).json({error: "_id not provided"});
-    next();
-},recipeController.data);
+router.get('/data', recipeController.data);
 
 
 
@@ -124,9 +121,10 @@ Method 'PUT' description:
     use the json object in req.recipeSchema to save over the recipe with the id req.body._id
 */
 
-router.all('/edit', recipeController.packageIncoming);
-router.post('/edit', recipeController.add);
-router.put('/edit', recipeController.update);
+router.route('/edit')
+.all(recipeController.packageIncoming)
+.post(recipeController.add)
+.put(recipeController.update);
 
 
 

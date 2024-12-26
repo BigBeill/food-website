@@ -5,89 +5,91 @@ const users = require("../models/user");
 exports.data = async (req, res) => {
    const { _id } = req.query
 
-   // find recipe in database
-   const data = await recipes.findOne({ _id:_id })
-   .catch((error) => {
+   if (!_id) return res.status(400).json({error: "_id not provided"});
+
+   try {
+      // find recipe in database
+      const data = await recipes.findOne({ _id:_id })
+
+      // return error if recipe does not exist
+      if(!data) return res.status(404).json({ error: "recipe with _id does not exist in database"});
+
+      //return recipe data to client
+      return res.status(200).json({ message: "recipe found", payload: data})
+   }
+
+   // handle any errors caused by the controller
+   catch (error) {
       console.error(error);
-      return res.status(500).json({ error: "database error finding recipe" });
-   });
-
-   // return error if recipe does not exist
-   if(!data) return res.status(404).json({ error: "recipe with _id does not exist in database"});
-
-   //return recipe data to client
-   return res.status(200).json({ message: "recipe found", payload: data})
+      return res.status(500).json({ error: "server failed to find recipe" });
+   }
 }
 
-
-
-
-
-
 exports.packageIncoming = async (req, res, next) => {
+   const { title, description, image, ingredients, instructions } = req.body;
+
+   // make sure user is signed in
    if(!req.user) return res.status(401).json({ error: 'user not signed in' });
 
-   const { title, description, image, ingredients, instructions } = req.body;
-   const clientRecipeData = { title, description, image, ingredients, instructions };
-
-   const response = await createRecipeSchema(clientRecipeData, req.user._id)
+   createRecipeSchema(clientRecipeData, req.user._id)
+   .then((response) => {
+      req.recipeSchema = response;
+      next();
+   })
    .catch((error) => {
       try {
+         // attempt to send detailed error back to client
          return res.status(error.status).json({ error: error.message});
       }
       catch (error) {
+         // if server failed to send detailed error, send generic error to client
          console.error(error);
          return res.status(500).json({ error: "server failed to provide valid error response" });
       }
    });
-
-   req.recipeSchema = response;
-   next();
 }
-
-
-
-
-
 
 exports.add = async (req, res) => {
-   const newRecipe = await new recipes(req.recipeSchema)
-   .save()
-   .catch ((error) => { 
-      console.error(error);
-      return res.status(500).json({ error: 'failed to save new recipe in database' });
-   });
+   try {
+      // create new recipe and save to database
+      const newRecipe = await new recipes(req.recipeSchema)
+      .save();
 
-   await users.updateOne({_id: req.user._id}, { $push: { ownedRecipes: newRecipe._id } })
-   .catch ((error) => {
-      console.error(error);
-      return res.status(500).json({ error: 'failed to add new recipe to users list of owned recipes' });
-   });
+      // add recipe to user's ownedRecipes list in database
+      await users.updateOne({_id: req.user._id}, { $push: { ownedRecipes: newRecipe._id } })
 
-   return res.status(201).json({ message: 'new recipe created' });
+      return res.status(201).json({ message: 'new recipe created' });
+   }
+
+   // handle any errors caused by the controller
+   catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'server failed to create new recipe' });
+   }
 }
 
-
 exports.update = async (req, res) => {
-   // check if _id exists in the body
-   if (!req.body._id) return res.status(400).json({ error: 'no recipe id provided' });
+   const { _id } = req.body;
 
-   // find recipe being updated in database
-   const recipe = await recipes.findOne({_id: req.body._id})
-   .catch ((error) => { 
-      console.error(error)
-      return res.status(500).json({error: 'failed to find recipe in database' }) 
-   })
+   // check if recipe id was provided
+   if (!_id) return res.status(400).json({ error: 'no recipe id provided' });
 
-   // make sure current user is the owner of found recipe
-   if (!recipe.owner == req.user) return res.status(401).json({ error: 'current user is not the owner of the recipe' });
+   try {
+      // find recipe being updated in database
+      const recipe = await recipes.findOne({_id: req.body._id})
 
-   // update recipe in database
-   await recipes.updateOne({_id: req.body._id}, {$set: req.recipeSchema})
-   .catch((error) => { 
+      // make sure current user is the owner of found recipe
+      if (!recipe.owner == req.user) return res.status(401).json({ error: 'current user is not the owner of the recipe' });
+
+      // update recipe in database
+      await recipes.updateOne({_id: req.body._id}, {$set: req.recipeSchema})
+      
+      return res.status(200).json({ message: 'recipe saved successfully' });
+   }
+
+   // handle any errors caused by the controller
+   catch (error) {
       console.error(error);
-      return res.status(500).json({ error: 'failed to save the recipe' }); 
-   })
-   
-   return res.status(200).json({ message: 'recipe saved successfully' });
+      return res.status(500).json({ error: 'server failed to update recipe' });
+   }
 }
