@@ -90,11 +90,9 @@ export default function NoteBook ({pageList, parentPageNumber = 0, RequestNewPag
     window.addEventListener('keydown', handleKeyDown)
     return () => { window.removeEventListener('keydown', handleKeyDown) }
 
-  }, [pageNumber])
+  }, [pageNumber, parentPageNumber])
 
   function previousPage() {
-    console.log("parentPageNumber: " + parentPageNumber)
-    console.log("pageNumber: " + pageNumber)
     if ( pageNumber > 0 ) { 
       setPageNumber( pageNumber - 2 ) 
     }
@@ -104,15 +102,10 @@ export default function NoteBook ({pageList, parentPageNumber = 0, RequestNewPag
   }
 
   function nextPage(){
-    console.log("pageNumber:", pageNumber);
-    console.log("looking for page: " + (pageNumber + 2 + parentPageNumber));
-    console.log("current pageList:", pageList);
     if (pageNumber + 2 < (pageList.length)) { 
-      console.log("found page: " + (pageNumber + 2 + parentPageNumber));
       setPageNumber(pageNumber + 2) 
     }
     else if (RequestNewPage) { 
-      console.log("requesting new page: " + (pageNumber + 2 + parentPageNumber));
       RequestNewPage( pageNumber + parentPageNumber + 2 ) 
     }
   }
