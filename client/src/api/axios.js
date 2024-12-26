@@ -45,7 +45,6 @@ export default async function sendRequest( configuration) {
       }
       catch (error) {
          console.error('failed to fetch refresh token');
-         return reject(error);
       }
 
       try {
