@@ -50,7 +50,7 @@ each json object should be setup as follows:
 order of json files in the pageList array will decide the order pages appear on the notebook
 */
 
-export default function NoteBook ({pageList, parentPageNumber, RequestNewPage}) {
+export default function NoteBook ({pageList, parentPageNumber = 0, RequestNewPage}) {
 
   const [displayRight, setDisplayRight] = useState(false)
   const [narrowScreen, setNarrowScreen] = useState(false)
@@ -93,22 +93,27 @@ export default function NoteBook ({pageList, parentPageNumber, RequestNewPage}) 
   }, [pageNumber])
 
   function previousPage() {
-    if (parentPageNumber){
-      if ( pageNumber > parentPageNumber ) { setPageNumber( pageNumber - 2 ) }
-      else { RequestNewPage( pageNumber - 2 ) }
+    console.log("parentPageNumber: " + parentPageNumber)
+    console.log("pageNumber: " + pageNumber)
+    if ( pageNumber > 0 ) { 
+      setPageNumber( pageNumber - 2 ) 
     }
-    else {
-      if (pageNumber > 0) { setPageNumber(pageNumber - 2) }
+    else if ( (pageNumber + parentPageNumber) > 0 && RequestNewPage ) {
+      RequestNewPage( pageNumber + parentPageNumber - 2 ) 
     }
   }
 
   function nextPage(){
-    if (parentPageNumber) {
-      if (pageNumber + 2 < (pageList.length + parentPageNumber)) { setPageNumber(pageNumber + 2) }
-      else { RequestNewPage( pageNumber + 2 ) }
+    console.log("pageNumber:", pageNumber);
+    console.log("looking for page: " + (pageNumber + 2 + parentPageNumber));
+    console.log("current pageList:", pageList);
+    if (pageNumber + 2 < (pageList.length)) { 
+      console.log("found page: " + (pageNumber + 2 + parentPageNumber));
+      setPageNumber(pageNumber + 2) 
     }
-    else {
-      if (pageNumber + 2 < pageList.length) { setPageNumber(pageNumber + 2) }
+    else if (RequestNewPage) { 
+      console.log("requesting new page: " + (pageNumber + 2 + parentPageNumber));
+      RequestNewPage( pageNumber + parentPageNumber + 2 ) 
     }
   }
 
@@ -118,7 +123,7 @@ export default function NoteBook ({pageList, parentPageNumber, RequestNewPage}) 
         <div className={`pageContent ${(displayRight && narrowScreen) ? 'shielded' : ''}`}> {FirstPage ? (<FirstPage.name {...FirstPage.props} />) : null} </div>
         <div className='bottomArrows'> 
           <div className='arrowContainer'><FontAwesomeIcon icon={faArrowLeft} onClick={() => previousPage()} /> </div>
-          <p>{pageNumber+1}</p>
+          <p>{pageNumber + parentPageNumber + 1}</p>
           <div className='arrowContainer notIntractable'></div>
         </div>
       </div>
@@ -127,7 +132,7 @@ export default function NoteBook ({pageList, parentPageNumber, RequestNewPage}) 
         <div className={`pageContent ${(!displayRight && narrowScreen) ? 'shielded' : ''}`}> {SecondPage ? (<SecondPage.name {...SecondPage.props} />) : null} </div>
         <div className='bottomArrows'> 
           <div className='arrowContainer notIntractable'></div>
-          <p>{pageNumber+2}</p>
+          <p>{pageNumber+ parentPageNumber +2}</p>
           <div className='arrowContainer'><FontAwesomeIcon icon={faArrowRight} onClick={() => nextPage()}/> </div>
         </div>
       </div>
