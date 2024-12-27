@@ -46,8 +46,6 @@ export default function FriendsList(){
       });
    }
 
-   useEffect (() => { loadMainPage() }, [searchParams]);
-
    function RequestNewPage(pageNumber) {
 
       if (pageNumber < 0) {
