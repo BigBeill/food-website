@@ -104,13 +104,13 @@ exports.login = async (req, res) => {
 exports.refresh = async (req, res) => {
   const refreshToken = req.cookies["refreshToken"];
 
-  // make sure refresh token exists in database
-  const databaseToken = await refreshTokens.findOne({ token: refreshToken });
-  if (!databaseToken)
-    return res.status(403).json({ error: "invalid refresh token" });
-
-  // validate the refresh token and send a new access token
   try {
+    // make sure refresh token exists in database
+    const databaseToken = await refreshTokens.findOne({ token: refreshToken });
+    if (!databaseToken)
+      return res.status(403).json({ error: "invalid refresh token" });
+
+    // validate the refresh token and send a new access token
     const validToken = verify(refreshToken, process.env.SESSION_SECRET);
     if (validToken && validToken._id == databaseToken.user) {
       const tokens = createToken({
@@ -120,10 +120,11 @@ exports.refresh = async (req, res) => {
       res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
       return res.status(200).json({ message: "new access token sent" });
     }
-  } catch (error) {
+  } 
+  catch (error) {
     console.error("error creating new access token:", refreshToken);
     console.error(error);
-    return res.status(403).json({ error: "could not create new access token" });
+    return res.status(500).json({ error: "could not create new access token" });
   }
 };
 
