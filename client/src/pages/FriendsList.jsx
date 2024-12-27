@@ -46,6 +46,8 @@ export default function FriendsList(){
       });
    }
 
+   useEffect (() => { loadMainPage() }, []);
+
    function RequestNewPage(pageNumber) {
 
       if (pageNumber < 0) {
