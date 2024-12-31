@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import axios from "../api/axios";
 
 import NoteBook from "../components/NoteBook"
+import GrowingText from "../components/GrowingText"
 
 export default function FriendsList(){
 
@@ -116,13 +117,21 @@ function MainPage({ changeSearchType }) {
 }
 
 function ListUsersPage({ usersList }) {
+   const parentRefs = useRef([]);
+ 
    return (
-      <div className='noteBookPinContainer'>
-         { usersList.map((listUser, index) => (
-            <div key={index} className='noteBookPin'>
-               <p>{listUser.username}</p>
+      <div className="noteBookPinContainer">
+         {usersList.map((listUser, index) => (
+            <div key={index} className="noteBookPin">
+               <div className="title" ref={(element) => (parentRefs.current[index] = element)} >
+               {parentRefs.current[index] && (
+                  <GrowingText text={listUser.username} parentDiv={{ current: parentRefs.current[index] }} />
+               )}
             </div>
-         ))}
-      </div>
-   )
+         </div>
+       ))}
+     </div>
+   );
 }
+
+ 

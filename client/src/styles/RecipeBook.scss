@@ -1,4 +1,3 @@
-
 .notebookRecipe {
   display: flex;
   width: 100%;
@@ -50,14 +49,21 @@
   height: 100%;
   padding: 1.2rem;
   margin: 0rem;
+  overflow: hidden;
 
   .noteBookPin{
+    flex: 1;
     box-sizing: border-box;
     margin: -0.06rem 0rem;
     width: 100%;
-    height: 100%;
     padding: 1.2rem;
     border-top: .12rem solid #797979;
     border-bottom: .12rem solid #797979;
+    overflow: hidden;
+
+    .title{
+      width: 100%;
+      height: 100%;
+    }
   }
 }
