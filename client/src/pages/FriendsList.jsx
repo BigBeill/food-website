@@ -67,8 +67,13 @@ export default function FriendsList(){
       axios({ method:'get', url })
       .then((usersList) => {
 
+         console.log("userList:", usersList)
+
          const usersListSetOne = usersList.slice(0, usersPerPage);
          const usersListSetTwo = usersList.slice(usersPerPage, usersList.length);
+
+         console.log("userListSetOne:", usersListSetOne);
+         console.log("userListSetTwo:", usersListSetTwo);
 
          setPageList([
             {
@@ -80,6 +85,7 @@ export default function FriendsList(){
                props: { usersList: usersListSetTwo }
             }
          ]);
+
       })
       .catch((error) => {
          console.error(error);
@@ -118,6 +124,8 @@ function MainPage({ changeSearchType }) {
 
 function ListUsersPage({ usersList }) {
    const parentRefs = useRef([]);
+
+   console.log("ListUsersPage loaded:", usersList)
  
    return (
       <div className="noteBookPinContainer">
