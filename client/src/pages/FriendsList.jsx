@@ -1,8 +1,8 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from "../api/axios";
 
 import NoteBook from "../components/NoteBook"
-import GrowingText from "../components/GrowingText"
+import UserNoteBookPin from '../components/UserNoteBookPin';
 
 export default function FriendsList(){
 
@@ -67,13 +67,8 @@ export default function FriendsList(){
       axios({ method:'get', url })
       .then((usersList) => {
 
-         console.log("userList:", usersList)
-
          const usersListSetOne = usersList.slice(0, usersPerPage);
          const usersListSetTwo = usersList.slice(usersPerPage, usersList.length);
-
-         console.log("userListSetOne:", usersListSetOne);
-         console.log("userListSetTwo:", usersListSetTwo);
 
          setPageList([
             {
@@ -123,21 +118,12 @@ function MainPage({ changeSearchType }) {
 }
 
 function ListUsersPage({ usersList }) {
-   const parentRefs = useRef([]);
-
-   console.log("ListUsersPage loaded:", usersList)
  
    return (
       <div className="noteBookPinContainer">
          {usersList.map((listUser, index) => (
-            <div key={index} className="noteBookPin">
-               <div className="title" ref={(element) => (parentRefs.current[index] = element)} >
-               {parentRefs.current[index] && (
-                  <GrowingText text={listUser.username} parentDiv={{ current: parentRefs.current[index] }} />
-               )}
-            </div>
-         </div>
-       ))}
+            <UserNoteBookPin key={index} userData={listUser} />
+         ))}
      </div>
    );
 }
