@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from "../api/axios";
 
 import NoteBook from "../components/NoteBook"
-import UserNoteBookPin from '../components/UserNoteBookPin';
+import UserNotebookPin from '../components/UserNotebookPin';
 
 export default function FriendsList(){
 
@@ -122,7 +122,7 @@ function ListUsersPage({ usersList }) {
    return (
       <div className="noteBookPinContainer">
          {usersList.map((listUser, index) => (
-            <UserNoteBookPin key={index} userData={listUser} />
+            <UserNotebookPin key={index} userData={listUser} />
          ))}
      </div>
    );

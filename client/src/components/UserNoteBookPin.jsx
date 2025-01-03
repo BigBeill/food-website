@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 
 import GrowingText from "./GrowingText";
 
-export default function UserNoteBookPin({ userData }) {
+export default function UserNotebookPin({ userData }) {
 
    const parentRefs = useRef(null);
 
