@@ -120,7 +120,7 @@ function MainPage({ changeSearchType }) {
 function ListUsersPage({ usersList }) {
  
    return (
-      <div className="noteBookPinContainer">
+      <div className="pinContainer">
          {usersList.map((listUser, index) => (
             <UserNotebookPin key={index} userData={listUser} />
          ))}

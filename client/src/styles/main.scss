@@ -49,7 +49,7 @@ main{
 /* ------------ general css classes ------------ */
 
 .hidden{
-  display: none;
+  display: none !important;
 }
 
 .centred{
