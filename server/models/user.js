@@ -5,10 +5,7 @@ const userSchema = new mongoose.Schema({
     email: String,
     bio: String,
     hash: {type: String, select: false},
-    salt: {type: String, select: false},
-    friends: { type: [{type: mongoose.SchemaTypes.ObjectId,}], select: false },
-    friendRequests: { type: [{type: mongoose.SchemaTypes.ObjectId}], select: false },
-    ownedRecipes: { type: [{type: mongoose.SchemaTypes.ObjectId}], select: false }
-})
+    salt: {type: String, select: false}
+}, { timestamps: true });
 
 module.exports = mongoose.model("user", userSchema)

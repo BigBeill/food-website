@@ -1,16 +1,40 @@
 const router = require("express").Router();
 const userController = require("../controllers/user.controller");
 
-// ------------ User Get Routes ------------
+/*
+------------ /info route ------------
 
-// takes 0 arguments from url
+takes 0 arguments from params
 
-// route will:
-//   return data for user that is currently logged in
-router.get("/info", (req, res) => {
-  if(!req.user)  return res.status(401).json({ error: "user not signed in" });
-  return res.status(200).json({ message: "signed in user data", payload: req.user });
-});
+Optionally accepts 1 arguments from params:
+    userId: mongoose object id
+
+
+route will:
+    get user data with {userId} from database
+    if no userId provided return data for user that is currently logged in
+
+*/
+router.get("/info/:userId?", userController.info);
+
+/*
+------------ /defineRelationship route ------------
+
+takes 1 arguments from params
+    userId: mongoose object id
+
+route will:
+    figure out the relationship between the user that is currently logged in and the user with {userId}
+
+returns:
+    type: int
+        0: no relationship
+        1: user is friends with {userId}
+        2: user has received a friend request from {userId}
+        3: user has sent a friend request to {userId}
+    _id: mongoose object id
+*/
+router.get("/defineRelationship/:userId", userController.defineRelationship);
 
 /*
 ---------- /findUser route ------------
@@ -119,5 +143,36 @@ Route description:
     create and send new cookies to client
 */
 router.post("/updateAccount", userController.updateAccount);
+
+/*
+---------- /sendFriendRequest route ------------
+
+Type:
+    POST - creates a friend request in server database
+
+Requires 1 arguments from body:
+    userId: mongoose object id
+
+Route description:
+    creates a friend request in the database, setting the current user as the sender and {receiver} as the receiver
+*/
+router.post("/sendFriendRequest", userController.sendFriendRequest);
+
+/*
+---------- /acceptFriendRequest route ------------
+
+Type:
+    POST - logs user out
+
+Requires 1 arguments from body:
+    requestId: mongoose object id
+    accept: boolean
+
+Route description:
+    checks the validity of the friend request
+    if accept is true, create a friendship object between the sender and receiver of the request
+    if accept is false, delete the friend request from the database
+*/
+router.post("/processFriendRequest", userController.processFriendRequest);
 
 module.exports = router;

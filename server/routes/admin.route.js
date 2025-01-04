@@ -3,6 +3,8 @@ const router = require("express").Router();
 const users = require("../models/user");
 const { genPassword } = require("../library/passwordUtils");
 const refreshTokens = require("../models/refreshToken");
+const friendship = require("../models/joinTables/friendship");
+const friendRequest = require("../models/joinTables/friendRequest");
 
 // ------------ preset database data ------------
 const presetUsers = [ 
@@ -62,6 +64,18 @@ router.put("/resetUsers", async (req, res) => {
    .catch((error) => {
       console.error(error);
       return res.status(500).json({ error: "server failed to delete refresh tokens" });
+   });
+
+   await friendship.deleteMany({})
+   .catch((error) => {
+      console.error(error);
+      return res.status(500).json({ error: "server failed to delete friendships" });
+   });
+
+   await friendRequest.deleteMany({})
+   .catch((error) => {
+      console.error(error);
+      return res.status(500).json({ error: "server failed to delete friend requests"});
    });
 
    presetUsers.forEach(async (user) => {
