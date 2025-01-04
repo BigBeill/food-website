@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from 'react'
-import NoteBook from '../components/NoteBook'
+// external imports
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
+
+// internal imports
+import NoteBook from '../components/NoteBook';
 
 export default function Home() {
 

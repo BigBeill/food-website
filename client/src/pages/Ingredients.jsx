@@ -1,5 +1,8 @@
+// external imports
 import React, {useEffect, useState} from "react";
 import { useParams, useNavigate } from 'react-router-dom';
+
+// internal imports
 import axios from '../api/axios';
 
 export default function Ingredients () {

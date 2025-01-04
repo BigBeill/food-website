@@ -1,5 +1,5 @@
+// internal imports
 import Home from './pages/Home'
-
 import EditRecipe from "./pages/EditRecipe"
 import FriendsList from './pages/FriendsList'
 import Ingredients from './pages/Ingredients'

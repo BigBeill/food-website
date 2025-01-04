@@ -1,5 +1,8 @@
+// external imports
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+
+// internal imports
 import App from './App.jsx'
 import './styles/main.scss'
 import './styles/pins.css'

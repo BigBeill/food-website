@@ -1,11 +1,14 @@
+// external imports
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, useOutletContext } from 'react-router-dom';
-import axios from '../api/axios';
-import NoteBook from '../components/NoteBook'
-import { Reorder } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPen } from '@fortawesome/free-solid-svg-icons';
 import { faCircleXmark } from '@fortawesome/free-regular-svg-icons';
+import { Reorder } from 'framer-motion';
+
+// internal imports
+import axios from '../api/axios';
+import NoteBook from '../components/NoteBook'
 import { assignIds, removeIds } from '../tools/general'
 
 export default function NewEditRecipe () {

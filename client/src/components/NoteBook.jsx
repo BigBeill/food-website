@@ -1,8 +1,10 @@
-import '../styles/componentSpecific/notebook.scss'
-
+// external imports
 import React, { useState, useEffect, useRef, Component} from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+
+// internal imports
+import '../styles/componentSpecific/notebook.scss'
 
 /*
 using notebook component:

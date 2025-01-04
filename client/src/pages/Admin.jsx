@@ -1,4 +1,7 @@
+// external imports
 import React from "react";
+
+// internal imports
 import axios from "../api/axios";
 
 export default function Admin(){

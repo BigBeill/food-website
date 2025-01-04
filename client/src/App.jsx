@@ -1,7 +1,9 @@
+// external imports
 import React, { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import axios from './api/axios';
 
+// internal imports
+import axios from './api/axios';
 import Layout from './Layout'
 import Loading from './components/Loading'
 import { routes } from './routes'

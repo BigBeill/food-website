@@ -1,6 +1,8 @@
-/* eslint-disable react/no-unknown-property */
+// external imports
 import React, { useRef, useState, useEffect } from 'react'
 import { useNavigate, useOutletContext } from 'react-router-dom';
+
+// internal imports
 import axios from '../api/axios'
 
 function Login() {

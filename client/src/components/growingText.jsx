@@ -1,6 +1,24 @@
-// returns html&css for provided text with maximum possible size before overflowing parentDiv
-
+// external imports
 import React, { useEffect, useRef, useState } from 'react';
+
+/*
+returns html&css for provided text with maximum possible size before overflowing parentDiv
+
+how to use:
+
+  import React, { useRef } from 'react';
+
+  function MyComponent() {
+    const parentDiv = useRef(null);
+
+    return (
+      <div ref={parentDiv}>
+        <GrowingText text="Hello, World!" parentDiv={parentDiv} />
+      </div>
+    )
+  }
+
+*/
 
 function GrowingText({text, parentDiv}) {
   
