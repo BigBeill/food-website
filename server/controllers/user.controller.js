@@ -247,22 +247,50 @@ exports.defineRelationship = async (req, res) => {
 }
 
 exports.find = async (req, res) => {
-  const { 
-    username = "", 
-    limit = 6, 
-    skip = 0 
-  } = req.query;
+  const { _id } = req.user;
+  const { username, limit, skip, collection } = req.query;
 
   // Parsing limit and skip as integers 
   const parsedLimit = parseInt(limit, 10) || 6; 
   const parsedSkip = parseInt(skip, 10) || 0;
+  const parsedCollection = parseInt(collection, 10) || 0;
+
+  if (parsedCollection != 0 && !_id) return res.status(401).json({ error: "user not signed in" });
 
   try {
+
     // create query for searching the database for usernames containing client provided string
     let query = {};
     if (username) { 
       const regex = new RegExp(username, 'i'); 
-      query = { username: { $regex: regex } }; 
+      query.username = { $regex: regex }; 
+    }
+
+    if (parsedCollection == 1) {
+      // collect a list of friendship relationships user is involved in
+      const friendshipList = await friendships.find({ friendIds: _id });
+      // extract the _ids of each non-signed in user
+      const friendsList = friendshipList.map((friendship) => friendship.friendIds.filter((friend) => friend != _id) );
+      // add the _ids to the query
+      query._id = { $in: friendsList };
+    }
+
+    else if (parsedCollection == 2) {
+      // collect a list of friend requests user has received
+      const receivedRequests = await friendRequest.find({ receiverId: _id });
+      // extract the _ids of each non-signed in user
+      const requestList = receivedRequests.map((request) => request.senderId);
+      // add the _ids to the query
+      query._id = { $in: requestList };
+    }
+
+    else if (parsedCollection == 3) {
+      // collect a list of friend requests user has sent
+      const sentRequests = await friendRequest.find({ senderId: _id });
+      // extract the _ids of each non-signed in user
+      const requestList = sentRequests.map((request) => request.receiverId);
+      // add the _ids to the query
+      query._id = { $in: requestList };
     }
 
     // use query to find users in database
@@ -302,10 +330,8 @@ exports.sendFriendRequest = async (req, res) => {
 
     // make sure friend request doesn't already exist in database
     const sentRequest = await friendRequest.findOne({ senderId: _id, receiverId: userId });
-    console.log("sentRequest:", sentRequest);
     if (sentRequest) return res.status(400).json({ error: "friend request already sent" });
     const receivedRequest = await friendRequest.findOne({ senderId: userId, receiverId: _id });
-    console.log("receivedRequest:", receivedRequest);
     if (receivedRequest) return res.status(400).json({ error: "friend request already received" });
 
     // make sure friendship doesn't already exist in database

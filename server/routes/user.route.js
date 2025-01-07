@@ -48,14 +48,28 @@ Optionally accepts 3 arguments from body:
     username: string (assumed to be "")
     limit: int (assumed to be 5)
     skip: int (assumed to be 0)
+    collection: int (assumed to be 0):
+        0: all users
+        1: friends
+        2: friend requests
+        3: sent friend requests
 
 Route description:
     gathers a list of users of size {limit} containing the string {username}
     skip over the first {skip} results found
     return list to client
 
-Returns:
-    array
+Returns: 
+    array of objects
+    [
+        {
+            _id: mongoose object id
+            username: string
+            email: string
+            bio: string
+            relationship: { type: int, _id: mongoose object id }
+        }
+    ]
 */
 
 router.get("/find", userController.find);
