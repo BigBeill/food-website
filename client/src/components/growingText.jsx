@@ -20,35 +20,46 @@ how to use:
 
 */
 
-function GrowingText({text, parentDiv}) {
+function GrowingText({ text, parentDiv }) {
   
-  const textRef = useRef(null)
-
-  const [fontSize, setFontSize] = useState(0.1)
+  const textRef = useRef(null);
+  const [fontSize, setFontSize] = useState(0.1);
 
   function adjustFontSize() {
-
     if (parentDiv.current && textRef.current) {
-
-      let newFontSize = 0.1 // set font size to be tiny
-      textRef.current.style.fontSize = `${newFontSize}rem` // apply new font size to textRef
+      let newFontSize = 0.1; // set font size to be tiny
+      textRef.current.style.fontSize = `${newFontSize}rem`; // apply new font size to textRef
 
       // while textRef is smaller than parentDiv
-      while ( textRef.current.scrollWidth <= parentDiv.current.clientWidth && textRef.current.scrollHeight <= parentDiv.current.clientHeight ) {
-        newFontSize += 0.1 // increase the font size by a small amount
-        textRef.current.style.fontSize = `${newFontSize}rem` // apply new font size
+      while (textRef.current.scrollWidth <= parentDiv.current.clientWidth && textRef.current.scrollHeight <= parentDiv.current.clientHeight) {
+        newFontSize += 0.1; // increase the font size by a small amount
+        textRef.current.style.fontSize = `${newFontSize}rem`; // apply new font size
       }
 
       // once textRef is larger than parentDiv, decrease the size by a small amount and apply changes
-      setFontSize(newFontSize - 0.2)
+      setFontSize(newFontSize - 0.2);
     }
   }
-  
+
   useEffect(() => {
-    adjustFontSize()
-    window.addEventListener('resize', adjustFontSize)
-    return () => window.removeEventListener('resize', adjustFontSize)
-  }, [])
+    adjustFontSize();
+    window.addEventListener('resize', adjustFontSize);
+
+    const resizeObserver = new ResizeObserver(() => {
+      adjustFontSize();
+    });
+
+    if (parentDiv.current) {
+      resizeObserver.observe(parentDiv.current);
+    }
+
+    return () => {
+      window.removeEventListener('resize', adjustFontSize);
+      if (parentDiv.current) {
+        resizeObserver.unobserve(parentDiv.current);
+      }
+    };
+  }, [text, parentDiv]);
 
   useEffect(() => {
     if (textRef.current) {
@@ -60,7 +71,7 @@ function GrowingText({text, parentDiv}) {
     <h4 className="growingText" ref={textRef}>
       {text}
     </h4>
-    )
+  );
 }
 
-export default GrowingText
+export default GrowingText;
