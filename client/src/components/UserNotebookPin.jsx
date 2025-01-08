@@ -19,7 +19,7 @@ export default function UserNotebookPin({ userData }) {
       .then((response) => {
          setRelationship(response);
       })
-   }, []);
+   }, [userData]);
 
    useEffect(() => { 
       setIconsHidden(false);
