@@ -17,7 +17,7 @@ export default function Home() {
   }, [pageNumber])
 
   const pageList = [{
-    name: MainPage,
+    content: MainPage,
     props: {
       recipeName,
       setRecipeName,

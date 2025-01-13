@@ -28,7 +28,7 @@ export default function FriendsList(){
       .then((usersList) => {
          setPageList([
             {
-               name: MainPage,
+               content: MainPage,
                props: { 
                   searchName,
                   setSearchName,
@@ -36,7 +36,7 @@ export default function FriendsList(){
                 }
             },
             {
-               name: ListUsersPage,
+               content: ListUsersPage,
                props: { usersList }
             }
          ]);
@@ -71,11 +71,11 @@ export default function FriendsList(){
 
          setPageList([
             {
-               name: ListUsersPage,
+               content: ListUsersPage,
                props: { usersList: usersListSetOne }
             },
             {
-               name: ListUsersPage,
+               content: ListUsersPage,
                props: { usersList: usersListSetTwo }
             }
          ]);

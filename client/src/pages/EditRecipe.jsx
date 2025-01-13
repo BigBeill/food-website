@@ -74,7 +74,7 @@ export default function NewEditRecipe () {
   // create pageList, a list of all function (plus associated variables) that are apart of the edit recipe page.
   const pageList = [
     {
-      name: GeneralInfoPage,
+      content: GeneralInfoPage,
       props: {
         newRecipe: !recipeId,
         title,
@@ -84,28 +84,28 @@ export default function NewEditRecipe () {
       }
     },
     { 
-      name: ImagePage,
+      content: ImagePage,
       props: {
         image,
         setImage,
       }
     },
     { 
-      name: IngredientPage,
+      content: IngredientPage,
       props: {
         ingredientList,
         setIngredientList
       }
     },
     { 
-      name: InstructionPage,
+      content: InstructionPage,
       props: {
         instructionList,
         setInstructionList
       }
     },
     {
-      name: SubmissionPage,
+      content: SubmissionPage,
       props: {
         submitRecipe
       }
