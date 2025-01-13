@@ -5,7 +5,7 @@ import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 
 // internal imports
 import axios from "../api/axios";
-import NoteBook from "../components/NoteBook"
+import Notebook from "../components/Notebook"
 import UserNotebookPin from '../components/UserNotebookPin';
 
 
@@ -48,7 +48,7 @@ export default function FriendsList(){
 
    useEffect (() => { loadMainPage() }, [searchName, searchType]);
 
-   function RequestNewPage(pageNumber) {
+   function requestNewPage(pageNumber) {
 
       if (pageNumber < 0) {
          console.error("Page number cannot be less than 0");
@@ -87,7 +87,7 @@ export default function FriendsList(){
 
    }
 
-   return <NoteBook pageList={pageList} parentPageNumber={parentPageNumber} RequestNewPage={RequestNewPage} />
+   return <Notebook pageList={pageList} parentPageNumber={parentPageNumber} requestNewPage={requestNewPage} />
 }
 
 function MainPage({ searchName, setSearchName, setSearchType }) {

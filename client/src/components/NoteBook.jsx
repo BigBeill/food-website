@@ -27,7 +27,7 @@ parent component should be setup as follows:
     const pageList = [{}]
 
     //no html should appear in the parent
-    return <NoteBook pageList={pageList} />
+    return <Notebook pageList={pageList} />
   }
 
 child components are setup as normal components:
@@ -36,6 +36,11 @@ child components are setup as normal components:
   function PageName({text, setText, eventHandler}) {
     //standard component rules apply
   }
+    
+their are 3 props that can be given to Notebook.jsx:
+  pageList: an array of json files
+  parentPageNumber: a number that will be added to the page number
+  requestNewPage: a function that will be called when the last page is reached
 
 the pageList is an array of json files
 each json file represents a child component and its props
@@ -52,7 +57,7 @@ each json object should be setup as follows:
 order of json files in the pageList array will decide the order pages appear on the notebook
 */
 
-export default function NoteBook ({pageList, parentPageNumber = 0, RequestNewPage}) {
+export default function Notebook ({pageList, parentPageNumber = 0, requestNewPage}) {
 
   const [displayRight, setDisplayRight] = useState(false)
   const [narrowScreen, setNarrowScreen] = useState(false)
@@ -98,8 +103,8 @@ export default function NoteBook ({pageList, parentPageNumber = 0, RequestNewPag
     if ( pageNumber > 0 ) { 
       setPageNumber( pageNumber - 2 ) 
     }
-    else if ( (pageNumber + parentPageNumber) > 0 && RequestNewPage ) {
-      RequestNewPage( pageNumber + parentPageNumber - 2 ) 
+    else if ( (pageNumber + parentPageNumber) > 0 && requestNewPage ) {
+      requestNewPage( pageNumber + parentPageNumber - 2 ) 
     }
   }
 
@@ -107,8 +112,8 @@ export default function NoteBook ({pageList, parentPageNumber = 0, RequestNewPag
     if (pageNumber + 2 < (pageList.length)) { 
       setPageNumber(pageNumber + 2) 
     }
-    else if (RequestNewPage) { 
-      RequestNewPage( pageNumber + parentPageNumber + 2 ) 
+    else if (requestNewPage) { 
+      requestNewPage( pageNumber + parentPageNumber + 2 ) 
     }
   }
 

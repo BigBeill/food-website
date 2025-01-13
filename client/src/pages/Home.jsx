@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 
 // internal imports
-import NoteBook from '../components/NoteBook';
+import Notebook from '../components/Notebook';
 
 export default function Home() {
 
@@ -26,7 +26,7 @@ export default function Home() {
     }
   }]
 
-  return <NoteBook pageList={pageList} />
+  return <Notebook pageList={pageList} />
 }
 
 function MainPage({recipeName, setRecipeName, ingredientList, setIngredientList}) {

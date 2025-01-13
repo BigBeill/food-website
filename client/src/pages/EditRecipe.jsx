@@ -8,7 +8,7 @@ import { Reorder } from 'framer-motion';
 
 // internal imports
 import axios from '../api/axios';
-import NoteBook from '../components/NoteBook'
+import Notebook from '../components/Notebook'
 import { assignIds, removeIds } from '../tools/general'
 
 export default function NewEditRecipe () {
@@ -113,7 +113,7 @@ export default function NewEditRecipe () {
   ]
 
   // call notebook and give it pageList
-  return <NoteBook pageList={pageList} />
+  return <Notebook pageList={pageList} />
 }
 
 
