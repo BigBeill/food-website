@@ -1,17 +1,18 @@
 // external imports
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 
 // internal imports
-import App from './App.jsx'
-import './styles/main.scss'
-import './styles/pins.css'
-import './styles/login.scss'
-import './styles/RecipeBook.scss'
-import './styles/inputs.scss'
+import App from './App.jsx';
+import './styles/displayData.scss';
+import './styles/main.scss';
+import './styles/pins.css';
+import './styles/login.scss';
+import './styles/RecipeBook.scss';
+import './styles/inputs.scss';
 
 //remove before production
-import './styles/testingStyles.scss'
+import './styles/testingStyles.scss';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

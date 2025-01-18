@@ -6,6 +6,7 @@ import Ingredients from './pages/Ingredients'
 import Login from './pages/Login'
 import Profile from './pages/Profile'
 import Register from './pages/Register'
+import SearchUser from './pages/SearchUser'
 import Admin from './pages/Admin'
 
 import NotFound from './pages/NotFound'
@@ -38,6 +39,10 @@ export const routes = [
   {
     path:'/register',
     element:<Register />,
+  },
+  {
+    path:'searchUser',
+    element:<SearchUser />,
   },
   {
     path: '/ingredients/:groupID?/:ingredientID?',

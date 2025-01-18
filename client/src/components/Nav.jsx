@@ -50,6 +50,7 @@ function Nav({userData}) {
 
                 <h3>Social</h3>
                 <NavLink className="navLink" to="/friendsList" onClick={() => setOpen(false)}>Friends</NavLink>
+                <NavLink className="navLink" to="/searchUser" onClick={() => setOpen(false)}>Search Users</NavLink>
 
                 <h3>Account</h3>
                 <NavLink className="navLink" to="/profile" onClick={() => setOpen(false)}>Profile</NavLink>
