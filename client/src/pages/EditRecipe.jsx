@@ -126,12 +126,12 @@ function GeneralInfoPage ({newRecipe, title, setTitle, description, setDescripti
     <div className='standardPage'>
       <h1>{newRecipe ? 'New Recipe' : 'Edit Recipe'}</h1>
 
-      <div className='textInput center extraBottom'>
+      <div className='textInput center extraBottom additionalMargin'>
         <label htmlFor='title'>Title</label>
         <input id='title' type='text' value={title} onChange={(event) => setTitle(event.target.value)} placeholder='give your recipe a title'/>
       </div>
 
-      <div className='textInput center'>
+      <div className='textInput center additionalMargin'>
         <label htmlFor='description'>Description</label>
         <textarea id='description' rows="9" value={description} onChange={(event) => setDescription(event.target.value)} placeholder='describe your recipe' />
       </div>
@@ -212,13 +212,13 @@ function IngredientPage ({ingredientList, setIngredientList}) {
       <h2>Recipe Ingredients</h2>
 
       {/* ingredients list */}
-      <Reorder.Group className='itemList' axis='y' values={ingredientList} onReorder={setIngredientList}>
+      <Reorder.Group className='displayList addPadding' axis='y' values={ingredientList} onReorder={setIngredientList}>
         {ingredientList.map((item, index) => (
-          <Reorder.Item key={item.id} value={item} className='listItem'>
+          <Reorder.Item key={item.id} value={item} className='listItemContainer'>
             <div className='itemOptions'>
               <FontAwesomeIcon icon={faCircleXmark} style={{color: "#575757",}} onClick={() => removeIngredient(index)} />
             </div>
-            <div className='itemContent'>
+            <div className='listItem'>
               {(item.content.unit == 'physical') ? (
                 <p>{item.content.amount} {item.content.name}{item.content.amount != 1 ? 's' : ''}</p>
               ):(
@@ -230,7 +230,7 @@ function IngredientPage ({ingredientList, setIngredientList}) {
       </Reorder.Group>
 
       {/* add new ingredient section */}
-      <div className='textInput shared'>
+      <div className='textInput shared additionalMargin'>
         <label>New Ingredient</label>
         <div className='inputs'>
           <input type='number' value={newIngredient.amount} onChange={(event) => setNewIngredient({...newIngredient, amount: event.target.value})} placeholder='Amount'/>
@@ -250,7 +250,7 @@ function IngredientPage ({ingredientList, setIngredientList}) {
           </div>
         </div>
       </div>
-      <button onClick={() => addIngredient()}>Add Ingredient</button>
+      <button className="darkText additionalMargin" onClick={() => addIngredient()}>Add Ingredient</button>
 
     </div>
   )
@@ -286,10 +286,10 @@ function InstructionPage ({instructionList, setInstructionList}) {
   return (
     <div className='standardPage'>
       <h2>Recipe Instructions</h2>
-      <Reorder.Group className='itemList noMargin' axis='y' values={instructionList} onReorder={setInstructionList}>
+      <Reorder.Group className='displayList' axis='y' values={instructionList} onReorder={setInstructionList}>
         {instructionList.map((item, index) => (
-          <Reorder.Item key={item.id} value={item} className='listItem'>
-            <div className='itemContent'>
+          <Reorder.Item key={item.id} value={item} className='listItemContainer'>
+            <div className='listItem'>
               <h4>Step {index + 1} </h4>
               <p>{item.content}</p>
             </div>
@@ -301,11 +301,11 @@ function InstructionPage ({instructionList, setInstructionList}) {
         ))}
       </Reorder.Group>
 
-      <div className='textInput'>
+      <div className='textInput additionalMargin'>
         <label htmlFor='newInstruction'>New Instruction</label>
         <textarea id="newInstruction" rows='6' value={newInstruction} onChange={(event) => {setNewInstruction(event.target.value)}} placeholder='add a new instruction'/>
       </div>
-      <button onClick={() => addInstruction()}>Add Instruction</button>
+      <button className="darkText additionalMargin" onClick={() => addInstruction()}>Add Instruction</button>
     </div>
   )
 }
@@ -319,7 +319,7 @@ function SubmissionPage({submitRecipe}) {
   return (
     <>
       <h2>Save Recipe</h2>
-      <button onClick={() => submitRecipe()}>Save recipe</button>
+      <button className="darkText additionalMargin" onClick={() => submitRecipe()}>Save recipe</button>
     </>
   )
 }
