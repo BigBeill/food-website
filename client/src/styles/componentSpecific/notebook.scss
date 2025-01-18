@@ -1,26 +1,42 @@
 .notebook {
-  $normalTextColor: #575757;
-  $darkTextColor: #4a4a4a;
+  --background-color: #f6eee3;
+  --supporting-color: #4a4a4a;
+  --text-color-main: #575757;
+  --text-color-dark: #4a4a4a;
 
 
   position: absolute;
-  display: flex;
   margin: .6rem 3rem;
-  padding: 3rem, 3rem, 3rem, 3rem;
-  gap: .6rem;
   width: calc(100% - 6rem);
   min-width: 75rem;
   height: calc(100% - 1.2rem);
   left: calc(50% - 3rem);
   transform: translate(-50%, 0%);
-  color: $normalTextColor;
+  padding: 3rem, 3rem, 3rem, 3rem;
+  display: flex;
+  gap: .6rem;
+  color: var(--text-color-main);
+
+  // if screen is too narrow to fit .notebook, show only one page at a time
+  @media (max-width: 78rem) {
+
+    margin-left: 1.5rem;
+    left: 0%;
+    transform: translate(0%, 0%);
+    transition: margin-left .3s ease-in-out;
+
+    // if the right page is being focused, move the left page off screen
+    &.displayRight{
+      margin-left: calc(100% - 76.5rem);
+    }
+  }
 
   .notebookPage {
     position: relative;
     width: calc(50% - .3rem);
     height: calc(100% - 2.1rem);
     z-index: 1;
-    background-color: #f6eee3;
+    background-color: var(--background-color);
     box-shadow: 0.09rem 0.09rem 0.3rem #2C1A1D;
 
     &:first-child {
@@ -40,6 +56,7 @@
       height: calc(100% - 6.9rem);
       overflow: hidden;
 
+      // make sure content isn't selectable when current page is not the one being focused one. (assuming screen is too narrow to show both pages)
       &.shielded *{
         pointer-events: none;
       }
@@ -74,13 +91,6 @@
     }
   }
 
-  .standardPage{
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-  }
-
   .notebookSpine {
     position: absolute;
     height: 100%;
@@ -91,58 +101,15 @@
     user-select: none;
   }
 
-  @media (max-width: 78rem) {
-    
-    margin-left: 1.5rem;
-    left: 0%;
-    transform: translate(0%, 0%);
-    transition: margin-left .3s ease-in-out;
+  // ------------ the following scss is for the content inside a notebook page, not for the notebook itself ------------
 
-    &.displayRight{
-      margin-left: calc(100% - 76.5rem);
-    }
-
-  }
-
-  .itemList {
+  p {
     margin: 0rem;
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    &.noMargin {
-      padding: 0rem;
-    }
-
-    .listItem{
-      display: flex;
-
-      .itemContent {
-        width: 100%;
-
-      }
-
-      .itemOptions{
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: .6rem;
-        margin: 0rem .3rem;
-        width: 1.2rem;
-
-        svg:hover {
-          cursor: pointer;
-        }
-
-        &.extraMargin{
-          margin-top: 1.5rem;
-        }
-      }
-    }
   }
 
   h1{
     margin: 3rem 3rem 3rem 3rem;
-    color: $darkTextColor;
+    color: var(--text-color-dark);
     text-decoration: underline #065F46;
   }
 
@@ -155,8 +122,11 @@
     margin-bottom: .3rem;
   }
 
-  p {
-    margin: 0rem;
+  .standardPage{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
   }
 
   .pinContainer{

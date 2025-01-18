@@ -8,7 +8,15 @@
   letter-spacing: 1px;
   font-family: 'Coolvetica', sans-serif;
   background-color: #f5f8fa;
+
+
+  // define color variables used throughout the scss files
   --base-color: #065F46;
+
+  --background-color: #f5f8fa;
+  --supporting-color: #065f46;
+  --text-color-main: grey;
+  --text-color-dark: black;
 }
 
 body {
@@ -20,9 +28,12 @@ body {
 }
 
 #root{
-  width:100%;
   margin: 0rem;
+  width:100%;
+  height:100vh;
   padding: 0rem;
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 main{
@@ -115,12 +126,21 @@ main{
   margin-bottom: 3rem;
 }
 
+.moveToBottom {
+  margin-top: auto;
+  bottom: 0;
+}
 
 
 
 
 
 /* ------------ universally applied css ------------ */
+
+h2{
+  text-decoration: underline #065F46;
+  text-decoration-thickness: 0.2rem;
+}
 
 h3 {
   margin-top: 2rem;
@@ -139,6 +159,7 @@ input::-webkit-inner-spin-button {
 }
 /* Firefox */
 input[type=number] {
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 
@@ -148,23 +169,23 @@ input[type=number] {
 
 /* Customize the thumb */
 ::-webkit-scrollbar-thumb {
-  background-color: #717171; /* color of the scrollbar thumb */
-  border-radius: 5px; /* rounded corners */
+  background-color: var(--background-color); /* color of the scrollbar thumb */
+  border-radius: 0.3rem; /* rounded corners */
 }
 
 /* Hover state of the thumb */
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #575757;
+  background-color: lightgray;
 }
 
 /* Customize the track */
 ::-webkit-scrollbar-track {
-  background: transparent; /* color of the scrollbar track */
+  background: var(--base-color); /* color of the scrollbar track */
 }
 
 /* Handle when scrollbar is in a drag state */
 ::-webkit-scrollbar-thumb:active {
-  background-color: #4a4a4a;
+  background-color: lightgray;
 }
 
 .growingText{
