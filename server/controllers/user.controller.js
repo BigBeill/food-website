@@ -248,7 +248,7 @@ exports.defineRelationship = async (req, res) => {
 
 exports.find = async (req, res) => {
   const { _id } = req.user;
-  const { username, limit, skip, collection } = req.query;
+  const { username, email, limit, skip, collection } = req.query;
 
   // Parsing limit and skip as integers 
   const parsedLimit = parseInt(limit, 10) || 6; 
@@ -261,10 +261,10 @@ exports.find = async (req, res) => {
 
     // create query for searching the database for usernames containing client provided string
     let query = {};
-    if (username) { 
-      const regex = new RegExp(username, 'i'); 
-      query.username = { $regex: regex }; 
-    }
+
+    // add username and email to query if provided
+    if (username) query.username = { $regex: new RegExp(username, 'i') };
+    if (email) query.email = { $regex: new RegExp(email, 'i') };
 
     if (parsedCollection == 1) {
       // collect a list of friendship relationships user is involved in

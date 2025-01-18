@@ -44,8 +44,9 @@ Type:
 
 Requires 0 arguments from body:
 
-Optionally accepts 3 arguments from body:
+Optionally accepts 5 arguments from body:
     username: string (assumed to be "")
+    email: string (assumed to be "")
     limit: int (assumed to be 5)
     skip: int (assumed to be 0)
     collection: int (assumed to be 0):
