@@ -9,6 +9,8 @@ import Register from './pages/Register'
 import SearchUser from './pages/SearchUser'
 import Admin from './pages/Admin'
 
+import TestPage from './pages/TestingCode'
+
 import NotFound from './pages/NotFound'
 
 export const routes = [
@@ -51,6 +53,10 @@ export const routes = [
   {
     path: '/admin',
     element: <Admin />
+  },
+  {
+    path:'/test',
+    element:<TestPage />,
   },
   {
     path:'*',
