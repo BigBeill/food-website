@@ -44,12 +44,12 @@ function MainPage({recipeName, setRecipeName, ingredientList, setIngredientList}
     <div className='standardPage'>
       <h1>Public Recipes</h1>
 
-      <div className='textInput'>
+      <div className='textInput additionalMargin'>
         <label>Name</label>
         <input type='text' value={recipeName} onChange={(event) => setRecipeName(event.target.value)} placeholder='recipe name' />
       </div>
 
-      <div className='textInput sideButton'>
+      <div className='textInput sideButton additionalMargin'>
         <div>
           <label>Ingredients</label>
           <input type='text' value={newIngredient} onChange={(event) => setNewIngredient(event.target.value)} placeholder='ingredient name' />
@@ -65,7 +65,7 @@ function MainPage({recipeName, setRecipeName, ingredientList, setIngredientList}
         ))}
       </ul>
 
-      <button> search </button>
+      <button className='additionalMargin'> search </button>
     </div>
   )
 }
