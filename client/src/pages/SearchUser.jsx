@@ -4,12 +4,11 @@ import { useSearchParams } from "react-router-dom";
 
 // internal imports
 import axios from "../api/axios";
-import GrowingText from "../components/GrowingText";
+import UserPin from "../components/UserPin";
 
 export default function SearchUser() {
 
    const [searchParams, setSearchParams] = useSearchParams();
-   const usernameContainer = useRef(null);
 
    const [_id, set_id] = useState(searchParams.get("_id") || "");
    const [username, setUsername] = useState(searchParams.get("username") || "");
@@ -89,18 +88,8 @@ export default function SearchUser() {
             </button>
          </div>
 
-         { users.map((user, index) => (
-            <div key={index} className="userInformationCard">
-               <div ref={usernameContainer}>
-                  <GrowingText text={user.username} parentDiv={usernameContainer} />
-               </div>
-               <div>
-               </div>
-               <div>
-               </div>
-               <div>
-               </div>
-            </div>
+         { users.map((userData, index) => (
+            <UserPin key={index} userData={userData} />
          ))}
       </div>
    );

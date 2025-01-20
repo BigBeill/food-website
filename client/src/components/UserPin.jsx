@@ -1,74 +1,49 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios';
+import React, { useEffect, useState, useRef } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBan, faCheck, faUser, faUserPlus, faX } from '@fortawesome/free-solid-svg-icons';
+
+import axios from '../api/axios';
+import GrowingText from './GrowingText';
 
 
-function UserPin(userData) {
-
-  const [userName, setUserName] = useState(userData.userData.username);
-  const [email, setEmail] = useState(userData.userData.email);
-  const [bio, setBio] = useState(userData.userData.bio);
+function UserPin({ userData }) {
   console.log(userData);
-  const [successMessage, setSuccessMessage] = useState(null);
-  const [error, setError] = useState(null);
 
-  //handle update account API key
-  const updateAccount = async () => {
-    try {
-      const url = `/server/user/updateAccount`;
-      let dataToSend = {};
+  const titleRef = useRef(null);
 
-      // Compare initial and current states to determine what has changed
-      if (userName !== userData.userData.username) {
-        dataToSend.username = userName;
-      }
-      if (email !== userData.userData.email) {
-        dataToSend.email = email;
-      }
-      if (bio !== userData.userData.bio) {
-        dataToSend.bio = bio;
-      }
-      const response = await axios({
-        method: 'POST',
-        url,
-        data: dataToSend
-      })
-      console.log(response);
-
-      setSuccessMessage(`${response.data.message}`);
-      //redirect back to the watchList page
-
-    } catch (error) {
-      setError(error);
-      console.log(error);
-    }
-
-  };
+  const [iconsHidden, setIconsHidden] = useState(false);
+  const [relationship, setRelationship] = useState({ type: 0, _id: '0' });
 
   return (
-
-    <div className="profileSplit">
-      <h1>My Profile</h1>
-      <div className="profileInfo">
-        <h2>username : </h2> <input type="text" defaultValue={userData.userData.username} onChange={(e) => setUserName(e.target.value)} />
-        <br />
-        <h2>email : </h2> <input type="text" defaultValue={userData.userData.email} placeholder="Add an email here" onChange={(e) => setEmail(e.target.value)} />
-        <br />
-        {/* if bio exists its displayed, otherwise display message to add bio */}
-        <h2>Bio : </h2><textarea placeholder='Add a bio here' onChange={(e) => setBio(e.target.value)} defaultValue={userData.userData.bio} />
-        <button className="btn btn-primary" onClick={updateAccount}>Update Account </button>
-        <br />
-        {error ? (
-          <span style={{ color: "red" }}>Error: {error.message} <br /> message : {error.response.data.error} </span>
-        ) : successMessage ? (
-          <span style={{ color: "green" }}>{successMessage}</span>
-        ) : (
-          <span />
-        )}
+    <div className='userPin'>
+      <div ref={titleRef}>
+        <GrowingText text={userData.username} parentDiv={titleRef} />
       </div>
+      <div>
+        <img src='../../public/profile-photo.png' alt='profile picture' />
+      </div>
+      <div className='contactInformation'>
+        <p>email: {userData.email}</p>
+        <p>
+          relationship: {relationship.type == 0 ? 'not friends' : relationship.type == 1 ? 'friends' : 'pending'}
+        </p>
+      </div>
+      <div className={`icons ${iconsHidden ? 'hidden' : ''}`}>
+        { relationship.type == 0 ? (
+          <FontAwesomeIcon icon={faUserPlus} onClick={() => { sendFriendRequest() } } />
+        ) : relationship.type == 1 ? (
+          <FontAwesomeIcon icon={faUser} />
+        ) : relationship.type == 2 ? (
+          <>
+            <FontAwesomeIcon icon={faCheck} onClick={ () => { acceptFriendRequest() } } />
+            <FontAwesomeIcon icon={faX} onClick={ () => { rejectFriendRequest() } } />
+          </>
+        ) : relationship.type == 3 ? (
+          <FontAwesomeIcon icon={faBan} onClick={ () => { rejectFriendRequest() } } />
+        ) : null }
+      </div>
+
     </div>
-
-
-
   )
 }
 

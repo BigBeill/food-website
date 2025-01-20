@@ -35,7 +35,7 @@
          }
       }
    }
- }
+}
 
 .displayUserInformationCards {
    box-sizing: border-box;
@@ -62,11 +62,45 @@
       padding: 0.6rem 1.8rem;
    }
 
-   .userInformationCard{
+   .userPin{
       width: calc(100% - 1.2rem);
       height: calc(100% - 1.2rem);
-      display: grid;
       grid-template-columns: 16.5rem 6.3rem;
       grid-template-rows: 6.3rem 4.5rem;
+   }
+}
+
+.userPin {
+   display: grid;
+
+   p{
+      margin: 0;
+   }
+   
+   img{
+      width: 100%;
+      height: 100%;
+   }
+
+   .contactInformation{
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: .15rem;
+   }
+
+   .icons{
+      display: flex;
+      justify-content: flex-end;
+      gap: 1.2rem;
+
+      svg{
+         margin: auto 0;
+         height: 50%;
+   
+         &:hover{
+            cursor: pointer;
+         }
+      }
    }
 }
