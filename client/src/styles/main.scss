@@ -33,7 +33,7 @@ body {
   height:100vh;
   padding: 0rem;
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 main{
@@ -66,6 +66,11 @@ main{
 .centred{
   margin-left: auto;
   margin-right: auto;
+}
+
+.centredVertically{
+  display: flex;
+  align-items: center;
 }
 
 .splitSpace{
@@ -178,14 +183,14 @@ input[type=number] {
   background-color: lightgray;
 }
 
-/* Customize the track */
-::-webkit-scrollbar-track {
-  background: var(--base-color); /* color of the scrollbar track */
-}
-
 /* Handle when scrollbar is in a drag state */
 ::-webkit-scrollbar-thumb:active {
   background-color: lightgray;
+}
+
+/* Customize the track */
+::-webkit-scrollbar-track {
+  background: var(--base-color); /* color of the scrollbar track */
 }
 
 .growingText{

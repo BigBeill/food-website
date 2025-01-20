@@ -14,14 +14,28 @@ function UserPin({ userData }) {
   const [iconsHidden, setIconsHidden] = useState(false);
   const [relationship, setRelationship] = useState({ type: 0, _id: '0' });
 
+  useEffect(() => {
+    axios({
+      method: 'get',
+      url: `user/defineRelationship/${userData._id}`
+    })
+    .then((response) => {
+      console.log(response);
+      setRelationship(response);
+    })
+  }, []);
+
   return (
     <div className='userPin'>
-      <div ref={titleRef}>
+      <div className="centredVertically" ref={titleRef}>
         <GrowingText text={userData.username} parentDiv={titleRef} />
       </div>
       <div>
         <img src='../../public/profile-photo.png' alt='profile picture' />
       </div>
+
+      <div className='styleDiv'></div>
+
       <div className='contactInformation'>
         <p>email: {userData.email}</p>
         <p>
@@ -42,7 +56,6 @@ function UserPin({ userData }) {
           <FontAwesomeIcon icon={faBan} onClick={ () => { rejectFriendRequest() } } />
         ) : null }
       </div>
-
     </div>
   )
 }
