@@ -35,7 +35,7 @@ export const routes = [
     element:<Login />,
   },
   {
-    path:'/profile',
+    path:'/profile/:userID?',
     element:<Profile />,
   },
   {

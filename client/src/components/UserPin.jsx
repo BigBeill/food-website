@@ -77,7 +77,7 @@ function UserPin({ userData }) {
       </div>
       <div className={`icons ${iconsHidden ? 'hidden' : ''}`}>
         { relationship.type == 0 ? (
-          <FontAwesomeIcon icon={faUserPlus} onClick={() => { () => { sendFriendRequest() } } } />
+          <FontAwesomeIcon icon={faUserPlus} onClick={() => { sendFriendRequest() } } />
         ) : relationship.type == 1 ? (
           <FontAwesomeIcon icon={faUser} onClick={ () => { viewProfile() } } />
         ) : relationship.type == 2 ? (
