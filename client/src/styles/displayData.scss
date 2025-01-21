@@ -44,7 +44,7 @@
    height: 100%;
    padding: 3rem;
    display: inline-grid;
-   grid-template-columns: repeat(auto-fit, 24rem);
+   grid-template-columns: repeat(auto-fill, 24rem);
    grid-auto-rows: 12rem;
    justify-content: center;
    gap: 1.5rem;
@@ -77,10 +77,18 @@
          background-color: var(--base-color);
          clip-path: polygon(0rem 0.3rem, 17.1rem 0.3rem, 17.4rem 0rem, 24rem 0rem, 24rem 0.6rem, 0rem 0.6rem);
       }
+
+      > div:nth-child(4){
+         margin-top: 0.6rem;
+      }
+
+      > div:nth-child(5){
+         margin-top: 0.6rem;
+      }
    }
 }
 
-.userPin {
+.userPin { 
    display: grid;
 
    p{
@@ -102,7 +110,7 @@
    .icons{
       display: flex;
       justify-content: flex-end;
-      gap: 1.2rem;
+      gap: 0.6rem;
 
       svg{
          margin: auto 0;
@@ -112,5 +120,12 @@
             cursor: pointer;
          }
       }
+   }
+
+   > div:nth-child(1):hover{
+      cursor: pointer;
+   }
+   > div:nth-child(2):hover{
+      cursor: pointer;
    }
 }
