@@ -32,7 +32,8 @@ returns:
         1: user is friends with {userId}
         2: user has received a friend request from {userId}
         3: user has sent a friend request to {userId}
-    _id: mongoose object id
+        4: users own profile
+    _id: mongoose object id (_id of the relationship, 0 if N/A)
 */
 router.get("/defineRelationship/:userId", userController.defineRelationship);
 

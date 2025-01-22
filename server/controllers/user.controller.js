@@ -223,7 +223,7 @@ exports.defineRelationship = async (req, res) => {
 
   // check for any missing or invalid fields in the request
   if (!userId) return res.status(400).json({ error: "missing userId parameter" });
-  if (userId == _id) return res.status(200).json({ message: "this is the current user", payload: { type: 1, _id: 0 } });
+  if (userId == _id) return res.status(200).json({ message: "this is the current user", payload: { type: 4, _id: 0 } });
 
   try {
     // check if users are friends

@@ -72,7 +72,11 @@ function UserPin({ userData }) {
       <div className='contactInformation'>
         <p>email: {userData.email}</p>
         <p>
-          relationship: {relationship.type == 0 ? 'not friends' : relationship.type == 1 ? 'friends' : 'pending'}
+          relationship: {
+          relationship.type == 0 ? 'none' : 
+          relationship.type == 1 ? 'friends' : 
+          relationship.type == 4 ? 'your account' : 
+          'friendship pending'}
         </p>
       </div>
       <div className={`icons ${iconsHidden ? 'hidden' : ''}`}>
@@ -87,6 +91,8 @@ function UserPin({ userData }) {
           </>
         ) : relationship.type == 3 ? (
           <FontAwesomeIcon icon={faBan} onClick={ () => { rejectFriendRequest() } } />
+        ) : relationship.type == 4 ? (
+          <FontAwesomeIcon icon={faUser} onClick={ () => { viewProfile() } } />
         ) : null }
       </div>
     </div>
