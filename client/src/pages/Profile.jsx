@@ -1,50 +1,87 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate, useOutletContext } from 'react-router-dom';
-import UserPin from '../components/UserPin'
-import axios from 'axios';
+import React, { useEffect, useState, useRef } from 'react'
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
+
+import axios from '../api/axios';
+import GrowingText from '../components/GrowingText';
+import Loading from '../components/Loading';
 
 
-function Profile() {
-  const navigate = useNavigate();
-  const { userData } = useOutletContext();
+export default function Profile() {
+   const titleParent = useRef(null);
+   const navigate = useNavigate();
+   const context = useOutletContext();
+   const { _id } = useParams();
 
-  // handle logout function
-  const handleLogout = () => {
-    const postRequest = {
-      method: 'POST',
-      url: 'server/user/logout',
-    }
-    axios(postRequest)
-      .then(response => {
-        console.log(response);
-        if (response.data.message == "success") { location.assign('/') }
+   const [userData, setUserData] = useState({});
+   const [relationship, setRelationship] = useState({type: 0, _id: '0'});
+
+   useEffect(() => {
+      if (!_id){
+         if (context.userData) setUserData(context.userData);
+         else navigate('/login');
+      }
+      else {
+         axios({
+            method: 'GET', 
+            url: `user/info/${_id}`
+         })
+         .then (response => {
+            setUserData(response);
+         });
+         axios({
+            method: 'GET',
+            url: `user/defineRelationship/${_id}`
+         })
+         .then(response => {
+            setRelationship(response);
+         });
+      }
+   }, [_id]);
+
+   // handle logout function
+   const handleLogout = () => {
+      const postRequest = {
+         method: 'POST',
+         url: 'user/logout',
+      }
+      axios(postRequest)
+      .then(() => {
+         location.assign('/')
       })
-      .catch(error => {
-        console.error("unable to logout", error)
-      })
-  };
+   };
 
-  //make sure user is signed in before trying to render there profile
-  if (!userData._id) navigate('/login');
+   if (!userData || !relationship) return <div><Loading /></div>;
 
-  return (
-    <div className='profile splitSpace'>
-      <div className="userPin">
-        <div className="splitSpace">
-          <UserPin userData={userData} />
-          <div className="profileButtons">
-            {/* <button>edit account -&t; </button> */}
+   return (
+      <div className='displayUserData'>
+         <div ref={titleParent} className='centredVertically'>
+            <GrowingText text={userData.username} parentDiv={titleParent} />
+         </div>
+         <div>
+            <img className="consumeSpace" src="../../public/profile-photo.png" alt='profile picture' />
+         </div>
+         <div></div>
+         <div>
+
+         </div>
+         <div>
+            <h4>Bio</h4>
+
+         </div>
+         <div></div>
+         <div className="splitSpace smallerGap">
             <button
-              onClick={handleLogout}
-
-            >logout -&gt; </button>
-          </div>
-        </div>
+            onClick={ () => { editAccount(); } }
+            >
+               edit account
+            </button>
+            <button
+            onClick={ () => { handleLogout(); } }
+            >
+               logout
+            </button>
+         </div>
 
       </div >
-    </div >
-  )
+   )
 }
-
-
-export default Profile
