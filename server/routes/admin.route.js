@@ -1,10 +1,11 @@
 const router = require("express").Router();
 
-const users = require("../models/user");
+const user = require("../models/user");
 const { genPassword } = require("../library/passwordUtils");
-const refreshTokens = require("../models/refreshToken");
+const refreshToken = require("../models/refreshToken");
 const friendship = require("../models/joinTables/friendship");
 const friendRequest = require("../models/joinTables/friendRequest");
+const friendFolder = require("../models/friendFolder");
 
 // ------------ preset database data ------------
 const presetUsers = [ 
@@ -53,43 +54,48 @@ const presetUsers = [
 
 router.put("/resetUsers", async (req, res) => {
 
-   // delete all users
-   await users.deleteMany({})
+   // delete all user related data from the database (users, refreshTokens, friendships, friendRequests, folders)
+   user.deleteMany({})
    .catch((error) => {
       console.error(error);
       return res.status(500).json({ error: "server failed to delete users" });
    });
-   // delete all refresh tokens
-   await refreshTokens.deleteMany({})
+   refreshToken.deleteMany({})
    .catch((error) => {
       console.error(error);
       return res.status(500).json({ error: "server failed to delete refresh tokens" });
    });
-
-   await friendship.deleteMany({})
+   friendship.deleteMany({})
    .catch((error) => {
       console.error(error);
       return res.status(500).json({ error: "server failed to delete friendships" });
    });
-
-   await friendRequest.deleteMany({})
+   friendRequest.deleteMany({})
    .catch((error) => {
       console.error(error);
       return res.status(500).json({ error: "server failed to delete friend requests"});
    });
+   friendFolder.deleteMany({})
+   .catch((error) => {
+      console.error(error);
+      return res.status(500).json({ error: "server failed to delete friend folders" });
+   });
 
+   
    presetUsers.forEach(async (user) => {
-
-      const hashedPassword = genPassword(user.password);
-      await new users({ username: user.username, email: user.email, bio: user.bio, hash: hashedPassword.hash, salt: hashedPassword.salt, })
-      .save()
-      .catch((error) => {
+      try {
+         const hashedPassword = genPassword(user.password);
+         await new user({ username: user.username, email: user.email, bio: user.bio, hash: hashedPassword.hash, salt: hashedPassword.salt, }).save();
+      }
+      catch (error) {
+         console.log("issue saving user to database:", user);
          console.error(error);
-         return res.status(500).json({ message: "server failed to save new user to database" });
-      });
+         return res.status(500).json({ error: "server failed to save preset users" });
+      }
    });
 
    return res.status(200).json({ message: "users and refresh tokens reset" });
+
 });
 
 require("dotenv").config();

@@ -66,6 +66,7 @@ export default function Profile() {
          </div>
          <div>
             <h4>Bio</h4>
+            { userData.bio ? <p>{userData.bio}</p> : <p>No bio available</p> }
 
          </div>
          <div></div>

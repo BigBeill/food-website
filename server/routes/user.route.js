@@ -37,8 +37,10 @@ returns:
 */
 router.get("/defineRelationship/:userId", userController.defineRelationship);
 
+
+
 /*
----------- /findUser route ------------
+---------- /find route ------------
 
 Type:
     GET - get a list of users
@@ -53,7 +55,7 @@ Optionally accepts 5 arguments from body:
     collection: int (assumed to be 0):
         0: all users
         1: friends
-        2: friend requests
+        2: received friend requests
         3: sent friend requests
 
 Route description:
@@ -73,8 +75,9 @@ Returns:
         }
     ]
 */
-
 router.get("/find", userController.find);
+
+
 
 /*
 ---------- /register route ------------

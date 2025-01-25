@@ -1,5 +1,85 @@
 // external imports
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from "react-router-dom";
+
+//internal imports
+import axios from '../api/axios';
+import UserPin from '../components/UserPin';
+import Folder from '../components/Folder';
+
+export default function FriendsList() {
+
+   const [_id, set_id] = useState('');
+   const [username, setUsername] = useState('');
+   const [email, setEmail] = useState('');
+
+   const [folders, setFolders] = useState([]);
+
+   function submitSearch() {
+      let params = {};
+      if (_id) params._id = _id;
+      if (username) params.username = username;
+      if (email) params.email = email;
+      setSearchParams(params);
+      // the actual search will be done in useEffect if searchParams changes
+   }
+
+   return (
+      <div className='displayUserInformationCards'>
+         <div className='filterPanel'>
+            <h2>Filter Users - Friends</h2>
+            <div className="textInput">
+               <label htmlFor="searchId">user ID</label>
+               <input 
+               id="searchId" 
+               type="text"
+               placeholder="Search by ID (exact match)"
+               value={_id}
+               onChange={(event) => set_id(event.target.value)}
+               onKeyDown={ (event) => { if(event.key == "Enter") submitSearch(); } }
+               />
+            </div>
+            <div className="textInput">
+               <label htmlFor="searchUsername">Username</label>
+               <input 
+               id="searchUsername" 
+               type="text"
+               placeholder="Search by username"
+               value={username}
+               onChange={(event) => setUsername(event.target.value)}
+               onKeyDown={ (event) => { if(event.key == "Enter") submitSearch(); } }
+               />
+            </div>
+            <div className="textInput">
+               <label htmlFor="searchEmail">Email</label>
+               <input 
+               id="searchEmail" 
+               type="text"
+               placeholder="Search by email"
+               value={email}
+               onChange={(event) => setEmail(event.target.value)}
+               onKeyDown={ (event) => { if(event.key == "Enter") submitSearch(); } }
+               />
+            </div>
+            <button 
+            className="moveToBottom"
+            onClick={() => submitSearch()}
+            >
+               Search
+            </button>
+         </div>
+
+         <Folder friendRequestFolder={true} />
+      </div>
+   )
+}
+
+
+/*
+   ------------ Old Code ------------
+
+// external imports
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 
@@ -145,5 +225,5 @@ function ListUsersPage({ usersList }) {
      </div>
    );
 }
-
+*/
  

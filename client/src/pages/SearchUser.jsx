@@ -46,7 +46,7 @@ export default function SearchUser() {
       <div className="displayUserInformationCards">
 
          <div className="filterPanel">
-            <h2>Filter users</h2>
+            <h2>Filter Users - Public</h2>
             <div className="textInput">
                <label htmlFor="searchId">user ID</label>
                <input 
