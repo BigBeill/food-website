@@ -55,37 +55,23 @@ const presetUsers = [
 router.put("/resetUsers", async (req, res) => {
 
    // delete all user related data from the database (users, refreshTokens, friendships, friendRequests, folders)
-   user.deleteMany({})
-   .catch((error) => {
+   try { 
+      await user.deleteMany({})
+      await refreshToken.deleteMany({})
+      await friendship.deleteMany({})
+      await friendRequest.deleteMany({})
+      await friendFolder.deleteMany({})
+   }
+   catch (error) {
       console.error(error);
-      return res.status(500).json({ error: "server failed to delete users" });
-   });
-   refreshToken.deleteMany({})
-   .catch((error) => {
-      console.error(error);
-      return res.status(500).json({ error: "server failed to delete refresh tokens" });
-   });
-   friendship.deleteMany({})
-   .catch((error) => {
-      console.error(error);
-      return res.status(500).json({ error: "server failed to delete friendships" });
-   });
-   friendRequest.deleteMany({})
-   .catch((error) => {
-      console.error(error);
-      return res.status(500).json({ error: "server failed to delete friend requests"});
-   });
-   friendFolder.deleteMany({})
-   .catch((error) => {
-      console.error(error);
-      return res.status(500).json({ error: "server failed to delete friend folders" });
-   });
+      return res.status(500).json({ error: "server failed to delete all data around users"})
+   }
 
    
-   presetUsers.forEach(async (user) => {
+   presetUsers.forEach(async (userData) => {
       try {
-         const hashedPassword = genPassword(user.password);
-         await new user({ username: user.username, email: user.email, bio: user.bio, hash: hashedPassword.hash, salt: hashedPassword.salt, }).save();
+         const hashedPassword = genPassword(userData.password);
+         await new user({ username: userData.username, email: userData.email, bio: userData.bio, hash: hashedPassword.hash, salt: hashedPassword.salt, }).save();
       }
       catch (error) {
          console.log("issue saving user to database:", user);

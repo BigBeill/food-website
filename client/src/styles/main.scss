@@ -59,6 +59,10 @@ main{
 
 /* ------------ general css classes ------------ */
 
+.shielded *{
+  pointer-events: none;
+}
+
 .hidden{
   display: none !important;
 }

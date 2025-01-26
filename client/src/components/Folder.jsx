@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react"
 
 import axios from "../api/axios"
-import userPin from "./UserPin"
+import UserPin from "./UserPin"
 
 export default function Folder(friendRequestFolder, folderDetails) {
 
@@ -28,6 +28,7 @@ export default function Folder(friendRequestFolder, folderDetails) {
         url: `/user/find?collection=2 limit=3`
       })
       .then((response) => {
+        console.log(response)
         setDisplayUsers(response)
       })
       .catch((error) => {
@@ -39,20 +40,20 @@ export default function Folder(friendRequestFolder, folderDetails) {
   return (
    <div className="displayFolder">
 
-      <div className="userCards">
+      <div className="userCards shielded">
         { displayUsers[0] ? (
           <div className="cardContainer">
-            <userPin userData={displayUsers[0]} />
+            <UserPin userData={displayUsers[0]} />
           </div>
         ) : null}
         { displayUsers[1] ? (
           <div className="cardContainer">
-            <userPin userData={displayUsers[1]} />
+            <UserPin userData={displayUsers[1]} />
           </div>
         ) : null }
         { displayUsers[2] ? (
           <div className="cardContainer">
-            <userPin userData={displayUsers[2]} />
+            <UserPin userData={displayUsers[2]} />
           </div>
         ) : null }
 
