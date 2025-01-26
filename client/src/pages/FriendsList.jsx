@@ -1,6 +1,6 @@
 // external imports
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useParams } from "react-router-dom";
 
 //internal imports
 import axios from '../api/axios';
@@ -9,11 +9,15 @@ import Folder from '../components/Folder';
 
 export default function FriendsList() {
 
-   const [_id, set_id] = useState('');
-   const [username, setUsername] = useState('');
-   const [email, setEmail] = useState('');
+   const { folderId } = useParams();
+   const [searchParams, setSearchParams] = useSearchParams();
+
+   const [_id, set_id] = useState(searchParams.get('_id') || '');
+   const [username, setUsername] = useState(searchParams.get('username') || '');
+   const [email, setEmail] = useState(searchParams.get('email') || '');
 
    const [folders, setFolders] = useState([]);
+   const [users, setUsers] = useState([]);
 
    function submitSearch() {
       let params = {};
@@ -23,6 +27,32 @@ export default function FriendsList() {
       setSearchParams(params);
       // the actual search will be done in useEffect if searchParams changes
    }
+
+   useEffect(() => {
+      if(!folderId){
+         axios({
+            method: 'GET',
+            url: '/user/find?collection=1&limit=15'
+         })
+         .then((response) => {
+            setFolders([{_id: "requests"}]);
+            setUsers(response);
+         });
+      }
+      else if (folderId == "requests") {
+         axios({
+            method: 'GET',
+            url: '/user/find?collection=2&limit=15'
+         })
+         .then((response) => {
+            setFolders([]);
+            setUsers(response);
+         });
+      }
+      else {
+         console.log("still working on this code")
+      }
+   },[searchParams, folderId]);
 
    return (
       <div className='displayUserInformationCards'>
@@ -69,7 +99,13 @@ export default function FriendsList() {
             </button>
          </div>
 
-         <Folder friendRequestFolder={true} />
+         {folders.map((folder, index) => ( 
+            <Folder key={index} folderDetails={folder} />
+         ))}
+
+         {users.map((userData, index) => (
+           <UserPin key={index} userData={userData} /> 
+         ))}
       </div>
    )
 }

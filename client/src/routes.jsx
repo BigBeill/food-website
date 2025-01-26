@@ -27,7 +27,7 @@ export const routes = [
     element:<EditRecipe />,
   },
   {
-    path:'/friendsList',
+    path:'/friendsList/:folderId?',
     element:<FriendsList />,
   },
   {

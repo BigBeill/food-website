@@ -1,64 +1,80 @@
-import React, {useEffect, useState} from "react"
+   import React, {useEffect, useState} from "react"
+   import { useNavigate } from "react-router-dom"
+   import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+   import { faFolder } from '@fortawesome/free-solid-svg-icons';
 
-import axios from "../api/axios"
-import UserPin from "./UserPin"
+   import axios from "../api/axios"
+   import UserPin from "./UserPin"
 
-export default function Folder(friendRequestFolder, folderDetails) {
+   export default function Folder({ folderDetails }) {
 
-  const [displayUsers, setDisplayUsers] = useState([])
+   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!friendRequestFolder) {
-      folderDetails.contents.slice(0, 3).forEach((userId) => {
-        axios({ 
-          method: 'get',
-          url: `/user/info/${userId}`
-        })
-        .then((response) => {
-          setDisplayUsers((prev) => [...prev, response])
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-      });
-    }
-    else {
-      axios({
-        method: 'GET',
-        url: `/user/find?collection=2 limit=3`
-      })
-      .then((response) => {
-        console.log(response)
-        setDisplayUsers(response)
-      })
-      .catch((error) => {
-        console.error(error)
-      })
-    }
-  }, []);
+   const [displayUsers, setDisplayUsers] = useState([])
 
-  return (
-   <div className="displayFolder">
+   useEffect(() => {
+      if (folderDetails._id == "requests") {
+         axios({
+         method: 'GET',
+         url: `/user/find?collection=2 limit=3`
+         })
+         .then((response) => {
+         setDisplayUsers(response)
+         })
+         .catch((error) => {
+         console.error(error)
+         })
+      }
+      else {
+         folderDetails.contents.slice(0, 3).forEach((userId) => {
+         axios({ 
+            method: 'get',
+            url: `/user/info/${userId}`
+         })
+         .then((response) => {
+            setDisplayUsers((prev) => [...prev, response])
+         })
+         .catch((error) => {
+            console.error(error)
+         })
+         });
+      }
+   }, []);
 
-      <div className="userCards shielded">
-        { displayUsers[0] ? (
-          <div className="cardContainer">
-            <UserPin userData={displayUsers[0]} />
-          </div>
-        ) : null}
-        { displayUsers[1] ? (
-          <div className="cardContainer">
-            <UserPin userData={displayUsers[1]} />
-          </div>
-        ) : null }
-        { displayUsers[2] ? (
-          <div className="cardContainer">
-            <UserPin userData={displayUsers[2]} />
-          </div>
-        ) : null }
+   function openFolder() {
+      navigate(`/friendsList/${folderDetails._id}`);
+   }
+   
+   return (
+      <div className="displayFolder">
+
+         <div className="userCards shielded">
+         { displayUsers[0] ? (
+            <div className="cardContainer">
+               <UserPin userData={displayUsers[0]} />
+            </div>
+         ) : null}
+         { displayUsers[1] ? (
+            <div className="cardContainer">
+               <UserPin userData={displayUsers[1]} />
+            </div>
+         ) : null }
+         { displayUsers[2] ? (
+            <div className="cardContainer">
+               <UserPin userData={displayUsers[2]} />
+            </div>
+         ) : null }
+
+         </div>
+         
+         <FontAwesomeIcon 
+         className="folder" 
+         icon={faFolder}
+         onClick={ () => { openFolder() } }
+         />
+
+         <p className="folderCover"> Friend Requests </p>
 
       </div>
-
-   </div>
-  )
-}
+   )
+   }

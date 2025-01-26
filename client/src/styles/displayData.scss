@@ -171,14 +171,15 @@
 }
 
 .displayFolder {
+   position: relative;
    width: 24rem;
    height: 12rem;
-   clip-path: polygon(0rem -6rem, 24rem -6rem, 24rem 12rem, 0rem 12rem);
 
    .userCards {
       position: relative;
       width: 100%;
       height: 100%;
+      clip-path: polygon(0rem -6rem, 24rem -6rem, 24rem 4.5rem, 3rem 4.5rem);
    }
 
    .cardContainer {
@@ -191,24 +192,48 @@
 
       &:nth-child(1) {
          bottom: 6em;
-         left: 0;
+         left: 1.5em;
       }
 
       &:nth-child(2) {
          bottom: 6em;
-         left: 9em;
+         left: 10.5em;
       }
 
       &:nth-child(3) {
          bottom: 6em;
-         left: 18em;
+         left: 19.5em;
       }
 
 
    }
 
-   svg {
-      height: 100%;
+   .folder{
+      position: absolute;
+      margin-bottom: -1rem;
       width: 100%;
+      height: 100%;
+      bottom: 0;
+      left: 0;
+      font-size: 12rem;
+      line-height: 1;
+      color: var(--base-color);
+      transform: scale(1.35, 1);
+
+      &:hover {
+         cursor: pointer;
+      }
+   }
+
+   .folderCover{
+      position: absolute;
+      margin: 0;
+      width: 50%;
+      height: 50%;
+      bottom: 1.5rem;
+      left: 25%;
+      color: var(--background-color);
+      font-size: 2.4rem;
+      pointer-events: none;
    }
 }
