@@ -17,6 +17,8 @@ route will:
 */
 router.get("/info/:userId?", userController.info);
 
+
+
 /*
 ------------ /defineRelationship route ------------
 

@@ -15,17 +15,8 @@ function App() {
   useEffect(() => {
 
     axios({ method: 'get', url: `user/info` })
-      .then(response => {
-        setUserData({
-          _id: response._id,
-          username: response.username,
-          email: response.email,
-          bio: response.bio
-        });
-      })
-      .catch(() => {
-        setUserData({});
-      });
+      .then( setUserData )
+      .catch(() => { setUserData({}); });
 
   }, []);
 

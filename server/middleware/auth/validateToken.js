@@ -5,7 +5,7 @@ function validateToken(req, res, next) {
   const accessToken = req.cookies["accessToken"];
 
   if (!accessToken) {
-    req.user = {failure: "no access token provided"};
+    console.log("no access token found");
     return next();
   }
 
@@ -24,7 +24,7 @@ function validateToken(req, res, next) {
     }
   } catch (error) {
     console.log("error validating access token:", accessToken);
-    req.user = {failure: "system error validating access token"};
+    console.error(error);
   }
   return next();
 }

@@ -80,7 +80,10 @@ exports.login = async (req, res) => {
 
   try {
     // find user in database with provided username
-    const user = await users.findOne({ username }, { _id: 1, username: 1, email: 1, bio: 1, hash: 1, salt: 1 })
+    const user = await users.findOne(
+      { username: new RegExp(username, 'i') },
+      { _id: 1, username: 1, email: 1, bio: 1, hash: 1, salt: 1 }
+    );
     if (!user) return res.status(400).json({ error: "username not found" });
 
     // check if password is correct
@@ -148,10 +151,10 @@ exports.updateAccount = (req, res) => {
 
   try{
     //make sure username or email isn't already taken
-    if (users.findOne({ username })) {
+    if (users.findOne({ username: new RegExp(username, 'i') })) {
       return res.status(400).json({ error: "username already taken" });
     }
-    if (users.findOne({ email })) {
+    if (users.findOne({ email: new RegExp(email, 'i') })) {
       return res.status(400).json({ error: "email already taken" });
     }
 

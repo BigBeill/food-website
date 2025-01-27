@@ -82,6 +82,10 @@ main{
   width: 100%;
   margin: 0rem;
   padding: 0rem;
+
+  > *{
+    flex-grow: 1;
+  }
 }
 
 .split{
