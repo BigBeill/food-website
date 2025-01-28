@@ -15,8 +15,6 @@ function validateToken(req, res, next) {
       req.user = {
         _id: validToken._id,
         username: validToken.username,
-        email: validToken.email,
-        bio: validToken.bio,
       };
     }
     else {

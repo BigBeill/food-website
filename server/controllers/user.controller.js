@@ -142,7 +142,7 @@ exports.logout = async (req, res) => {
   res.status(200).json({ message: "success" });
 };
 
-exports.updateAccount = (req, res) => {
+exports.updateAccount = async (req, res) => {
   const { username, email, bio } = req.body;
 
   // check for any missing fields in the request
@@ -151,38 +151,26 @@ exports.updateAccount = (req, res) => {
 
   try{
     //make sure username or email isn't already taken
-    if (users.findOne({ username: new RegExp(username, 'i') })) {
-      return res.status(400).json({ error: "username already taken" });
-    }
-    if (users.findOne({ email: new RegExp(email, 'i') })) {
-      return res.status(400).json({ error: "email already taken" });
-    }
+    const foundUsername = await users.findOne({ username: new RegExp(username, 'i') });
+    if (foundUsername && foundUsername._id != req.user._id) { return res.status(400).json({ error: "username already taken" }); }
+    const foundEmail = await users.findOne({ email: new RegExp(email, 'i') }) 
+    if (foundEmail && foundEmail._id != req.user._id) { return res.status(400).json({ error: "email already taken" }); }
 
     // save user to database
-    users
-      .updateOne(
-        { _id: req.user._id },
-        {
-          $set: {
-            email: email,
-            username: username,
-            bio: bio,
-          },
-        }
-      )
-      .then((result) => {
-        // create tokens
-        const tokens = createToken(result);
-        // send tokens to database
-        new refreshTokens({ user: savedUser._id, token: tokens.refreshToken })
-        .save()
-        .then(() => {
-          // send cookies to client
-          res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
-          res.cookie("refreshToken", tokens.refreshToken, { maxAge: cookieAge });
-          return res.status(200).json({ message: "account registered successfully" });
-        })
-      });
+    const updatedUser = await users.updateOne(
+      { _id: req.user._id },
+      { $set: {
+        email: email,
+        username: username,
+        bio: bio,
+      }, }
+    )
+    
+    // send updated accessTokens to client
+    const tokens = await createToken(updatedUser);
+    res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
+
+    return res.status(200).json({ message: "account registered successfully" });
   }
 
   // handle any errors caused by the controller
