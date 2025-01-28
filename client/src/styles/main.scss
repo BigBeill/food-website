@@ -6,7 +6,8 @@
 :root{
   font-size: 1rem;
   letter-spacing: 1px;
-  font-family: 'Coolvetica', sans-serif;
+  // font-family: 'Coolvetica', sans-serif;
+  font-family: 'Archivo', sans-serif;
   background-color: #f5f8fa;
 
 
@@ -84,7 +85,7 @@ main{
   padding: 0rem;
 
   > *{
-    flex-grow: 1;
+    flex: 1;
   }
 }
 

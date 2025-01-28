@@ -49,21 +49,21 @@
       <div className="displayFolder">
 
          <div className="userCards shielded">
-         { displayUsers[0] ? (
-            <div className="cardContainer">
-               <UserPin userData={displayUsers[0]} />
-            </div>
-         ) : null}
-         { displayUsers[1] ? (
-            <div className="cardContainer">
-               <UserPin userData={displayUsers[1]} />
-            </div>
-         ) : null }
          { displayUsers[2] ? (
             <div className="cardContainer">
                <UserPin userData={displayUsers[2]} />
             </div>
-         ) : null }
+         ) : <div style={ {display: 'none'} }></div>}
+         { displayUsers[0] ? (
+            <div className="cardContainer">
+               <UserPin userData={displayUsers[0]} />
+            </div>
+         ) : <div style={ {display: 'none'} }></div> }
+         { displayUsers[1] ? (
+            <div className="cardContainer">
+               <UserPin userData={displayUsers[1]} />
+            </div>
+         ) : <div style={ {display: 'none'} }></div> }
 
          </div>
          

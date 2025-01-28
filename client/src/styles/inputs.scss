@@ -141,7 +141,6 @@ button{
   }
 }
 
-
 .svgButtonContainer{
   margin-top: auto;
 
@@ -153,3 +152,48 @@ button{
     cursor: pointer;
   }
 }
+
+.textInputParent {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+
+  &.bottomPadding {
+    padding-bottom: 0.6rem;
+  }
+
+  label {
+    margin: 0.9rem 0rem;
+    width: 100%;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  textarea {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    padding: .3rem .6rem;
+    resize: none;
+  }
+
+  // incase plane text needs to be put in the input div
+  h4 {
+    margin: 0.9rem 0rem;
+    width: 100%;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  p {
+    box-sizing: border-box;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    resize: none;
+  }
+}
+
