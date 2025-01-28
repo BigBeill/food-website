@@ -152,6 +152,10 @@ main{
 
 /* ------------ universally applied css ------------ */
 
+p {
+  white-space: pre-line;
+}
+
 h2{
   text-decoration: underline #065F46;
   text-decoration-thickness: 0.2rem;

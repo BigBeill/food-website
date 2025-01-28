@@ -30,10 +30,10 @@ exports.register = async (req, res) => {
 
   try {
     // make sure username and email don't already exist in database
-    const searchUsername = await users.findOne({ username });
+    const searchUsername = await users.findOne({ username: { $regex: `^${username}$`} });
     if (searchUsername) return res.status(400).json({ error: "username already taken" });
 
-    const searchEmail = await users.findOne({ email });
+    const searchEmail = await users.findOne({ email: { $regex: `^${email}$`} });
     if (searchEmail) return res.status(400).json({ error: "email already taken" });
 
     // hash password
@@ -81,7 +81,7 @@ exports.login = async (req, res) => {
   try {
     // find user in database with provided username
     const user = await users.findOne(
-      { username: new RegExp(username, 'i') },
+      { username: new RegExp(`^${username}$`, 'i') },
       { _id: 1, username: 1, email: 1, bio: 1, hash: 1, salt: 1 }
     );
     if (!user) return res.status(400).json({ error: "username not found" });
@@ -151,9 +151,9 @@ exports.updateAccount = async (req, res) => {
 
   try{
     //make sure username or email isn't already taken
-    const foundUsername = await users.findOne({ username: new RegExp(username, 'i') });
+    const foundUsername = await users.findOne({ username: new RegExp(`^${username}$`, 'i') });
     if (foundUsername && foundUsername._id != req.user._id) { return res.status(400).json({ error: "username already taken" }); }
-    const foundEmail = await users.findOne({ email: new RegExp(email, 'i') }) 
+    const foundEmail = await users.findOne({ email: new RegExp(`^${email}$`, 'i') }) 
     if (foundEmail && foundEmail._id != req.user._id) { return res.status(400).json({ error: "email already taken" }); }
 
     // save user to database
@@ -168,7 +168,7 @@ exports.updateAccount = async (req, res) => {
     
     // send updated accessTokens to client
     const tokens = await createToken(updatedUser);
-    res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
+    await res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
 
     return res.status(200).json({ message: "account registered successfully" });
   }

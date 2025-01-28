@@ -22,7 +22,6 @@ function validateToken(req, res, next) {
     }
   } catch (error) {
     console.log("error validating access token:", accessToken);
-    console.error(error);
   }
   return next();
 }
