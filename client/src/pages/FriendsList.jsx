@@ -12,7 +12,6 @@ export default function FriendsList() {
    const { folderId } = useParams();
    const [searchParams, setSearchParams] = useSearchParams();
 
-   const [_id, set_id] = useState(searchParams.get('_id') || '');
    const [username, setUsername] = useState(searchParams.get('username') || '');
    const [email, setEmail] = useState(searchParams.get('email') || '');
 
@@ -21,7 +20,6 @@ export default function FriendsList() {
 
    function submitSearch() {
       let params = {};
-      if (_id) params._id = _id;
       if (username) params.username = username;
       if (email) params.email = email;
       setSearchParams(params);
@@ -32,7 +30,7 @@ export default function FriendsList() {
       if(!folderId){
          axios({
             method: 'GET',
-            url: '/user/find?collection=1&limit=15'
+            url: `/user/find?collection=1&limit=15&username=${username}&email=${email}`
          })
          .then((response) => {
             setFolders([{_id: "requests"}]);
@@ -42,7 +40,7 @@ export default function FriendsList() {
       else if (folderId == "requests") {
          axios({
             method: 'GET',
-            url: '/user/find?collection=2&limit=15'
+            url: `/user/find?collection=2&limit=15&username=${username}&email=${email}`
          })
          .then((response) => {
             setFolders([]);
@@ -58,17 +56,6 @@ export default function FriendsList() {
       <div className='displayUserInformationCards'>
          <div className='filterPanel'>
             <h2>Filter Users - Friends</h2>
-            <div className="textInput">
-               <label htmlFor="searchId">user ID</label>
-               <input 
-               id="searchId" 
-               type="text"
-               placeholder="Search by ID (exact match)"
-               value={_id}
-               onChange={(event) => set_id(event.target.value)}
-               onKeyDown={ (event) => { if(event.key == "Enter") submitSearch(); } }
-               />
-            </div>
             <div className="textInput">
                <label htmlFor="searchUsername">Username</label>
                <input 
