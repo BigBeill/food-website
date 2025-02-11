@@ -5,6 +5,38 @@ download "Full Download of All Data Types"
 extract the zip folder into root folder of the project
 rename the folder to foodData_USDA (make sure its recognized by the .gitignore)
 
+open all files inside foodData_USDA folder in notepad++
+for all files replace all instances of ,"", with ,, (replace comma-quotation-quotation-comma with comma-comma)
+for all files replace all instances of '" with ''" (replace apostrophe-quotation with apostrophe-apostrophe-quotation)
+THEN for all files replace all instances of '''" with ''''" (replace apostrophe-apostrophe-apostrophe-quotation with apostrophe-apostrophe-apostrophe-apostrophe-quotation)
+
+for branded_food.csv
+split the folder into sets of 600,000 entries (all go to the same place, just upload in split up chunks)
+
+open food.csv
+go to line 41848 and check its been filled in correctly (no enter was pressed splitting the line into 2 parts)
+replace all instances of "(\d{1,2})\/(\d{1,2})\/(\d{4})" with "\3-\1-\2" (make sure to have find in regex mode)
+
+open food_attribute.csv
+
+open food_calorie_converion_factor.csv
+replace all instances of ,""$ with , (make sure to have find in regex mode)
+
+open food_component.csv
+replace all instances of ,""$ with , (make sure to have find in regex mode)
+
+open food_nutrient.csv
+replace all instances of "" with (replace quotation-quotation with NULL)
+
+open food_portion.csv
+replace all instances of ,""$ with , (make sure to have find in regex mode)
+
+open market_acquisition.csv
+replace all instances of ,""$ with , (make sure to have find in regex mode)
+
+
+
+
 download PostgreSQL
 open pgAdmin 4
 create a database called "foodData_USDA"
@@ -28,7 +60,7 @@ CREATE TABLE branded_food (
 	brand_owner text,
 	brand_name text,
 	subbrand_name text,
-	gtin_upc numeric,
+	gtin_upc text,
 	ingredients text,
 	not_a_significant_source_of text,
 	serving_size numeric,
@@ -36,7 +68,7 @@ CREATE TABLE branded_food (
 	household_serving_fulltext text,
 	branded_food_category text,
 	data_source text,
-	package_weight numeric,
+	package_weight text,
 	modified_date date,
 	available_date date,
 	market_country text,
@@ -76,12 +108,12 @@ CREATE TABLE food_attribute (
 	seq_num numeric,
 	food_attribute_type_id numeric,
 	name text,
-	value numeric
+	value text
 );
 CREATE TABLE food_attribute_type (
 	id numeric,
 	name text,
-	description numeric
+	description text
 );
 CREATE TABLE food_calorie_conversion_factor (
 	food_nutrient_conversion_factor_id numeric,
@@ -200,7 +232,7 @@ CREATE TABLE market_acquisition (
 	store_city text,
 	store_name text,
 	store_state text,
-	upc_code numeric
+	upc_code text
 );
 CREATE TABLE measure_unit (
 	id numeric,
