@@ -49,11 +49,11 @@ function GroupList({clickHandler}) {
   },[]);
 
   return (
-    <>
+    <div className="displayButtons">
       {groupList.map((row, index) => (
         <button key={index} onClick={() => clickHandler(row)}>{row.foodgroupname}</button>
       ))}
-    </>
+    </div>
   );
 }
 
@@ -67,11 +67,11 @@ function IngredientList({groupID, clickHandler}) {
   },[])
 
   return (
-    <>
+    <div className="displayButtons">
       {ingredientList.map((row, index) => (
         <button key={index} onClick={() => clickHandler(row)}>{row.fooddescription}</button>
       ))}
-    </>
+    </div>
   )
 }
 
@@ -90,7 +90,7 @@ function IngredientDetails({ingredientID}) {
   if (Object.keys(ingredientData).length == 0) { return <p>loading page</p> }
   return (
     <div className="whiteBackground">
-      <h1>{ingredientData.name}</h1>
+      <h1>{ingredientData.foodDescription}</h1>
       <input type='number' value={amount.value} onChange={(event) => setAmount({...amount, value: event.target.value})}/>
       <p>calories: {((ingredientData.nutrition.calories/100) * amount.value).toFixed(0)}</p>
       <p>fat: {((ingredientData.nutrition.fat/100) * amount.value).toFixed(2)}g</p>
