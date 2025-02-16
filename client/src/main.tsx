@@ -3,17 +3,18 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 // internal imports
-import App from './App.jsx';
+import App from './App';
 import './styles/displayData.scss';
 import './styles/main.scss';
 import './styles/login.scss';
 import './styles/RecipeBook.scss';
 import './styles/inputs.scss';
+import './styles/componentSpecific/PaginationBar.scss';
 
 //remove before production
 import './styles/testingStyles.scss';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,

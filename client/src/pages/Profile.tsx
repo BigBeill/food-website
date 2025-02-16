@@ -5,16 +5,19 @@ import axios from '../api/axios';
 import GrowingText from '../components/GrowingText';
 import Loading from '../components/Loading';
 
+import UserObject from '../interfaces/UserObject';
+import RelationshipObject from '../interfaces/RelationshipObject';
+
 
 export default function Profile() {
    const titleParent = useRef(null);
    const navigate = useNavigate();
-   const context = useOutletContext();
+   const context = useOutletContext<{userData: UserObject}>();
    const { _id } = useParams();
 
-   const [userData, setUserData] = useState(); // { _id, username, email, bio }
-   const [relationship, setRelationship] = useState();
-   const [editMode, setEditMode] = useState(false);
+   const [userData, setUserData] = useState<UserObject>({_id: '', username: '', email: '', bio: ''});
+   const [relationship, setRelationship] = useState<RelationshipObject>({ type: 0, _id: '0' });
+   const [editMode, setEditMode] = useState<boolean>(false);
 
    useEffect(() => {
       setEditMode(false);
@@ -22,14 +25,14 @@ export default function Profile() {
       if (!_id){
          if (!context.userData._id) { navigate('/login'); }
 
-         axios({ method: 'GET', url: `user/info/${context.userData._id}` })
+         axios({ method: 'get', url: `user/info/${context.userData._id}` })
          .then((response) => { setUserData(response); });
-         setRelationship({ type: 4, _id: 0 });
+         setRelationship({ type: 4, _id: "0" });
       }
       else {
-         axios({ method: 'GET', url: `user/info/${_id}` })
+         axios({ method: 'get', url: `user/info/${_id}` })
          .then((response) => { setUserData(response); });
-         axios({ method: 'GET', url: `user/defineRelationship/${_id}` })
+         axios({ method: 'get', url: `user/defineRelationship/${_id}` })
          .then((response) => { setRelationship(response); });
       }
    }, [_id]);
@@ -41,13 +44,13 @@ export default function Profile() {
             email: userData.email,
             bio: userData.bio
          }
-         axios({ method: 'POST', url: 'user/updateAccount', data: requestData })
+         axios({ method: 'post', url: 'user/updateAccount', data: requestData })
       }
       else {
          let url;
          if (!_id) { url = `user/info/${context.userData._id}`; }
          else { url = `user/info/${_id}`; }
-         axios({ method: 'GET', url })
+         axios({ method: 'get', url })
          .then((response) => { setUserData(response); });
       }
       setEditMode(false);
@@ -71,7 +74,7 @@ export default function Profile() {
 
    // handle logout function
    const handleLogout = () => {
-      axios({ method: 'POST', url: 'user/logout' })
+      axios({ method: 'post', url: 'user/logout' })
       .then(() => { location.assign('/') })
    };
 

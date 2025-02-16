@@ -235,18 +235,18 @@ exports.defineRelationship = async (req, res) => {
     console.error(error);
     return res.status(500).json({ error: "server failed to define relationship" });
   }
-}
+};
 
 exports.find = async (req, res) => {
   const { _id } = req.user;
-  const { username, email, limit, skip, collection } = req.query;
+  const { username, email, limit, skip, relationship } = req.query;
 
   // Parsing limit and skip as integers 
   const parsedLimit = parseInt(limit, 10) || 6; 
   const parsedSkip = parseInt(skip, 10) || 0;
-  const parsedCollection = parseInt(collection, 10) || 0;
+  const parsedRelationship = parseInt(relationship, 10) || 0;
 
-  if (parsedCollection != 0 && !_id) return res.status(401).json({ error: "user not signed in" });
+  if (parsedRelationship != 0 && !_id) { return res.status(401).json({ error: "user not signed in" }) };
 
   try {
 
@@ -257,7 +257,7 @@ exports.find = async (req, res) => {
     if (username) query.username = { $regex: new RegExp(username, 'i') };
     if (email) query.email = { $regex: new RegExp(email, 'i') };
 
-    if (parsedCollection == 1) {
+    if (parsedRelationship == 1) {
       // collect a list of friendship relationships user is involved in
       const friendshipList = await friendships.find({ friendIds: _id });
       // extract the _ids of each non-signed in user
@@ -266,7 +266,7 @@ exports.find = async (req, res) => {
       query._id = { $in: friendsList };
     }
 
-    else if (parsedCollection == 2) {
+    else if (parsedRelationship == 2) {
       // collect a list of friend requests user has received
       const receivedRequests = await friendRequest.find({ receiverId: _id });
       // extract the _ids of each non-signed in user
@@ -275,7 +275,7 @@ exports.find = async (req, res) => {
       query._id = { $in: requestList };
     }
 
-    else if (parsedCollection == 3) {
+    else if (parsedRelationship == 3) {
       // collect a list of friend requests user has sent
       const sentRequests = await friendRequest.find({ senderId: _id });
       // extract the _ids of each non-signed in user
@@ -285,11 +285,12 @@ exports.find = async (req, res) => {
     }
 
     // use query to find users in database
+    const totalCount = await users.countDocuments(query);
     const usersList = await users.find(query)
     .skip(parsedSkip)
     .limit(parsedLimit);
     
-    return res.status(200).json({message: "List of users collected successfully", payload: usersList})
+    return res.status(200).json({message: "List of users collected successfully", payload: { users: usersList, totalCount}})
   }
 
   // handle any errors caused by the controller

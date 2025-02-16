@@ -6,17 +6,19 @@ import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 // internal imports
 import Notebook from '../components/Notebook';
 
+import PageObject from '../interfaces/PageObject';
+
 export default function Home() {
 
-  const [recipeName, setRecipeName] = useState('')
-  const [ingredientList, setIngredientList] = useState([])
-  const [pageNumber, setPageNumber] = useState(0)
+  const [recipeName, setRecipeName] = useState<string>('')
+  const [ingredientList, setIngredientList] = useState<string[]>([])
+  const [pageNumber, setPageNumber] = useState<number>(0)
 
   useEffect(() => {
 
   }, [pageNumber])
 
-  const pageList = [{
+  const pageList: PageObject[] = [{
     content: MainPage,
     props: {
       recipeName,
@@ -29,15 +31,22 @@ export default function Home() {
   return <Notebook pageList={pageList} />
 }
 
-function MainPage({recipeName, setRecipeName, ingredientList, setIngredientList}) {
+interface MainPageProps {
+  recipeName: string;
+  setRecipeName: React.Dispatch<React.SetStateAction<string>>;
+  ingredientList: string[];
+  setIngredientList: React.Dispatch<React.SetStateAction<string[]>>;
+}
+
+function MainPage({recipeName, setRecipeName, ingredientList, setIngredientList}: MainPageProps) {
 
   const [newIngredient, setNewIngredient] = useState('')
 
   function addIngredient() {
-    if (!newIngredient) { return }
+    if (!newIngredient) { return; }
 
-    setIngredientList(list => [...list, newIngredient])
-    setNewIngredient('')
+    setIngredientList((list: string[]) => [...list, newIngredient]);
+    setNewIngredient('');
   }
 
   return (
@@ -67,16 +76,5 @@ function MainPage({recipeName, setRecipeName, ingredientList, setIngredientList}
 
       <button className='additionalMargin'> search </button>
     </div>
-  )
-}
-
-function DisplayRecipes({recipes}) {
-
-  return(
-    <>
-      {recipes.map((item, index) => (
-        <p key={index}>{item.title}</p>
-      ))}
-    </>
   )
 }

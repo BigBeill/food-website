@@ -6,6 +6,8 @@ import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 // internal imports
 import '../styles/componentSpecific/notebook.scss'
 
+import PageObject from '../interfaces/PageObject';
+
 /*
 using notebook component:
 
@@ -72,6 +74,7 @@ export default function MainFunction() {
             //pass down the function
             searchFunction: searchFunction
          }
+      }
    ];
 
    // call the Notebook and make sure to pass pageList 
@@ -97,14 +100,20 @@ function PageOne({ search, setSearch, submitSearch }) {
 order of json files in the pageList array will decide the order pages appear on the notebook
 */
 
-export default function Notebook ({pageList, parentPageNumber = 0, requestNewPage}) {
+interface NotebookProps {
+   pageList: PageObject[];
+   parentPageNumber?: number;
+   requestNewPage?: (pageNumber: number) => void;
+}
+
+export default function Notebook ({pageList, parentPageNumber = 0, requestNewPage}: NotebookProps) {
 
    const [displayRight, setDisplayRight] = useState(false)
    const [narrowScreen, setNarrowScreen] = useState(false)
 
    const [pageNumber, setPageNumber] = useState(parentPageNumber || 0)
-   const FirstPage = pageList[pageNumber]
-   const SecondPage = pageList[pageNumber + 1]
+   const FirstPage: PageObject = pageList[pageNumber]
+   const SecondPage: PageObject = pageList[pageNumber + 1]
 
    useEffect(() => {
 

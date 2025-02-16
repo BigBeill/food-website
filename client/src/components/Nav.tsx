@@ -5,9 +5,16 @@ import React, { useState, useEffect, useRef} from 'react'
 import '../styles/componentSpecific/nav.scss'
 import { NavLink } from "react-router-dom";
 
+import UserObject from '../interfaces/UserObject'
+
+
+interface NavProps {
+    userData: UserObject
+}
+
 function Nav({userData}) {
-    const [open, setOpen] = useState(false);
-    const navRef = useRef(null);
+    const [open, setOpen] = useState<boolean>(false);
+    const navRef = useRef<HTMLDivElement>(null);
     
     // open/close the nav bar whenever the handle on the side of the nav panel is clicked
     function openNav() {
@@ -15,8 +22,8 @@ function Nav({userData}) {
     }
 
     // close the nav bar whenever the user clicks outside of it
-    function handleOutsideClick(event) {
-        if (navRef.current && !navRef.current.contains(event.target)) {
+    function handleOutsideClick(event: MouseEvent) {
+        if (navRef.current && !navRef.current.contains(event.target as Node)) {
             setOpen(false);
         }
     }

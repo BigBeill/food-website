@@ -25,8 +25,9 @@ const axiosInstance =  axios.create({
 function checkAccessToken() {
    try {
       const accessToken = cookies.get('accessToken');
-      if (!accessToken) return false;
+      if (!accessToken) { return false; }
       const decodedToken = jwtDecode(accessToken);
+      if (!decodedToken.exp) { return false; }
       const validToken = decodedToken.exp > Date.now() / 1000;
       return validToken;
    } 
@@ -36,8 +37,14 @@ function checkAccessToken() {
    }
 }
 
-export default async function sendRequest( configuration) {
-   return new Promise(async (resolve, reject) => {
+interface sendRequestProps {
+   method: string;
+   url: string;
+   data?: { [key: string]: any };
+}
+
+export default async function sendRequest( configuration: sendRequestProps ) {
+   return new Promise<any>(async (resolve, reject) => {
 
       // if refresh token exists and client needs a new access token, use the refresh api
       try {
@@ -55,7 +62,12 @@ export default async function sendRequest( configuration) {
       }
       catch (error) {
          console.error('issue processing request:', error);
-         return reject(error.response.data);
+         
+         if (axios.isAxiosError(error) && error.response) {
+            return reject(error.response.data);
+         } else {
+            return reject(error);
+         }
       }
    })
 }

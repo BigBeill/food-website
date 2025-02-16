@@ -59,10 +59,9 @@ exports.list = async (req, res) => {
       query += `LIMIT $${values.length}`;
    }
 
-   console.log('sending query to postgre');
-   console.log('query:', query);
-   console.log('values:', values);
    const data = await postgresConnection.query(query, values);
+   // change the data to make it usable by the client
+   data.rows = data.rows.map(row => { return { foodId: row.foodid, foodDescription: row.fooddescription } });
    return res.status(200).json({ message: "ingredient list collected from server", payload: data.rows });
 }
 
@@ -73,5 +72,8 @@ exports.list = async (req, res) => {
 
 exports.groups = async (req, res) => {
    const data = await postgresConnection.query('select * from foodgroup');
+   console.log(data.rows);
+   // change the data to make it usable by the client
+   data.rows = data.rows.map(row => { return { foodGroupId: row.foodgroupid, foodGroupName: row.foodgroupname } });
    return (res.status(200).json({ message: "ingredient groups collected from server", payload: data.rows }));
 };

@@ -11,11 +11,15 @@ import axios from '../api/axios';
 import Notebook from '../components/Notebook'
 import { assignIds, removeIds } from '../tools/general'
 
+import RecipeObject from '../interfaces/RecipeObject';
+import UserObject from '../interfaces/UserObject';
+import IngredientObject from '../interfaces/IngredientObject';
+
 export default function NewEditRecipe () {
 
   // define react hooks
   const navigate = useNavigate();
-  const { userData } = useOutletContext();
+  const { userData } = useOutletContext<{userData: UserObject}>();
   const [searchParams] = useSearchParams();
 
   //get recipeId if in url
@@ -25,11 +29,11 @@ export default function NewEditRecipe () {
   if (userData._id == "") navigate('/login');
 
   //define required useStates
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [image, setImage] = useState('');
-  const [ingredientList, setIngredientList] = useState([]);
-  const [instructionList, setInstructionList] = useState([]);
+  const [title, setTitle] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const [image, setImage] = useState<string>('');
+  const [ingredientList, setIngredientList] = useState<{id: number, content: IngredientObject}[]>([]);
+  const [instructionList, setInstructionList] = useState<{id: number, content: string}[]>([]);
 
   //run useEffect on page start
   useEffect (() => {
@@ -51,12 +55,12 @@ export default function NewEditRecipe () {
   function submitRecipe(){
 
     //define what type of request is being sent to the server
-    let method
+    let method: string;
     if (!recipeId) method = 'post';
     else method = 'put';
 
     //package relevant data into recipeData
-    const recipeData = {
+    const recipeData: RecipeObject = {
       _id: recipeId,
       title: title,
       description: description,
@@ -119,9 +123,15 @@ export default function NewEditRecipe () {
 
 
 
+interface GeneralInfoPageProps {
+  newRecipe: boolean;
+  title: string;
+  setTitle: React.Dispatch<React.SetStateAction<string>>;
+  description: string;
+  setDescription: React.Dispatch<React.SetStateAction<string>>;
+}
 
-
-function GeneralInfoPage ({newRecipe, title, setTitle, description, setDescription}) {
+function GeneralInfoPage ({newRecipe, title, setTitle, description, setDescription}: GeneralInfoPageProps) {
   return (
     <div className='standardPage'>
       <h1>{newRecipe ? 'New Recipe' : 'Edit Recipe'}</h1>
@@ -133,7 +143,7 @@ function GeneralInfoPage ({newRecipe, title, setTitle, description, setDescripti
 
       <div className='textInput center additionalMargin'>
         <label htmlFor='description'>Description</label>
-        <textarea id='description' rows="9" value={description} onChange={(event) => setDescription(event.target.value)} placeholder='describe your recipe' />
+        <textarea id='description' rows={9} value={description} onChange={(event) => setDescription(event.target.value)} placeholder='describe your recipe' />
       </div>
     </div>
   )
@@ -142,9 +152,12 @@ function GeneralInfoPage ({newRecipe, title, setTitle, description, setDescripti
 
 
 
+interface ImagePageProps {
+  image: string;
+  setImage: React.Dispatch<React.SetStateAction<string>>;
+}
 
-
-function ImagePage ({image, setImage}) {
+function ImagePage ({image, setImage}: ImagePageProps) {
   const imageOptions = ['🧀', '🥞', '🍗', '🍔','🍞', '🥯', '🥐','🥨','🍗','🥓','🥩','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🥚','🍳','🥘','🥣','🥗','🍿','🧂','🥫']
   return (
     <div className='standardPage'>
@@ -161,30 +174,35 @@ function ImagePage ({image, setImage}) {
 
 
 
+interface IngredientPageProps { 
+  ingredientList: {id: number, content: IngredientObject}[];
+  setIngredientList: React.Dispatch<React.SetStateAction<{id: number, content: IngredientObject}[]>>;
+}
 
-
-function IngredientPage ({ingredientList, setIngredientList}) {
+function IngredientPage ({ingredientList, setIngredientList}: IngredientPageProps) {
 
   // define useStates
-  const [newIngredient, setNewIngredient] = useState({foodId:"", foodDescription:"", measureId:"", unit:"", amount:""})
-  const [conversionFactorsAvailable, setConversionFactorsAvailable] = useState([{ measureId: '1489', unit: 'g' }])
-  const [ingredientsAvailable, setIngredientsAvailable] = useState([])
-  const [availableId, setAvailableId] = useState(ingredientList.length)
+  const [newIngredient, setNewIngredient] = useState<IngredientObject>({foodId:"", foodDescription:"", measureId:"", unit:"", amount: null});
+  const [conversionFactorsAvailable, setConversionFactorsAvailable] = useState<{measureId: string, unit: string}[]>([{ measureId: '1489', unit: 'g' }])
+  const [ingredientsAvailable, setIngredientsAvailable] = useState<IngredientObject[]>([])
+  const [availableId, setAvailableId] = useState<number>(ingredientList.length)
   
-  function updateNewIngredientName (value) {
+  function updateNewIngredientName (value: string) {
     setNewIngredient({...newIngredient, foodId:"", foodDescription: value});
     if (value.length >= 3) searchIngredients(value);
     else setIngredientsAvailable([]);
   }
 
   //fetch up to 10 ingredients from database that have similar names to value given
-  function searchIngredients (value) { 
+  function searchIngredients (value: string) { 
     axios({ method: 'get', url:`ingredient/list?foodDescription=${value}&limit=10` })
-    .then(setIngredientsAvailable)
+    .then(response => {
+      setIngredientsAvailable(response);
+    })
     .catch(error => { console.error('unable to fetch ingredients:', error); });
   }
 
-  function ingredientSelected (foodId) {
+  function ingredientSelected (foodId: string) {
     axios({ method: 'get', url:`ingredient/details?foodId=${foodId}`})
     .then(response => {
       setNewIngredient({ ...newIngredient, foodId, foodDescription: response.foodDescription});
@@ -198,10 +216,10 @@ function IngredientPage ({ingredientList, setIngredientList}) {
     if (!newIngredient.foodId || !newIngredient.unit || !newIngredient.amount) return
     setIngredientList([...ingredientList, {id: availableId, content: newIngredient} ]);
     setAvailableId( availableId+1 );
-    setNewIngredient({foodId:"", foodDescription:"", unit:"", amount:""});
+    setNewIngredient({foodId:"", foodDescription:"", unit:"", amount:0});
   }
 
-  function removeIngredient (index) {
+  function removeIngredient (index: number) {
     let tempArray = ingredientList.slice()
     tempArray.splice(index, 1)
     setIngredientList(tempArray)
@@ -220,7 +238,7 @@ function IngredientPage ({ingredientList, setIngredientList}) {
             </div>
             <div className='listItem'>
               {(item.content.unit == 'physical') ? (
-                <p>{item.content.amount} {item.content.name}{item.content.amount != 1 ? 's' : ''}</p>
+                <p>{item.content.amount} {item.content.foodDescription}{item.content.amount != 1 ? 's' : ''}</p>
               ):(
               <p>{item.content.amount} {item.content.unit}{item.content.amount != 1 ? 's' : ''} of {item.content.foodDescription}</p>
               )}
@@ -233,7 +251,7 @@ function IngredientPage ({ingredientList, setIngredientList}) {
       <div className='textInput shared additionalMargin'>
         <label>New Ingredient</label>
         <div className='inputs'>
-          <input type='number' value={newIngredient.amount} onChange={(event) => setNewIngredient({...newIngredient, amount: event.target.value})} placeholder='Amount'/>
+          <input type='number' value={newIngredient.amount ?? ''} onChange={(event) => setNewIngredient({...newIngredient, amount: Number(event.target.value)})} placeholder='Amount'/>
           <select value={newIngredient.unit} onChange={(event) => setNewIngredient({...newIngredient, measureId: event.target.options[event.target.selectedIndex].id, unit: event.target.value})} >
             <option value="" disabled hidden className='light'>Units</option>
             {conversionFactorsAvailable.map((conversionFactor, index) => (
@@ -243,8 +261,8 @@ function IngredientPage ({ingredientList, setIngredientList}) {
           <div className='activeSearchBar'> {/* ingredient search bar */}
             <input type='text' className='mainInput' value={newIngredient.foodDescription} onChange={(event) => {updateNewIngredientName(event.target.value)}} placeholder='Ingredient Name'/>
             <ul className={`${ingredientsAvailable.length == 0 ? 'hidden' : ''}`}>
-              {ingredientsAvailable.map(ingredient => (
-                <li key={ingredient.foodid} onClick={() => ingredientSelected(ingredient.foodid)}> {ingredient.fooddescription} </li>
+              {ingredientsAvailable.map((ingredient, index) => (
+                  <li key={index} onClick={() => ingredientSelected(ingredient.foodId)}> {ingredient.foodDescription} </li>
               ))}
             </ul>
           </div>
@@ -258,10 +276,12 @@ function IngredientPage ({ingredientList, setIngredientList}) {
 
 
 
+interface InstructionPageProps {
+  instructionList: {id: number, content: string}[];
+  setInstructionList: React.Dispatch<React.SetStateAction<{id: number, content: string}[]>>;
+}
 
-
-
-function InstructionPage ({instructionList, setInstructionList}) {
+function InstructionPage ({instructionList, setInstructionList}: InstructionPageProps) {
   const [newInstruction, setNewInstruction] = useState('')
   const [availableId, setAvailableId] = useState(instructionList.length)
 
@@ -277,7 +297,7 @@ function InstructionPage ({instructionList, setInstructionList}) {
     setNewInstruction('')
   }
 
-  function removeInstruction(index){
+  function removeInstruction(index: number){
     let tempArray = instructionList.slice()
     tempArray.splice(index, 1)
     setInstructionList(tempArray)
@@ -303,7 +323,7 @@ function InstructionPage ({instructionList, setInstructionList}) {
 
       <div className='textInput additionalMargin'>
         <label htmlFor='newInstruction'>New Instruction</label>
-        <textarea id="newInstruction" rows='6' value={newInstruction} onChange={(event) => {setNewInstruction(event.target.value)}} placeholder='add a new instruction'/>
+        <textarea id="newInstruction" rows={6} value={newInstruction} onChange={(event) => {setNewInstruction(event.target.value)}} placeholder='add a new instruction'/>
       </div>
       <button className="darkText additionalMargin" onClick={() => addInstruction()}>Add Instruction</button>
     </div>
@@ -313,9 +333,11 @@ function InstructionPage ({instructionList, setInstructionList}) {
 
 
 
+interface SubmissionPageProps {
+  submitRecipe: () => void;
+}
 
-
-function SubmissionPage({submitRecipe}) {
+function SubmissionPage({submitRecipe}: SubmissionPageProps) {
   return (
     <>
       <h2>Save Recipe</h2>

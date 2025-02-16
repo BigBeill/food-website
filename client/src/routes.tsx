@@ -1,17 +1,19 @@
+import React from 'react';
+
 // internal imports
-import Home from './pages/Home'
-import EditRecipe from "./pages/EditRecipe"
-import FriendsList from './pages/FriendsList'
-import Ingredients from './pages/Ingredients'
-import Login from './pages/Login'
-import Profile from './pages/Profile'
-import Register from './pages/Register'
-import SearchUser from './pages/SearchUser'
-import Admin from './pages/Admin'
+import Home from './pages/Home.tsx'
+import EditRecipe from "./pages/EditRecipe.tsx"
+import FriendsList from './pages/FriendsList.tsx'
+import Ingredients from './pages/Ingredients.tsx'
+import Login from './pages/Login.tsx'
+import Profile from './pages/Profile.tsx'
+import Register from './pages/Register.tsx'
+import SearchUser from './pages/SearchUser.tsx'
+import Admin from './pages/Admin.tsx'
 
-import TestPage from './pages/TestingCode'
+import TestPage from './pages/TestingCode.tsx'
 
-import NotFound from './pages/NotFound'
+import NotFound from './pages/NotFound.tsx'
 
 export const routes = [
   {

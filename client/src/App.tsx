@@ -8,15 +8,17 @@ import Layout from './Layout'
 import Loading from './components/Loading'
 import { routes } from './routes'
 
+import UserObject from './interfaces/UserObject';
+
 function App() {
   // userData is passed down to all children
-  const [userData, setUserData] = useState()
+  const [userData, setUserData] = useState<UserObject>()
 
   useEffect(() => {
 
     axios({ method: 'get', url: `user/info` })
-      .then( setUserData )
-      .catch(() => { setUserData({}); });
+    .then((response) => { setUserData(response) } )
+    .catch(() => { setUserData({_id: "", username: ""}); });
 
   }, []);
 

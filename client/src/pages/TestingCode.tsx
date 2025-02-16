@@ -1,19 +1,21 @@
 import React, {useState} from 'react';
 import Notebook from "../components/Notebook";
 
+import PageObject from "../interfaces/PageObject";
+
 // this is the main function that is being exported
 // this is the function that will calls notebook
 export default function MainFunction() {
 
    // create a use state for testing the component
-   const [search, setSearch] = useState('');
+   const [search, setSearch] = useState<string>('');
 
    // create a function for testing the component
    function searchFunction() {
       console.log('searching database for:', search);
    }
 
-   const pageList = [
+   const pageList: PageObject[] = [
       // JSON object for the first page
       {
          content: PageOne,
@@ -44,7 +46,13 @@ export default function MainFunction() {
    return <Notebook pageList={pageList} />
 }
 
-function PageOne({ search, setSearch, searchFunction }) {
+interface PageOneProps {
+   search: string,
+   setSearch: React.Dispatch<React.SetStateAction<string>>,
+   searchFunction: () => void
+}
+
+function PageOne({ search, setSearch, searchFunction }: PageOneProps) {
    // use the props being passed down 
    return (
       <div>
@@ -66,8 +74,8 @@ function PageTwo() {
    // no props given by parent, so lets create our own variables
 
    // create useStates for testing the component
-   const [userInput, setUserInput] = useState('');
-   const [text, setText] = useState('');
+   const [userInput, setUserInput] = useState<string>('');
+   const [text, setText] = useState<string>('');
    // create a function for testing the component
    function searchFunction() {
       setText(userInput);
@@ -89,7 +97,10 @@ function PageTwo() {
    )
 }
 
-function PageThree({ text }) {
+interface PageThreeProps { 
+   text: string 
+}
+function PageThree({ text }: PageThreeProps) {
    // display the text given by parent through props
    return (
       <div>

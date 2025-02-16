@@ -22,7 +22,7 @@ how to use:
 
 function GrowingText({ text, parentDiv }) {
   
-  const textRef = useRef(null);
+  const textRef = useRef<HTMLDivElement>(null);
 
   function adjustFontSize() {
     if (textRef.current && parentDiv.current) {

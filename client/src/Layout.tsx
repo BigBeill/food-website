@@ -1,10 +1,17 @@
 // external imports
+import React from 'react'
 import {Outlet} from 'react-router-dom'
 
 // internal imports
 import Nav from './components/Nav'
 
-export default function Layout({userData}){
+import UserObject from './interfaces/UserObject'
+
+interface LayoutProps {
+  userData: UserObject
+}
+
+export default function Layout({userData}: LayoutProps) {
   return(
     <>
       <header />

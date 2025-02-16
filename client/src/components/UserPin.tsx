@@ -5,15 +5,20 @@ import { faBan, faCheck, faUser, faUserPlus, faX } from '@fortawesome/free-solid
 
 import axios from '../api/axios';
 import GrowingText from './GrowingText';
+import UserObject from '../interfaces/UserObject';
+import RelationshipObject from '../interfaces/RelationshipObject';
 
+interface UserPinProps {
+  userData: UserObject;
+}
 
-function UserPin({ userData }) {
+export default function UserPin({ userData }: UserPinProps) {
   
   const navigate = useNavigate();
   const titleRef = useRef(null);
 
-  const [iconsHidden, setIconsHidden] = useState(false);
-  const [relationship, setRelationship] = useState({ type: 0, _id: '0' });
+  const [iconsHidden, setIconsHidden] = useState<boolean>(false);
+  const [relationship, setRelationship] = useState<RelationshipObject>({ type: 0, _id: '0' });
 
   useEffect(() => {
     axios({
@@ -98,5 +103,3 @@ function UserPin({ userData }) {
     </div>
   )
 }
-
-export default UserPin

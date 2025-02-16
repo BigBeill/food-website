@@ -52,30 +52,32 @@ Requires 0 arguments from body:
 Optionally accepts 5 arguments from body:
     username: string (assumed to be "")
     email: string (assumed to be "")
-    limit: int (assumed to be 5)
+    limit: int (assumed to be 6)
     skip: int (assumed to be 0)
-    collection: int (assumed to be 0):
+    relationship: int (assumed to be 0):
         0: all users
         1: friends
         2: received friend requests
         3: sent friend requests
 
 Route description:
-    gathers a list of users of size {limit} containing the string {username}
+    get a count of all users in the database that match the search criteria
+    gathers a list of users of size {limit} that match the search criteria
     skip over the first {skip} results found
-    return list to client
+    return list and count to client
 
 Returns: 
-    array of objects
-    [
-        {
-            _id: mongoose object id
-            username: string
-            email: string
-            bio: string
-            relationship: { type: int, _id: mongoose object id }
-        }
-    ]
+    users:
+        [
+            {
+                _id: mongoose object id
+                username: string
+                email: string
+                bio: string
+                relationship: { type: int, _id: mongoose object id }
+            }
+        ]
+    totalCount: int
 */
 router.get("/find", userController.find);
 
