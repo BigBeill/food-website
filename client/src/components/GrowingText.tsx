@@ -1,5 +1,5 @@
 // external imports
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 /*
 returns html&css for provided text with maximum possible size before overflowing parentDiv
@@ -20,7 +20,12 @@ how to use:
 
 */
 
-function GrowingText({ text, parentDiv }) {
+interface GrowingTextProps {
+  text: string;
+  parentDiv: React.RefObject<HTMLDivElement> | React.RefObject<null>;
+}
+
+function GrowingText({ text, parentDiv }: GrowingTextProps) {
   
   const textRef = useRef<HTMLDivElement>(null);
 

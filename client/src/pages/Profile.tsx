@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 
 import axios from '../api/axios';
@@ -7,7 +7,6 @@ import Loading from '../components/Loading';
 
 import UserObject from '../interfaces/UserObject';
 import RelationshipObject from '../interfaces/RelationshipObject';
-
 
 export default function Profile() {
    const titleParent = useRef(null);
@@ -37,7 +36,7 @@ export default function Profile() {
       }
    }, [_id]);
 
-   function exitEditMode(saveChanges) {
+   function exitEditMode(saveChanges: boolean) {
       if (saveChanges) {
          const requestData = {
             username: userData.username,
@@ -61,7 +60,7 @@ export default function Profile() {
       .then((response) => { setRelationship({ type: 3, _id: response._id }); });
    }
 
-   function processFriendRequest(accept) {
+   function processFriendRequest(accept: boolean) {
       if (accept) {
          axios({ method: 'post', url: 'user/processFriendRequest', data: { requestId: relationship._id, accept: true } })
          .then((response) => { setRelationship({ type: 1, _id: response._id}); });

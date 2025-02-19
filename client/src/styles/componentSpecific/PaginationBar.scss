@@ -20,6 +20,7 @@
       &.primaryBlock {
          border: 0.18rem solid var(--base-color);
          pointer-events: none;
+         justify-self: center;
       }
    }
 }

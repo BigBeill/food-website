@@ -1,5 +1,4 @@
 // external imports
-import React from 'react'
 import {Outlet} from 'react-router-dom'
 
 // internal imports

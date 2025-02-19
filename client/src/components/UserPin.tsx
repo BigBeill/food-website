@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBan, faCheck, faUser, faUserPlus, faX } from '@fortawesome/free-solid-svg-icons';
@@ -21,6 +21,7 @@ export default function UserPin({ userData }: UserPinProps) {
   const [relationship, setRelationship] = useState<RelationshipObject>({ type: 0, _id: '0' });
 
   useEffect(() => {
+    /*
     axios({
       method: 'get',
       url: `user/defineRelationship/${userData._id}`
@@ -28,6 +29,7 @@ export default function UserPin({ userData }: UserPinProps) {
     .then((response) => {
       setRelationship(response);
     })
+      */
   }, [userData]);
 
   useEffect(() => { 

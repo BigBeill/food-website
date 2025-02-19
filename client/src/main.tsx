@@ -9,7 +9,6 @@ import './styles/main.scss';
 import './styles/login.scss';
 import './styles/RecipeBook.scss';
 import './styles/inputs.scss';
-import './styles/componentSpecific/PaginationBar.scss';
 
 //remove before production
 import './styles/testingStyles.scss';

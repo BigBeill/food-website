@@ -1,5 +1,5 @@
 // external imports
-import React, { useState, useEffect, useRef, Component} from 'react'
+import { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
@@ -137,10 +137,10 @@ export default function Notebook ({pageList, parentPageNumber = 0, requestNewPag
    useEffect(() => {
 
       // changes page if arrow key or a/d is pressed
-      function handleKeyDown(event) {
-         if (event.target.tagName == 'INPUT' || event.target.tagName == 'TEXTAREA'){ return }
-         if (event.key == 'a' || event.key == 'ArrowLeft') { previousPage() }
-         if (event.key == 'd' || event.key == 'ArrowRight') { nextPage() }
+      function handleKeyDown(event: KeyboardEvent) {
+         if (event.target && (event.target as HTMLElement).tagName == 'INPUT' || (event.target as HTMLElement).tagName == 'TEXTAREA'){ return; }
+         if (event.key == 'a' || event.key == 'ArrowLeft') { previousPage(); }
+         if (event.key == 'd' || event.key == 'ArrowRight') { nextPage(); }
       }
 
       window.addEventListener('keydown', handleKeyDown)
