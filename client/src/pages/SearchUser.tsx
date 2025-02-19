@@ -1,5 +1,5 @@
 // external imports
-import {useState, useEffect, useRef } from "react";
+import {useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 
 // internal imports
@@ -9,9 +9,10 @@ import PaginationBar from "../components/PaginationBar.tsx";
 import UserObject from "../interfaces/UserObject.ts";
 
 export default function SearchUser() {
-   const pageSize: number = 15;
-
    const [searchParams, setSearchParams] = useSearchParams();
+
+   const pageSize: number = 15;
+   const currentPage: number = Number(searchParams.get("pageNumber")) || 1;
 
    const [_id, set_id] = useState<string>(searchParams.get("_id") || "");
    const [username, setUsername] = useState<string>(searchParams.get("username") || "");
@@ -19,23 +20,28 @@ export default function SearchUser() {
 
    const [users, setUsers] = useState<UserObject[]>([]);
    const [totalCount, setTotalCount] = useState<number>(0);
-   const [currentPage, setCurrentPage] = useState<number>( Number(searchParams.get("pageNumber")) || 1 );
 
    function submitSearch() {
+      setUsers([]);
+      document.getElementById("root")?.scrollTo({ top: 0, behavior: "auto" });
       let params: { _id?: string, username?: string, email?: string } = {};
       if (_id) params._id = _id;
       if (username) params.username = username;
       if (email) params.email = email;
-      setSearchParams(params);
+      setSearchParams(searchParams => ({...searchParams, ...params}));
       // the actual search will be done in useEffect if searchParams changes
    }
 
    function requestNewPage(page: number) {
-      
+      setUsers([]);
+      document.getElementById("root")?.scrollTo({ top: 0, behavior: "auto" });
+      setSearchParams(searchParams => ({...searchParams, pageNumber: page}));
+      // the actual search will be done in useEffect if searchParams changes
    }
 
    useEffect (() => {
-      let url: string = `user/find?limit=${pageSize}`;
+
+      let url: string = `user/find?skip=${(currentPage - 1) * pageSize}&limit=${pageSize}`;
 
       // add username and password to url
       if (username) url += `&username=${username}`;
@@ -52,7 +58,6 @@ export default function SearchUser() {
       })
    },[searchParams]);
 
-   console.log(users);
    return (
       <div>
          <div className="displayUserInformationCards">
