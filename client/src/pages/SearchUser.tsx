@@ -28,7 +28,7 @@ export default function SearchUser() {
       if (_id) params._id = _id;
       if (username) params.username = username;
       if (email) params.email = email;
-      setSearchParams(searchParams => ({...searchParams, ...params}));
+      setSearchParams(params);
       // the actual search will be done in useEffect if searchParams changes
    }
 

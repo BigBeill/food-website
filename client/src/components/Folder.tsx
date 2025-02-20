@@ -23,7 +23,7 @@ export default function Folder({ folderDetails }: FolderProps) {
       if (folderDetails._id == "requests") {
          axios({
             method: 'get',
-            url: `/user/find?collection=2 limit=3`
+            url: `/user/find?collection=2&limit=3`
          })
          .then((response) => {
             setDisplayUsers(response)
