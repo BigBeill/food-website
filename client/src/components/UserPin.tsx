@@ -21,7 +21,6 @@ export default function UserPin({ userData }: UserPinProps) {
   const [relationship, setRelationship] = useState<RelationshipObject>({ type: 0, _id: '0' });
 
   useEffect(() => {
-    /*
     axios({
       method: 'get',
       url: `user/defineRelationship/${userData._id}`
@@ -29,7 +28,6 @@ export default function UserPin({ userData }: UserPinProps) {
     .then((response) => {
       setRelationship(response);
     })
-      */
   }, [userData]);
 
   useEffect(() => { 
