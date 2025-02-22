@@ -1,5 +1,6 @@
 // external imports
 const { verify } = require("jsonwebtoken");
+const { validationResult } = require("express-validator");
 
 // internal imports
 const friendRequest = require("../models/joinTables/friendRequest");
@@ -21,6 +22,10 @@ require("dotenv").config();
 const cookieAge = 1000 * 60 * 60 * 24 * 30; // 30 days in milliseconds
 
 exports.register = async (req, res) => {
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) { return res.status(400).json({ error: errors.array() }); }
+
   const { username, email, password } = req.body;
 
   // check for any missing fields in the request
@@ -72,6 +77,10 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) { return res.status(400).json({ error: errors.array() }); }
+
   const { username, password } = req.body;
 
   // check for any missing fields in the request
@@ -143,6 +152,8 @@ exports.logout = async (req, res) => {
 };
 
 exports.updateAccount = async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "user not signed in" });
+
   const { username, email, bio } = req.body;
 
   // check for any missing fields in the request
@@ -206,14 +217,15 @@ exports.info = async (req, res) => {
 };
 
 exports.defineRelationship = async (req, res) => {
+  if (!req.user) { return res.status(401).json({ error: "user not signed in" }); }
+
   const { _id } = req.user;
   const { userId } = req.params;
 
-  // check if user is signed in
-  if (!_id) return res.status(401).json({ error: "user not signed in" });
-
-  // check for any missing or invalid fields in the request
+  // check for any missing fields in the request
   if (!userId) return res.status(400).json({ error: "missing userId parameter" });
+
+  // check if user is trying to define relationship with self
   if (userId == _id) return res.status(200).json({ message: "this is the current user", payload: { type: 4, _id: 0 } });
 
   try {
@@ -238,8 +250,9 @@ exports.defineRelationship = async (req, res) => {
 };
 
 exports.find = async (req, res) => {
-  const { _id } = req.user;
-  const { username, email, limit, skip, relationship } = req.query;
+  const { _id } = req?.user;
+
+  const { username, email, limit, skip, relationship, count } = req.query;
 
   // Parsing limit and skip as integers 
   const parsedLimit = parseInt(limit, 10) || 6; 
@@ -285,12 +298,18 @@ exports.find = async (req, res) => {
     }
 
     // use query to find users in database
-    const totalCount = await users.countDocuments(query);
     const usersList = await users.find(query)
     .skip(parsedSkip)
     .limit(parsedLimit);
-    
-    return res.status(200).json({message: "List of users collected successfully", payload: { users: usersList, totalCount}})
+    let payload = {users: usersList};
+
+    // attach count if requested by the client
+    if (count) {
+      const totalCount = await users.countDocuments(query);
+      payload.totalCount = totalCount;
+    }
+
+    return res.status(200).json({message: "List of users collected successfully", payload})
   }
 
   // handle any errors caused by the controller
@@ -301,6 +320,8 @@ exports.find = async (req, res) => {
 };
 
 exports.sendFriendRequest = async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "user not signed in" });
+
   const { _id } = req.user;
   const { userId } = req.body;
 
@@ -351,6 +372,8 @@ exports.sendFriendRequest = async (req, res) => {
 };
 
 exports.processFriendRequest = async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "user not signed in" });
+
   const { _id } = req.user;
   const { requestId, accept } = req.body;
 
@@ -417,6 +440,8 @@ exports.processFriendRequest = async (req, res) => {
 };
 
 exports.deleteFriend = async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "user not signed in" });
+
   const { _id } = req.user;
   const { relationshipId } = req.body;
 

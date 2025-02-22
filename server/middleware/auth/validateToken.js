@@ -2,7 +2,7 @@ const { verify } = require("jsonwebtoken");
 require("dotenv").config();
 
 function validateToken(req, res, next) {
-  const accessToken = req.cookies["accessToken"];
+  const accessToken = req.cookies?.accessToken;
 
   if (!accessToken) {
     console.log("no access token found");
@@ -11,17 +11,17 @@ function validateToken(req, res, next) {
 
   try {
     const validToken = verify(accessToken, process.env.SESSION_SECRET);
-    if (validToken) {
+    if (validToken && typeof validToken._id === "string" && typeof validToken.username === "string") {
       req.user = {
         _id: validToken._id,
         username: validToken.username,
       };
     }
     else {
-      req.user = {failure: "invalid access token"};
+      console.log("invalid access token:", accessToken);
     }
   } catch (error) {
-    console.log("error validating access token:", accessToken);
+    console.log("error validating access token:", error.message);
   }
   return next();
 }

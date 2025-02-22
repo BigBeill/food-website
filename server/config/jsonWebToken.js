@@ -5,8 +5,6 @@ function createToken(user) {
   const accessToken = sign(
     {
       _id: user._id,
-      email: user.email,
-      bio: user.bio,
       username: user.username,
     },
     process.env.SESSION_SECRET,
@@ -15,8 +13,6 @@ function createToken(user) {
   const refreshToken = sign(
     {
       _id: user._id,
-      email: user.email,
-      bio: user.bio,
       username: user.username,
     },
     process.env.SESSION_SECRET

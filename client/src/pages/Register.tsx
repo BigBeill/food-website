@@ -1,5 +1,5 @@
 // external imports
-import React, { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 
 // internal imports
@@ -41,7 +41,12 @@ function Register() {
          navigate('/');
          window.location.reload();
       })
-      .catch(response => { setErrorMessage(response.error); });
+      .catch(response => { 
+         if (response.error) {
+            if (typeof response.error == "string") { setErrorMessage(response.error); }
+            else if (Array.isArray(response.error) && response.error[0].msg) { setErrorMessage(response.error[0].msg); }
+         }
+      });
    }
 
    return (

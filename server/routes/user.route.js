@@ -1,5 +1,7 @@
 const router = require("express").Router();
 const userController = require("../controllers/user.controller");
+const { body } = require("express-validator");
+const { validateNoExtraFields } = require("../library/sanitationUtils");
 
 /*
 ------------ /info route ------------
@@ -59,6 +61,7 @@ Optionally accepts 5 arguments from body:
         1: friends
         2: received friend requests
         3: sent friend requests
+    count: boolean (assumed to be false)
 
 Route description:
     get a count of all users in the database that match the search criteria
@@ -77,7 +80,7 @@ Returns:
                 relationship: { type: int, _id: mongoose object id }
             }
         ]
-    totalCount: int
+    totalCount: int (if count is true)
 */
 router.get("/find", userController.find);
 
@@ -101,7 +104,14 @@ Route description:
     create json cookies
     send json cookies to client
 */
-router.post("/register",  userController.register);
+router.post("/register",  
+    [
+        body("username").isString().isLength({ min: 3, max: 60 }).withMessage("Username must be a string between 3 and 60 characters"),
+        body("email").isString().isEmail().withMessage("Email must be a valid email address"),
+        body("password").isString().isLength({ min: 3, max: 60 }).withMessage("Password must be a string between 3 and 60 characters"),
+        validateNoExtraFields(["username", "email", "password"])
+    ],
+userController.register);
 
 /*
 ---------- /login route ------------
@@ -118,7 +128,13 @@ Route description:
     encrypt password and compare to database
     return json web token to client if valid password
 */
-router.post("/login", userController.login);
+router.post("/login", 
+    [
+        body("username").isString().isLength({ min: 3, max: 60 }).withMessage("Username must be a string between 3 and 60 characters"),
+        body("password").isString().isLength({ min: 3, max: 60 }).withMessage("Password must be a string between 3 and 60 characters"),
+        validateNoExtraFields(["username", "password"])
+    ],
+userController.login);
 
 /*
 ---------- /refresh route ------------
@@ -198,5 +214,21 @@ Route description:
 */
 router.post("/processFriendRequest", userController.processFriendRequest);
 
+
+
+
+/*
+---------- /deleteFriend route ------------
+
+Type:
+    POST - deletes a friendship object from the database
+
+Requires 1 argument from body:
+    relationshipId: mongoose object id
+
+Route description:
+    deletes the friendship object from the database
+*/
+router.post("/deleteFriend", userController.deleteFriend);
 
 module.exports = router;

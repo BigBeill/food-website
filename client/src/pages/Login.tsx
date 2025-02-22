@@ -34,11 +34,16 @@ function Login() {
 
       const userData = { username, password };
       axios({method: 'post', url: 'user/login', data: userData})
-      .then(() => { 
+      .then(() => {
          navigate('/');
          window.location.reload();
       })
-      .catch(response => { setErrorMessage(response.error) });
+      .catch(response => { 
+         if (response.error) {
+            if (typeof response.error == "string") { setErrorMessage(response.error); }
+            else if (Array.isArray(response.error) && response.error[0].msg) { setErrorMessage(response.error[0].msg); }
+         }
+      });
    }
 
    return (
