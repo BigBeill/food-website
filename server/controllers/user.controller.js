@@ -415,3 +415,33 @@ exports.processFriendRequest = async (req, res) => {
     return res.status(500).json({ error: "server failed to accept friend request" });
   }
 };
+
+exports.deleteFriend = async (req, res) => {
+  const { _id } = req.user;
+  const { relationshipId } = req.body;
+
+  // check if user is signed in
+  if (!_id) return res.status(401).json({ error: "user not signed in" });
+
+  // check for any missing fields in the request
+  if (!relationshipId) return res.status(400).json({ error: 'missing relationshipId field in body' });
+
+  try {
+    // make sure friendship exists in database
+    const friendship = await friendships.findOne({ _id: relationshipId });
+    if (!friendship) return res.status(400).json({ error: "friendship not found in database" });
+
+    // make sure user is part of the friendship
+    if (!friendship.friendIds.includes(_id)) return res.status(401).json({ error: "user is not part of this friendship" });
+
+    // delete friendship from database
+    await friendships.deleteOne({ _id: relationshipId });
+    return res.status(200).json({ message: "friendship deleted successfully" });
+  }
+
+  // handle any errors caused by the controller
+  catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "server failed to delete friendship" });
+  }
+};
