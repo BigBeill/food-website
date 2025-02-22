@@ -61,4 +61,40 @@ const presetUsers = [
    { username: "masonGonzalez", email: "manson@gmail.com", bio: "default account for mason", password: "123" },
 ]
 
-module.exports = presetUsers;
+const presetFriendRequests = [
+   {sender: "test4", receiver: "test"},
+   {sender: "test5", receiver: "test"},
+   {sender: "test6", receiver: "test"},
+   {sender: "test7", receiver: "test"},
+   {sender: "test8", receiver: "test"},
+   {sender: "test9", receiver: "test"},
+   {sender: "test10", receiver: "test"},
+   {sender: "test11", receiver: "test"},
+   {sender: "test12", receiver: "test"},
+   {sender: "test13", receiver: "test"},
+   {sender: "test14", receiver: "test"},
+   {sender: "test15", receiver: "test"},
+   {sender: "test16", receiver: "test"},
+   {sender: "test17", receiver: "test"},
+   {sender: "test18", receiver: "test"},
+   {sender: "test19", receiver: "test"},
+   {sender: "test20", receiver: "test"},
+   {sender: "test21", receiver: "test"},
+   {sender: "test22", receiver: "test"},
+   {sender: "test", receiver: "test23"},
+   {sender: "test", receiver: "test24"},
+   {sender: "mackenzieNeill", receiver: "test"},
+   {sender: "connorPink", receiver: "test"},
+   {sender: "alexSmith", receiver: "test"},
+   {sender: "sarahJohnson", receiver: "test"},
+   {sender: "michaelBrown", receiver: "test"},
+]
+
+const presetFriends = [
+   {users: ["mackenzieNeill", "connorPink"]},
+   {users: ["test", "test1"]},
+   {users: ["test", "test2"]},
+   {users: ["test", "test3"]},
+]
+
+module.exports = { presetUsers, presetFriendRequests, presetFriends };
