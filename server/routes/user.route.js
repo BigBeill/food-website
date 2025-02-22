@@ -187,7 +187,7 @@ router.post("/sendFriendRequest", userController.sendFriendRequest);
 Type:
     POST - logs user out
 
-Requires 1 arguments from body:
+Requires 2 arguments from body:
     requestId: mongoose object id
     accept: boolean
 

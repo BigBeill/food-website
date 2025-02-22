@@ -47,6 +47,7 @@ export default function SearchUser() {
       if (username) url += `&username=${username}`;
       if (email) url += `&email=${email}`;
 
+      url += `&count=true`;
       // make axios call
       axios({
          method: 'get',

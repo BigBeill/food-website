@@ -20,30 +20,17 @@ export default function Folder({ folderDetails }: FolderProps) {
    const [displayUsers, setDisplayUsers] = useState<UserObject[]>([])
 
    useEffect(() => {
+      // fetch the first 3 users in the folder from server
       if (folderDetails._id == "requests") {
-         axios({
-            method: 'get',
-            url: `/user/find?collection=2&limit=3`
-         })
-         .then((response) => {
-            setDisplayUsers(response)
-         })
-         .catch((error) => {
-            console.error(error)
-         })
+         axios({ method: 'get', url: `/user/find?limit=3&relationship=2` })
+         .then((response) => { setDisplayUsers(response.users) })
+         .catch((error) => { console.error(error) });
       }
       else {
          folderDetails.content.slice(0, 3).forEach((userId) => {
-         axios({ 
-            method: 'get',
-            url: `/user/info/${userId}`
-         })
-         .then((response) => {
-            setDisplayUsers((prev) => [...prev, response])
-         })
-         .catch((error) => {
-            console.error(error)
-         })
+            axios({ method: 'get', url: `/user/info/${userId}` })
+            .then((response) => { setDisplayUsers((prev) => [...prev, response]) })
+            .catch((error) => { console.error(error) });
          });
       }
    }, []);

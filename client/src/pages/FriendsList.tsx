@@ -1,6 +1,6 @@
 // external imports
 import { useState, useEffect } from 'react';
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useParams } from "react-router-dom";
 
 //internal imports
 import axios from '../api/axios';
@@ -13,10 +13,9 @@ import PaginationBar from '../components/PaginationBar';
 
 export default function FriendsList() {
    const [searchParams, setSearchParams] = useSearchParams();
+   const { folderId } = useParams<{folderId: string}>();
 
    const pageSize: number = 15;
-
-   const folderId: string = searchParams.get('folderId') || '';
    const pageNumber: number = Number(searchParams.get('pageNumber')) || 1;
 
    const [totalCount, setTotalCount] = useState<number>(0);
@@ -59,6 +58,7 @@ export default function FriendsList() {
       if (username) { url += `&username=${username}`; }
       if (email) { url += `&email=${email}`; }
 
+      url += `&count=true`;
       axios({
          method: 'get',
          url
@@ -67,7 +67,7 @@ export default function FriendsList() {
          setUsers(response.users);
          setTotalCount(response.totalCount);
       })
-   }, [searchParams]);
+   }, [searchParams, folderId]);
 
    return (
       <div>

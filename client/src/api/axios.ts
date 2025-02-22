@@ -57,7 +57,7 @@ export default async function sendRequest( configuration: sendRequestProps ) {
       try {
          // process the request
          const response = await axiosInstance(configuration);
-         console.log(response);
+         console.trace("Response from server:", response);
          return resolve(response.data.payload);
       }
       catch (error) {
