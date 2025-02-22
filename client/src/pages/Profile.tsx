@@ -18,6 +18,8 @@ export default function Profile() {
    const [relationship, setRelationship] = useState<RelationshipObject>({ type: 0, _id: '0' });
    const [editMode, setEditMode] = useState<boolean>(false);
 
+   const [buttonSafety, setButtonSafety] = useState<boolean>(true);
+
    useEffect(() => {
       setEditMode(false);
       
@@ -69,6 +71,15 @@ export default function Profile() {
          axios({ method: 'post', url: 'user/processFriendRequest', data: { requestId: relationship._id, accept: false } })
          .then(() => { setRelationship({ type: 0, _id: '0' }); });
       }
+   }
+
+   function removeFriend() {
+      if (buttonSafety) {
+         setButtonSafety(false);
+         return;
+      }
+      axios({ method: 'post', url: 'user/deleteFriend', data: { relationshipId: relationship._id } })
+      .then(() => { setRelationship({ type: 0, _id: '0' }); });
    }
 
    // handle logout function
@@ -128,7 +139,10 @@ export default function Profile() {
             ) : relationship.type == 1 ? (
                <>
                   <div></div>
-                  <button>Remove friend</button>
+                  <div className='devisableButton'>
+                     <button onClick={() => { removeFriend(); }}>Remove friend</button>
+                     <button className={buttonSafety ? 'hideButton' : 'showButton'} onClick={() => { setButtonSafety(true); }} >Cancel</button>
+                  </div>
                </>
             ) : relationship.type == 2 ? (
                <>
