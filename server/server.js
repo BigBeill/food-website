@@ -3,16 +3,19 @@ const express = require('express');
 const bodyParser = require ('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const https = require('https');
+const fs = require('fs');
 
 //Local imports
 const mongoConnection = require ('./config/connectMongo');
 const validateToken = require ('./middleware/auth/validateToken');
 const setCookieFlags = require ('./middleware/auth/cookieFlags');
+require("dotenv").config();
 
 // define server settings
 const corsOptions = {
    origin: function (origin, callback) {
-      if (origin && origin.startsWith('http://localhost')) {
+      if (origin && origin.startsWith('https://localhost')) {
          callback(null, true);
       } else {
          callback(new Error('Not allowed by CORS'));
@@ -28,11 +31,12 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({limit: '10mb', extended: false}));
 app.use(express.json());
 app.use(cookieParser());
-app.use(validateToken);
 app.use(setCookieFlags);
 
 const logGeneralData = require('./middleware/debugging/logGeneralData')
 app.use(logGeneralData)
+
+app.use(validateToken);
 
 const authenticationRouter = require('./routes/authentication.route')
 app.use('/authentication', authenticationRouter)
@@ -52,6 +56,11 @@ app.use('/user', userRouter)
 const errorHandler = require('./middleware/debugging/errorHandler');
 app.use(errorHandler);
 
+const options = {
+   key: fs.readFileSync(process.env.SSL_KEY_PATH),
+   cert: fs.readFileSync(process.env.SSL_CERT_PATH)
+}
+
 //listen to port
 const PORT = 4000
-app.listen(PORT, () => {console.log("Server started on port " + PORT)})
+https.createServer(options, app).listen(PORT, () => {console.log("Server started on port " + PORT)})

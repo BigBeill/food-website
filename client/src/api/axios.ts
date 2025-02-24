@@ -16,7 +16,7 @@ const response = await axios({
 import axios from 'axios';
 
 const axiosInstance =  axios.create({
-   baseURL: 'http://localhost:4000',
+   baseURL: 'https://localhost:4000',
    withCredentials: true
 });
 

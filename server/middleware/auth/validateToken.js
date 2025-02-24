@@ -4,16 +4,7 @@ require("dotenv").config();
 function validateToken(req, res, next) {
   const accessToken = req.cookies?.accessToken;
 
-  if (!accessToken) {
-    console.log("no access token found");
-    if (refreshToken) { 
-      console.log("refresh token found");
-    }
-    else {
-      console.log("proceeding with no account")
-      return next();
-    }
-  }
+  if (!accessToken) { console.log("no access token found"); }
 
   try {
     const validToken = verify(accessToken, process.env.SESSION_SECRET);
