@@ -86,82 +86,10 @@ router.get("/find", userController.find);
 
 
 
-/*
----------- /register route ------------
 
-Type:
-    POST - registers a new user
 
-Requires 3 arguments from body:
-    username: string
-    email: string
-    password: string
 
-Route description:
-    checks database for any data already being used by another account
-    encrypt password
-    create user profile and save in database
-    create json cookies
-    send json cookies to client
-*/
-router.post("/register",  
-    [
-        body("username").isString().isLength({ min: 3, max: 60 }).withMessage("Username must be a string between 3 and 60 characters"),
-        body("email").isString().isEmail().withMessage("Email must be a valid email address"),
-        body("password").isString().isLength({ min: 3, max: 60 }).withMessage("Password must be a string between 3 and 60 characters"),
-        validateNoExtraFields(["username", "email", "password"])
-    ],
-userController.register);
 
-/*
----------- /login route ------------
-
-Type:
-    POST - logs user in
-
-Requires 2 arguments from body:
-    username: string
-    password: string
-
-Route description:
-    get user data from database
-    encrypt password and compare to database
-    return json web token to client if valid password
-*/
-router.post("/login", 
-    [
-        body("username").isString().isLength({ min: 3, max: 60 }).withMessage("Username must be a string between 3 and 60 characters"),
-        body("password").isString().isLength({ min: 3, max: 60 }).withMessage("Password must be a string between 3 and 60 characters"),
-        validateNoExtraFields(["username", "password"])
-    ],
-userController.login);
-
-/*
----------- /refresh route ------------
-
-Type: 
-    POST - gets a new user token
-
-Requires 0 arguments from body
-
-Route description:
-    check validity of refresh tokens saved in cookies
-    create and send new user token to client
-*/
-router.post("/refresh", userController.refresh);
-
-/*
----------- /logout route ------------
-
-Type:
-    POST - logs user out
-
-Requires 0 arguments from body
-
-Route description:
-    removes cookies from clients local storage
-*/
-router.post("/logout", userController.logout);
 
 /*
 ---------- /updateAccount route ------------
@@ -181,7 +109,14 @@ Route description:
     update users profile data in database
     create and send new cookies to client
 */
-router.post("/updateAccount", userController.updateAccount);
+router.post("/updateAccount", 
+    [
+        body("username").isString().isLength({ min: 3, max: 60 }).withMessage("Username must be a string between 3 and 60 characters"),
+        body("email").isString().isEmail().withMessage("Email must be a valid email address"),
+        body("bio").isString().withMessage("Bio must be a string"),
+        validateNoExtraFields(["username", "email", "bio"])
+    ],
+userController.updateAccount);
 
 /*
 ---------- /sendFriendRequest route ------------
@@ -195,7 +130,12 @@ Requires 1 arguments from body:
 Route description:
     creates a friend request in the database, setting the current user as the sender and {receiver} as the receiver
 */
-router.post("/sendFriendRequest", userController.sendFriendRequest);
+router.post("/sendFriendRequest", 
+    [
+        body("userId").isString().isLength({ min: 24, max: 24 }).withMessage("userId must be a string of 24 characters"),
+        validateNoExtraFields(["userId"])
+    ],
+userController.sendFriendRequest);
 
 /*
 ---------- /acceptFriendRequest route ------------
@@ -212,7 +152,13 @@ Route description:
     if accept is true, create a friendship object between the sender and receiver of the request
     if accept is false, delete the friend request from the database
 */
-router.post("/processFriendRequest", userController.processFriendRequest);
+router.post("/processFriendRequest", 
+    [
+        body("requestId").isString().isLength({ min: 24, max: 24 }).withMessage("requestId must be a string of 24 characters"),
+        body("accept").isBoolean().withMessage("accept must be a boolean"),
+        validateNoExtraFields(["requestId", "accept"])
+    ],
+userController.processFriendRequest);
 
 
 
@@ -229,6 +175,11 @@ Requires 1 argument from body:
 Route description:
     deletes the friendship object from the database
 */
-router.post("/deleteFriend", userController.deleteFriend);
+router.post("/deleteFriend", 
+    [
+        body("relationshipId").isString().isLength({ min: 24, max: 24 }).withMessage("relationshipId must be a string of 24 characters"),
+        validateNoExtraFields(["relationshipId"])
+    ],
+userController.deleteFriend);
 
 module.exports = router;

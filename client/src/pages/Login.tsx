@@ -33,7 +33,7 @@ function Login() {
       if (!password) return setErrorMessage("no password given");
 
       const userData = { username, password };
-      axios({method: 'post', url: 'user/login', data: userData})
+      axios({method: 'post', url: 'authentication/login', data: userData})
       .then(() => {
          navigate('/');
          window.location.reload();

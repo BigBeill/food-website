@@ -84,7 +84,7 @@ export default function Profile() {
 
    // handle logout function
    const handleLogout = () => {
-      axios({ method: 'post', url: 'user/logout' })
+      axios({ method: 'post', url: 'authentication/logout' })
       .then(() => { location.assign('/') })
    };
 

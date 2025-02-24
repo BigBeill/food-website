@@ -6,7 +6,13 @@ function validateToken(req, res, next) {
 
   if (!accessToken) {
     console.log("no access token found");
-    return next();
+    if (refreshToken) { 
+      console.log("refresh token found");
+    }
+    else {
+      console.log("proceeding with no account")
+      return next();
+    }
   }
 
   try {
@@ -18,7 +24,7 @@ function validateToken(req, res, next) {
       };
     }
     else {
-      console.log("invalid access token:", accessToken);
+      console.log("invalid access token");
     }
   } catch (error) {
     console.log("error validating access token:", error.message);

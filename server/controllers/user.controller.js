@@ -1,472 +1,330 @@
-// external imports
-const { verify } = require("jsonwebtoken");
-const { validationResult } = require("express-validator");
-
 // internal imports
 const friendRequest = require("../models/joinTables/friendRequest");
 const friendships = require("../models/joinTables/friendship");
 const users = require("../models/user");
-const refreshTokens = require("../models/refreshToken");
-const { validPassword, genPassword } = require("../library/passwordUtils");
-const createToken = require("../config/jsonWebToken");
 require("dotenv").config();
 
 
-
-
-
-
-/*------CONTROLLERS FOR MANAGING USER AUTHENTICATION / ACCOUNT DETAILS------*/
-
-// the max age of all cookies created by this controller
-const cookieAge = 1000 * 60 * 60 * 24 * 30; // 30 days in milliseconds
-
-exports.register = async (req, res) => {
-
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) { return res.status(400).json({ error: errors.array() }); }
-
-  const { username, email, password } = req.body;
-
-  // check for any missing fields in the request
-  if(!username) return res.status(400).json({error: 'missing username field in body'});
-  if(!email) return res.status(400).json({error: 'missing email field in body'});
-  if(!password) return res.status(400).json({error: 'missing password field in body'});
-
-  try {
-    // make sure username and email don't already exist in database
-    const searchUsername = await users.findOne({ username: { $regex: `^${username}$`} });
-    if (searchUsername) return res.status(400).json({ error: "username already taken" });
-
-    const searchEmail = await users.findOne({ email: { $regex: `^${email}$`} });
-    if (searchEmail) return res.status(400).json({ error: "email already taken" });
-
-    // hash password
-    const hashedPassword = genPassword(password);
-
-    // create user
-    const newUser = {
-      username,
-      email,
-      hash: hashedPassword.hash,
-      salt: hashedPassword.salt,
-    };
-
-    // save new user to database
-    const savedUser = await new users(newUser)
-    .save();
-
-    // create tokens
-    const tokens = createToken(savedUser);
-
-    // save refresh token in database
-    await new refreshTokens({ user: savedUser._id, token: tokens.refreshToken })
-    .save();
-
-    // send cookies to client
-    res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
-    res.cookie("refreshToken", tokens.refreshToken, { maxAge: cookieAge });
-    return res.status(200).json({ message: "account registered successfully" });
-  }
-
-  // handle any errors caused by the controller
-  catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "server failed to register new user" });
-  }
-};
-
-exports.login = async (req, res) => {
-
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) { return res.status(400).json({ error: errors.array() }); }
-
-  const { username, password } = req.body;
-
-  // check for any missing fields in the request
-  if (!username) return res.status(400).json({error: 'missing username field in body'});
-  if (!password) return res.status(400).json({error: 'missing password field in body'});
-
-  try {
-    // find user in database with provided username
-    const user = await users.findOne(
-      { username: new RegExp(`^${username}$`, 'i') },
-      { _id: 1, username: 1, email: 1, bio: 1, hash: 1, salt: 1 }
-    );
-    if (!user) return res.status(400).json({ error: "username not found" });
-
-    // check if password is correct
-    if (!validPassword(password, user.hash, user.salt)) return res.status(400).json({ error: "incorrect password" });
-
-    // create new refresh tokens
-    const tokens = createToken(user);
-
-    //save refresh tokens in database
-    await new refreshTokens({ user: user._id, token: tokens.refreshToken })
-    .save();
-
-    // save tokens as cookies for client
-    res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
-    res.cookie("refreshToken", tokens.refreshToken, { maxAge: cookieAge });
-    return res.status(200).json({ message: "user Signed in" });
-  }
-
-  // handle any errors caused by the controller
-  catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "server failed to login user" });
-  }
-};
-
-exports.refresh = async (req, res) => {
-  const refreshToken = req.cookies["refreshToken"];
-
-  try {
-    // make sure refresh token exists in database
-    const databaseToken = await refreshTokens.findOne({ token: refreshToken });
-    if (!databaseToken)
-      return res.status(403).json({ error: "invalid refresh token" });
-
-    // validate the refresh token and send a new access token
-    const validToken = verify(refreshToken, process.env.SESSION_SECRET);
-    if (validToken && validToken._id == databaseToken.user) {
-      const tokens = createToken({
-        _id: validToken._id,
-        username: validToken.username,
-      });
-      res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
-      return res.status(200).json({ message: "new access token sent" });
-    }
-  } 
-  catch (error) {
-    console.error("error creating new access token:", refreshToken);
-    console.error(error);
-    return res.status(500).json({ error: "could not create new access token" });
-  }
-};
-
-exports.logout = async (req, res) => {
-  res.clearCookie("accessToken");
-  res.clearCookie("refreshToken");
-  res.status(200).json({ message: "success" });
-};
-
 exports.updateAccount = async (req, res) => {
-  if (!req.user) return res.status(401).json({ error: "user not signed in" });
+   if (!req.user) return res.status(401).json({ error: "user not signed in" });
 
-  const { username, email, bio } = req.body;
+   const errors = validationResult(req);
+   if (!errors.isEmpty()) { return res.status(400).json({ error: errors.array() }); }
 
-  // check for any missing fields in the request
-  if (!username) return res.status(400).json({error: 'missing username filed provided in body'});
-  if (!email) return res.status(400).json({error: 'missing email field provided in body'});
+   const { username, email, bio } = req.body;
 
-  try{
-    //make sure username or email isn't already taken
-    const foundUsername = await users.findOne({ username: new RegExp(`^${username}$`, 'i') });
-    if (foundUsername && foundUsername._id != req.user._id) { return res.status(400).json({ error: "username already taken" }); }
-    const foundEmail = await users.findOne({ email: new RegExp(`^${email}$`, 'i') }) 
-    if (foundEmail && foundEmail._id != req.user._id) { return res.status(400).json({ error: "email already taken" }); }
+   // check for any missing fields in the request
+   if (!username) return res.status(400).json({error: 'missing username filed provided in body'});
+   if (!email) return res.status(400).json({error: 'missing email field provided in body'});
 
-    // save user to database
-    const updatedUser = await users.updateOne(
-      { _id: req.user._id },
-      { $set: {
-        email: email,
-        username: username,
-        bio: bio,
-      }, }
-    )
-    
-    // send updated accessTokens to client
-    const tokens = await createToken(updatedUser);
-    await res.cookie("accessToken", tokens.accessToken, { maxAge: cookieAge });
+   try{
+      //make sure username or email isn't already taken
+      const foundUsername = await users.findOne({ username: new RegExp(`^${username}$`, 'i') });
+      if (foundUsername && foundUsername._id != req.user._id) { return res.status(400).json({ error: "username already taken" }); }
+      const foundEmail = await users.findOne({ email: new RegExp(`^${email}$`, 'i') }) 
+      if (foundEmail && foundEmail._id != req.user._id) { return res.status(400).json({ error: "email already taken" }); }
 
-    return res.status(200).json({ message: "account registered successfully" });
-  }
+      // save user to database
+      await users.updateOne(
+         { _id: req.user._id },
+         { $set: {
+         email: email,
+         username: username,
+         bio: bio,
+         }, }
+      );
 
-  // handle any errors caused by the controller
-  catch(error){
-    console.error(error);
-    return res.status(500).json({ error: "server failed to update user account" });
-  }
-};
+      return res.status(200).json({ message: "account registered successfully" });
+   }
 
-
-
-/*------CONTROLLERS FOR MANAGING USER INTERACTION WITH OTHER ACCOUNTS------*/
+   // handle any errors caused by the controller
+   catch(error){
+      console.error(error);
+      return res.status(500).json({ error: "server failed to update user account" });
+   }
+}
 
 exports.info = async (req, res) => {
-  const { userId } = req.params;
+   const { userId } = req.params;
 
-  if (!userId) {
-    if(!req.user)  return res.status(401).json({ error: "user not signed in" });
-    return res.status(200).json({ message: "signed in user data", payload: req.user });
-  }
+   if (!userId) {
+      if(!req.user)  return res.status(401).json({ error: "user not signed in" });
+      return res.status(200).json({ message: "signed in user data", payload: req.user });
+   }
 
-  try {
-    // find user in database
-    const userData = await users.findOne({ _id: userId });
-    if (!userData) return res.status(400).json({ error: "user not found" });
+   try {
+      // find user in database
+      const userData = await users.findOne({ _id: userId });
+      if (!userData) return res.status(400).json({ error: "user not found" });
 
-    return res.status(200).json({ message: "user data collected successfully", payload: userData });
-  }
-  catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "server failed to find user" });
-  }
-};
+      return res.status(200).json({ message: "user data collected successfully", payload: userData });
+   }
+   catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "server failed to find user" });
+   }
+}
 
 exports.defineRelationship = async (req, res) => {
-  if (!req.user) { return res.status(401).json({ error: "user not signed in" }); }
+   if (!req.user) { return res.status(401).json({ error: "user not signed in" }); }
 
-  const { _id } = req.user;
-  const { userId } = req.params;
+   const { _id } = req.user;
+   const { userId } = req.params;
 
-  // check for any missing fields in the request
-  if (!userId) return res.status(400).json({ error: "missing userId parameter" });
+   // check for any missing fields in the request
+   if (!userId) return res.status(400).json({ error: "missing userId parameter" });
 
-  // check if user is trying to define relationship with self
-  if (userId == _id) return res.status(200).json({ message: "this is the current user", payload: { type: 4, _id: 0 } });
+   // check if user is trying to define relationship with self
+   if (userId == _id) return res.status(200).json({ message: "this is the current user", payload: { type: 4, _id: 0 } });
 
-  try {
-    // check if users are friends
-    const friendship = await friendships.findOne({ friendIds: { $all: [_id, userId] } });
-    if (friendship) return res.status(200).json({ message: "users are friends", payload: {type: 1, _id: friendship._id} });
+   try {
+      // check if users are friends
+      const friendship = await friendships.findOne({ friendIds: { $all: [_id, userId] } });
+      if (friendship) return res.status(200).json({ message: "users are friends", payload: {type: 1, _id: friendship._id} });
 
-    // check if friend request has been received
-    const received = await friendRequest.findOne({ senderId: userId, receiverId: _id });
-    if (received) return res.status(200).json({ message: "friend request received", payload: { type: 2, _id: received._id } });
+      // check if friend request has been received
+      const received = await friendRequest.findOne({ senderId: userId, receiverId: _id });
+      if (received) return res.status(200).json({ message: "friend request received", payload: { type: 2, _id: received._id } });
 
-    // check if friend request has been sent
-    const sent = await friendRequest.findOne({ senderId: _id, receiverId: userId });
-    if (sent) return res.status(200).json({ message: "friend request sent", payload: { type: 3, _id: sent._id } });
+      // check if friend request has been sent
+      const sent = await friendRequest.findOne({ senderId: _id, receiverId: userId });
+      if (sent) return res.status(200).json({ message: "friend request sent", payload: { type: 3, _id: sent._id } });
 
-    return res.status(200).json({ message: "no relationship", payload: { type: 0, _id: 0 } });
-  }
-  catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "server failed to define relationship" });
-  }
-};
+      return res.status(200).json({ message: "no relationship", payload: { type: 0, _id: 0 } });
+   }
+   catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "server failed to define relationship" });
+   }
+}
 
 exports.find = async (req, res) => {
-  const { _id } = req?.user;
+   const _id = req.user?._id;
 
-  const { username, email, limit, skip, relationship, count } = req.query;
+   const { username, email, limit, skip, relationship, count } = req.query;
 
-  // Parsing limit and skip as integers 
-  const parsedLimit = parseInt(limit, 10) || 6; 
-  const parsedSkip = parseInt(skip, 10) || 0;
-  const parsedRelationship = parseInt(relationship, 10) || 0;
+   // Parsing limit and skip as integers 
+   const parsedLimit = parseInt(limit, 10) || 6; 
+   const parsedSkip = parseInt(skip, 10) || 0;
+   const parsedRelationship = parseInt(relationship, 10) || 0;
 
-  if (parsedRelationship != 0 && !_id) { return res.status(401).json({ error: "user not signed in" }) };
+   if (parsedRelationship != 0 && !_id) { return res.status(401).json({ error: "user not signed in" }) };
 
-  try {
+   try {
 
-    // create query for searching the database for usernames containing client provided string
-    let query = {};
+      // create query for searching the database for usernames containing client provided string
+      let query = {};
 
-    // add username and email to query if provided
-    if (username) query.username = { $regex: new RegExp(username, 'i') };
-    if (email) query.email = { $regex: new RegExp(email, 'i') };
+      // add username and email to query if provided
+      if (username) query.username = { $regex: new RegExp(username, 'i') };
+      if (email) query.email = { $regex: new RegExp(email, 'i') };
 
-    if (parsedRelationship == 1) {
-      // collect a list of friendship relationships user is involved in
-      const friendshipList = await friendships.find({ friendIds: _id });
-      // extract the _ids of each non-signed in user
-      const friendsList = friendshipList.map((friendship) => friendship.friendIds.filter((friend) => friend != _id) );
-      // add the _ids to the query
-      query._id = { $in: friendsList };
-    }
+      if (parsedRelationship == 1) {
+         // collect a list of friendship relationships user is involved in
+         const friendshipList = await friendships.find({ friendIds: _id });
+         // extract the _ids of each non-signed in user
+         const friendsList = friendshipList.map((friendship) => friendship.friendIds.filter((friend) => friend != _id) );
+         // add the _ids to the query
+         query._id = { $in: friendsList };
+      }
 
-    else if (parsedRelationship == 2) {
-      // collect a list of friend requests user has received
-      const receivedRequests = await friendRequest.find({ receiverId: _id });
-      // extract the _ids of each non-signed in user
-      const requestList = receivedRequests.map((request) => request.senderId);
-      // add the _ids to the query
-      query._id = { $in: requestList };
-    }
+      else if (parsedRelationship == 2) {
+         // collect a list of friend requests user has received
+         const receivedRequests = await friendRequest.find({ receiverId: _id });
+         // extract the _ids of each non-signed in user
+         const requestList = receivedRequests.map((request) => request.senderId);
+         // add the _ids to the query
+         query._id = { $in: requestList };
+      }
 
-    else if (parsedRelationship == 3) {
-      // collect a list of friend requests user has sent
-      const sentRequests = await friendRequest.find({ senderId: _id });
-      // extract the _ids of each non-signed in user
-      const requestList = sentRequests.map((request) => request.receiverId);
-      // add the _ids to the query
-      query._id = { $in: requestList };
-    }
+      else if (parsedRelationship == 3) {
+         // collect a list of friend requests user has sent
+         const sentRequests = await friendRequest.find({ senderId: _id });
+         // extract the _ids of each non-signed in user
+         const requestList = sentRequests.map((request) => request.receiverId);
+         // add the _ids to the query
+         query._id = { $in: requestList };
+      }
 
-    // use query to find users in database
-    const usersList = await users.find(query)
-    .skip(parsedSkip)
-    .limit(parsedLimit);
-    let payload = {users: usersList};
+      // use query to find users in database
+      const usersList = await users.find(query)
+      .skip(parsedSkip)
+      .limit(parsedLimit);
+      let payload = {users: usersList};
 
-    // attach count if requested by the client
-    if (count) {
-      const totalCount = await users.countDocuments(query);
-      payload.totalCount = totalCount;
-    }
+      // attach count if requested by the client
+      if (count) {
+         const totalCount = await users.countDocuments(query);
+         payload.totalCount = totalCount;
+      }
 
-    return res.status(200).json({message: "List of users collected successfully", payload})
-  }
+      return res.status(200).json({message: "List of users collected successfully", payload})
+   }
 
-  // handle any errors caused by the controller
-  catch (error){
-    console.error(error);
-    return res.status(500).json({ error: "server failed to find users with provided parameters" });
-  }
-};
+   // handle any errors caused by the controller
+   catch (error){
+      console.error(error);
+      return res.status(500).json({ error: "server failed to find users with provided parameters" });
+   }
+}
 
 exports.sendFriendRequest = async (req, res) => {
-  if (!req.user) return res.status(401).json({ error: "user not signed in" });
+   if (!req.user) return res.status(401).json({ error: "user not signed in" });
 
-  const { _id } = req.user;
-  const { userId } = req.body;
+   const errors = validationResult(req);
+   if (!errors.isEmpty()) { return res.status(400).json({ error: errors.array() }); }
 
-  // check if user is signed in
-  if (!_id) return res.status(401).json({ error: "user not signed in" });
+   const { _id } = req.user;
+   const { userId } = req.body;
 
-  // check for any missing or invalid fields in the request
-  if (!userId) return res.status(400).json({error: 'missing userId field in body'});
-  if (userId == _id) return res.status(400).json({ error: "user cannot send friend request to self" });
+   // check if user is signed in
+   if (!_id) return res.status(401).json({ error: "user not signed in" });
 
-  try {
-    // make sure user exists in database
-    const senderData = await users.findOne({ _id });
-    if (!senderData) return res.status(400).json({ error: "signed in user not found in database" });
+   // check for any missing or invalid fields in the request
+   if (!userId) return res.status(400).json({error: 'missing userId field in body'});
+   if (userId == _id) return res.status(400).json({ error: "user cannot send friend request to self" });
 
-    // make sure receiver exists in database
-    const receiverData = await users.findOne({ _id: userId });
-    if (!receiverData) return res.status(400).json({ error: "receiver not found" });
+   try {
+      // make sure user exists in database
+      const senderData = await users.findOne({ _id });
+      if (!senderData) return res.status(400).json({ error: "signed in user not found in database" });
 
-    // make sure friend request doesn't already exist in database
-    const sentRequest = await friendRequest.findOne({ senderId: _id, receiverId: userId });
-    if (sentRequest) return res.status(400).json({ error: "friend request already sent" });
-    const receivedRequest = await friendRequest.findOne({ senderId: userId, receiverId: _id });
-    if (receivedRequest) return res.status(400).json({ error: "friend request already received" });
+      // make sure receiver exists in database
+      const receiverData = await users.findOne({ _id: userId });
+      if (!receiverData) return res.status(400).json({ error: "receiver not found" });
 
-    // make sure friendship doesn't already exist in database
-    const existingFriendship = await friendships.findOne({ friendIds: { $all: [senderData._id, receiverData._id] } });
-    if (existingFriendship) return res.status(400).json({ error: "friendship already exists" });
+      // make sure friend request doesn't already exist in database
+      const sentRequest = await friendRequest.findOne({ senderId: _id, receiverId: userId });
+      if (sentRequest) return res.status(400).json({ error: "friend request already sent" });
+      const receivedRequest = await friendRequest.findOne({ senderId: userId, receiverId: _id });
+      if (receivedRequest) return res.status(400).json({ error: "friend request already received" });
 
-    // create friend request
-    const newRequest = {
-      senderId: _id,
-      receiverId: userId,
-    };
+      // make sure friendship doesn't already exist in database
+      const existingFriendship = await friendships.findOne({ friendIds: { $all: [senderData._id, receiverData._id] } });
+      if (existingFriendship) return res.status(400).json({ error: "friendship already exists" });
 
-    // save friend request to database
-    const friendship = await new friendRequest(newRequest)
-    .save();
+      // create friend request
+      const newRequest = {
+         senderId: _id,
+         receiverId: userId,
+      };
 
-    return res.status(200).json({ message: "friend request sent", payload: friendship });
-  }
+      // save friend request to database
+      const friendship = await new friendRequest(newRequest)
+      .save();
 
-  // handle any errors caused by the controller
-  catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "server failed to send friend request" });
-  }
-};
+      return res.status(200).json({ message: "friend request sent", payload: friendship });
+   }
+
+   // handle any errors caused by the controller
+   catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "server failed to send friend request" });
+   }
+}
 
 exports.processFriendRequest = async (req, res) => {
-  if (!req.user) return res.status(401).json({ error: "user not signed in" });
+   if (!req.user) return res.status(401).json({ error: "user not signed in" });
 
-  const { _id } = req.user;
-  const { requestId, accept } = req.body;
+   const errors = validationResult(req);
+   if (!errors.isEmpty()) { return res.status(400).json({ error: errors.array() }); }
 
-  // check if user is signed in
-  if (!_id) return res.status(401).json({ error: "user not signed in" });
+   const { _id } = req.user;
+   const { requestId, accept } = req.body;
 
-  // check for any missing fields in the request
-  if (!requestId) return res.status(400).json({ error: 'missing sender field in body' });
-  if (accept === undefined) return res.status(400).json({ error: 'missing accept field in body' });
+   // check if user is signed in
+   if (!_id) return res.status(401).json({ error: "user not signed in" });
 
-  try {
+   // check for any missing fields in the request
+   if (!requestId) return res.status(400).json({ error: 'missing sender field in body' });
+   if (accept === undefined) return res.status(400).json({ error: 'missing accept field in body' });
 
-    // make sure friend request exists in database
-    const requestData = await friendRequest.findOne({ _id: requestId });
-    if (!requestData) return res.status(400).json({ error: "request not found in database" });
-    // check if sender is current user
-    if (requestData.senderId == _id) {
-      if (accept) return res.status(401).json({ error: "you cant accept a friend request sent by you" });
-      await friendRequest.deleteOne({ _id: requestData._id });
-      return res.status(200).json({ message: "friend request canceled" });
-    }
-    // check that current user is the receiver of the request
-    if (!requestData.receiverId == _id) return res.status(401).json({ error: "current user is not the receiver of this request" });
+   try {
 
-    // check if user accepted the friend request
-    if (!accept) {
+      // make sure friend request exists in database
+      const requestData = await friendRequest.findOne({ _id: requestId });
+      if (!requestData) return res.status(400).json({ error: "request not found in database" });
+      // check if sender is current user
+      if (requestData.senderId == _id) {
+         if (accept) return res.status(401).json({ error: "you cant accept a friend request sent by you" });
+         await friendRequest.deleteOne({ _id: requestData._id });
+         return res.status(200).json({ message: "friend request canceled" });
+      }
+      // check that current user is the receiver of the request
+      if (!requestData.receiverId == _id) return res.status(401).json({ error: "current user is not the receiver of this request" });
+
+      // check if user accepted the friend request
+      if (!accept) {
+         // delete friend request from database
+         await friendRequest.deleteOne({ _id: requestData._id });
+         return res.status(200).json({ message: "friend request denied" });
+      }
+
+      // make sure user exists in database
+      const receiverData = await users.findOne({ _id });
+      if (!receiverData) return res.status(400).json({ error: "signed in user not found in database" });
+
+      // make sure receiver exists in database
+      const senderData = await users.findOne({ _id: requestData.senderId });
+      if (!senderData) return res.status(400).json({ error: "request sender not found in database" });
+
+      // make sure friendship doesn't already exist in database
+      const existingFriendship = await friendships.findOne({ friends: { $all: [senderData._id, _id] }});
+      if (existingFriendship) {
+         await friendRequest.deleteOne({ _id: request });
+         return res.status(400).json({ error: "friendship already exists" });
+      }
+
       // delete friend request from database
-      await friendRequest.deleteOne({ _id: requestData._id });
-      return res.status(200).json({ message: "friend request denied" });
-    }
+      await friendRequest.deleteOne({ _id: requestId });
 
-    // make sure user exists in database
-    const receiverData = await users.findOne({ _id });
-    if (!receiverData) return res.status(400).json({ error: "signed in user not found in database" });
+      // create friendship and save to database
+      const newFriendship = await new friendships({
+         friendIds: [senderData._id, _id]
+      })
+      .save();
 
-    // make sure receiver exists in database
-    const senderData = await users.findOne({ _id: requestData.senderId });
-    if (!senderData) return res.status(400).json({ error: "request sender not found in database" });
+      return res.status(200).json({ message: "friend request accepted", payload: newFriendship });
+   }
 
-    // make sure friendship doesn't already exist in database
-    const existingFriendship = await friendships.findOne({ friends: { $all: [senderData._id, _id] }});
-    if (existingFriendship) {
-      await friendRequest.deleteOne({ _id: request });
-      return res.status(400).json({ error: "friendship already exists" });
-    }
-
-    // delete friend request from database
-    await friendRequest.deleteOne({ _id: requestId });
-
-    // create friendship and save to database
-    const newFriendship = await new friendships({
-      friendIds: [senderData._id, _id]
-    })
-    .save();
-
-    return res.status(200).json({ message: "friend request accepted", payload: newFriendship });
-  }
-
-  // handle any errors caused by the controller
-  catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "server failed to accept friend request" });
-  }
-};
+   // handle any errors caused by the controller
+   catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "server failed to accept friend request" });
+   }
+}
 
 exports.deleteFriend = async (req, res) => {
-  if (!req.user) return res.status(401).json({ error: "user not signed in" });
+   if (!req.user) return res.status(401).json({ error: "user not signed in" });
 
-  const { _id } = req.user;
-  const { relationshipId } = req.body;
+   const errors = validationResult(req);
+   if (!errors.isEmpty()) { return res.status(400).json({ error: errors.array() }); }
 
-  // check if user is signed in
-  if (!_id) return res.status(401).json({ error: "user not signed in" });
+   const { _id } = req.user;
+   const { relationshipId } = req.body;
 
-  // check for any missing fields in the request
-  if (!relationshipId) return res.status(400).json({ error: 'missing relationshipId field in body' });
+   // check if user is signed in
+   if (!_id) return res.status(401).json({ error: "user not signed in" });
 
-  try {
-    // make sure friendship exists in database
-    const friendship = await friendships.findOne({ _id: relationshipId });
-    if (!friendship) return res.status(400).json({ error: "friendship not found in database" });
+   // check for any missing fields in the request
+   if (!relationshipId) return res.status(400).json({ error: 'missing relationshipId field in body' });
 
-    // make sure user is part of the friendship
-    if (!friendship.friendIds.includes(_id)) return res.status(401).json({ error: "user is not part of this friendship" });
+   try {
+      // make sure friendship exists in database
+      const friendship = await friendships.findOne({ _id: relationshipId });
+      if (!friendship) return res.status(400).json({ error: "friendship not found in database" });
 
-    // delete friendship from database
-    await friendships.deleteOne({ _id: relationshipId });
-    return res.status(200).json({ message: "friendship deleted successfully" });
-  }
+      // make sure user is part of the friendship
+      if (!friendship.friendIds.includes(_id)) return res.status(401).json({ error: "user is not part of this friendship" });
 
-  // handle any errors caused by the controller
-  catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "server failed to delete friendship" });
-  }
-};
+      // delete friendship from database
+      await friendships.deleteOne({ _id: relationshipId });
+      return res.status(200).json({ message: "friendship deleted successfully" });
+   }
+
+   // handle any errors caused by the controller
+   catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "server failed to delete friendship" });
+   }
+}

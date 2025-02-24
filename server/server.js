@@ -7,6 +7,7 @@ const cors = require('cors');
 //Local imports
 const mongoConnection = require ('./config/connectMongo');
 const validateToken = require ('./middleware/auth/validateToken');
+const setCookieFlags = require ('./middleware/auth/cookieFlags');
 
 // define server settings
 const corsOptions = {
@@ -28,9 +29,13 @@ app.use(bodyParser.urlencoded({limit: '10mb', extended: false}));
 app.use(express.json());
 app.use(cookieParser());
 app.use(validateToken);
+app.use(setCookieFlags);
 
 const logGeneralData = require('./middleware/debugging/logGeneralData')
 app.use(logGeneralData)
+
+const authenticationRouter = require('./routes/authentication.route')
+app.use('/authentication', authenticationRouter)
 
 const adminRouter = require('./routes/admin.route')
 app.use('/admin', adminRouter)

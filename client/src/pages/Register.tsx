@@ -36,7 +36,7 @@ function Register() {
       if (passwordOne != passwordTwo) { return setErrorMessage("passwords don't match"); }
 
       const userData = { username, email, password:passwordOne };
-      axios({ method:'post', url:'user/register', data: userData })
+      axios({ method:'post', url:'authentication/register', data: userData })
       .then(() => { 
          navigate('/');
          window.location.reload();
