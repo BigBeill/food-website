@@ -2,6 +2,7 @@
 const friendRequest = require("../models/joinTables/friendRequest");
 const friendships = require("../models/joinTables/friendship");
 const users = require("../models/user");
+const { validationResult } = require("express-validator");
 require("dotenv").config();
 
 
