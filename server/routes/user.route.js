@@ -89,6 +89,41 @@ router.get("/find", userController.find);
 
 
 
+/*
+---------- /folders route ------------
+
+type: 
+    GET - get a list of folders
+
+requires 0 arguments from body
+
+Optionally accepts 2 arguments from body:
+    folderId: mongoose object id
+    count: boolean (assumed to be false)
+
+Route description:
+    gets a list of all folders in the database that are owned by the user that is currently logged in
+    if folderId is provided, get the folders that are inside the folder with {folderId}
+    if count is true, return the count of folders that match the search criteria
+
+Returns:
+    folders:
+        [
+            {
+                _id: mongoose object id
+                name: string
+            }
+        ]
+    totalCount: int (if count is true)
+
+*/
+router.get("/folders", userController.folders);
+
+
+
+
+
+
 
 
 /*

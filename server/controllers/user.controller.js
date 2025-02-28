@@ -1,6 +1,7 @@
 // internal imports
 const friendRequest = require("../models/joinTables/friendRequest");
 const friendships = require("../models/joinTables/friendship");
+const friendFolders = require("../models/friendFolder");
 const users = require("../models/user");
 const { validationResult } = require("express-validator");
 require("dotenv").config();
@@ -166,6 +167,35 @@ exports.find = async (req, res) => {
    catch (error){
       console.error(error);
       return res.status(500).json({ error: "server failed to find users with provided parameters" });
+   }
+}
+
+exports.folders = async (req, res) => {
+   if (!req.user) return res.status(401).json({ error: "user not signed in" });
+
+   const { _id } = req.user;
+   const { folderId, count } = req.query;
+
+   try {
+      let query;
+      if (!folderId) { query = { owner: _id, parent: null }; }
+      else { query = { owner: _id, parent: folderId }; }
+
+      // find folders in database
+      const foldersList = await friendFolders.find(query);
+      let payload = { folders: foldersList };
+
+      // attach count if requested by the client
+      if (count) {
+         const totalCount = await friendFolders.countDocuments(query);
+         payload.totalCount = totalCount;
+      }
+
+      res.status(200).json({ message: "folders collected successfully", payload });
+   }
+   catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "server failed to find folders" });
    }
 }
 

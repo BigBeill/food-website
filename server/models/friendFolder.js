@@ -2,10 +2,13 @@ const mongoose = require('mongoose');
 
 const friendFolderSchema = new mongoose.Schema({
    owner: mongoose.SchemaTypes.ObjectId,
+   parent: mongoose.SchemaTypes.ObjectId,
    title: String,
-   contents: {
+   folders: {
+      type: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'friendFolder' }],
+   },
+   users: {
       type: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'user' }],
-      validate: [limitSize, 'Folder contents must be less than 3 users']
    }
 });
 
