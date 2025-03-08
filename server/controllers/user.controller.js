@@ -110,7 +110,7 @@ exports.find = async (req, res) => {
    const parsedSkip = parseInt(skip, 10) || 0;
    const parsedRelationship = parseInt(relationship, 10) || 0;
 
-   if (parsedRelationship != 0 && !_id) { return res.status(401).json({ error: "user not signed in" }) };
+   if (parsedRelationship != 0 && !_id) { return res.status(401).json({ error: "user not signed in" }); };
 
    try {
 
@@ -157,7 +157,7 @@ exports.find = async (req, res) => {
       // attach count if requested by the client
       if (count) {
          const totalCount = await users.countDocuments(query);
-         payload.totalCount = totalCount;
+         payload.count = totalCount;
       }
 
       return res.status(200).json({message: "List of users collected successfully", payload})
@@ -170,11 +170,14 @@ exports.find = async (req, res) => {
    }
 }
 
-exports.folders = async (req, res) => {
+exports.folder = async (req, res) => {
    if (!req.user) return res.status(401).json({ error: "user not signed in" });
 
    const { _id } = req.user;
-   const { folderId, count } = req.query;
+   const { folderId, count, limit, skip } = req.query;
+
+   const parsedLimit = parseInt(limit, 10) || 6; 
+   const parsedSkip = parseInt(skip, 10) || 0;
 
    try {
       let query;
@@ -182,13 +185,15 @@ exports.folders = async (req, res) => {
       else { query = { owner: _id, parent: folderId }; }
 
       // find folders in database
-      const foldersList = await friendFolders.find(query);
+      const foldersList = await friendFolders.find(query)
+      .skip(parsedSkip)
+      .limit(parsedLimit);
       let payload = { folders: foldersList };
 
       // attach count if requested by the client
       if (count) {
          const totalCount = await friendFolders.countDocuments(query);
-         payload.totalCount = totalCount;
+         payload.count = totalCount;
       }
 
       res.status(200).json({ message: "folders collected successfully", payload });

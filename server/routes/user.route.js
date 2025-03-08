@@ -80,7 +80,7 @@ Returns:
                 relationship: { type: int, _id: mongoose object id }
             }
         ]
-    totalCount: int (if count is true)
+    count: int (if count is true)
 */
 router.get("/find", userController.find);
 
@@ -90,14 +90,16 @@ router.get("/find", userController.find);
 
 
 /*
----------- /folders route ------------
+---------- /folder route ------------
 
 type: 
     GET - get a list of folders
 
 requires 0 arguments from body
 
-Optionally accepts 2 arguments from body:
+Optionally accepts 4 arguments from body:
+    skip: int (assumed to be 0)
+    limit: int (assumed to be 6)
     folderId: mongoose object id
     count: boolean (assumed to be false)
 
@@ -114,10 +116,10 @@ Returns:
                 name: string
             }
         ]
-    totalCount: int (if count is true)
+    count: int (if count is true)
 
 */
-router.get("/folders", userController.folders);
+router.get("/folder", userController.folder);
 
 
 

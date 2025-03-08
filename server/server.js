@@ -33,10 +33,10 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(setCookieFlags);
 
+app.use(validateToken);
+
 const logGeneralData = require('./middleware/debugging/logGeneralData')
 app.use(logGeneralData)
-
-app.use(validateToken);
 
 const authenticationRouter = require('./routes/authentication.route')
 app.use('/authentication', authenticationRouter)
