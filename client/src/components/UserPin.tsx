@@ -21,13 +21,11 @@ export default function UserPin({ userData }: UserPinProps) {
   const [relationship, setRelationship] = useState<RelationshipObject>({ type: 0, _id: '0' });
 
   useEffect(() => {
-    axios({
-      method: 'get',
-      url: `user/defineRelationship/${userData._id}`
-    })
-    .then((response) => {
-      setRelationship(response);
-    })
+    if (userData.relationship) { setRelationship(userData.relationship); }
+    else {
+      axios({ method: 'get', url: `user/defineRelationship/${userData._id}` })
+      .then((response) => { setRelationship(response); });
+    }
   }, [userData]);
 
   useEffect(() => { 

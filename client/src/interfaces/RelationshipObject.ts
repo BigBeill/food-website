@@ -6,6 +6,6 @@ type:
    3: sent friend requests
 */
 export default interface RelationshipObject {
-   type: number;
    _id: string;
+   type: number;
 }

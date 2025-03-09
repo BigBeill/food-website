@@ -4,6 +4,7 @@ const friendships = require("../models/joinTables/friendship");
 const friendFolders = require("../models/friendFolder");
 const users = require("../models/user");
 const { validationResult } = require("express-validator");
+const { getRelationship } = require('../library/userUtils');
 require("dotenv").config();
 
 
@@ -76,23 +77,9 @@ exports.defineRelationship = async (req, res) => {
    // check for any missing fields in the request
    if (!userId) return res.status(400).json({ error: "missing userId parameter" });
 
-   // check if user is trying to define relationship with self
-   if (userId == _id) return res.status(200).json({ message: "this is the current user", payload: { type: 4, _id: 0 } });
-
    try {
-      // check if users are friends
-      const friendship = await friendships.findOne({ friendIds: { $all: [_id, userId] } });
-      if (friendship) return res.status(200).json({ message: "users are friends", payload: {type: 1, _id: friendship._id} });
-
-      // check if friend request has been received
-      const received = await friendRequest.findOne({ senderId: userId, receiverId: _id });
-      if (received) return res.status(200).json({ message: "friend request received", payload: { type: 2, _id: received._id } });
-
-      // check if friend request has been sent
-      const sent = await friendRequest.findOne({ senderId: _id, receiverId: userId });
-      if (sent) return res.status(200).json({ message: "friend request sent", payload: { type: 3, _id: sent._id } });
-
-      return res.status(200).json({ message: "no relationship", payload: { type: 0, _id: 0 } });
+      const definedRelationship = await getRelationship(_id, userId); 
+      return res.status(200).json({ message: "relationship defined successfully", payload: definedRelationship });
    }
    catch (error) {
       console.error(error);
@@ -149,10 +136,26 @@ exports.find = async (req, res) => {
       }
 
       // use query to find users in database
-      const usersList = await users.find(query)
+      let userList = await users.find(query)
       .skip(parsedSkip)
       .limit(parsedLimit);
-      let payload = {users: usersList};
+
+      if (!_id) {
+         userList = await Promise.all(userList.map(async (user) => {
+            user =  user.toObject();
+            user.relationship = { type: 0, _id: 0 };
+            return user;
+         }));
+      }
+      else {
+         userList = await Promise.all(userList.map(async (user) => {
+            user = user.toObject();
+            user.relationship = await getRelationship(_id, user._id);
+            return user;
+         }));
+      }
+
+      let payload = {users: userList};
 
       // attach count if requested by the client
       if (count) {
