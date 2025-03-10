@@ -48,6 +48,10 @@ exports.updateAccount = async (req, res) => {
 }
 
 exports.info = async (req, res) => {
+
+   const paramErrors = validationResult(req);
+   if (!paramErrors.isEmpty()) { return res.status(400).json({ error: paramErrors.array() }); }
+
    const { userId } = req.params;
 
    if (!userId) {
@@ -69,6 +73,10 @@ exports.info = async (req, res) => {
 }
 
 exports.defineRelationship = async (req, res) => {
+
+   const paramErrors = validationResult(req);
+   if (!paramErrors.isEmpty()) { return res.status(400).json({ error: paramErrors.array() }); }
+
    if (!req.user) { return res.status(401).json({ error: "user not signed in" }); }
 
    const { _id } = req.user;
@@ -88,16 +96,15 @@ exports.defineRelationship = async (req, res) => {
 }
 
 exports.find = async (req, res) => {
+
+   const queryErrors = validationResult(req);
+   if (!queryErrors.isEmpty()) { return res.status(400).json({ error: queryErrors.array() }); }
+
    const _id = req.user?._id;
 
    const { username, email, limit, skip, relationship, count } = req.query;
 
-   // Parsing limit and skip as integers 
-   const parsedLimit = parseInt(limit, 10) || 6; 
-   const parsedSkip = parseInt(skip, 10) || 0;
-   const parsedRelationship = parseInt(relationship, 10) || 0;
-
-   if (parsedRelationship != 0 && !_id) { return res.status(401).json({ error: "user not signed in" }); };
+   if (relationship != 0 && !_id) { return res.status(401).json({ error: "user not signed in" }); };
 
    try {
 
@@ -108,7 +115,7 @@ exports.find = async (req, res) => {
       if (username) query.username = { $regex: new RegExp(username, 'i') };
       if (email) query.email = { $regex: new RegExp(email, 'i') };
 
-      if (parsedRelationship == 1) {
+      if (relationship == 1) {
          // collect a list of friendship relationships user is involved in
          const friendshipList = await friendships.find({ friendIds: _id });
          // extract the _ids of each non-signed in user
@@ -117,7 +124,7 @@ exports.find = async (req, res) => {
          query._id = { $in: friendsList };
       }
 
-      else if (parsedRelationship == 2) {
+      else if (relationship == 2) {
          // collect a list of friend requests user has received
          const receivedRequests = await friendRequest.find({ receiverId: _id });
          // extract the _ids of each non-signed in user
@@ -126,7 +133,7 @@ exports.find = async (req, res) => {
          query._id = { $in: requestList };
       }
 
-      else if (parsedRelationship == 3) {
+      else if (relationship == 3) {
          // collect a list of friend requests user has sent
          const sentRequests = await friendRequest.find({ senderId: _id });
          // extract the _ids of each non-signed in user
@@ -137,8 +144,8 @@ exports.find = async (req, res) => {
 
       // use query to find users in database
       let userList = await users.find(query)
-      .skip(parsedSkip)
-      .limit(parsedLimit);
+      .skip(skip)
+      .limit(limit);
 
       if (!_id) {
          userList = await Promise.all(userList.map(async (user) => {
@@ -174,13 +181,14 @@ exports.find = async (req, res) => {
 }
 
 exports.folder = async (req, res) => {
+
+   const queryErrors = validationResult(req);
+   if (!queryErrors.isEmpty()) { return res.status(400).json({ error: queryErrors.array() }); }
+
    if (!req.user) return res.status(401).json({ error: "user not signed in" });
 
    const { _id } = req.user;
    const { folderId, count, limit, skip } = req.query;
-
-   const parsedLimit = parseInt(limit, 10) || 6; 
-   const parsedSkip = parseInt(skip, 10) || 0;
 
    try {
       let query;
@@ -189,8 +197,8 @@ exports.folder = async (req, res) => {
 
       // find folders in database
       const foldersList = await friendFolders.find(query)
-      .skip(parsedSkip)
-      .limit(parsedLimit);
+      .skip(skip)
+      .limit(limit);
       let payload = { folders: foldersList };
 
       // attach count if requested by the client

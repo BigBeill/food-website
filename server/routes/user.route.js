@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const userController = require("../controllers/user.controller");
-const { body } = require("express-validator");
+const { body, param, query } = require("express-validator");
 const { validateNoExtraFields } = require("../library/sanitationUtils");
 
 /*
@@ -17,7 +17,12 @@ route will:
     if no userId provided return data for user that is currently logged in
 
 */
-router.get("/info/:userId?", userController.info);
+router.get("/info/:userId?",
+    [
+        param("userId").optional().isString().isLength({ min: 24, max: 24 }).withMessage("userId must be a string of 24 characters"),
+        validateNoExtraFields(["userId"], "params")
+    ],
+userController.info);
 
 
 
@@ -39,7 +44,12 @@ returns:
         4: users own profile
     _id: mongoose object id (_id of the relationship, 0 if N/A)
 */
-router.get("/defineRelationship/:userId", userController.defineRelationship);
+router.get("/defineRelationship/:userId",
+    [
+        param("userId").isString().isLength({ min: 24, max: 24 }).withMessage("userId must be a string of 24 characters"),
+        validateNoExtraFields(["userId"], "params")
+    ],
+userController.defineRelationship);
 
 
 
@@ -82,7 +92,17 @@ Returns:
         ]
     count: int (if count is true)
 */
-router.get("/find", userController.find);
+router.get("/find",
+    [
+        query("username").optional().isString().isLength({ min: 3, max: 60 }).withMessage("username must be a string between 3 and 60 characters"),
+        query("email").optional().isString().isEmail().withMessage("email must be a valid email address"),
+        query("limit").optional().isInt({ min: 1, max: 90 }).toInt().withMessage("limit must be an integer between 1 and 90"),
+        query("skip").optional().isInt({ min: 0, max: 900 }).toInt().withMessage("skip must be an integer between 0 and 900"),
+        query("relationship").optional().isInt({ min: 0, max: 4 }).toInt().withMessage("relationship must be an integer between 0 and 4"),
+        query("count").optional().isBoolean().withMessage("count must be a boolean"),
+        validateNoExtraFields(["username", "email", "limit", "skip", "relationship", "count"], "query")
+    ],
+userController.find);
 
 
 
@@ -119,7 +139,15 @@ Returns:
     count: int (if count is true)
 
 */
-router.get("/folder", userController.folder);
+router.get("/folder",
+    [
+        query("skip").optional().isInt({ min: 0, max: 900 }).toInt().withMessage("skip must be an integer between 3 and 900"),
+        query("limit").optional().isInt({ min: 1, max: 90 }).toInt().withMessage("limit must be an integer between 3 and 90"),
+        query("folderId").optional().isString().isLength({ min: 24, max: 24 }).withMessage("folderId must be a string of 24 characters"),
+        query("count").optional().isBoolean().withMessage("count must be a boolean"),
+        validateNoExtraFields(["skip", "limit", "folderId", "count"], "query")
+    ],
+userController.folder);
 
 
 
@@ -151,7 +179,7 @@ router.post("/updateAccount",
         body("username").isString().isLength({ min: 3, max: 60 }).withMessage("Username must be a string between 3 and 60 characters"),
         body("email").isString().isEmail().withMessage("Email must be a valid email address"),
         body("bio").isString().withMessage("Bio must be a string"),
-        validateNoExtraFields(["username", "email", "bio"])
+        validateNoExtraFields(["username", "email", "bio"], "body")
     ],
 userController.updateAccount);
 
@@ -170,7 +198,7 @@ Route description:
 router.post("/sendFriendRequest", 
     [
         body("userId").isString().isLength({ min: 24, max: 24 }).withMessage("userId must be a string of 24 characters"),
-        validateNoExtraFields(["userId"])
+        validateNoExtraFields(["userId"], "body")
     ],
 userController.sendFriendRequest);
 
@@ -193,7 +221,7 @@ router.post("/processFriendRequest",
     [
         body("requestId").isString().isLength({ min: 24, max: 24 }).withMessage("requestId must be a string of 24 characters"),
         body("accept").isBoolean().withMessage("accept must be a boolean"),
-        validateNoExtraFields(["requestId", "accept"])
+        validateNoExtraFields(["requestId", "accept"], "body")
     ],
 userController.processFriendRequest);
 
@@ -215,7 +243,7 @@ Route description:
 router.post("/deleteFriend", 
     [
         body("relationshipId").isString().isLength({ min: 24, max: 24 }).withMessage("relationshipId must be a string of 24 characters"),
-        validateNoExtraFields(["relationshipId"])
+        validateNoExtraFields(["relationshipId"], "body")
     ],
 userController.deleteFriend);
 
