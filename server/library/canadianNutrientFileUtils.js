@@ -150,9 +150,7 @@ function ingredientNutrition (ingredient) {
 
         // apply conversionFactorValue to each item in nutrition
         for (let item in nutrients) {
-          console.log(nutrients[item]);
           nutrients[item] = (nutrients[item]/100) * conversionFactorValue * amount;
-          console.log(nutrients[item]);
         }
 
       }
@@ -192,13 +190,13 @@ function conversionFactorList (ingredientId) {
       // get a list of all possible conversions from database
       const query = `SELECT measureid, conversionfactorvalue FROM conversionfactor WHERE foodid = $1`;
       const values = [ingredientId];
-      const data = await postgresConnection.query(query, values);
+      const possibleConversionsData = await postgresConnection.query(query, values);
 
       //go though all items in list of possible conversions and collect more detailed information
-      for(const conversion of data.rows){
+      for(const conversion of possibleConversionsData.rows){
         // get more detailed information about conversion from database
         const query = `SELECT measuredescription FROM measurename WHERE measureid = $1 LIMIT 1`;
-        const values = [conversion.measureId];
+        const values = [conversion.measureid];
         const data = await postgresConnection.query(query, values);
 
         // if conversion is found add to conversionOptions arrays
@@ -221,7 +219,7 @@ function conversionFactorList (ingredientId) {
         }
       }
 
-    resolve (conversionOptions);
+      resolve (conversionOptions);
     }
     catch (error) {
       console.error("error:", error);
@@ -238,7 +236,6 @@ example:
   output: { 12345, "testing" }
 */
 function breakupMeasureDescription(measureDescription) {
-  console.log(measureDescription)
   let integer = "";
   let denominator = "";
   let slashFound = false;
