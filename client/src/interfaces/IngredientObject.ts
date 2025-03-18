@@ -14,5 +14,5 @@ export default interface IngredientObject {
    }
    measureId?: string;
    unit?: string;
-   amount?: number | null;
+   amount?: string | null;
 }

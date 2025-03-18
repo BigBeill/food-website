@@ -216,7 +216,7 @@ function IngredientPage ({ingredientList, setIngredientList}: IngredientPageProp
     if (!newIngredient.foodId || !newIngredient.unit || !newIngredient.amount) return
     setIngredientList([...ingredientList, {id: availableId, content: newIngredient} ]);
     setAvailableId( availableId+1 );
-    setNewIngredient({foodId:"", foodDescription:"", unit:"", amount:0});
+    setNewIngredient({foodId:"", foodDescription:"", unit:"", amount: null});
   }
 
   function removeIngredient (index: number) {
@@ -237,11 +237,7 @@ function IngredientPage ({ingredientList, setIngredientList}: IngredientPageProp
               <FontAwesomeIcon icon={faCircleXmark} style={{color: "#575757",}} onClick={() => removeIngredient(index)} />
             </div>
             <div className='listItem'>
-              {(item.content.unit == 'physical') ? (
-                <p>{item.content.amount} {item.content.foodDescription}{item.content.amount != 1 ? 's' : ''}</p>
-              ):(
-              <p>{item.content.amount} {item.content.unit}{item.content.amount != 1 ? 's' : ''} of {item.content.foodDescription}</p>
-              )}
+              <p>{item.content.amount} {item.content.unit} of [{item.content.foodDescription}]</p>
             </div>
           </Reorder.Item>
         ))}
@@ -251,7 +247,7 @@ function IngredientPage ({ingredientList, setIngredientList}: IngredientPageProp
       <div className='textInput shared additionalMargin'>
         <label>New Ingredient</label>
         <div className='inputs'>
-          <input type='number' value={newIngredient.amount ?? ''} onChange={(event) => setNewIngredient({...newIngredient, amount: Number(event.target.value)})} placeholder='Amount'/>
+          <input type='number' value={newIngredient.amount ?? ''} onChange={(event) => setNewIngredient({...newIngredient, amount: event.target.value})} placeholder='Amount'/>
           <select value={newIngredient.unit} onChange={(event) => setNewIngredient({...newIngredient, measureId: event.target.options[event.target.selectedIndex].id, unit: event.target.value})} >
             <option value="" disabled hidden className='light'>Units</option>
             {conversionFactorsAvailable.map((conversionFactor, index) => (
