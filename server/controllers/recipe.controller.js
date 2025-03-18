@@ -1,6 +1,7 @@
 const { createRecipeSchema } = require("../library/validSchemaUtils");
 const recipes = require("../models/recipe");
 const users = require("../models/user");
+const { validationResult } = require("express-validator");
 
 exports.data = async (req, res) => {
    const { _id } = req.query
@@ -26,12 +27,14 @@ exports.data = async (req, res) => {
 }
 
 exports.packageIncoming = async (req, res, next) => {
-   const { title, description, image, ingredients, instructions } = req.body;
+
+   const bodyErrors = validationResult(req);
+   if (!bodyErrors.isEmpty()) { return res.status(400).json({ error: bodyErrors.array() }); }
 
    // make sure user is signed in
    if(!req.user) return res.status(401).json({ error: 'user not signed in' });
 
-   createRecipeSchema(clientRecipeData, req.user._id)
+   createRecipeSchema(req.body, req.user._id)
    .then((response) => {
       req.recipeSchema = response;
       next();

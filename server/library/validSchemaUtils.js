@@ -25,8 +25,6 @@ function createRecipeSchema (recipe, userId) {
 
   return new Promise ( async (resolve, reject) => {
 
-    console.log("creating recipe schema")
-
     // create schema
     let schema = {
       owner: userId,
@@ -45,7 +43,7 @@ function createRecipeSchema (recipe, userId) {
       ingredients: false,
       instructions: false
     }
-  
+
     // make sure all required information is provided
     if(schema.owner && ObjectId.isValid(schema.owner)) validData.owner = true;
     if(schema.title && schema.title.length >= 3 && schema.title.length <= 60) validData.title = true;
@@ -67,7 +65,7 @@ function createRecipeSchema (recipe, userId) {
     if(schema.instructions && schema.instructions.length >= 1 && schema.instructions.length <= 100) {
       let key = true
       schema.instructions.forEach(instruction => {
-        if (instruction.length < 3 || instruction.length > 300) {
+        if (instruction.length < 3 || instruction.length > 3000) {
           key = false
         }
       })
@@ -77,7 +75,6 @@ function createRecipeSchema (recipe, userId) {
     //check for any missing data (reject promise if found)
     for (let index in validData) { 
       if (!validData[index]) { 
-        console.log("failed to create recipe schema:", validData);
         reject({status: 400, message: "recipe is missing valid " + index + " field." });
         return;
       }
@@ -95,8 +92,6 @@ function createRecipeSchema (recipe, userId) {
     }
 
     //if no data is missing, return schema
-    console.log("successfully created recipe schema...");
-    console.log(schema);
     resolve(schema);
   })
 }

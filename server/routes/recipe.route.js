@@ -1,6 +1,8 @@
 const router = require("express").Router();
 const recipeController = require("../controllers/recipe.controller");
 const recipes = require("../models/recipe");
+const { body } = require("express-validator");
+const { validateNoExtraFields } = require("../library/sanitationUtils");
 
 
 
@@ -48,7 +50,7 @@ router.get('/list', async (req, res) => {
     } catch {
         res.status(500).json({ message: "failed to collect recipes from database" });
     }
-})
+});
 
 
 
@@ -83,7 +85,7 @@ router.get('/paginatedList', async (req, res) => {
     }
 
     return res.status(200).json( pageList )
-})
+});
 
 
 
@@ -105,7 +107,7 @@ requires 5 arguments from body:
     instructions: [string]
 
 method 'PUT' requires 1 additional argument from body:
-    _id: mongoDB objectId (recipe id)
+    recipeId: mongoDB objectId (recipe id)
 
 Method 'ALL' description:
     put relevant data from body into a json object
@@ -121,7 +123,17 @@ Method 'PUT' description:
     use the json object in req.recipeSchema to save over the recipe with the id req.body._id
 */
 
-router.route('/edit')
+router.route('/edit',
+    [
+        body("title").isString().isLength({ min: 3, max: 90 }).withMessage("title must be a string between 3 and 100 characters"),
+        body("description").isString().isLength({ min: 3, max: 9000 }).withMessage("description must be a string between 3 and 1000 characters"),
+        body("image").isString().isLength({ min: 0, max: 90 }).withMessage("image must be a string between 3 and 900 characters"),
+        body("ingredients").isArray().withMessage("ingredients must be an array"),
+        body("instructions").isArray().withMessage("instructions must be an array"),
+        body("recipeId").optional().isString().isLength({ min: 24, max: 24 }).withMessage("recipeId must be a string of 24 characters"),
+        validateNoExtraFields(["title", "description", "image", "ingredients", "instructions", "recipeId"], "body")
+    ],
+)
 .all(recipeController.packageIncoming)
 .post(recipeController.add)
 .put(recipeController.update);
