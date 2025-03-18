@@ -116,6 +116,12 @@
       }
     }
   }
+
+  &.bottom {
+    ul{
+      bottom: auto;
+    }
+  }
 }
 
 button{
