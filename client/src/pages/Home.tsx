@@ -12,11 +12,11 @@ export default function Home() {
 
   const [recipeName, setRecipeName] = useState<string>('')
   const [ingredientList, setIngredientList] = useState<string[]>([])
-  const [pageNumber, setPageNumber] = useState<number>(0)
 
   useEffect(() => {
 
   }, [pageNumber])
+   const [pageNumber, setPageNumber] = useState<number>(1);
 
   const pageList: PageObject[] = [{
     content: MainPage,

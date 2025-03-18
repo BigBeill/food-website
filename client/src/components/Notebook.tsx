@@ -1,11 +1,8 @@
-// external imports
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
-// internal imports
-import '../styles/componentSpecific/notebook.scss'
-
+import '../styles/componentSpecific/notebook.scss';
 import PageObject from '../interfaces/PageObject';
 
 /*
@@ -106,31 +103,31 @@ interface NotebookProps {
    requestNewPage?: (pageNumber: number) => void;
 }
 
-export default function Notebook ({pageList, parentPageNumber = 0, requestNewPage}: NotebookProps) {
+export default function Notebook ({pageList, parentPageNumber = 1, requestNewPage}: NotebookProps) {
 
-   const [displayRight, setDisplayRight] = useState(false)
-   const [narrowScreen, setNarrowScreen] = useState(false)
+   const [displayRight, setDisplayRight] = useState(false);
+   const [narrowScreen, setNarrowScreen] = useState(false);
 
-   const [pageNumber, setPageNumber] = useState(parentPageNumber || 0)
-   const FirstPage: PageObject = pageList[pageNumber]
-   const SecondPage: PageObject = pageList[pageNumber + 1]
+   const [pageNumber, setPageNumber] = useState(1);
+   const FirstPage: PageObject = pageList[pageNumber - 1];
+   const SecondPage: PageObject = pageList[pageNumber];
 
    useEffect(() => {
 
       // check if the screen is too small to support both pages of notebook at once
       function handleResize() {
-         const width = window.innerWidth
-         const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize)
-         const threshold = 78 * rootFontSize // 78rem
+         const width = window.innerWidth;
+         const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+         const threshold = 78 * rootFontSize; // 78rem
 
-         if (width < threshold) { setNarrowScreen(true) }
-         else { setNarrowScreen(false) }
+         if (width < threshold) { setNarrowScreen(true); }
+         else { setNarrowScreen(false); }
       }
 
-      handleResize()
+      handleResize();
 
-      window.addEventListener('resize', handleResize)
-      return () => { window.removeEventListener('resize', handleResize) }
+      window.addEventListener('resize', handleResize);
+      return () => { window.removeEventListener('resize', handleResize); }
 
    }, [])
 
@@ -149,21 +146,13 @@ export default function Notebook ({pageList, parentPageNumber = 0, requestNewPag
    }, [pageNumber, parentPageNumber])
 
    function previousPage() {
-      if ( pageNumber > 0 ) { 
-         setPageNumber( pageNumber - 2 ) 
-      }
-      else if ( (pageNumber + parentPageNumber) > 0 && requestNewPage ) {
-         requestNewPage( pageNumber + parentPageNumber - 2 ) 
-      }
+      if ( pageNumber > 1 ) { setPageNumber( pageNumber - 2 ); }
+      else if ( requestNewPage && (pageNumber + parentPageNumber - 1) > 1 ) { requestNewPage( pageNumber + parentPageNumber - 3 ); }
    }
 
    function nextPage(){
-      if (pageNumber + 2 < (pageList.length)) { 
-         setPageNumber(pageNumber + 2) 
-      }
-      else if (requestNewPage) { 
-         requestNewPage( pageNumber + parentPageNumber + 2 ) 
-      }
+      if (pageNumber + 1 < (pageList.length)) { setPageNumber(pageNumber + 2); }
+      else if (requestNewPage) { requestNewPage( pageNumber + parentPageNumber + 1 ); }
    }
 
    return(
@@ -172,7 +161,7 @@ export default function Notebook ({pageList, parentPageNumber = 0, requestNewPag
          <div className={`pageContent ${(displayRight && narrowScreen) ? 'shielded' : ''}`}> {FirstPage ? (<FirstPage.content {...FirstPage.props} />) : null} </div>
          <div className='bottomArrows'> 
             <div className='arrowContainer'><FontAwesomeIcon icon={faArrowLeft} onClick={() => previousPage()} /> </div>
-            <p>{pageNumber + parentPageNumber + 1}</p>
+            <p>{pageNumber + parentPageNumber - 1}</p>
             <div className='arrowContainer notIntractable'></div>
          </div>
          </div>
@@ -181,7 +170,7 @@ export default function Notebook ({pageList, parentPageNumber = 0, requestNewPag
          <div className={`pageContent ${(!displayRight && narrowScreen) ? 'shielded' : ''}`}> {SecondPage ? (<SecondPage.content {...SecondPage.props} />) : null} </div>
          <div className='bottomArrows'> 
             <div className='arrowContainer notIntractable'></div>
-            <p>{pageNumber+ parentPageNumber +2}</p>
+            <p>{pageNumber + parentPageNumber}</p>
             <div className='arrowContainer'><FontAwesomeIcon icon={faArrowRight} onClick={() => nextPage()}/> </div>
          </div>
          </div>
