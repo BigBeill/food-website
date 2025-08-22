@@ -1,6 +1,7 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const path = require('path');
 
 const validateToken = require ('./middleware/auth/validateToken');
 const setCookieFlags = require ('./middleware/auth/cookieFlags');
@@ -28,6 +29,9 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 app.use(setCookieFlags);
+
+// serve static files from /mnt/volume/uploads
+app.use('/uploads', express.static(path.join("/mnt/volume", "uploads")));
 
 app.use(validateToken);
 
