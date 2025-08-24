@@ -3,5 +3,5 @@ export default interface ImageObject {
    url: string;
    size: number;
    mimetype: string;
-   createdAt: Date;
+   uploadedAt: Date;
 }

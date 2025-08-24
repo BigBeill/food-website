@@ -5,10 +5,9 @@ import axios from '../api/axios';
 import GrowingText from '../components/GrowingText';
 import Loading from '../components/Loading';
 import UserObject from '../interfaces/UserObject';
-import ImageObject from '../interfaces/ImageObject';
 import ImageUploader from '../components/ImageUploader';
 
-const database = import.meta.env.VITE_DATABASE_URL;
+const database = import.meta.env.VITE_SERVER_LOCATION;
 
 export default function Profile() {
    const titleParent = useRef(null);
@@ -105,7 +104,7 @@ export default function Profile() {
             : (
                <img
                   className="consumeSpace" 
-                  src={!(userObject.image instanceof File) && userObject.image?.filename ? `${database}/uploads/users/${userObject.image.filename}` : "/profile-photo.png"} 
+                  src={!(userObject.image instanceof File) && userObject.image?.filename ? `${database}/uploads/${userObject.image.filename}` : "/profile-photo.png"} 
                   alt='profile picture' 
                />
             )}

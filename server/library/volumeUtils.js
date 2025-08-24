@@ -2,7 +2,7 @@ const fs = require('fs');
 const multer = require('multer');
 const path = require('path');
 
-const volumeDirectory = '/mnt/volume';
+const volumeDirectory = path.join(__dirname, '../mnt/volume');
 
 const storage = multer.diskStorage({
    destination: (_req, _file, cb) => { cb(null, volumeDirectory); },

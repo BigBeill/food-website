@@ -24,14 +24,30 @@ const corsOptions = {
 
 //setup server
 const app = express();
+
+// Serve static files from the "uploads" volume folder without authentication
+const uploadsDir = path.resolve(__dirname, './mnt/volume');
+app.use('/uploads', (req, res, next) => {console.log("accessing uploads"); next();}, require('cors')({
+  origin: true,
+  credentials: false,
+  maxAge: 86400,
+}), (req, res, next) => {console.log("passed CORS"); next();}, express.static(uploadsDir, {fallthrough: false}),
+
+   (err, req, res, next) => {
+      console.error('[uploads error]', err);            // <-- see real cause in console
+      if (err && err.code === 'ENOENT') return res.status(404).send('Not found');
+      if (err && err.code === 'EACCES') return res.status(403).send('Forbidden');
+      return res.status(500).send('Static error');
+   }
+);
+
 app.use((req, res, next) => {console.log("\n\n\n"); next();}); // split up request logs
+
 app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(setCookieFlags);
-
-// serve static files from /mnt/volume/uploads
-app.use('/uploads', express.static(path.join("/mnt/volume", "uploads")));
 
 app.use(validateToken);
 

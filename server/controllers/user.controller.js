@@ -185,15 +185,16 @@ exports.updateAccount = async (req, res) => {
       return res.status(500).json({ error: "server failed to update user account" });
    }
 
-   try {
-      let updateData = {
-         username: username,
-         email: email,
-         bio: bio || ""
-      }
+   let updatedUserData = {
+      username: username,
+      email: email,
+      bio: bio || ""
+   };
 
+   try {
       if (req.file) {
-         updateData.image = {
+
+         updatedUserData.image = {
             filename: req.file.filename,
             url: path.join(UPLOAD_DIRECTORY_USERS, req.file.filename),
             size: req.file.size,
@@ -209,9 +210,18 @@ exports.updateAccount = async (req, res) => {
             });
          }
       }
+   }
+   catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "server failed to handle replacing profile photo" });
+   }
 
-      res.status(200).json({ message: "user account updated successfully" });
+   try {
+      // update new user data inside the database
+      const updatedUserObject = await userUtils.verifyObject(updatedUserData, false);
+      await User.updateOne({ _id: req.user._id }, { $set: updatedUserObject });
 
+      return res.status(200).json({ message: "user account updated successfully" });
    }
    catch (error) {
       console.error(error);
