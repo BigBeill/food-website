@@ -50,6 +50,7 @@ export default function Profile() {
             formData.append("image", userObject.image);
          }
          axios({ method: 'post', url: 'user/updateAccount', data: formData })
+         .then(() => { resetUserObject(); });
       }
       else { resetUserObject(); }
       setEditMode(false);
@@ -104,7 +105,7 @@ export default function Profile() {
             : (
                <img
                   className="consumeSpace" 
-                  src={!(userObject.image instanceof File) && userObject.image?.filename ? `${database}/uploads/${userObject.image.filename}` : "/profile-photo.png"} 
+                  src={!(userObject.image instanceof File) && userObject.image?.filename ? `${database}${userObject.image.url}` : "/profile-photo.png"} 
                   alt='profile picture' 
                />
             )}

@@ -5,8 +5,11 @@ const path = require('path');
 
 const validateToken = require ('./middleware/auth/validateToken');
 const setCookieFlags = require ('./middleware/auth/cookieFlags');
+const { verifyVolumeLayout } = require ('./library/volumeUtils');
 require ('./config/connectMongo');
 require("dotenv").config();
+
+verifyVolumeLayout() // ensure volume is correctly setup
 
 // define cors settings
 const allowedOrigins = process.env.FRONTEND_URLS.split(',').map(url => url.trim());
@@ -26,15 +29,16 @@ const corsOptions = {
 const app = express();
 
 // Serve static files from the "uploads" volume folder without authentication
-const uploadsDir = path.resolve(__dirname, './mnt/volume');
-app.use('/uploads', (req, res, next) => {console.log("accessing uploads"); next();}, require('cors')({
-  origin: true,
-  credentials: false,
-  maxAge: 86400,
-}), (req, res, next) => {console.log("passed CORS"); next();}, express.static(uploadsDir, {fallthrough: false}),
-
-   (err, req, res, next) => {
-      console.error('[uploads error]', err);            // <-- see real cause in console
+const uploadsDir = path.resolve(__dirname, './mnt/volume/uploads');
+app.use('/uploads', 
+   require('cors')({
+      origin: true,
+      credentials: false,
+      maxAge: 86400,
+   }), 
+   express.static(uploadsDir, {fallthrough: false}),
+   (err, _req, res) => {
+      console.error('[uploads error]', err);
       if (err && err.code === 'ENOENT') return res.status(404).send('Not found');
       if (err && err.code === 'EACCES') return res.status(403).send('Forbidden');
       return res.status(500).send('Static error');

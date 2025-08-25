@@ -1,13 +1,11 @@
 const FriendRequest = require("../models/joinTables/friendRequest");
 const Friendship = require("../models/joinTables/friendship");
 const FriendFolder = require("../models/friendFolder");
-const fs = require("fs");
 const path = require("path");
 const User = require("../models/user");
 const userUtils = require('../library/userUtils');
+const volumeUtils = require("../library/volumeUtils");
 require("dotenv").config();
-
-const UPLOAD_DIRECTORY_USERS = "/mnt/volume/uploads/users";
 
 /*
 returns a complete userObject depending on the parameters provided in the request
@@ -196,7 +194,7 @@ exports.updateAccount = async (req, res) => {
 
          updatedUserData.image = {
             filename: req.file.filename,
-            url: path.join(UPLOAD_DIRECTORY_USERS, req.file.filename),
+            url: path.join("/uploads/users", req.file.filename),
             size: req.file.size,
             mimetype: req.file.mimetype,
             uploadedAt: new Date()
@@ -205,9 +203,7 @@ exports.updateAccount = async (req, res) => {
          // delete the old image file from the server if it exists
          const existingImage = await User.findOne({ _id: req.user._id }, { image: 1 });
          if (existingImage && existingImage.image) {
-            fs.unlink(path.join(UPLOAD_DIRECTORY_USERS, existingImage.image.filename), (err) => {
-               if (err) console.error("Failed to delete old image file:", err);
-            });
+            volumeUtils.deleteVolumeFile("users", existingImage.image.filename);
          }
       }
    }

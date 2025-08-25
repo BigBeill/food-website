@@ -163,7 +163,7 @@ Returns:
    - 401 access token could not be found
 */
 router.post("/updateAccount",
-   uploadVolumeFile(),
+   uploadVolumeFile("users"),
    [
       body("username").isString().isLength({ min: 3, max: 60 }).withMessage("Username must be a string between 3 and 60 characters"),
       body("email").isString().isEmail().withMessage("Email must be a valid email address"),
