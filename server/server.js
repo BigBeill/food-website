@@ -29,7 +29,7 @@ const corsOptions = {
 const app = express();
 
 // Serve static files from the "uploads" volume folder without authentication
-const uploadsDir = path.resolve(__dirname, './mnt/volume/uploads');
+const volumeDirectory = process.env.VOLUME_DIR || path.join(__dirname, '../mnt/volume');
 app.use('/uploads', 
    require('cors')({
       origin: true,
