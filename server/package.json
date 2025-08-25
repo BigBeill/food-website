@@ -13,6 +13,7 @@
   "author": "Mackenzie Neill",
   "license": "ISC",
   "dependencies": {
+    "clamscan": "^2.4.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "express": "^4.18.2",
@@ -23,8 +24,7 @@
     "node-fetch": "^2.7.0",
     "openai": "^5.8.2",
     "pdf-parse": "^1.1.1",
-    "pg": "^8.12.0",
-    "sharp": "^0.34.3"
+    "pg": "^8.12.0"
   },
   "devDependencies": {
     "dotenv": "^16.3.1",

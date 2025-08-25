@@ -1,6 +1,8 @@
 const fs = require('fs');
 const multer = require('multer');
+const NodeClam = require('clamscan');
 const path = require('path');
+require('dotenv').config();
 
 const volumeDirectory = path.join(__dirname, '../mnt/volume');
 
@@ -9,12 +11,66 @@ const buckets = Object.freeze({
   recipes: "uploads/recipes",
 });
 
+let _avInit;
+async function getAV() {
+   if (!_avInit) {
+      _avInit = new NodeClam().init({
+         removeInfected: false,
+         quarantineInfected: false,
+         clamdscan: {
+         // Prefer a UNIX socket if you provide one; else host/port.
+         socket: process.env.CLAMD_SOCKET || false,
+         host: process.env.CLAMAV_HOST || 'clamav',              // e.g. your Railway service name
+         port: +(process.env.CLAMAV_PORT || 3310),
+         timeout: 120000
+         },
+         clamscan: { path: process.env.CLAMSCAN_PATH || '/usr/bin/clamscan' }, // fallback
+         preference: 'clamdscan'
+      });
+   }
+   return _avInit;
+}
+
+async function isFileClean(filePath) {
+   const av = await getAV();
+   const { isInfected/*, viruses*/ } = await av.isInfected(filePath);
+   return !isInfected;
+}
+
+const TMP_REL = 'uploads/.tmp';
+
+function ensureTempDir() {
+   const base = path.resolve(volumeDirectory);
+   const tmpAbs = path.resolve(base, TMP_REL);
+
+   // create (race-safe)
+   fs.mkdirSync(tmpAbs, { recursive: true, mode: 0o700 });
+
+   const st = fs.lstatSync(tmpAbs);
+   if (st.isSymbolicLink()) throw new Error(`Temp dir must not be symlink: ${tmpAbs}`);
+   if (!st.isDirectory()) throw new Error(`Temp path is not dir: ${tmpAbs}`);
+
+   const realBase = fs.realpathSync.native(base);
+   const realTmp  = fs.realpathSync.native(tmpAbs);
+   if (!realTmp.startsWith(realBase + path.sep) && realTmp !== realBase) {
+      throw new Error('Temp dir escapes volume root');
+   }
+
+   fs.accessSync(realTmp, fs.constants.W_OK);
+   return realTmp;
+}
+
 // Verify volume layout at startup
 function verifyVolumeLayout() {
 
    // Ensure the volume root exists and is a directory
    const baseDirectory = path.resolve(volumeDirectory);
-   if (!fs.existsSync(baseDirectory) || !fs.lstatSync(baseDirectory).isDirectory()) { throw new Error(`Volume root not found: ${baseDirectory}`); }
+
+   if (!fs.existsSync(baseDirectory)) { throw new Error(`Volume root not found: ${baseDirectory}`); }
+   const baseStatus = fs.lstatSync(baseDirectory);
+   if (baseStatus.isSymbolicLink()) { throw new Error(`Volume root must not be a symlink: ${baseDirectory}`); }
+   if (!baseStatus.isDirectory()) { throw new Error(`Volume root is not a directory: ${baseDirectory}`); }
+
    const normalizedBase = fs.realpathSync.native(baseDirectory);
 
    // Ensure each bucket exists, is a directory, and is writable
@@ -53,6 +109,8 @@ function verifyVolumeLayout() {
       try { fs.accessSync(bucketDirectory, fs.constants.W_OK); } 
       catch { throw new Error(`Bucket "${key}" not writable: ${bucketDirectory}`); }
    }
+
+   ensureTempDir();
 }
 
 // find the absolute path for a bucket key, ensuring it's valid
@@ -86,8 +144,8 @@ function storage(destination) {
             const realDestination = fs.realpathSync.native(destination);
             if (!realDestination.startsWith(realBase + path.sep) && realDestination !== realBase) { return cb(new Error("Upload directory escapes volume root")); }
 
-            fs.accessSync(destination, fs.constants.W_OK);
-            cb(null, destination);
+            fs.accessSync(realDestination, fs.constants.W_OK);
+            cb(null, realDestination);
          }
          catch (error) { 
             cb(error); 
@@ -104,12 +162,45 @@ function storage(destination) {
 }
 
 function uploadVolumeFile(bucketKey) {
-   const destination = findSubdirectory(bucketKey);
-   return multer({
-      storage: storage(destination),
+   const temporaryDirectory = ensureTempDir();
+   const toTemp = multer({
+      storage: storage(temporaryDirectory),
       fileFilter,
-      limits: { fileSize: 5 * 1024 * 1024 },
-   }).single("image");
+      limits: { fileSize: 5 * 1024 * 1024, files: 1 },
+   }).single('image');
+
+   // 2) after write, scan -> move or delete
+   return (req, res, next) => {
+      toTemp(req, res, async (error) => {
+         if (error) return next(error);
+         try {
+            if (!req.file?.path || !req.file?.filename) {
+               return next(new Error('No file uploaded'));
+            }
+
+            const clean = await isFileClean(req.file.path);
+            if (!clean) {
+               // infected: delete from temp and block
+               try { fs.unlinkSync(req.file.path); } catch {}
+               return next(new Error('Upload blocked: antivirus detected malware'));
+            }
+
+            // clean: move into final bucket (atomic rename within same volume)
+            const finalDirectory = findSubdirectory(bucketKey);
+            const finalPath = path.join(finalDirectory, req.file.filename);
+            fs.renameSync(req.file.path, finalPath);
+
+            // update req.file so downstream code still works
+            req.file.destination = finalDirectory;
+            req.file.path = finalPath;
+
+            return next();
+         } 
+         catch (error) {
+            return next(error);
+         }
+      });
+   };
 }
 
 // Allowed file extensions for deletion
