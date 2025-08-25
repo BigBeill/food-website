@@ -27,6 +27,16 @@ async function verifyObject (user, insideDatabase = true) {
       if (!userObject.username || typeof userObject.username != 'string') { found.push('username'); }
       if (!userObject.email || typeof userObject.email != 'string') { found.push('email'); }
       if (!userObject.bio || typeof userObject.bio != 'string') { found.push('bio'); }
+      if (userObject.image) {
+         if (typeof userObject.image != 'object') { found.push('image'); }
+         else {
+            if (!userObject.image.filename || typeof userObject.image.filename != 'string') { found.push('image.filename'); }
+            if (!userObject.image.url || typeof userObject.image.url != 'string') { found.push('image.url'); }
+            if (!userObject.image.size || typeof userObject.image.size != 'number') { found.push('image.size'); }
+            if (!userObject.image.mimetype || typeof userObject.image.mimetype != 'string') { found.push('image.mimetype'); }
+            if (!userObject.image.uploadedAt || !(userObject.image.uploadedAt instanceof Date)) { found.push('image.uploadedAt'); }
+         }
+      }
       return found;
    }
 
@@ -69,6 +79,15 @@ async function verifyObject (user, insideDatabase = true) {
          username: userObject.username,
          email: userObject.email,
          bio: userObject.bio,
+         ...userObject.image ? {
+            image: {
+               filename: userObject.image.filename,
+               url: userObject.image.url,
+               size: userObject.image.size,
+               mimetype: userObject.image.mimetype,
+               uploadedAt: userObject.image.uploadedAt
+            }
+         } : null,
       }
    }
 
@@ -85,7 +104,16 @@ async function verifyObject (user, insideDatabase = true) {
          _id: userObject.relationship._id,
          target: userObject.relationship.target,
          type: userObject.relationship.type
-      }
+      },
+      ...userObject.image ? {
+         image: {
+            filename: userObject.image.filename,
+            url: userObject.image.url,
+            size: userObject.image.size,
+            mimetype: userObject.image.mimetype,
+            uploadedAt: userObject.image.uploadedAt
+         }
+      } : null,
    }
 }
 

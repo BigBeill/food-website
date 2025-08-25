@@ -1,11 +1,11 @@
 const FriendRequest = require("../models/joinTables/friendRequest");
 const Friendship = require("../models/joinTables/friendship");
 const FriendFolder = require("../models/friendFolder");
+const path = require("path");
 const User = require("../models/user");
 const userUtils = require('../library/userUtils');
+const volumeUtils = require("../library/volumeUtils");
 require("dotenv").config();
-
-
 
 /*
 returns a complete userObject depending on the parameters provided in the request
@@ -176,22 +176,50 @@ exports.updateAccount = async (req, res) => {
       if (foundUsername && foundUsername._id != req.user._id) { return res.status(400).json({ error: "username already taken" }); }
       const foundEmail = await User.findOne({ email: new RegExp(`^${email}$`, 'i') }) 
       if (foundEmail && foundEmail._id != req.user._id) { return res.status(400).json({ error: "email already taken" }); }
-
-      // save user to database
-      await User.updateOne(
-         { _id: req.user._id },
-         { $set: {
-            email: email,
-            username: username,
-            bio: bio,
-         }, }
-      );
-
-      return res.status(200).json({ message: "account registered successfully" });
+   }
+   // handle any errors caused by checking for already existing data
+   catch(error){
+      console.error(error);
+      return res.status(500).json({ error: "server failed to update user account" });
    }
 
-   // handle any errors caused by the controller
-   catch(error){
+   let updatedUserData = {
+      username: username,
+      email: email,
+      bio: bio || ""
+   };
+
+   try {
+      if (req.file) {
+
+         updatedUserData.image = {
+            filename: req.file.filename,
+            url: path.join("/uploads/users", req.file.filename),
+            size: req.file.size,
+            mimetype: req.file.mimetype,
+            uploadedAt: new Date()
+         }
+
+         // delete the old image file from the server if it exists
+         const existingImage = await User.findOne({ _id: req.user._id }, { image: 1 });
+         if (existingImage && existingImage.image) {
+            volumeUtils.deleteVolumeFile("users", existingImage.image.filename);
+         }
+      }
+   }
+   catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "server failed to handle replacing profile photo" });
+   }
+
+   try {
+      // update new user data inside the database
+      const updatedUserObject = await userUtils.verifyObject(updatedUserData, false);
+      await User.updateOne({ _id: req.user._id }, { $set: updatedUserObject });
+
+      return res.status(200).json({ message: "user account updated successfully" });
+   }
+   catch (error) {
       console.error(error);
       return res.status(500).json({ error: "server failed to update user account" });
    }

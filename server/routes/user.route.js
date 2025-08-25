@@ -2,6 +2,7 @@ const router = require("express").Router();
 const userController = require("../controllers/user.controller");
 const { body, param, query, checkExact } = require("express-validator");
 const { runValidation } = require("../library/sanitationUtils");
+const { uploadVolumeFile } = require("../library/volumeUtils");
 
 
 
@@ -20,6 +21,7 @@ Route Description:
    - If userId is not provided, get the userObject associated with the current signed in user
    - If {relationship} is true, attach the relationship field to the userObject
    - Reminder: the relationship field represents how the userObject feels about the current user
+   - If a file field is attached to the request, upload the file to the volume and update the profileImage field of the userObject
 
 Returns:
    - 200 userObject returned
@@ -160,7 +162,8 @@ Returns:
    - 400 missing or invalid arguments
    - 401 access token could not be found
 */
-router.post("/updateAccount", 
+router.post("/updateAccount",
+   uploadVolumeFile("users"),
    [
       body("username").isString().isLength({ min: 3, max: 60 }).withMessage("Username must be a string between 3 and 60 characters"),
       body("email").isString().isEmail().withMessage("Email must be a valid email address"),

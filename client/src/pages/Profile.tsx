@@ -5,6 +5,9 @@ import axios from '../api/axios';
 import GrowingText from '../components/GrowingText';
 import Loading from '../components/Loading';
 import UserObject from '../interfaces/UserObject';
+import ImageUploader from '../components/ImageUploader';
+
+const database = import.meta.env.VITE_SERVER_LOCATION;
 
 export default function Profile() {
    const titleParent = useRef(null);
@@ -13,6 +16,8 @@ export default function Profile() {
    const { targetId = userId } = useParams();
 
    const [userObject, setUserObject] = useState<UserObject>({_id: '', username: '', email: '', bio: '', relationship: undefined });
+   function setUserPhoto(file: File) { setUserObject((currentUserObject) => ({ ...currentUserObject, image: file })); }
+
    const [fetchingUserData, setFetchingUserData] = useState<boolean>(true);
    const [editMode, setEditMode] = useState<boolean>(false);
 
@@ -37,12 +42,15 @@ export default function Profile() {
    function exitEditMode(saveChanges: boolean) {
       if (!userObject) { return; }
       if (saveChanges) {
-         const requestData = {
-            username: userObject.username,
-            email: userObject.email,
-            bio: userObject.bio
+         const formData = new FormData();
+         formData.append("username", userObject.username);
+         formData.append("email", userObject.email ?? "");
+         formData.append("bio", userObject.bio ?? "");
+         if (userObject.image instanceof File) {
+            formData.append("image", userObject.image);
          }
-         axios({ method: 'post', url: 'user/updateAccount', data: requestData })
+         axios({ method: 'post', url: 'user/updateAccount', data: formData })
+         .then(() => { resetUserObject(); });
       }
       else { resetUserObject(); }
       setEditMode(false);
@@ -91,7 +99,16 @@ export default function Profile() {
             <GrowingText text={userObject.username} parentDiv={titleParent} />
          </div>
          <div>
-            <img className="consumeSpace" src="/profile-photo.png" alt='profile picture' />
+            { editMode ? (
+               <ImageUploader file={ userObject.image instanceof File ? userObject.image : undefined } setFile={setUserPhoto} />
+            )
+            : (
+               <img
+                  className="consumeSpace" 
+                  src={!(userObject.image instanceof File) && userObject.image?.filename ? `${database}${userObject.image.url}` : "/profile-photo.png"} 
+                  alt='profile picture' 
+               />
+            )}
          </div>
 
          <div> {/* styleDiv, should not contain anything */} </div>
