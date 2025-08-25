@@ -4,7 +4,7 @@ const NodeClam = require('clamscan');
 const path = require('path');
 require('dotenv').config();
 
-const volumeDirectory = path.join(__dirname, '../mnt/volume');
+const volumeDirectory = process.env.VOLUME_DIR || path.join(__dirname, '../mnt/volume');
 
 const buckets = Object.freeze({
   users: "uploads/users",
