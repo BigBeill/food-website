@@ -29,14 +29,14 @@ const corsOptions = {
 const app = express();
 
 // Serve static files from the "uploads" volume folder without authentication
-const volumeDirectory = process.env.VOLUME_DIR || path.join(__dirname, '../mnt/volume');
+const uploadsDirectory = process.env.VOLUME_DIR || path.join(__dirname, '../mnt/volume');
 app.use('/uploads', 
    require('cors')({
       origin: true,
       credentials: false,
       maxAge: 86400,
    }), 
-   express.static(uploadsDir, {fallthrough: false}),
+   express.static(uploadsDirectory, {fallthrough: false}),
    (err, _req, res) => {
       console.error('[uploads error]', err);
       if (err && err.code === 'ENOENT') return res.status(404).send('Not found');
