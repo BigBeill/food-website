@@ -44,7 +44,7 @@ function ensureTempDir() {
    const tmpAbs = path.resolve(base, TMP_REL);
 
    // create (race-safe)
-   fs.mkdirSync(tmpAbs, { recursive: true, mode: 0o700 });
+   fs.mkdirSync(tmpAbs, { recursive: true, mode: 0o755 });
 
    const st = fs.lstatSync(tmpAbs);
    if (st.isSymbolicLink()) throw new Error(`Temp dir must not be symlink: ${tmpAbs}`);
@@ -94,7 +94,7 @@ function verifyVolumeLayout() {
       const bucketDirectory = path.resolve(baseDirectory, buckets[key]);
 
       // Make sure bucket exists
-      if (!fs.existsSync(bucketDirectory)) { fs.mkdirSync(bucketDirectory, { recursive: true, mode: 0o700 }); }
+      if (!fs.existsSync(bucketDirectory)) { fs.mkdirSync(bucketDirectory, { recursive: true, mode: 0o755 }); }
 
       // Make sure bucket is a valid directory
       const bucketStatus = fs.lstatSync(bucketDirectory);
