@@ -13,14 +13,14 @@ exports.getObject = async (req, res) => {
    const { foodId, measureId, amount } = req.params;
 
    // create object containing foodId field
-   let skipPortion = true;
+   let includeNutrition = false;
    let recipe = {
       foodId,
    };
 
    // add extra fields to recipe object if they are provided
    if (measureId &&  amount) {
-      skipPortion = false;
+      includeNutrition = true;
       recipe.portion = {
          measureId,
          amount
@@ -28,7 +28,7 @@ exports.getObject = async (req, res) => {
    }
 
    try {
-      const ingredientObject = await ingredientUtils.verifyObject(recipe, skipPortion);
+      const ingredientObject = await ingredientUtils.verifyObject(recipe, includeNutrition);
       return res.status(200).json({ message: 'returning ingredientObject', payload: ingredientObject });
    }
    catch (error) {

@@ -101,7 +101,7 @@ function IngredientDetails({ingredientID}: IngredientDetailsProps) {
 	const [amount, setAmount] = useState<{value: number, unit: string}>({value: 100, unit: 'g'});
 
 	useEffect(() => {
-		axios({ method: 'get', url:`ingredient/details/?foodId=${ingredientID}` })
+		axios({ method: 'get', url:`ingredient/getObject/${ingredientID}/1455/1` })
 		.then(response => { 
 			setIngredientData(response);
 		})
@@ -110,7 +110,7 @@ function IngredientDetails({ingredientID}: IngredientDetailsProps) {
 
 	if (!ingredientData || !ingredientData.nutrition) { return <p>loading page</p> }
 	return (
-		<div className="whiteBackground">
+		<div className="standardPage">
 			<h1>{ingredientData.foodDescription}</h1>
 			<input type='number' value={amount.value} onChange={(event) => setAmount({...amount, value: Number(event.target.value)})}/>
 			<p>calories: {((ingredientData.nutrition.calories/100) * amount.value).toFixed(0)}</p>
