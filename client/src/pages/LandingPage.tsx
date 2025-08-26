@@ -1,4 +1,9 @@
+import { useOutletContext } from "react-router-dom";
+
 export default function LandingPage() {
+
+   const { userId } = useOutletContext<{userId: string}>();
+
    return (
       <>
          <div className="landingPage">
@@ -21,8 +26,15 @@ export default function LandingPage() {
 
             <ul>
                <li><a href="/searchRecipes/public" className="button">Explore Recipes</a></li>
-               <li><a href="/login" className="button">Login</a></li>
-               <li><a href="/register" className="button">Register</a></li>
+               { userId ? <>
+                  <li><a href="/searchRecipes/personal" className="button">My Recipes</a></li>
+                  <li><a href="/searchRecipes/friends" className="button">Friends Recipes</a></li>
+                  <li><a href="/editRecipe" className="button">Create Recipe</a></li>
+                  <li><a href="/profile" className="button">My Profile</a></li>
+               </> : <>
+                  <li><a href="/login" className="button">Login</a></li>
+                  <li><a href="/register" className="button">Register</a></li>
+               </> }
                <li><a href="/aboutMe" className="button">Learn About Me</a></li>
             </ul>
          </div>

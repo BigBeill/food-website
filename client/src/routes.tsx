@@ -47,7 +47,7 @@ export const routes = [
     requireUser: true
   },
   {
-    path: '/searchRecipes/:category',
+    path: '/searchRecipes/:category', // category can be 'public', 'friends', or 'personals'
     element: withSuspense(SearchRecipes),
     requireUser: false
   },
