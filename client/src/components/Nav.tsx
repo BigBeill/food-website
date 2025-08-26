@@ -70,7 +70,14 @@ function Nav({userId}: NavProps) {
             <NavLink className="navLink" to="/ingredients" onClick={() => setOpen(false)}>Ingredients List</NavLink>
             <NavLink className="navLink" to="/aboutMe" onClick={() => setOpen(false)}>About Me</NavLink>
 
-            <div className='navButton' onClick={openNav}/>
+            <div className='navButton' onClick={openNav}>
+                <div className={`hamburgerButton ${open ? 'open' : ''}`}>
+                    <span className="bar"></span>
+                    <span className="bar"></span>
+                    <span className="bar"></span>
+                    <span className="bar"></span>
+                </div>
+            </div>
 
         </nav>
         </>
