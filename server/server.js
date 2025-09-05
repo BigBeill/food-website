@@ -11,6 +11,33 @@ require("dotenv").config();
 
 verifyVolumeLayout() // ensure volume is correctly setup
 
+//setup server
+const app = express();
+
+// Helper function to serve static files with CORS and error handling
+const serveStaticWithCors = (route, relativePath, routeName) => {
+   const directory = process.env.SERVER_DIRECTORY ? path.join(process.env.SERVER_DIRECTORY, relativePath) : `./${relativePath}`;
+
+   app.use(route,
+      require('cors')({
+         origin: true,
+         credentials: false,
+         maxAge: 86400,
+      }),
+      express.static(directory, {fallthrough: false}),
+      (error, _req, res, _next) => {
+         console.error(`[${routeName} error]`, error);
+         if (error && error.code === 'ENOENT') return res.status(404).send('Not found');
+         if (error && error.code === 'EACCES') return res.status(403).send('Forbidden');
+         return res.status(500).send('Static error');
+      }
+   );
+};
+
+// Serve static files without authentication
+serveStaticWithCors('/uploads', 'mnt/volume/uploads', 'uploads');
+serveStaticWithCors('/emailAssets', 'email/publicAssets', 'emailAssets');
+
 // define cors settings
 const allowedOrigins = process.env.FRONTEND_URLS.split(',').map(url => url.trim());
 const corsOptions = {
@@ -24,26 +51,6 @@ const corsOptions = {
    },
    credentials: true
 };
-
-//setup server
-const app = express();
-
-// Serve static files from the "uploads" volume folder without authentication
-const uploadsDirectory = process.env.VOLUME_DIR ? path.join(process.env.VOLUME_DIR, 'uploads') : path.join(__dirname, '../mnt/volume/uploads');
-app.use('/uploads', 
-   require('cors')({
-      origin: true,
-      credentials: false,
-      maxAge: 86400,
-   }),
-   express.static(uploadsDirectory, {fallthrough: false}),
-   (err, _req, res) => {
-      console.error('[uploads error]', err);
-      if (err && err.code === 'ENOENT') return res.status(404).send('Not found');
-      if (err && err.code === 'EACCES') return res.status(403).send('Forbidden');
-      return res.status(500).send('Static error');
-   }
-);
 
 app.use((req, res, next) => {console.log("\n\n\n"); next();}); // split up request logs
 
