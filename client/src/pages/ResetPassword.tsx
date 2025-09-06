@@ -9,9 +9,8 @@ export default function ResetPassword() {
    const { userId } = useOutletContext<{userId: string}>();
    
    const hash = typeof window !== 'undefined' ? window.location.hash : '';
-   console.log("hash:", hash);
    const uniqueString = new URLSearchParams(hash.replace(/^#/, '')).get('token') ?? undefined;
-   console.log("uniqueString:", uniqueString);
+   if (typeof window !== 'undefined' && hash) { window.history.replaceState(null, '', window.location.pathname + window.location.search); }
 
    useEffect(() => {
       if (userId) navigate('/profile');

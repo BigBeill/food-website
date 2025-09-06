@@ -176,13 +176,14 @@ exports.requestPasswordReset = async (req, res) => {
    // find user in database with provided email
    let userData;
    try {
+      const washedEmail = email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       userData = await User.findOne(
-         { email: new RegExp(`^${email}$`, 'i') },
+         { email: new RegExp(`^${washedEmail}$`, 'i') },
          { _id: 1, email: 1 }
       );
 
-      // make sure user exists
-      if (!userData) { return res.status(200).json({ error: "email not found in database" }); }
+      // respond with success message even if email not found to prevent email enumeration
+      if (!userData) { return res.status(200).json({ message: "If an account exists for that email, a reset link will be sent." }); }
    }
    catch (error) {
       console.log("\x1b[31m%s\x1b[0m", "authentication.controller.requestPasswordReset failed... server failed to find user by email");
@@ -210,7 +211,7 @@ exports.requestPasswordReset = async (req, res) => {
       });
 
       await mailUtils.sendPasswordResetEmail(userData.email, uniqueString);
-      return res.status(200).json({ message: "password reset email sent" });
+      return res.status(200).json({ message: "If an account exists for that email, a reset link will be sent." });
    }
    catch (error) {
       console.log("\x1b[31m%s\x1b[0m", "authentication.controller.requestPasswordReset failed... server failed to send password reset email");
@@ -236,6 +237,7 @@ exports.changePassword = async (req, res) => {
       // re-authenticate user for sensitive change
       if (!currentPassword) { return res.status(401).json({ error: "missing current password for re-authentication" }); }
       const user = await User.findById(authenticatedUserId, { hash: 1, salt: 1 });
+      if (!user) { return res.status(401).json({ error: "invalid session" }); }
       if (!passwordUtils.correctPassword(currentPassword, user.hash, user.salt)) { return res.status(401).json({ error: "incorrect password" }); }
 
    }

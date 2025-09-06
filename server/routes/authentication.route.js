@@ -189,7 +189,7 @@ Returns:
 */
 router.post("/changePassword",
    [
-      body("password").isString().isLength({ min: 3, max: 60 }).withMessage("Password must be a string between 3 and 60 characters"),
+      body("password").isString().isLength({ min: 6, max: 45 }).withMessage("Password must be a string between 6 and 45 characters"),
       body("uniqueString").optional().isString().withMessage("Unique string must be a valid string"),
       body("currentPassword").optional().isString().withMessage("Current password must be a valid string"),
       checkExact(),
