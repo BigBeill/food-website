@@ -63,7 +63,7 @@ export const routes = [
     requireUser: false
   },
   {
-    path: '/resetPassword/:uniqueString?',
+    path: '/resetPassword',
     element: withSuspense(ResetPassword),
     requireUser: false
   },

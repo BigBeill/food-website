@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 
 import axios from '../api/axios';
 
@@ -7,7 +7,11 @@ export default function ResetPassword() {
 
    const navigate = useNavigate();
    const { userId } = useOutletContext<{userId: string}>();
-   const { uniqueString } = useParams<{uniqueString: string}>();
+   
+   const hash = typeof window !== 'undefined' ? window.location.hash : '';
+   console.log("hash:", hash);
+   const uniqueString = new URLSearchParams(hash.replace(/^#/, '')).get('token') ?? undefined;
+   console.log("uniqueString:", uniqueString);
 
    useEffect(() => {
       if (userId) navigate('/profile');
@@ -91,8 +95,11 @@ function ChangePassword({ uniqueString }: ChangePasswordProps) {
    }
 
    function changePassword() {
-      if (!passwordOne || !passwordTwo) return;
-      if (passwordOne !== passwordTwo) return;
+      if (!passwordOne || !passwordTwo) { return; }
+      if (passwordOne !== passwordTwo) {
+         setErrorMessage("passwords don't match");
+         return;
+      }
 
       const missingPasswordRequirements: string | null = checkPasswordRequirements(passwordOne);
       if (missingPasswordRequirements) {
@@ -134,7 +141,7 @@ function ChangePassword({ uniqueString }: ChangePasswordProps) {
             <label htmlFor="newPasswordTwo">Re-Enter New Password</label>
          </div>
          <button onClick={changePassword}> Change Password </button>
-         <p ref={errorRef} className={errorMessage ? "error" : "hidden"} area-live="assertive">{errorMessage}</p>
+         <p ref={errorRef} className={errorMessage ? "error" : "hidden"} aria-live="assertive">{errorMessage}</p>
          <p>Need a new link?</p>
          <a href='/resetPassword'>Reset Password</a>
       </div>

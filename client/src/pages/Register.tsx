@@ -139,7 +139,7 @@ function Register() {
             onClick={attemptRegister}
          > Create Account </button>
 
-         <p ref={errorRef} className={errorMessage ? "error" : "hidden"} area-live="assertive">{errorMessage}</p>
+         <p ref={errorRef} className={errorMessage ? "error" : "hidden"} aria-live="assertive">{errorMessage}</p>
 
          <p>Already have an account?</p>
          <a href='/login'>Login</a>

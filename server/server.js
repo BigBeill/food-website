@@ -16,10 +16,10 @@ const app = express();
 
 // Helper function to serve static files with CORS and error handling
 const serveStaticWithCors = (route, relativePath, routeName) => {
-   const directory = process.env.SERVER_DIRECTORY ? path.join(process.env.SERVER_DIRECTORY, relativePath) : `./${relativePath}`;
+   const directory = process.env.SERVER_DIRECTORY ? path.join(process.env.SERVER_DIRECTORY, relativePath) : `/${relativePath}`;
 
    app.use(route,
-      require('cors')({
+      cors({
          origin: true,
          credentials: false,
          maxAge: 86400,

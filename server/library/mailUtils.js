@@ -11,20 +11,20 @@ const transporter = nodemailer.createTransport({
       pass: process.env.SUPPORT_TEAM_EMAIL_PASSWORD,
    },
 });
+const fileLocation = './email/templates/resetPassword.html';
+const emailTemplate = fs.readFileSync(fileLocation, 'utf8');
 
 async function sendPasswordResetEmail(userEmail, resetString) {
 
    // get the html file and replace placeholder resetString
-   const fileLocation = './email/templates/resetPassword.html';
-   let htmlContent = fs.readFileSync(fileLocation, 'utf8');
-   htmlContent = htmlContent.replace(/{{\s*resetString\s*}}/g, resetString);
+   const htmlContent = emailTemplate.replace(/{{\s*resetString\s*}}/g, encodeURIComponent(resetString));
 
    return transporter.sendMail({
       from: '"Support Team" <no-reply@big-beills-greenhouse.ca>',
       to: userEmail,
       subject: "Password Reset Request - Big Beill's Greenhouse",
       html: htmlContent,
-      text: `Reset your password using this link: https://big-beills-greenhouse.ca/reset-password/${resetString}` // fallback for email clients that don't support HTML
+      text: `Reset your password using this link: https://big-beills-greenhouse.ca/reset-password/${encodeURIComponent(resetString)}`,
    });
 }
 

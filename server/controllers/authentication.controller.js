@@ -4,7 +4,6 @@ const passwordUtils = require("../library/passwordUtils");
 const userUtils = require("../library/userUtils");
 const { verify } = require("jsonwebtoken");
 const createToken = require("../config/jsonWebToken");
-const uuid = require("uuid");
 const PasswordReset = require("../models/passwordReset");
 const mailUtils = require("../library/mailUtils");
 const crypto = require('crypto');
@@ -183,7 +182,7 @@ exports.requestPasswordReset = async (req, res) => {
       );
 
       // make sure user exists
-      if (!userData) { return res.status(404).json({ error: "email not found in database" }); }
+      if (!userData) { return res.status(200).json({ error: "email not found in database" }); }
    }
    catch (error) {
       console.log("\x1b[31m%s\x1b[0m", "authentication.controller.requestPasswordReset failed... server failed to find user by email");
@@ -203,11 +202,8 @@ exports.requestPasswordReset = async (req, res) => {
 
    //send reset password email to user
    try {
-      const uniqueString = uuid.v4() + userData._id;
-
-      const encryptedString = crypto.pbkdf2Sync(uniqueString, "fixedSalt", 10000, 64, 'sha512').toString('hex');
-      console.log("uniqueString:", uniqueString);
-      console.log("encryptedString:", encryptedString);
+      const uniqueString = crypto.randomBytes(32).toString('hex');
+      const encryptedString = crypto.createHash('sha256').update(uniqueString).digest('hex');
       await PasswordReset.create({
          userId: userData._id,
          encryptedString,
@@ -231,17 +227,26 @@ exports.requestPasswordReset = async (req, res) => {
 exports.changePassword = async (req, res) => {
 
    const authenticatedUserId = req.user?._id;
-   const { uniqueString, password } = req.body;
+   const { uniqueString, password, currentPassword } = req.body;
 
-   // find userId if not provided by authentication
    let passwordResetEntry;
-   if (!authenticatedUserId) {
+
+   // if user is authenticated, re-authenticate them with their current password
+   if (authenticatedUserId) {
+      // re-authenticate user for sensitive change
+      if (!currentPassword) { return res.status(401).json({ error: "missing current password for re-authentication" }); }
+      const user = await User.findById(authenticatedUserId, { hash: 1, salt: 1 });
+      if (!passwordUtils.correctPassword(currentPassword, user.hash, user.salt)) { return res.status(401).json({ error: "incorrect password" }); }
+
+   }
+   // find userId if not provided by authentication
+   else {
       // make sure uniqueString is provided
       if (!uniqueString) { return res.status(401).json({ error: "no user authenticated and missing uniqueString" }); }
 
       // verify the uniqueString provided
       try {
-         const encryptedString = crypto.pbkdf2Sync(uniqueString, "fixedSalt", 10000, 64, 'sha512').toString('hex');
+         const encryptedString = crypto.createHash('sha256').update(uniqueString).digest('hex');
          passwordResetEntry = await PasswordReset.findOne({ encryptedString });
          if (!passwordResetEntry) { return res.status(404).json({ error: "uniqueString not found in database" }); }
          await PasswordReset.deleteMany({ userId: passwordResetEntry.userId }); // delete all password reset tokens for user
@@ -265,6 +270,7 @@ exports.changePassword = async (req, res) => {
       await PasswordReset.deleteMany({ userId });
       res.clearCookie("accessToken");
       res.clearCookie("refreshToken");
+      await RefreshToken.deleteMany({ user: userId });
 
       // update user password in database
       await User.updateOne({ _id: userId }, { hash: hashedPassword.hash, salt: hashedPassword.salt });
