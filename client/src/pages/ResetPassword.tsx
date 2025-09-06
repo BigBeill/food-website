@@ -3,6 +3,16 @@ import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 
 import axios from '../api/axios';
 
+/**
+ * Renders the password reset page, either showing a reset-request form or a change-password form.
+ *
+ * On mount, redirects to `/profile` if a user is already signed in and adds the `loginBackground`
+ * class to document.body; the class is removed on unmount. If the URL contains a `uniqueString`
+ * parameter the component renders the ChangePassword view (passing `uniqueString`), otherwise it
+ * renders the RequestReset view.
+ *
+ * @returns The ResetPassword page React element.
+ */
 export default function ResetPassword() {
 
    const navigate = useNavigate();
@@ -19,6 +29,16 @@ export default function ResetPassword() {
    else { return <ChangePassword uniqueString={uniqueString} />; }
 }
 
+/**
+ * Renders a form to request a password-reset link and handles submitting the request.
+ *
+ * Displays an email input and "Request Reset Link" button; after a successful submission attempt
+ * the UI shows a confirmation message (regardless of whether the email exists). If the email
+ * field is empty the submission is ignored. On submit the component sends a POST to
+ * `authentication/requestPasswordReset` and logs any errors to the console.
+ *
+ * @returns The JSX for the request-reset form or a sent-confirmation message.
+ */
 function RequestReset() {
 
    const [email, setEmail] = useState<string>("");
@@ -60,6 +80,14 @@ interface ChangePasswordProps {
    uniqueString: string;
 }
 
+/**
+ * Renders a "Change Your Password" form that lets a user set a new password using a reset token.
+ *
+ * Displays two password fields, validates that they match and meet strength rules (6–45 chars, at least one lowercase, one uppercase, one digit, and one of !@#$%^&*), and submits the new password to the backend using the provided `uniqueString` token. On successful response the component navigates to `/login`; on failure it surfaces a user-facing error message. Empty or non-matching inputs are ignored (no submission).
+ *
+ * @param uniqueString - The password-reset token taken from the URL; sent to the server to authorize the password change.
+ * @returns A React element containing the password inputs, submit button, inline error area, and a link to request a new reset link.
+ */
 function ChangePassword({ uniqueString }: ChangePasswordProps) {
    
    const errorRef = useRef(null);

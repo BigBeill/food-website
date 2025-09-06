@@ -3,6 +3,21 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 
 import axios from '../api/axios';
 
+/**
+ * Login form component that authenticates a user and redirects on success.
+ *
+ * Renders username and password inputs, a "Remember Me" checkbox, submit controls,
+ * and links to register or reset password. On mount, redirects to '/profile' when
+ * a `userId` is present in the outlet context and adds the `loginBackground` CSS
+ * class to the document body (removed on unmount).
+ *
+ * Calling the form submit button or pressing Enter in either input will validate
+ * inputs and POST `{ username, password, rememberMe }` to `authentication/login`.
+ * On successful authentication the component navigates to '/' and reloads the page.
+ * Validation and server-side errors are surfaced via an inline error message.
+ *
+ * @returns The rendered login form as a JSX.Element.
+ */
 function Login() {
    const errorRef = useRef(null);
    const navigate = useNavigate();
