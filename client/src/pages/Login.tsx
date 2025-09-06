@@ -91,9 +91,12 @@ function Login() {
             id="submitButton"
             onClick={attemptLogin}
          > Login </button>
-         <p ref={errorRef} className={errorMessage ? "error" : "hidden"} area-live="assertive">{errorMessage}</p>
+         <p ref={errorRef} className={errorMessage ? "error" : "hidden"} area-live="assertive" role="alert">{errorMessage}</p>
          <p>Don&apos;t have an account?</p>
          <a href='/register'>create account</a>
+         <p>------------</p>
+         <p>Forgot your password?</p>
+         <a href='/resetPassword'>reset password</a>
 
          </div>
       </>
