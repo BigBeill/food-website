@@ -137,6 +137,71 @@ router.post("/refresh",
 
 
 /*
+---------- /requestPasswordReset route ------------
+Type: 
+   POST — sends a password reset email to client
+
+Expects:
+   email: string
+
+Route description:
+   - Verifies if the email is associated with a registered user
+   - Generates a unique password reset token
+   - Sends an email to the user with the password reset link
+
+Returns:
+   - 200 Password reset email sent
+   - 400 Invalid or missing fields
+   - 401 User is already logged in
+   - 404 Email not found in database
+*/
+router.post("/requestPasswordReset", 
+   [
+      body("email").isString().isEmail().withMessage("Email must be a valid email address"),
+      checkExact(),
+   ],
+   runValidation,
+   authenticationController.requestPasswordReset
+);
+
+/*
+---------- /changePassword route ------------
+
+Type:
+   POST — Changes the user’s password
+
+Expects 2 arguments in body:
+   password: string
+   uniqueString: string (optional, required if user is not logged in)
+
+Route description:
+   - Get userId from JWT if user is logged in
+   - If userId not found in JWT, get userId from uniqueString
+   - Salts and hashes the new password
+   - Deletes any user authentication tokens (logs user out of all devices)
+   - Deletes the password reset token from the database
+
+Returns:
+   - 200 Password successfully changed
+   - 400 Invalid or missing fields
+   - 401 User isn’t logged in and no uniqueString provided
+   - 404 uniqueString not found in database
+*/
+router.post("/changePassword",
+   [
+      body("password").isString().isLength({ min: 3, max: 60 }).withMessage("Password must be a string between 3 and 60 characters"),
+      body("uniqueString").optional().isString().withMessage("Unique string must be a valid string"),
+      checkExact(),
+   ],
+   runValidation,
+   authenticationController.changePassword
+);
+
+
+
+
+
+/*
 ---------- /logout route ------------
 
 Type:

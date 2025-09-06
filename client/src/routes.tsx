@@ -9,6 +9,7 @@ const Profile = lazy(() => import('./pages/Profile.tsx'))
 const SearchRecipes = lazy(() => import('./pages/SearchRecipes.tsx'))
 const Register = lazy(() => import('./pages/Register.tsx'))
 const Recipe = lazy(() => import('./pages/Recipe.tsx'))
+const ResetPassword = lazy(() => import('./pages/ResetPassword.tsx'))
 const SearchUser = lazy(() => import('./pages/SearchUser.tsx'))
 const NotFound = lazy(() => import('./pages/NotFound.tsx'))
 
@@ -59,6 +60,11 @@ export const routes = [
   {
     path: '/recipe/:recipeId?',
     element: withSuspense(Recipe),
+    requireUser: false
+  },
+  {
+    path: '/resetPassword/:uniqueString?',
+    element: withSuspense(ResetPassword),
     requireUser: false
   },
   {

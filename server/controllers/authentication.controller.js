@@ -4,6 +4,10 @@ const passwordUtils = require("../library/passwordUtils");
 const userUtils = require("../library/userUtils");
 const { verify } = require("jsonwebtoken");
 const createToken = require("../config/jsonWebToken");
+const uuid = require("uuid");
+const PasswordReset = require("../models/passwordReset");
+const mailUtils = require("../library/mailUtils");
+const crypto = require('crypto');
 require("dotenv").config();
 
 // the max age of all cookies created by this controller
@@ -160,6 +164,120 @@ exports.refresh = async (req, res) => {
 
 
 
+
+
+
+exports.requestPasswordReset = async (req, res) => {
+
+   const userId = req.user?._id;
+   if (userId) return res.status(401).json({ error: "User already authenticated" });
+
+   const { email } = req.body;
+
+   // find user in database with provided email
+   let userData;
+   try {
+      userData = await User.findOne(
+         { email: new RegExp(`^${email}$`, 'i') },
+         { _id: 1, email: 1 }
+      );
+
+      // make sure user exists
+      if (!userData) { return res.status(404).json({ error: "email not found in database" }); }
+   }
+   catch (error) {
+      console.log("\x1b[31m%s\x1b[0m", "authentication.controller.requestPasswordReset failed... server failed to find user by email");
+      console.error(error);
+      return res.status(500).json({ error: "server failed to find user by email" });
+   }
+
+   // remove existing password reset tokens for user
+   try {
+      await PasswordReset.deleteMany({ userId: userData._id });
+   }
+   catch (error) {
+      console.log("\x1b[31m%s\x1b[0m", "authentication.controller.requestPasswordReset failed... server failed to remove existing password reset tokens");
+      console.error(error);
+      return res.status(500).json({ error: "server failed to remove existing password reset tokens" });
+   }
+
+   //send reset password email to user
+   try {
+      const uniqueString = uuid.v4() + userData._id;
+
+      const encryptedString = crypto.pbkdf2Sync(uniqueString, "fixedSalt", 10000, 64, 'sha512').toString('hex');
+      console.log("uniqueString:", uniqueString);
+      console.log("encryptedString:", encryptedString);
+      await PasswordReset.create({
+         userId: userData._id,
+         encryptedString,
+      });
+
+      await mailUtils.sendPasswordResetEmail(userData.email, uniqueString);
+      return res.status(200).json({ message: "password reset email sent" });
+   }
+   catch (error) {
+      console.log("\x1b[31m%s\x1b[0m", "authentication.controller.requestPasswordReset failed... server failed to send password reset email");
+      console.error(error);
+      return res.status(500).json({ error: "server failed to send password reset email" });
+   }
+}
+
+
+
+
+
+
+exports.changePassword = async (req, res) => {
+
+   const authenticatedUserId = req.user?._id;
+   const { uniqueString, password } = req.body;
+
+   // find userId if not provided by authentication
+   let passwordResetEntry;
+   if (!authenticatedUserId) {
+      // make sure uniqueString is provided
+      if (!uniqueString) { return res.status(401).json({ error: "no user authenticated and missing uniqueString" }); }
+
+      // verify the uniqueString provided
+      try {
+         const encryptedString = crypto.pbkdf2Sync(uniqueString, "fixedSalt", 10000, 64, 'sha512').toString('hex');
+         passwordResetEntry = await PasswordReset.findOne({ encryptedString });
+         if (!passwordResetEntry) { return res.status(404).json({ error: "uniqueString not found in database" }); }
+         await PasswordReset.deleteMany({ userId: passwordResetEntry.userId }); // delete all password reset tokens for user
+      }
+      catch (error) {
+         console.log("\x1b[31m%s\x1b[0m", "authentication.controller.changePassword failed... server failed to find uniqueString in database");
+         console.error(error);
+         return res.status(500).json({ error: "server failed to find uniqueString in database" });
+      }
+   }
+
+   // set userId
+   const userId = authenticatedUserId ? authenticatedUserId : passwordResetEntry.userId;
+
+   // change password for user inside the database
+   try {
+      if (!passwordUtils.validPassword(password)) { return res.status(400).json({ error: "password does not meet requirements" }); }
+      const hashedPassword = passwordUtils.encryptPassword(password);
+
+      // remove all password reset tokens for user
+      await PasswordReset.deleteMany({ userId });
+      res.clearCookie("accessToken");
+      res.clearCookie("refreshToken");
+
+      // update user password in database
+      await User.updateOne({ _id: userId }, { hash: hashedPassword.hash, salt: hashedPassword.salt });
+
+      return res.status(200).json({ message: "password changed successfully" });
+   }
+   catch (error) {
+      console.log("\x1b[31m%s\x1b[0m", "authentication.controller.changePassword failed... server failed to change users password inside the database");
+      console.error(error);
+      return res.status(500).json({ error: "server failed to change users password inside the database" });
+   }
+
+}
 
 
 
