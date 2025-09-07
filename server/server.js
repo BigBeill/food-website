@@ -36,7 +36,7 @@ const serveStaticWithCors = (route, relativePath, routeName) => {
 
 // Serve static files without authentication
 serveStaticWithCors('/uploads', 'mnt/volume/uploads', 'uploads');
-serveStaticWithCors('/publicAssets', 'mnt/volume/publicAssets', 'publicAssets');
+serveStaticWithCors('/emailAssets', 'email/publicAssets', 'emailAssets');
 
 // define cors settings
 const allowedOrigins = process.env.FRONTEND_URLS.split(',').map(url => url.trim());
