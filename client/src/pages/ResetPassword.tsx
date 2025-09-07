@@ -8,18 +8,23 @@ export default function ResetPassword() {
    const navigate = useNavigate();
    const { userId } = useOutletContext<{userId: string}>();
    
-   const hash = typeof window !== 'undefined' ? window.location.hash : '';
-   const uniqueString = new URLSearchParams(hash.replace(/^#/, '')).get('token') ?? undefined;
-   if (typeof window !== 'undefined' && hash) { window.history.replaceState(null, '', window.location.pathname + window.location.search); }
+   const [token, setToken] = useState<string | undefined>(undefined);
 
    useEffect(() => {
       if (userId) navigate('/profile');
       document.body.classList.add('loginBackground');
+
+      const hash = typeof window !== 'undefined' ? window.location.hash : '';
+      const uniqueString = new URLSearchParams(hash.replace(/^#/, '')).get('token') ?? undefined;
+
+      setToken(uniqueString);
+      if (typeof window !== 'undefined' && hash) { window.history.replaceState(null, '', window.location.pathname + window.location.search); }
+
       return () => { document.body.classList.remove('loginBackground'); }
    }, []);
 
-   if (!uniqueString) { return <RequestReset />; }
-   else { return <ChangePassword uniqueString={uniqueString} />; }
+   if (!token) { return <RequestReset />; }
+   else { return <ChangePassword uniqueString={token} />; }
 }
 
 function RequestReset() {
