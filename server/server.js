@@ -15,12 +15,12 @@ verifyVolumeLayout() // ensure volume is correctly setup
 const app = express();
 
 // Helper function to serve static files with CORS and error handling
-const serveStaticWithCors = (route, relativePath, routeName) => {
+const serveStaticWithCors = (route, relativePath, routeName, publicRoute) => {
    const directory = process.env.SERVER_DIRECTORY ? path.join(process.env.SERVER_DIRECTORY, relativePath) : `/${relativePath}`;
 
    app.use(route,
       cors({
-         origin: true,
+         origin: !publicRoute,
          credentials: false,
          maxAge: 86400,
       }),
@@ -35,8 +35,8 @@ const serveStaticWithCors = (route, relativePath, routeName) => {
 };
 
 // Serve static files without authentication
-serveStaticWithCors('/uploads', 'mnt/volume/uploads', 'uploads');
-serveStaticWithCors('/emailAssets', 'email/publicAssets', 'emailAssets');
+serveStaticWithCors('/emailAssets', 'email/publicAssets', 'emailAssets', true);
+serveStaticWithCors('/uploads', 'mnt/volume/uploads', 'uploads', false);
 
 // define cors settings
 const allowedOrigins = process.env.FRONTEND_URLS.split(',').map(url => url.trim());
