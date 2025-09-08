@@ -16,7 +16,8 @@ export default function Profile() {
    const { targetId = userId } = useParams();
 
    const [userObject, setUserObject] = useState<UserObject>({_id: '', username: '', email: '', bio: '', relationship: undefined });
-   function setUserPhoto(file: File) { setUserObject((currentUserObject) => ({ ...currentUserObject, image: file })); }
+   
+   const [imageBuffer, setImageBuffer] = useState<File | null>(null);
 
    const [fetchingUserData, setFetchingUserData] = useState<boolean>(true);
    const [editMode, setEditMode] = useState<boolean>(false);
@@ -46,8 +47,8 @@ export default function Profile() {
          formData.append("username", userObject.username);
          formData.append("email", userObject.email ?? "");
          formData.append("bio", userObject.bio ?? "");
-         if (userObject.image instanceof File) {
-            formData.append("image", userObject.image);
+         if (imageBuffer instanceof File) {
+            formData.append("image", imageBuffer);
          }
          axios({ method: 'post', url: 'user/updateAccount', data: formData })
          .then(() => { resetUserObject(); });
@@ -100,12 +101,15 @@ export default function Profile() {
          </div>
          <div>
             { editMode ? (
-               <ImageUploader file={ userObject.image instanceof File ? userObject.image : undefined } setFile={setUserPhoto} />
+               <ImageUploader 
+                  file={ userObject.image instanceof File ? userObject.image : undefined } 
+                  setFile={setImageBuffer} 
+               />
             )
             : (
                <img
                   className="consumeSpace" 
-                  src={!(userObject.image instanceof File) && userObject.image?.filename ? `${database}${userObject.image.url}` : "/profile-photo.png"} 
+                  src={userObject.image?.filename ? `${database}${userObject.image.url}` : "/profile-photo.png"} 
                   alt='profile picture' 
                />
             )}
