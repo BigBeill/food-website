@@ -107,10 +107,10 @@ export default function Profile() {
                />
             )
             : (
-               <img
-                  className="consumeSpace" 
+               <img 
                   src={userObject.image?.filename ? `${database}${userObject.image.url}` : "/profile-photo.png"} 
-                  alt='profile picture' 
+                  alt='profile picture'
+                  onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => { (error.currentTarget.src = "/profile-photo.png"); }}
                />
             )}
          </div>
