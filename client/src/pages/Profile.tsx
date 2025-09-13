@@ -101,7 +101,13 @@ export default function Profile() {
          </div>
          <div>
             { editMode ? (
-               <ImageUploader {...{ imageBuffer, setImageBuffer, oldImageUrl: `${database}${userObject.image?.url}` }} />
+               <ImageUploader 
+                  {...{ 
+                     imageBuffer, 
+                     setImageBuffer, 
+                     oldImageUrl: userObject.image?.url ? `${database}${userObject.image.url}` : undefined
+                  }} 
+               />
             )
             : (
                <img 
