@@ -27,6 +27,7 @@ export default function Profile() {
    function resetUserObject() {
       axios({ method: 'get', url: `user/getObject/${targetId}/true` })
       .then((response) => { 
+         setImageBuffer(null);
          setUserObject(response);
          setFetchingUserData(false);
       });
@@ -34,7 +35,7 @@ export default function Profile() {
 
    useEffect(() => {
       setEditMode(false);
-
+      setImageBuffer(null);
       setFetchingUserData(true);
       if (!targetId) { navigate('/login'); }
       resetUserObject();
@@ -110,9 +111,9 @@ export default function Profile() {
                />
             )
             : (
-               <img 
+               <img
                   className='consumeSpace'
-                  src={userObject.image?.filename ? `${database}${userObject.image.url}` : "/profile-photo.png"} 
+                  src={userObject.image?.url ? `${database}${userObject.image.url}` : "/profile-photo.png"} 
                   alt='profile picture'
                   onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => { (error.currentTarget.src = "/profile-photo.png"); }}
                />
@@ -130,7 +131,7 @@ export default function Profile() {
             { editMode ? (
                <>
                   <label htmlFor="bio">Personal Bio</label>
-                  <textarea id="bio "value={userObject.bio} onChange={ (event) => { setUserObject({ ...userObject, bio: event.target.value }); } } />
+                  <textarea id="bio" value={userObject.bio} onChange={ (event) => { setUserObject({ ...userObject, bio: event.target.value }); } } />
                </> 
             ) : (
                <>
