@@ -7,6 +7,8 @@ import axios from '../api/axios';
 import GrowingText from './GrowingText';
 import UserObject from '../interfaces/UserObject';
 
+const database = import.meta.env.VITE_SERVER_LOCATION;
+
 interface UserPinProps {
    userObject: UserObject;
 }
@@ -63,7 +65,11 @@ export default function UserPin({ userObject: parentUserObject }: UserPinProps) 
             <GrowingText text={userObject.username} parentDiv={titleRef} />
          </div>
          <div onClick={ () => { viewProfile() } }>
-            <img src='/profile-photo.png' alt='profile picture' />
+               <img 
+                  src={userObject.image?.filename ? `${database}${userObject.image.url}` : "/profile-photo.png"} 
+                  alt='profile picture'
+                  onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => { (error.currentTarget.src = "/profile-photo.png"); }}
+               />
          </div>
 
          <div className='styleDiv'></div>
