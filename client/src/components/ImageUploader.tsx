@@ -1,28 +1,52 @@
-import { ChangeEvent } from "react"
+import { useRef, useState, useEffect } from "react"
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCamera } from '@fortawesome/free-solid-svg-icons';
 
 interface ImageUploaderProps {
-   file?: File;
-   setFile: (file: File) => void;
+   imageBuffer?: File | null;
+   setImageBuffer: (file: File) => void;
 }
 
-export default function ImageUploader({ file, setFile }: ImageUploaderProps) {
+export default function ImageUploader({ imageBuffer, setImageBuffer }: ImageUploaderProps) {
    const maxFileSize = 5 * 1024 * 1024; // 5 MB
 
-   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
-      const newFile = event.target.files?.[0];
-      if (newFile && newFile.size <= maxFileSize) { setFile(newFile); }
+   const fileInputRef = useRef<HTMLInputElement | null>(null);
+   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+   useEffect(() => {
+      if (imageBuffer instanceof File) {
+         const objectUrl = URL.createObjectURL(imageBuffer);
+         setPreviewUrl(objectUrl);
+      }
+   }, [imageBuffer]);
+
+   function updateBuffer(file: File) {
+      if (file.size <= maxFileSize) { setImageBuffer(file); }
+   }
+
+   function uploadFile() {
+      fileInputRef.current?.click();
    }
 
    return (
-      <div className="image-uploader">
-         <input type="file" onChange={handleFileChange} />
-         {file && (
-            <div>
-               <p>File name: {file.name}</p>
-               <p>Size: {(file.size / 1024).toFixed(2)} KB</p>
-               <p>Type: {file.type}</p>
-            </div>
-         )}
+      <div 
+         className="imageInput"
+         onClick={uploadFile}
+      >
+         {/* input will be hidden by css, but still included in DOM for screen readers */}
+         <input 
+            type="file"
+            ref={fileInputRef}
+            onChange={(event) => { if (event.target.files?.[0]) { updateBuffer(event.target.files[0]) } }} 
+         />
+
+         { previewUrl ? (
+            <img className="consumeSpace" alt="preview of uploaded file" src={previewUrl}/>
+         ) : ( 
+            <img className="consumeSpace" src="/profile-photo.png" alt="default profile" />
+         ) }
+         <FontAwesomeIcon icon={faCamera}/>
       </div>
    )
 }

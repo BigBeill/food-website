@@ -101,13 +101,11 @@ export default function Profile() {
          </div>
          <div>
             { editMode ? (
-               <ImageUploader 
-                  file={ userObject.image instanceof File ? userObject.image : undefined } 
-                  setFile={setImageBuffer} 
-               />
+               <ImageUploader {...{ imageBuffer, setImageBuffer }} />
             )
             : (
                <img 
+                  className='consumeSpace'
                   src={userObject.image?.filename ? `${database}${userObject.image.url}` : "/profile-photo.png"} 
                   alt='profile picture'
                   onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => { (error.currentTarget.src = "/profile-photo.png"); }}
