@@ -3,12 +3,15 @@ import { useRef, useState, useEffect } from "react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
 
+
+
 interface ImageUploaderProps {
    imageBuffer?: File | null;
    setImageBuffer: (file: File) => void;
+   oldImageUrl?: string | null;
 }
 
-export default function ImageUploader({ imageBuffer, setImageBuffer }: ImageUploaderProps) {
+export default function ImageUploader({ imageBuffer, setImageBuffer, oldImageUrl }: ImageUploaderProps) {
    const maxFileSize = 5 * 1024 * 1024; // 5 MB
 
    const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -44,7 +47,7 @@ export default function ImageUploader({ imageBuffer, setImageBuffer }: ImageUplo
          { previewUrl ? (
             <img className="consumeSpace" alt="preview of uploaded file" src={previewUrl}/>
          ) : ( 
-            <img className="consumeSpace" src="/profile-photo.png" alt="default profile" />
+            <img className="consumeSpace" src={oldImageUrl ? oldImageUrl : "/profile-photo.png"} alt="default profile" />
          ) }
          <FontAwesomeIcon icon={faCamera}/>
       </div>
