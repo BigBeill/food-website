@@ -1,10 +1,11 @@
 const mongoose = require('mongoose')
+const ImageSchema = require('./image');
 
 const recipeSchema = new mongoose.Schema({
     owner: mongoose.SchemaTypes.ObjectId,
     title: String,
     description: String,
-    image: {type: String, enum: ['🧀', '🥞', '🍗', '🍔','🍞', '🥯', '🥐','🥨','🍗','🥓','🥩','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🥚','🍳','🥘','🥣','🥗','🍿','🧂','🥫']},
+    image: { type: ImageSchema, default: null },
     ingredients: [{
         foodId: Number,
         label: String,

@@ -150,12 +150,23 @@ exports.packageIncoming = async (req, res, next) => {
    if (!recipe.owner) { recipe.owner = req.user._id; }
 
    try {
+      // if an image was uploaded, add the image data to the recipe object
+      if (req.file) {
+         recipe.image = {
+            filename: req.file.filename,
+            url: path.join("/uploads/recipes", req.file.filename),
+            size: req.file.size,
+            mimetype: req.file.mimetype,
+            uploadedAt: new Date()
+         };
+      }
+
       if (!recipe.visibility) { recipe.visibility = "public"; }
       const recipeObject = await recipeUtils.verifyObject(recipe, false);
       req.recipeObject = recipeObject;
-      console.log("Recipe Object: ", req.recipeObject);
       next();
    }
+
    catch (error) {
       console.log("\x1b[31m%s\x1b[0m", "recipe.controller.packageIncoming failed... unable to create recipe object");
       console.error(error);
@@ -192,25 +203,23 @@ changes the contents of an existing recipe in the database
 */
 exports.update = async (req, res) => {
 
-   recipeId = req.body._id;
-
-   // check if recipe _id was provided
-   if (!recipeId) return res.status(400).json({ error: 'recipe _id needs to be provided' });
-
-   // grab recipe object from req and attach _id to it
    const recipeObject = req.recipeObject;
 
-   try {
-      // find recipe being updated in database
-      const recipeData = await recipes.findOne({ _id: recipeId });
+   // check if recipe _id was provided
+   const recipeId = req.body._id;  
+   if (!recipeId) { return res.status(400).json({ error: 'recipe _id needs to be provided' }); }
 
+   try {
       // make sure current user is the owner of found recipe
+      const recipeData = await recipes.findOne({ _id: recipeId });
       if (!recipeData.owner == req.user) { return res.status(403).json({ error: 'current user does not have write access to this recipe' }); }
 
-      // update recipe in database
-      await recipes.updateOne({ _id: recipeId }, { $set: recipeObject });
+      // remove old images from server if a new image was uploaded
+      if (req.file && recipeData.image) { volumeUtils.deleteVolumeFile("users", recipeData.image.filename); }
 
-      return res.status(201).json({ message: 'recipe saved successfully' });
+      // update recipe in database and return
+      await recipes.updateOne({ _id: recipeId }, { $set: recipeObject });
+      return res.status(201).json({ message: 'recipe updated successfully' });
    }
 
    // handle any errors caused by the controller
@@ -228,7 +237,7 @@ exports.update = async (req, res) => {
 
 /*
 deletes a recipe from the database
-@route: DELETE /recipe/edit
+@route: DELETE /recipe/delete
 */
 exports.delete = async (req, res) => {
 

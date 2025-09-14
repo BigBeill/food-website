@@ -28,7 +28,16 @@ async function verifyObject (recipe, insideDatabase = true, includeNutrition = t
       if (insideDatabase && ( !recipeObject.owner || typeof recipeObject.owner == 'string' )) { found.push('owner'); }
       if (!recipeObject.title || typeof recipeObject.title != 'string') { found.push('title'); }
       if (!recipeObject.description || typeof recipeObject.description != 'string') { found.push('description'); }
-      if (!recipeObject.image || typeof recipeObject.image != 'string') { found.push('image'); }
+      if (recipeObject.image) {
+         if (typeof recipeObject.image != 'object' ) { found.push('image'); }
+         else {
+            if (!recipeObject.image.filename || typeof recipeObject.image.filename != 'string') { found.push('image'); }
+            if (!recipeObject.image.url || typeof recipeObject.image.url != 'string') { found.push('image'); }
+            if (!recipeObject.image.size || typeof recipeObject.image.size != 'number') { found.push('image'); }
+            if (!recipeObject.image.mimetype || typeof recipeObject.image.mimetype != 'string') { found.push('image'); }
+            if (recipeObject.image.uploadedAt && !(recipeObject.image.uploadedAt instanceof Date)) { found.push('image'); }
+         }
+      }
       if (!recipeObject.ingredients || !Array.isArray(recipeObject.ingredients)) { found.push('ingredients'); }
       else {
          try { 
@@ -59,7 +68,6 @@ async function verifyObject (recipe, insideDatabase = true, includeNutrition = t
 
    // check for any missing fields in the recipe object
    let invalidFields = await checkInvalidFields();
-
    if (invalidFields.length != 0) {  
       if (!insideDatabase) { throw new Error('missing fields in recipe object: ' + invalidFields.join(', ')); } // return error if insideDatabase is false
 
@@ -85,7 +93,13 @@ async function verifyObject (recipe, insideDatabase = true, includeNutrition = t
       owner: recipeObject.owner,
       title: recipeObject.title,
       description: recipeObject.description,
-      image: recipeObject.image,
+      image: {
+         filename: recipeObject.image?.filename,
+         url: recipeObject.image?.url,
+         size: recipeObject.image?.size,
+         mimetype: recipeObject.image?.mimetype,
+         uploadedAt: recipeObject.image?.uploadedAt
+      },
       ingredients: recipeObject.ingredients,
       instructions: recipeObject.instructions,
       visibility: recipeObject.visibility
@@ -109,7 +123,13 @@ async function verifyObject (recipe, insideDatabase = true, includeNutrition = t
       owner: recipeObject.owner,
       title: recipeObject.title,
       description: recipeObject.description,
-      image: recipeObject.image,
+      image: {
+         filename: recipeObject.image?.filename,
+         url: recipeObject.image?.url,
+         size: recipeObject.image?.size,
+         mimetype: recipeObject.image?.mimetype,
+         uploadedAt: recipeObject.image?.uploadedAt
+      },
       ingredients: recipeObject.ingredients,
       instructions: recipeObject.instructions,
       nutrition: {

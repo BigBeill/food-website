@@ -2,7 +2,7 @@ const router = require("express").Router();
 const recipeController = require("../controllers/recipe.controller");
 const { body, query, param, checkExact } = require("express-validator");
 const { advancedCheckExact, runValidation } = require("../library/sanitationUtils");
-
+const { uploadVolumeFile } = require("../library/volumeUtils");
 
 /*
 ------------ /getObject route ------------
@@ -105,7 +105,6 @@ Expects 6 arguments from body:
    _id: mongoose.SchemaTypes.ObjectId (Only for PUT method)
    title: string
    description: string
-   image: string
    ingredients: ingredientObject[]
    instructions: string[]
    visibility: enum["public", "friends", "personal"] (optional, default "public")
@@ -126,11 +125,11 @@ Returns:
 
 router.route('/edit')
 .all(
+   uploadVolumeFile("recipes"),
    [
       body("_id").optional().isString().isLength({ min: 24, max: 24 }).withMessage("_id must be a string of 24 characters"),
       body("title").isString().isLength({ min: 3, max: 900 }).withMessage("Your recipe must contain a title between 1 and 900 characters long"),
       body("description").isString().isLength({ min: 3, max: 90000 }).withMessage("description must be a string between 3 and 90000 characters"),
-      body("image").isString().isLength({ min: 0, max: 90 }).withMessage("image must be a string"),
       body("ingredients").isArray().withMessage("ingredients must be an array"),
       body("ingredients.*").isObject().withMessage("ingredients must be an array of objects"),
       body("ingredients.*.foodId").toInt().isInt({ min: 1, max: 100000000 }).withMessage("All ingredients must have a valid foodId"),
