@@ -182,7 +182,7 @@ function uploadVolumeFile(bucketKey) {
       if (!req.user) { return res.status(401).json({ error: "No user authenticated" }); }
 
       toTemp(req, res, async (error) => {
-         if (error) return next(error);
+         if (error) { return next(error); }
          try {
             if (!req.file?.path || !req.file?.filename) {
                return next(new Error('No file uploaded'));
@@ -194,7 +194,7 @@ function uploadVolumeFile(bucketKey) {
                // infected: delete from temp and block
                try { fs.unlinkSync(req.file.path); } 
                catch { console.error('Server failed to delete infected temp file'); }
-               return res.status(422).json({ error: 'Upload blocked by antivirus' });
+               return next(new Error('Upload blocked by antivirus'));
             }
 
             // clean: move into final bucket (atomic rename within same volume)
@@ -209,6 +209,9 @@ function uploadVolumeFile(bucketKey) {
             return next();
          } 
          catch (error) {
+            // on any error, try to clean up temp file if it exists
+            try { if (req.file?.path && fs.existsSync(req.file.path)) { fs.unlinkSync(req.file.path); } }
+            catch (error) { console.error('Temp cleanup failed:', error); }
             return next(error);
          }
       });

@@ -1,8 +1,9 @@
 const recipeUtils = require("../library/recipeUtils");
 const userUtils = require("../library/userUtils");
-const recipes = require("../models/recipe");
-const users = require("../models/user");
+const Recipe = require("../models/recipe");
+const User = require("../models/user");
 const path = require("path");
+const volumeUtils = require("../library/volumeUtils");
 
 // IMPORTANT: go to server/routes/recipe.router.js for a more detailed explanations
 
@@ -27,7 +28,7 @@ exports.getObject = async (req, res) => {
       recipeObject = await recipeUtils.verifyObject(recipe, true, includeNutrition);
 
       // return recipe if client is the owner or the recipe is public
-      if (recipe.visibility == "public") { return res.status(200).json({ message: "recipe object found", payload: recipeObject }); }
+      if (recipeObject.visibility == "public") { return res.status(200).json({ message: "recipe object found", payload: recipeObject }); }
    }
    catch (error) {
       console.log("\x1b[31m%s\x1b[0m", "recipe.controller.getObject failed... unable to create recipe object");
@@ -104,7 +105,7 @@ exports.find = async (req, res) => {
    try {
       if (title) { query.title = { $regex: new RegExp(title, 'i') } }
       if (foodIdList) { query["ingredients.foodId"] = { $all: foodIdList }; }
-      recipeData = await recipes.find(query)
+      recipeData = await Recipe.find(query)
       .limit(limit)
       .skip(skip);
    }
@@ -119,7 +120,7 @@ exports.find = async (req, res) => {
       let payload = { recipeObjectArray };
 
       if (count) {
-         const recipeCount = await recipes.countDocuments(query);
+         const recipeCount = await Recipe.countDocuments(query);
          payload.count = recipeCount;
       }
 
@@ -155,7 +156,7 @@ exports.packageIncoming = async (req, res, next) => {
       if (req.file) {
          recipe.image = {
             filename: req.file.filename,
-            url: path.join("/uploads/recipes", req.file.filename),
+            url: `/uploads/recipes/${req.file.filename}`,
             size: req.file.size,
             mimetype: req.file.mimetype,
             uploadedAt: new Date()
@@ -186,7 +187,7 @@ exports.add = async (req, res) => {
       .save();
 
       // add recipe to user's ownedRecipes list in database
-      await users.updateOne({ _id: req.user._id }, { $push: { ownedRecipes: newRecipe._id } })
+      await User.updateOne({ _id: req.user._id }, { $push: { ownedRecipes: newRecipe._id } })
 
       return res.status(201).json({ message: 'new recipe created' });
    }
@@ -212,15 +213,16 @@ exports.update = async (req, res) => {
 
    try {
       // make sure current user is the owner of found recipe
-      const recipeData = await recipes.findOne({ _id: recipeId });
-      if (!recipeData.owner == req.user) { return res.status(403).json({ error: 'current user does not have write access to this recipe' }); }
+      const recipeData = await Recipe.findOne({ _id: recipeId });
+      if (!recipeData) { return res.status(404).json({ error: 'no recipe found with provided _id' }); }
+      if (recipeData.owner != req.user._id) { return res.status(403).json({ error: 'current user does not have write access to this recipe' }); }
 
       // remove old images from server if a new image was uploaded
-      if (req.file && recipeData.image) { volumeUtils.deleteVolumeFile("users", recipeData.image.filename); }
+      if (req.file && recipeData.image) { volumeUtils.deleteVolumeFile("recipes", recipeData.image.filename); }
 
       // update recipe in database and return
-      await recipes.updateOne({ _id: recipeId }, { $set: recipeObject });
-      return res.status(201).json({ message: 'recipe updated successfully' });
+      await Recipe.updateOne({ _id: recipeId }, { $set: recipeObject });
+      return res.status(200).json({ message: 'recipe updated successfully' });
    }
 
    // handle any errors caused by the controller
@@ -260,7 +262,7 @@ exports.delete = async (req, res) => {
 
    // delete the recipe from the database
    try {
-      await recipes.deleteOne({ _id: recipeId });
+      await Recipe.deleteOne({ _id: recipeId });
       return res.status(200).json({ message: 'recipe deleted successfully' });
    }
    catch (error) {

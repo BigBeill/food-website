@@ -45,9 +45,12 @@ export default function ImageUploader({ imageBuffer, setImageBuffer, oldImageUrl
          <input 
             type="file"
             ref={fileInputRef}
-            accept="image/*"
-            aria-label="Choose profile photo"
-            onChange={(event) => { if (event.target.files?.[0]) { updateBuffer(event.target.files[0]) } }} 
+            accept="image/png, image/jpeg, image/jpg, image/webp"
+            aria-label="Choose image for user profile"
+            onChange={(event) => { 
+               const userFile = event.target.files?.[0];
+               if (userFile) { (updateBuffer(userFile)); }
+            }}
          />
 
          { previewUrl ? (
@@ -56,8 +59,11 @@ export default function ImageUploader({ imageBuffer, setImageBuffer, oldImageUrl
             <img 
                className="consumeSpace" 
                src={oldImageUrl ? oldImageUrl : fallbackImageUrl} 
-               alt="default profile" 
-               onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => { (error.currentTarget.src = fallbackImageUrl); }}
+               alt="user profile" 
+               onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                  error.currentTarget.onerror = null; // Prevents looping
+                  error.currentTarget.src = fallbackImageUrl; 
+               }}
             />
          ) }
          <FontAwesomeIcon icon={faCamera}/>

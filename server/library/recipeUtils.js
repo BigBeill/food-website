@@ -29,14 +29,14 @@ async function verifyObject (recipe, insideDatabase = true, includeNutrition = t
       if (!recipeObject.title || typeof recipeObject.title != 'string') { found.push('title'); }
       if (!recipeObject.description || typeof recipeObject.description != 'string') { found.push('description'); }
       if (recipeObject.image) {
-         if (typeof recipeObject.image != 'object' ) { found.push('image'); }
-         else {
-            if (!recipeObject.image.filename || typeof recipeObject.image.filename != 'string') { found.push('image'); }
-            if (!recipeObject.image.url || typeof recipeObject.image.url != 'string') { found.push('image'); }
-            if (!recipeObject.image.size || typeof recipeObject.image.size != 'number') { found.push('image'); }
-            if (!recipeObject.image.mimetype || typeof recipeObject.image.mimetype != 'string') { found.push('image'); }
-            if (recipeObject.image.uploadedAt && !(recipeObject.image.uploadedAt instanceof Date)) { found.push('image'); }
-         }
+         if (
+            typeof recipeObject.image != 'object' 
+            || !recipeObject.image.filename || typeof recipeObject.image.filename != 'string'
+            || !recipeObject.image.url || typeof recipeObject.image.url != 'string'
+            || !recipeObject.image.size || typeof recipeObject.image.size != 'number'
+            || !recipeObject.image.mimetype || typeof recipeObject.image.mimetype != 'string'
+            || ( recipeObject.image.uploadedAt && !(recipeObject.image.uploadedAt instanceof Date) )
+         ) { found.push('image'); }
       }
       if (!recipeObject.ingredients || !Array.isArray(recipeObject.ingredients)) { found.push('ingredients'); }
       else {
@@ -89,17 +89,17 @@ async function verifyObject (recipe, insideDatabase = true, includeNutrition = t
    }
 
    if (!includeNutrition) { return {
-      ...(insideDatabase ? { _id: recipeObject._id, } : {}),
+      _id: insideDatabase ? recipeObject._id : undefined,
       owner: recipeObject.owner,
       title: recipeObject.title,
       description: recipeObject.description,
-      image: {
-         filename: recipeObject.image?.filename,
-         url: recipeObject.image?.url,
-         size: recipeObject.image?.size,
-         mimetype: recipeObject.image?.mimetype,
-         uploadedAt: recipeObject.image?.uploadedAt
-      },
+      image: recipeObject.image ? {
+         filename: recipeObject.image.filename,
+         url: recipeObject.image.url,
+         size: recipeObject.image.size,
+         mimetype: recipeObject.image.mimetype,
+         uploadedAt: recipeObject.image.uploadedAt
+      } : undefined,
       ingredients: recipeObject.ingredients,
       instructions: recipeObject.instructions,
       visibility: recipeObject.visibility
@@ -119,17 +119,17 @@ async function verifyObject (recipe, insideDatabase = true, includeNutrition = t
 
    // make sure any additional fields are removed
    return {
-      ...(insideDatabase ? { _id: recipeObject._id, } : {}),
+      _id: insideDatabase ? recipeObject._id : undefined,
       owner: recipeObject.owner,
       title: recipeObject.title,
       description: recipeObject.description,
-      image: {
-         filename: recipeObject.image?.filename,
-         url: recipeObject.image?.url,
-         size: recipeObject.image?.size,
-         mimetype: recipeObject.image?.mimetype,
-         uploadedAt: recipeObject.image?.uploadedAt
-      },
+      image: recipeObject.image ? {
+         filename: recipeObject.image.filename,
+         url: recipeObject.image.url,
+         size: recipeObject.image.size,
+         mimetype: recipeObject.image.mimetype,
+         uploadedAt: recipeObject.image.uploadedAt
+      } : undefined,
       ingredients: recipeObject.ingredients,
       instructions: recipeObject.instructions,
       nutrition: {

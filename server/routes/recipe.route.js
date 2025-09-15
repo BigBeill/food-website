@@ -30,7 +30,7 @@ payload: recipeObject
 */
 router.get("/getObject/:recipeId/:includeNutrition?",
    [
-      param("recipeId").isString({ min: 24, max:24 }).withMessage("recipeId must be a positive integer"),
+      param("recipeId").isHexadecimal().isLength({ min: 24, max: 24 }).withMessage("recipeId must be a 24-character hex string"),
       param("includeNutrition").optional().isBoolean().toBoolean().withMessage("includeNutrition must be a boolean"),
       checkExact()
    ],
@@ -75,13 +75,13 @@ payload: {
 
 router.get('/find',
    [
-      query("category").optional().isString().isIn(["public", "friends", "personal"]).withMessage("category must be one of the following: all, friends, personal"),
+      query("category").optional().isString().isIn(["public", "friends", "personal"]).withMessage("category must be one of the following: public, friends, personal"),
       query("title").optional().isString().isLength({ min: 3, max: 90 }).withMessage("title must be a string between 3 and 100 characters"),
       query("foodIdList").optional().isArray().withMessage("ingredientIdList must be an array"),
       query("foodIdList.*").toInt().isInt().withMessage("All ingredientIds must be an integer"),
       query("limit").optional().toInt().isInt({ min: 1, max: 90 }).withMessage("limit must be an integer between 1 and 90"),
       query("skip").optional().toInt().isInt({ min: 0, max: 900 }).withMessage("skip must be an integer between 0 and 900"),
-      query("count").optional().isBoolean().withMessage("count must be a boolean"),
+      query("count").optional().isBoolean().toBoolean().withMessage("count must be a boolean"),
       query("includeNutrition").optional().isBoolean().toBoolean().withMessage("includeNutrition must be a boolean"),
       checkExact()
    ],

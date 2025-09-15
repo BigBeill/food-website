@@ -42,7 +42,10 @@ export default function RecipePreview({ recipe }: RecipePreviewProps) {
                className='consumeSpace'
                src={recipe.image?.url ? `${database}${recipe.image.url}` : "/recipe-image-fallback.png"} 
                alt='profile picture'
-               onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => { (error.currentTarget.src = "/recipe-image-fallback.png"); }}
+               onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                  error.currentTarget.onerror = null; // Prevents looping
+                  error.currentTarget.src = "/recipe-image-fallback.png"; 
+               }}
             />
          </p>
          <p className="description">{recipe.description}</p>

@@ -116,7 +116,10 @@ export default function Profile() {
                   className='consumeSpace'
                   src={userObject.image?.url ? `${database}${userObject.image.url}` : "/user-image-fallback.png"} 
                   alt='profile picture'
-                  onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => { (error.currentTarget.src = "/user-image-fallback.png"); }}
+                  onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                     error.currentTarget.onerror = null; // Prevents looping
+                     error.currentTarget.src = "/user-image-fallback.png"; 
+                  }}
                />
             )}
          </div>

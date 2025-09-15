@@ -93,9 +93,9 @@ export default function NewEditRecipe () {
 		if (imageBuffer instanceof File) { formData.append("image", imageBuffer); }
 
 		//send request to the server
-		axios({ method:method, url:'recipe/edit', data: formData })
-		.then(() => { navigate('/'); })
-		.catch(console.error);
+		axios({ method: method, url: 'recipe/edit', data: formData })
+			.then(() => { navigate('/'); })
+			.catch(console.error);
 	}
 
 	function deleteRecipe() {
@@ -135,7 +135,6 @@ export default function NewEditRecipe () {
 		{
 			content: AdditionalInfoPage,
 			props: {
-				image: recipeObject.image,
 				imageBuffer,
 				setImageBuffer,
 				oldImageUrl: recipeObject.image?.url ? `${database}${recipeObject.image.url}` : "",
@@ -507,7 +506,7 @@ function FinalizeChangesPage({errorMessage, submitRecipe, deleteRecipe, revertCh
 		<div className='standardContent'>
 			<h2>Finalize Recipe Changes</h2>
 			<button className="darkText additionalMargin" onClick={() => submitRecipe()}>Save recipe</button>
-			<p className={errorMessage ? "error" : "hidden"} area-live="assertive">{errorMessage}</p>
+			<p className={errorMessage ? "error" : "hidden"} aria-live="assertive">{errorMessage}</p>
 			{ revertChanges ? (
 				<div className='devisableButton additionalMargin'>
 					<button onClick={() => attemptRevertChanges()}>{!revertChangesConfirmation ? "Revert Changes" : "Confirm Revert"}</button>
