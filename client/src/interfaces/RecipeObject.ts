@@ -1,11 +1,12 @@
+import ImageObject from './ImageObject'
 import IngredientObject from './IngredientObject'
 
 export default interface RecipeObject {
-   _id: string | null | undefined;
+   _id: string;
    owner?: string;
    title: string;
    description: string;
-   image: string;
+   image?: ImageObject;
    ingredients: IngredientObject[];
    instructions: string[];
    nutrition?: {

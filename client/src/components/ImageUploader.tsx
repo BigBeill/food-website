@@ -9,9 +9,10 @@ interface ImageUploaderProps {
    imageBuffer?: File | null;
    setImageBuffer: (file: File | null) => void;
    oldImageUrl?: string | null;
+   fallbackImageUrl: string;
 }
 
-export default function ImageUploader({ imageBuffer, setImageBuffer, oldImageUrl }: ImageUploaderProps) {
+export default function ImageUploader({ imageBuffer, setImageBuffer, oldImageUrl, fallbackImageUrl }: ImageUploaderProps) {
    const maxFileSize = 5 * 1024 * 1024; // 5 MB
 
    const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -54,9 +55,9 @@ export default function ImageUploader({ imageBuffer, setImageBuffer, oldImageUrl
          ) : ( 
             <img 
                className="consumeSpace" 
-               src={oldImageUrl ? oldImageUrl : "/profile-photo.png"} 
+               src={oldImageUrl ? oldImageUrl : fallbackImageUrl} 
                alt="default profile" 
-               onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => { (error.currentTarget.src = "/profile-photo.png"); }}
+               onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => { (error.currentTarget.src = fallbackImageUrl); }}
             />
          ) }
          <FontAwesomeIcon icon={faCamera}/>

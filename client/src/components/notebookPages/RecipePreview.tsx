@@ -6,6 +6,8 @@ import GrowingText from "../GrowingText";
 import Popup from "../Popup";
 import Recipe from "../../pages/Recipe";
 
+const database = import.meta.env.VITE_SERVER_LOCATION;
+
 interface RecipePreviewProps {
    recipe: RecipeObject;
 }
@@ -35,7 +37,14 @@ export default function RecipePreview({ recipe }: RecipePreviewProps) {
          <div className="titleContainer" ref={titleRef}>
             <GrowingText text={recipe.title} parentDiv={titleRef}/>
          </div>
-         <p className="image">{recipe.image}</p>
+         <p className="image">
+            <img
+               className='consumeSpace'
+               src={recipe.image?.url ? `${database}${recipe.image.url}` : "/recipe-image-fallback.png"} 
+               alt='profile picture'
+               onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => { (error.currentTarget.src = "/recipe-image-fallback.png"); }}
+            />
+         </p>
          <p className="description">{recipe.description}</p>
          <div className="ingredients">
             <p>Ingredients:</p>
