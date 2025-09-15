@@ -177,6 +177,10 @@ function uploadVolumeFile(bucketKey) {
 
    // 2) after write, scan -> move or delete
    return (req, res, next) => {
+
+      // only users are allowed to upload files
+      if (!req.user) { return res.status(401).json({ error: "No user authenticated" }); }
+
       toTemp(req, res, async (error) => {
          if (error) return next(error);
          try {
@@ -190,7 +194,7 @@ function uploadVolumeFile(bucketKey) {
                // infected: delete from temp and block
                try { fs.unlinkSync(req.file.path); } 
                catch { console.error('Server failed to delete infected temp file'); }
-               return next(new Error('Upload blocked: antivirus detected malware'));
+               return res.status(422).json({ error: 'Upload blocked by antivirus' });
             }
 
             // clean: move into final bucket (atomic rename within same volume)
