@@ -2,6 +2,7 @@ const recipeUtils = require("../library/recipeUtils");
 const userUtils = require("../library/userUtils");
 const recipes = require("../models/recipe");
 const users = require("../models/user");
+const path = require("path");
 
 // IMPORTANT: go to server/routes/recipe.router.js for a more detailed explanations
 
