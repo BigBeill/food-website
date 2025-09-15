@@ -4,6 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import RecipeObject from "../interfaces/RecipeObject";
 import axios from "../api/axios";
 
+const database = import.meta.env.VITE_SERVER_LOCATION;
+
 interface RecipeParams {
    recipe?: RecipeObject
 }
@@ -37,7 +39,12 @@ export default function Recipe({recipe}: RecipeParams) {
    return (
       <div className="recipeObjectView fullViewPage">
          <h1>{recipeObject.title}</h1>
-         <p>{recipeObject.image}</p>
+         <img
+            className='consumeSpace'
+            src={recipeObject.image?.url ? `${database}${recipeObject.image.url}` : "/recipe-image-fallback.png"} 
+            alt='recipe picture'
+            onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => { (error.currentTarget.src = "/recipe-image-fallback.png"); }}
+         />
          <h2>Nutrition</h2>
          <ul>
             { recipeObject.nutrition ? 
