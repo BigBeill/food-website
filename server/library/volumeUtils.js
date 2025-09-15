@@ -32,9 +32,15 @@ async function getAV() {
 }
 
 async function isFileClean(filePath) {
-   const av = await getAV();
-   const { isInfected/*, viruses*/ } = await av.isInfected(filePath);
-   return !isInfected;
+   try {
+      const av = await getAV();
+      const { isInfected/*, viruses*/ } = await av.isInfected(filePath);
+      return !isInfected;
+   }
+   catch (error) {
+      console.error('Antivirus scan failed:', error);
+      throw new Error('isFileClean function failed');
+   }
 }
 
 const TMP_REL = 'uploads/.tmp';
@@ -180,8 +186,10 @@ function uploadVolumeFile(bucketKey) {
 
             const clean = await isFileClean(req.file.path);
             if (!clean) {
+               console.warn('Upload blocked: antivirus detected malware');
                // infected: delete from temp and block
-               try { fs.unlinkSync(req.file.path); } catch {}
+               try { fs.unlinkSync(req.file.path); } 
+               catch { console.error('Server failed to delete infected temp file'); }
                return next(new Error('Upload blocked: antivirus detected malware'));
             }
 
