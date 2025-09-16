@@ -68,7 +68,7 @@ finds a list of recipes in the database that match the query parameters
 exports.find = async (req, res) => {
 
    // get query parameters from request
-   const { title, foodIdList, limit, skip, count, category = 'public', includeNutrition = false } = req.query;
+   const { title, foodIdList, limit = 6, skip = 0, count, category = 'public', includeNutrition = false } = req.query;
    const userId = req.user?._id;
 
    // make sure user is signed in if visibility is not public
@@ -250,8 +250,9 @@ exports.delete = async (req, res) => {
    if (!userId) { return res.status(401).json({ error: "user must be signed in to delete a recipe" }); }
 
    // make sure client as access to the recipe being deleted
+   let recipe;
    try {
-      const recipe = await recipeUtils.verifyObject({ _id: recipeId }, true);
+      recipe = await recipeUtils.verifyObject({ _id: recipeId }, true);
       if (recipe.owner != userId) { return res.status(403).json({ error: "current user does not have write access to this recipe" }); }
    }
    catch (error) {
@@ -262,6 +263,9 @@ exports.delete = async (req, res) => {
 
    // delete the recipe from the database
    try {
+      // remove recipe image from server
+      if (recipe.image) { volumeUtils.deleteVolumeFile("recipes", recipe.image.filename); }
+
       await Recipe.deleteOne({ _id: recipeId });
       return res.status(200).json({ message: 'recipe deleted successfully' });
    }

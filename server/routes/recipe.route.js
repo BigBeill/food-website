@@ -159,7 +159,6 @@ router.route('/edit')
             _id: true,
             title: true,
             description: true,
-            image: true,
             ingredients: [{foodId: true, label: true, foodDescription: true, portion: {measureId: true, measureDescription: true, amount: true}}],
             instructions: [],
             visibility: true
