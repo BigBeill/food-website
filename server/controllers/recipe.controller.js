@@ -183,7 +183,7 @@ adds a new recipe to the database
 exports.add = async (req, res) => {
    try {
       // create new recipe and save to database
-      const newRecipe = await new recipes(req.recipeObject)
+      const newRecipe = await new Recipe(req.recipeObject)
       .save();
 
       // add recipe to user's ownedRecipes list in database

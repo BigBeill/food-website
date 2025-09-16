@@ -176,46 +176,58 @@ function uploadVolumeFile(bucketKey) {
    }).single('image');
 
    // 2) after write, scan -> move or delete
-   return (req, res, next) => {
+   return [
+      // function for handling the upload and scanning
+      (req, res, next) => {
 
-      // only users are allowed to upload files
-      if (!req.user) { return res.status(401).json({ error: "No user authenticated" }); }
+         // only users are allowed to upload files
+         if (!req.user) { return res.status(401).json({ error: "No user authenticated" }); }
 
-      toTemp(req, res, async (error) => {
-         if (error) { return next(error); }
-         try {
-            if (!req.file?.path || !req.file?.filename) {
-               return next(new Error('No file uploaded'));
+         toTemp(req, res, async (error) => {
+            if (error) { return next(error); }
+            try {
+               if (!req.file?.path || !req.file?.filename) {
+                  return next(); // no file uploaded, nothing to do
+               }
+
+               const clean = await isFileClean(req.file.path);
+               if (!clean) {
+                  console.warn('Upload blocked: antivirus detected malware');
+                  // infected: delete from temp and block
+                  try { fs.unlinkSync(req.file.path); } 
+                  catch { console.error('Server failed to delete infected temp file'); }
+                  return next(new Error('Upload blocked by antivirus'));
+               }
+
+               // clean: move into final bucket (atomic rename within same volume)
+               const finalDirectory = findSubdirectory(bucketKey);
+               const finalPath = path.join(finalDirectory, req.file.filename);
+               fs.renameSync(req.file.path, finalPath);
+
+               // update req.file so downstream code still works
+               req.file.destination = finalDirectory;
+               req.file.path = finalPath;
+
+               return next();
+            } 
+            catch (error) {
+               // on any error, try to clean up temp file if it exists
+               try { if (req.file?.path && fs.existsSync(req.file.path)) { fs.unlinkSync(req.file.path); } }
+               catch (error) { console.error('Temp cleanup failed:', error); }
+               return next(error);
             }
-
-            const clean = await isFileClean(req.file.path);
-            if (!clean) {
-               console.warn('Upload blocked: antivirus detected malware');
-               // infected: delete from temp and block
-               try { fs.unlinkSync(req.file.path); } 
-               catch { console.error('Server failed to delete infected temp file'); }
-               return next(new Error('Upload blocked by antivirus'));
-            }
-
-            // clean: move into final bucket (atomic rename within same volume)
-            const finalDirectory = findSubdirectory(bucketKey);
-            const finalPath = path.join(finalDirectory, req.file.filename);
-            fs.renameSync(req.file.path, finalPath);
-
-            // update req.file so downstream code still works
-            req.file.destination = finalDirectory;
-            req.file.path = finalPath;
-
-            return next();
-         } 
-         catch (error) {
-            // on any error, try to clean up temp file if it exists
-            try { if (req.file?.path && fs.existsSync(req.file.path)) { fs.unlinkSync(req.file.path); } }
-            catch (error) { console.error('Temp cleanup failed:', error); }
-            return next(error);
+         });
+      },
+      // error handler for multer issues
+      (error, _req, res, _next) => {
+         console.error('File upload error:', error);
+         if (error instanceof multer.MulterError) {
+            if (error.code === 'LIMIT_FILE_SIZE') { return res.status(400).json({ error: 'File too large' }); }
+            if (error.code === 'LIMIT_FILE_COUNT') { return res.status(400).json({ error: 'Too many files' }); }
+            return res.status(500).json({ error: 'Issue uploading file' });
          }
-      });
-   };
+      }
+   ];
 }
 
 // Allowed file extensions for deletion

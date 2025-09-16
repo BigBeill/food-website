@@ -52,7 +52,10 @@ export default function NewEditRecipe () {
 			})
 			.catch(console.error);
 		}
-	},[]);
+		else {
+			setRecipeObject({_id: 'unsavedRecipe', title: '', description: '', ingredients: [], instructions: [], visibility: 'public'});
+		}
+	},[recipeId]);
 
 	//function for sending recipe changes to server
 	function submitRecipe(){
@@ -137,7 +140,7 @@ export default function NewEditRecipe () {
 			props: {
 				imageBuffer,
 				setImageBuffer,
-				oldImageUrl: recipeObject.image?.url ? `${database}${recipeObject.image.url}` : "",
+				oldImageUrl: recipeObject.image?.url ? `${database}${recipeObject.image.url}` : undefined,
 				visibility: recipeObject.visibility,
 				setVisibility
 			}
@@ -222,7 +225,7 @@ interface AdditionalInfoPageProps {
 }
 
 function AdditionalInfoPage ({imageBuffer, setImageBuffer, oldImageUrl, visibility, setVisibility}: AdditionalInfoPageProps) {
-
+	console.log("oldImageUrl:", oldImageUrl);
 	return (
 		<div className='standardContent'>
 			<h2>Additional Information</h2>

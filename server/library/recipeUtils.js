@@ -1,3 +1,4 @@
+const { check } = require('express-validator');
 const recipes = require('../models/recipe');
 const ingredientUtils = require('./ingredientUtils');
 
@@ -28,16 +29,14 @@ async function verifyObject (recipe, insideDatabase = true, includeNutrition = t
       if (insideDatabase && ( !recipeObject.owner || typeof recipeObject.owner == 'string' )) { found.push('owner'); }
       if (!recipeObject.title || typeof recipeObject.title != 'string') { found.push('title'); }
       if (!recipeObject.description || typeof recipeObject.description != 'string') { found.push('description'); }
-      if (recipeObject.image) {
-         if (
-            typeof recipeObject.image != 'object' 
-            || !recipeObject.image.filename || typeof recipeObject.image.filename != 'string'
-            || !recipeObject.image.url || typeof recipeObject.image.url != 'string'
-            || !recipeObject.image.size || typeof recipeObject.image.size != 'number'
-            || !recipeObject.image.mimetype || typeof recipeObject.image.mimetype != 'string'
-            || ( recipeObject.image.uploadedAt && !(recipeObject.image.uploadedAt instanceof Date) )
-         ) { found.push('image'); }
-      }
+      if (
+         !recipeObject.image || typeof recipeObject.image != 'object' 
+         || !recipeObject.image.filename || typeof recipeObject.image.filename != 'string'
+         || !recipeObject.image.url || typeof recipeObject.image.url != 'string'
+         || !recipeObject.image.size || typeof recipeObject.image.size != 'number'
+         || !recipeObject.image.mimetype || typeof recipeObject.image.mimetype != 'string'
+         || ( recipeObject.image.uploadedAt && !(recipeObject.image.uploadedAt instanceof Date) )
+      ) { found.push('image'); }
       if (!recipeObject.ingredients || !Array.isArray(recipeObject.ingredients)) { found.push('ingredients'); }
       else {
          try { 
@@ -66,27 +65,31 @@ async function verifyObject (recipe, insideDatabase = true, includeNutrition = t
       return found;
    }
 
-   // check for any missing fields in the recipe object
-   let invalidFields = await checkInvalidFields();
-   if (invalidFields.length != 0) {  
-      if (!insideDatabase) { throw new Error('missing fields in recipe object: ' + invalidFields.join(', ')); } // return error if insideDatabase is false
+   let invalidFields
+   // if the object exists inside the database, check the database for any missing fields before rejecting object
+   if (insideDatabase) {
 
-      // search the database for any missing fields
-      try {
-         const updatedRecipe = await recipes.findOne({ _id: recipe._id }, invalidFields.join(' '));
-         if (!updatedRecipe) { throw new Error('recipe not found in database'); }
-         invalidFields.forEach((field) => { recipeObject[field] = updatedRecipe[field]; });
-      }
-      catch (error) {
-         console.log("failed to search database for missing fields belonging to recipe:", recipe);
-         console.error(error);
-         throw new Error('failed to search database for missing fields');
-      }
-
-      // make sure all fields are present after searching the database
       invalidFields = await checkInvalidFields();
-      if (invalidFields.length != 0) { throw new Error('missing fields in recipe object: ' + invalidFields.join(', ')); }
+      if (invalidFields.length != 0) {  
+
+         // search the database for any missing fields
+         try {
+            const updatedRecipe = await recipes.findOne({ _id: recipe._id }, invalidFields.join(' '));
+            if (!updatedRecipe) { throw new Error('recipe not found in database'); }
+            invalidFields.forEach((field) => { recipeObject[field] = updatedRecipe[field]; });
+         }
+         catch (error) {
+            console.log("failed to search database for missing fields belonging to recipe:", recipe);
+            console.error(error);
+            throw new Error('failed to search database for missing fields');
+         }
+      }
    }
+
+   // make sure all fields are present before returning the object
+   invalidFields = await checkInvalidFields();
+   invalidFields = invalidFields.filter((item) => { return item != "image"; }); // image field is allowed to be missing
+   if (invalidFields.length != 0) { throw new Error('missing fields in recipe object: ' + invalidFields.join(', ')); }
 
    if (!includeNutrition) { return {
       _id: insideDatabase ? recipeObject._id : undefined,
