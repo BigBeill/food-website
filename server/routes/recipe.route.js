@@ -2,7 +2,7 @@ const router = require("express").Router();
 const recipeController = require("../controllers/recipe.controller");
 const { body, query, param, checkExact } = require("express-validator");
 const { advancedCheckExact, runValidation } = require("../library/sanitationUtils");
-
+const { uploadVolumeFile } = require("../library/volumeUtils");
 
 /*
 ------------ /getObject route ------------
@@ -30,7 +30,7 @@ payload: recipeObject
 */
 router.get("/getObject/:recipeId/:includeNutrition?",
    [
-      param("recipeId").isString({ min: 24, max:24 }).withMessage("recipeId must be a positive integer"),
+      param("recipeId").isHexadecimal().isLength({ min: 24, max: 24 }).withMessage("recipeId must be a 24-character hex string"),
       param("includeNutrition").optional().isBoolean().toBoolean().withMessage("includeNutrition must be a boolean"),
       checkExact()
    ],
@@ -75,13 +75,13 @@ payload: {
 
 router.get('/find',
    [
-      query("category").optional().isString().isIn(["public", "friends", "personal"]).withMessage("category must be one of the following: all, friends, personal"),
+      query("category").optional().isString().isIn(["public", "friends", "personal"]).withMessage("category must be one of the following: public, friends, personal"),
       query("title").optional().isString().isLength({ min: 3, max: 90 }).withMessage("title must be a string between 3 and 100 characters"),
       query("foodIdList").optional().isArray().withMessage("ingredientIdList must be an array"),
       query("foodIdList.*").toInt().isInt().withMessage("All ingredientIds must be an integer"),
       query("limit").optional().toInt().isInt({ min: 1, max: 90 }).withMessage("limit must be an integer between 1 and 90"),
       query("skip").optional().toInt().isInt({ min: 0, max: 900 }).withMessage("skip must be an integer between 0 and 900"),
-      query("count").optional().isBoolean().withMessage("count must be a boolean"),
+      query("count").optional().isBoolean().toBoolean().withMessage("count must be a boolean"),
       query("includeNutrition").optional().isBoolean().toBoolean().withMessage("includeNutrition must be a boolean"),
       checkExact()
    ],
@@ -105,7 +105,6 @@ Expects 6 arguments from body:
    _id: mongoose.SchemaTypes.ObjectId (Only for PUT method)
    title: string
    description: string
-   image: string
    ingredients: ingredientObject[]
    instructions: string[]
    visibility: enum["public", "friends", "personal"] (optional, default "public")
@@ -125,40 +124,51 @@ Returns:
 */
 
 router.route('/edit')
-.all(
-   [
-      body("_id").optional().isString().isLength({ min: 24, max: 24 }).withMessage("_id must be a string of 24 characters"),
-      body("title").isString().isLength({ min: 3, max: 900 }).withMessage("Your recipe must contain a title between 1 and 900 characters long"),
-      body("description").isString().isLength({ min: 3, max: 90000 }).withMessage("description must be a string between 3 and 90000 characters"),
-      body("image").isString().isLength({ min: 0, max: 90 }).withMessage("image must be a string"),
-      body("ingredients").isArray().withMessage("ingredients must be an array"),
-      body("ingredients.*").isObject().withMessage("ingredients must be an array of objects"),
-      body("ingredients.*.foodId").toInt().isInt({ min: 1, max: 100000000 }).withMessage("All ingredients must have a valid foodId"),
-      body("ingredients.*.label").optional().isString().isLength({ min: 1, max: 900}).withMessage("All ingredients with the label field must have a label as a string between 1 and 900 characters long"),
-      body("ingredients.*.foodDescription").isString().isLength({ min: 1, max: 900 }).withMessage("All ingredients must have a foodDescription that is a string between 1 and 900 characters long"),
-      body("ingredients.*.portion").isObject().withMessage("All ingredients must have a portion object"),
-      body("ingredients.*.portion.measureId").toInt().isInt({ min: 1, max: 900000 }).withMessage("All ingredients portion field must have a valid measureId"),
-      body("ingredients.*.portion.measureDescription").isString().isLength({ min: 1, max: 900 }).withMessage("All ingredients portion field must have a measureDescription that is a string between 1 and 900 characters long"),
-      body("ingredients.*.portion.amount").toFloat().isFloat({ min: 0.01, max: 90000 }).withMessage("All ingredients portion field must have an amount that is a float between 0.01 and 90000"),
-      body("instructions").isArray().withMessage("instructions must be an array"),
-      body("instructions.*").isString().isLength({ min: 3, max: 10000 }).withMessage("instructions must be an array of strings"),
-      body("visibility").optional().isString().isIn(["public", "private", "personal"]).withMessage("visibility must be one of the following: public, private, personal"),
-      checkExact(),
-      advancedCheckExact({
-         _id: true,
-         title: true,
-         description: true,
-         image: true,
-         ingredients: [{foodId: true, label: true, foodDescription: true, portion: {measureId: true, measureDescription: true, amount: true}}],
-         instructions: [],
-         visibility: true
-      }, "body" )
-   ],
-   runValidation,
-   recipeController.packageIncoming
-)
-.post(recipeController.add)
-.put(recipeController.update);
+   .all(
+      uploadVolumeFile("recipes"),
+      [
+         body("_id").optional().isString().isLength({ min: 24, max: 24 }).withMessage("_id must be a string of 24 characters"),
+         body("title").isString().isLength({ min: 3, max: 900 }).withMessage("Your recipe must contain a title between 1 and 900 characters long"),
+         body("description").isString().isLength({ min: 3, max: 90000 }).withMessage("description must be a string between 3 and 90000 characters"),
+         body("ingredients")
+            .customSanitizer((value) => {
+               try { return typeof value === "string" ? JSON.parse(value) : value; }
+               catch { return value; }
+            })
+            .isArray()
+            .withMessage("ingredients must be an array"),
+         body("ingredients.*").isObject().withMessage("ingredients must be an array of objects"),
+         body("ingredients.*.foodId").toInt().isInt({ min: 1, max: 100000000 }).withMessage("All ingredients must have a valid foodId"),
+         body("ingredients.*.label").optional().isString().isLength({ min: 1, max: 900}).withMessage("All ingredients with the label field must have a label as a string between 1 and 900 characters long"),
+         body("ingredients.*.foodDescription").isString().isLength({ min: 1, max: 900 }).withMessage("All ingredients must have a foodDescription that is a string between 1 and 900 characters long"),
+         body("ingredients.*.portion").isObject().withMessage("All ingredients must have a portion object"),
+         body("ingredients.*.portion.measureId").toInt().isInt({ min: 1, max: 900000 }).withMessage("All ingredients portion field must have a valid measureId"),
+         body("ingredients.*.portion.measureDescription").isString().isLength({ min: 1, max: 900 }).withMessage("All ingredients portion field must have a measureDescription that is a string between 1 and 900 characters long"),
+         body("ingredients.*.portion.amount").toFloat().isFloat({ min: 0.01, max: 90000 }).withMessage("All ingredients portion field must have an amount that is a float between 0.01 and 90000"),
+         body("instructions")
+            .customSanitizer((value) => {
+               try { return typeof value === "string" ? JSON.parse(value) : value; }
+               catch { return value; }
+            })
+            .isArray()
+            .withMessage("instructions must be an array"),
+         body("instructions.*").isString().isLength({ min: 3, max: 10000 }).withMessage("instructions must be an array of strings"),
+         body("visibility").optional().isString().isIn(["public", "private", "personal"]).withMessage("visibility must be one of the following: public, private, personal"),
+         checkExact(),
+         advancedCheckExact({
+            _id: true,
+            title: true,
+            description: true,
+            ingredients: [{foodId: true, label: true, foodDescription: true, portion: {measureId: true, measureDescription: true, amount: true}}],
+            instructions: [],
+            visibility: true
+         }, "body" )
+      ],
+      runValidation,
+      recipeController.packageIncoming
+   )
+   .post(recipeController.add)
+   .put(recipeController.update);
 
 
 

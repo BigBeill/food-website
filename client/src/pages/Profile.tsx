@@ -103,19 +103,23 @@ export default function Profile() {
          <div>
             { editMode ? (
                <ImageUploader 
-                  {...{ 
+                  {...{
                      imageBuffer, 
                      setImageBuffer, 
-                     oldImageUrl: userObject.image?.url ? `${database}${userObject.image.url}` : undefined
-                  }} 
+                     oldImageUrl: userObject.image?.url ? `${database}${userObject.image.url}` : undefined,
+                     fallbackImageUrl: "/user-image-fallback.png"
+                  }}
                />
             )
             : (
                <img
                   className='consumeSpace'
-                  src={userObject.image?.url ? `${database}${userObject.image.url}` : "/profile-photo.png"} 
+                  src={userObject.image?.url ? `${database}${userObject.image.url}` : "/user-image-fallback.png"} 
                   alt='profile picture'
-                  onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => { (error.currentTarget.src = "/profile-photo.png"); }}
+                  onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                     error.currentTarget.onerror = null; // Prevents looping
+                     error.currentTarget.src = "/user-image-fallback.png"; 
+                  }}
                />
             )}
          </div>

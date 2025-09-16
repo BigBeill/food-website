@@ -1,7 +1,9 @@
 const recipeUtils = require("../library/recipeUtils");
 const userUtils = require("../library/userUtils");
-const recipes = require("../models/recipe");
-const users = require("../models/user");
+const Recipe = require("../models/recipe");
+const User = require("../models/user");
+const path = require("path");
+const volumeUtils = require("../library/volumeUtils");
 
 // IMPORTANT: go to server/routes/recipe.router.js for a more detailed explanations
 
@@ -26,7 +28,7 @@ exports.getObject = async (req, res) => {
       recipeObject = await recipeUtils.verifyObject(recipe, true, includeNutrition);
 
       // return recipe if client is the owner or the recipe is public
-      if (recipe.visibility == "public") { return res.status(200).json({ message: "recipe object found", payload: recipeObject }); }
+      if (recipeObject.visibility == "public") { return res.status(200).json({ message: "recipe object found", payload: recipeObject }); }
    }
    catch (error) {
       console.log("\x1b[31m%s\x1b[0m", "recipe.controller.getObject failed... unable to create recipe object");
@@ -66,7 +68,7 @@ finds a list of recipes in the database that match the query parameters
 exports.find = async (req, res) => {
 
    // get query parameters from request
-   const { title, foodIdList, limit, skip, count, category = 'public', includeNutrition = false } = req.query;
+   const { title, foodIdList, limit = 6, skip = 0, count, category = 'public', includeNutrition = false } = req.query;
    const userId = req.user?._id;
 
    // make sure user is signed in if visibility is not public
@@ -103,7 +105,7 @@ exports.find = async (req, res) => {
    try {
       if (title) { query.title = { $regex: new RegExp(title, 'i') } }
       if (foodIdList) { query["ingredients.foodId"] = { $all: foodIdList }; }
-      recipeData = await recipes.find(query)
+      recipeData = await Recipe.find(query)
       .limit(limit)
       .skip(skip);
    }
@@ -118,7 +120,7 @@ exports.find = async (req, res) => {
       let payload = { recipeObjectArray };
 
       if (count) {
-         const recipeCount = await recipes.countDocuments(query);
+         const recipeCount = await Recipe.countDocuments(query);
          payload.count = recipeCount;
       }
 
@@ -150,12 +152,23 @@ exports.packageIncoming = async (req, res, next) => {
    if (!recipe.owner) { recipe.owner = req.user._id; }
 
    try {
+      // if an image was uploaded, add the image data to the recipe object
+      if (req.file) {
+         recipe.image = {
+            filename: req.file.filename,
+            url: `/uploads/recipes/${req.file.filename}`,
+            size: req.file.size,
+            mimetype: req.file.mimetype,
+            uploadedAt: new Date()
+         };
+      }
+
       if (!recipe.visibility) { recipe.visibility = "public"; }
       const recipeObject = await recipeUtils.verifyObject(recipe, false);
       req.recipeObject = recipeObject;
-      console.log("Recipe Object: ", req.recipeObject);
       next();
    }
+
    catch (error) {
       console.log("\x1b[31m%s\x1b[0m", "recipe.controller.packageIncoming failed... unable to create recipe object");
       console.error(error);
@@ -170,11 +183,11 @@ adds a new recipe to the database
 exports.add = async (req, res) => {
    try {
       // create new recipe and save to database
-      const newRecipe = await new recipes(req.recipeObject)
+      const newRecipe = await new Recipe(req.recipeObject)
       .save();
 
       // add recipe to user's ownedRecipes list in database
-      await users.updateOne({ _id: req.user._id }, { $push: { ownedRecipes: newRecipe._id } })
+      await User.updateOne({ _id: req.user._id }, { $push: { ownedRecipes: newRecipe._id } })
 
       return res.status(201).json({ message: 'new recipe created' });
    }
@@ -192,25 +205,24 @@ changes the contents of an existing recipe in the database
 */
 exports.update = async (req, res) => {
 
-   recipeId = req.body._id;
-
-   // check if recipe _id was provided
-   if (!recipeId) return res.status(400).json({ error: 'recipe _id needs to be provided' });
-
-   // grab recipe object from req and attach _id to it
    const recipeObject = req.recipeObject;
 
+   // check if recipe _id was provided
+   const recipeId = req.body._id;  
+   if (!recipeId) { return res.status(400).json({ error: 'recipe _id needs to be provided' }); }
+
    try {
-      // find recipe being updated in database
-      const recipeData = await recipes.findOne({ _id: recipeId });
-
       // make sure current user is the owner of found recipe
-      if (!recipeData.owner == req.user) { return res.status(403).json({ error: 'current user does not have write access to this recipe' }); }
+      const recipeData = await Recipe.findOne({ _id: recipeId });
+      if (!recipeData) { return res.status(404).json({ error: 'no recipe found with provided _id' }); }
+      if (recipeData.owner != req.user._id) { return res.status(403).json({ error: 'current user does not have write access to this recipe' }); }
 
-      // update recipe in database
-      await recipes.updateOne({ _id: recipeId }, { $set: recipeObject });
+      // remove old images from server if a new image was uploaded
+      if (req.file && recipeData.image) { volumeUtils.deleteVolumeFile("recipes", recipeData.image.filename); }
 
-      return res.status(201).json({ message: 'recipe saved successfully' });
+      // update recipe in database and return
+      await Recipe.updateOne({ _id: recipeId }, { $set: recipeObject });
+      return res.status(200).json({ message: 'recipe updated successfully' });
    }
 
    // handle any errors caused by the controller
@@ -228,7 +240,7 @@ exports.update = async (req, res) => {
 
 /*
 deletes a recipe from the database
-@route: DELETE /recipe/edit
+@route: DELETE /recipe/delete
 */
 exports.delete = async (req, res) => {
 
@@ -238,8 +250,9 @@ exports.delete = async (req, res) => {
    if (!userId) { return res.status(401).json({ error: "user must be signed in to delete a recipe" }); }
 
    // make sure client as access to the recipe being deleted
+   let recipe;
    try {
-      const recipe = await recipeUtils.verifyObject({ _id: recipeId }, true);
+      recipe = await recipeUtils.verifyObject({ _id: recipeId }, true);
       if (recipe.owner != userId) { return res.status(403).json({ error: "current user does not have write access to this recipe" }); }
    }
    catch (error) {
@@ -250,7 +263,10 @@ exports.delete = async (req, res) => {
 
    // delete the recipe from the database
    try {
-      await recipes.deleteOne({ _id: recipeId });
+      // remove recipe image from server
+      if (recipe.image) { volumeUtils.deleteVolumeFile("recipes", recipe.image.filename); }
+
+      await Recipe.deleteOne({ _id: recipeId });
       return res.status(200).json({ message: 'recipe deleted successfully' });
    }
    catch (error) {

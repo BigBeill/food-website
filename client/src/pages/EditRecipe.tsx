@@ -9,9 +9,12 @@ import axios from '../api/axios';
 import Notebook from '../components/Notebook'
 import { assignIds, removeIds } from '../tools/general'
 import LoadingPage from '../components/Loading';
+import ImageUploader from '../components/ImageUploader';
 
 import RecipeObject from '../interfaces/RecipeObject';
 import IngredientObject from '../interfaces/IngredientObject';
+
+const database = import.meta.env.VITE_SERVER_LOCATION;
 
 export default function NewEditRecipe () {
 
@@ -23,13 +26,14 @@ export default function NewEditRecipe () {
 	const [loadingContent, setLoadingContent] = useState<boolean>(false);
 
 	//define required useStates
-	const [recipeObject, setRecipeObject] = useState<RecipeObject>({_id: 'unsavedRecipe', title: '', description: '', image: '', ingredients: [], instructions: [], visibility: 'public'});
+	const [recipeObject, setRecipeObject] = useState<RecipeObject>({_id: 'unsavedRecipe', title: '', description: '', ingredients: [], instructions: [], visibility: 'public'});
 	function setTitle(title: string) { setRecipeObject((oldRecipe) => ({ ...oldRecipe, title })); }
 	function setDescription(description: string) { setRecipeObject((oldRecipe) => ({ ...oldRecipe, description })); }
-	function setImage(image: string) { setRecipeObject((oldRecipe) => ({ ...oldRecipe, image })); }
 	function setIngredients(ingredients: IngredientObject[]) { setRecipeObject((oldRecipe) => ({ ...oldRecipe, ingredients })); }
 	function setInstructions(instructions: string[]) { setRecipeObject((oldRecipe) => ({ ...oldRecipe, instructions })); }
 	function setVisibility(visibility: 'public' | 'private' | 'personal') { setRecipeObject((oldRecipe) => ({ ...oldRecipe, visibility })); }
+
+	const [imageBuffer, setImageBuffer] = useState<File | null>(null);
 
 	const [errorMessage, setErrorMessage] = useState<string>("");
 
@@ -48,7 +52,10 @@ export default function NewEditRecipe () {
 			})
 			.catch(console.error);
 		}
-	},[]);
+		else {
+			setRecipeObject({_id: 'unsavedRecipe', title: '', description: '', ingredients: [], instructions: [], visibility: 'public'});
+		}
+	},[recipeId]);
 
 	//function for sending recipe changes to server
 	function submitRecipe(){
@@ -63,41 +70,35 @@ export default function NewEditRecipe () {
 			setErrorMessage("your recipe must have a description"); 
 			return; 
 		}
-		if (!recipeObject.image) { 
-			setErrorMessage("your recipe must have an image"); 
-			return; 
-		}
 		if (recipeObject.ingredients.length == 0) { 
 			setErrorMessage("your recipe must have at least one ingredient");
-			return; 
+			return;
 		}
 		if (recipeObject.instructions.length == 0) { 
 			setErrorMessage("your recipe must have at least one instruction");
 			return; 
 		}
 
-		//remove recipeId if its unsaved
-		if (recipeObject._id == 'unsavedRecipe') { delete recipeObject._id }
-
 		//define what type of request is being sent to the server
 		let method: string;
 		if (!recipeId) method = 'post';
 		else method = 'put';
 
-		const requestBody = {
-			_id: recipeObject._id != 'unsavedRecipe' ? recipeObject._id : undefined,
-			title: recipeObject.title,
-			description: recipeObject.description,
-			image: recipeObject.image,
-			ingredients: recipeObject.ingredients,
-			instructions: recipeObject.instructions,
-			visibility: recipeObject.visibility
-		}
+		const formData = new FormData();
+
+		if (recipeObject._id != 'unsavedRecipe') { formData.append("_id", recipeObject._id); }
+		formData.append("title", recipeObject.title);
+		formData.append("description", recipeObject.description);
+		formData.append("ingredients", JSON.stringify(recipeObject.ingredients));
+		formData.append("instructions", JSON.stringify(recipeObject.instructions));
+		formData.append("visibility", recipeObject.visibility);
+
+		if (imageBuffer instanceof File) { formData.append("image", imageBuffer); }
 
 		//send request to the server
-		axios({ method:method, url:'recipe/edit', data: requestBody })
-		.then(() => { navigate('/'); })
-		.catch(console.error);
+		axios({ method: method, url: 'recipe/edit', data: formData })
+			.then(() => { navigate('/'); })
+			.catch(console.error);
 	}
 
 	function deleteRecipe() {
@@ -134,11 +135,12 @@ export default function NewEditRecipe () {
 				setDescription,
 			}
 		},
-		{ 
+		{
 			content: AdditionalInfoPage,
 			props: {
-				image: recipeObject.image,
-				setImage,
+				imageBuffer,
+				setImageBuffer,
+				oldImageUrl: recipeObject.image?.url ? `${database}${recipeObject.image.url}` : undefined,
 				visibility: recipeObject.visibility,
 				setVisibility
 			}
@@ -215,24 +217,21 @@ function GeneralInfoPage ({newRecipe, title, setTitle, description, setDescripti
 
 //  ------------ ADDITIONAL INFORMATION PAGE ------------
 interface AdditionalInfoPageProps {
-	image: string;
-	setImage: React.Dispatch<React.SetStateAction<string>>;
+	imageBuffer?: File;
+	setImageBuffer: React.Dispatch<React.SetStateAction<File | null>>;
+	oldImageUrl?: string;
 	visibility: 'public' | 'private' | 'personal';
 	setVisibility: React.Dispatch<React.SetStateAction<'public' | 'private' | 'personal'>>;
 }
 
-function AdditionalInfoPage ({image, setImage, visibility, setVisibility}: AdditionalInfoPageProps) {
-	const imageOptions = ['🧀', '🥞', '🍗', '🍔','🍞', '🥯', '🥐','🥨','🍗','🥓','🥩','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🥚','🍳','🥘','🥣','🥗','🍿','🧂','🥫']
+function AdditionalInfoPage ({imageBuffer, setImageBuffer, oldImageUrl, visibility, setVisibility}: AdditionalInfoPageProps) {
+	console.log("oldImageUrl:", oldImageUrl);
 	return (
 		<div className='standardContent'>
 			<h2>Additional Information</h2>
-			
-			<div className='imageInput'>
-				<label htmlFor='image'>Recipe Image</label>
-				<select id='image' value={image} onChange={(event) => setImage(event.target.value)}>
-					<option value="" disabled hidden>choose image</option>
-					{imageOptions.map((option, index) => ( <option key={index}>{option}</option> ))}
-				</select>
+
+			<div style={{ width: '12rem', height: '12rem', margin: '0rem 0rem 3rem 3rem' }}>
+				<ImageUploader {...{ imageBuffer, setImageBuffer, oldImageUrl, fallbackImageUrl: "/recipe-image-fallback.png" }} />
 			</div>
 
 			<div className='textInput center additionalMargin'>
@@ -510,7 +509,7 @@ function FinalizeChangesPage({errorMessage, submitRecipe, deleteRecipe, revertCh
 		<div className='standardContent'>
 			<h2>Finalize Recipe Changes</h2>
 			<button className="darkText additionalMargin" onClick={() => submitRecipe()}>Save recipe</button>
-			<p className={errorMessage ? "error" : "hidden"} area-live="assertive">{errorMessage}</p>
+			<p className={errorMessage ? "error" : "hidden"} aria-live="assertive">{errorMessage}</p>
 			{ revertChanges ? (
 				<div className='devisableButton additionalMargin'>
 					<button onClick={() => attemptRevertChanges()}>{!revertChangesConfirmation ? "Revert Changes" : "Confirm Revert"}</button>

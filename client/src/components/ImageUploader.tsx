@@ -9,9 +9,10 @@ interface ImageUploaderProps {
    imageBuffer?: File | null;
    setImageBuffer: (file: File | null) => void;
    oldImageUrl?: string | null;
+   fallbackImageUrl: string;
 }
 
-export default function ImageUploader({ imageBuffer, setImageBuffer, oldImageUrl }: ImageUploaderProps) {
+export default function ImageUploader({ imageBuffer, setImageBuffer, oldImageUrl, fallbackImageUrl }: ImageUploaderProps) {
    const maxFileSize = 5 * 1024 * 1024; // 5 MB
 
    const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -44,9 +45,12 @@ export default function ImageUploader({ imageBuffer, setImageBuffer, oldImageUrl
          <input 
             type="file"
             ref={fileInputRef}
-            accept="image/*"
-            aria-label="Choose profile photo"
-            onChange={(event) => { if (event.target.files?.[0]) { updateBuffer(event.target.files[0]) } }} 
+            accept="image/png, image/jpeg, image/jpg, image/webp"
+            aria-label="Choose image for user profile"
+            onChange={(event) => { 
+               const userFile = event.target.files?.[0];
+               if (userFile) { (updateBuffer(userFile)); }
+            }}
          />
 
          { previewUrl ? (
@@ -54,9 +58,12 @@ export default function ImageUploader({ imageBuffer, setImageBuffer, oldImageUrl
          ) : ( 
             <img 
                className="consumeSpace" 
-               src={oldImageUrl ? oldImageUrl : "/profile-photo.png"} 
-               alt="default profile" 
-               onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => { (error.currentTarget.src = "/profile-photo.png"); }}
+               src={oldImageUrl ? oldImageUrl : fallbackImageUrl} 
+               alt="user profile" 
+               onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                  error.currentTarget.onerror = null; // Prevents looping
+                  error.currentTarget.src = fallbackImageUrl; 
+               }}
             />
          ) }
          <FontAwesomeIcon icon={faCamera}/>

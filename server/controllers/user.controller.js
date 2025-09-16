@@ -190,8 +190,10 @@ exports.updateAccount = async (req, res) => {
    };
 
    try {
+      // check if a file has been uploaded with the request 
       if (req.file) {
 
+         // add image data to the updated user data
          updatedUserData.image = {
             filename: req.file.filename,
             url: path.join("/uploads/users", req.file.filename),
