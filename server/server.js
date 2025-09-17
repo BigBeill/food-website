@@ -14,6 +14,16 @@ verifyVolumeLayout() // ensure volume is correctly setup
 //setup server
 const app = express();
 
+// Global error handlers
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+  process.exit(1);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection:', reason);
+  process.exit(1);
+});
+
 // Helper function to serve static files with CORS and error handling
 const serveStaticWithCors = (route, relativePath, routeName) => {
    const directory = process.env.SERVER_DIRECTORY ? path.join(process.env.SERVER_DIRECTORY, relativePath) : `/${relativePath}`;
@@ -52,7 +62,7 @@ const corsOptions = {
    credentials: true
 };
 
-app.use((req, res, next) => {console.log("\n\n\n"); next();}); // split up request logs
+app.use((_req, _res, next) => {console.log("\n\n\n"); next();}); // split up request logs
 
 app.use(cors(corsOptions));
 
