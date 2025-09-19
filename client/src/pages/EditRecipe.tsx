@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
+import { useParams, useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPen } from '@fortawesome/free-solid-svg-icons';
 import { faCircleXmark } from '@fortawesome/free-regular-svg-icons';
@@ -22,6 +22,7 @@ export default function NewEditRecipe () {
 	const navigate = useNavigate();
 	const { userId } = useOutletContext<{userId: string}>();
 	const { recipeId } = useParams(); //get recipeId if in url
+	const location = useLocation();
 
 	const [loadingContent, setLoadingContent] = useState<boolean>(false);
 
@@ -40,14 +41,19 @@ export default function NewEditRecipe () {
 	//run useEffect on page start
 	useEffect (() => {
 		// make sure current user is signed in, otherwise redirect to login
-		if (!userId) { navigate('/login'); }
+		if (!userId) { 
+			navigate('/login');
+			return;
+		}
+		
+		setImageBuffer(null);
 
 		// if recipeId exists, populate the page with data from server for associated recipe
 		if (recipeId) {
 			setLoadingContent(true);
 			axios({ method:'get', url:`recipe/getObject/${recipeId}/false` })
-			.then ((returnObject) => {
-				setRecipeObject(returnObject);
+			.then ((data) => {
+				setRecipeObject(data);
 				setLoadingContent(false);
 			})
 			.catch(console.error);
@@ -55,7 +61,7 @@ export default function NewEditRecipe () {
 		else {
 			setRecipeObject({_id: 'unsavedRecipe', title: '', description: '', ingredients: [], instructions: [], visibility: 'public'});
 		}
-	},[recipeId]);
+	},[location.key]);
 
 	//function for sending recipe changes to server
 	function submitRecipe(){

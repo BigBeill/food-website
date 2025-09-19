@@ -19,10 +19,8 @@ const ALLOWED_DELETE_EXTS = new Set(['.png', '.jpg', '.jpeg', '.webp', '.bin']);
 
 // Prevent path traversal or escape
 function checkFilePathSafety(filePath) {
-   const realDirectory = fs.realpathSync.native(volumeDirectory);
-   const realFilePath = fs.realpathSync.native(filePath);
-
-   if (realFilePath.startsWith(realDirectory + path.sep)) {return true; } 
+   resolvedPath = path.resolve(filePath);
+   if (resolvedPath.startsWith(volumeDirectory + path.sep)) {return true; } 
    else { throw new Error("Path escape attempt"); }
 }
 
@@ -52,6 +50,7 @@ async function isFileClean(filePath) {
       return !isInfected;
    }
    catch (error) {
+      console.error('Antivirus scan failed:', error);
       throw new Error('isFileClean function failed:', error);
    }
 }
