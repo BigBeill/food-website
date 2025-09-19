@@ -189,13 +189,13 @@ exports.add = async (req, res) => {
       await User.updateOne({ _id: req.user._id }, { $push: { ownedRecipes: newRecipe._id } });
    }
    catch (error) {
-      if (req.file) { volumeUtils.deleteVolumeFile("recipes", req.file.filename); }
+      if (req.file) { volumeUtils.deleteVolumeFile("tmp", req.file.filename); }
       console.error("\x1b[31m%s\x1b[0m", "recipe.controller.add failed...\n" + "Error:", error);
       return res.status(500).json({ error: 'server failed to save new recipe in the database' });
    }
 
    // move image to permanent location inside the volume
-   if (req.file) { volumeUtils.moveFileToBucket("tmp", req.file.filename); }
+   if (req.file) { volumeUtils.moveFileToBucket("recipes", req.file.filename); }
 
    return res.status(201).json({ message: 'new recipe created' });
 }
@@ -225,15 +225,18 @@ exports.update = async (req, res) => {
       return res.status(500).json({ error: 'server failed to verify recipe ownership' });
    }
 
-   // remove old images from server if a new image was uploaded
-   if (req.file && oldRecipeData.image) { volumeUtils.deleteVolumeFile("recipes", oldRecipeData.image.filename); }
+   // replace old image with new image if a new image was provided
+   if (req.file) { 
+      if (oldRecipeData.image) { volumeUtils.deleteVolumeFile("recipes", oldRecipeData.image.filename); }
+      volumeUtils.moveFileToBucket("recipes", req.file.filename); 
+   }
 
    // update recipe inside the database
    try {
       await Recipe.updateOne({ _id: recipeId }, { $set: recipeObject });
    }
    catch (error) {
-      if (req.file) { volumeUtils.deleteVolumeFile("tmp", req.file.filename); }
+      if (req.file) { volumeUtils.deleteVolumeFile("recipes", req.file.filename); }
       console.log("\x1b[31m%s\x1b[0m", "recipe.controller.update failed...\n" + "Error:", error);
       return res.status(500).json({ error: 'server failed to update recipe' });
    }

@@ -238,15 +238,19 @@ function uploadVolumeFile() {
 
 // this is the second step in the upload process for images provided by the client
 // moves a file from the tmp bucket to its final bucket
-function moveFileToBucket(fileName, currentPath, bucketKey) {
+function moveFileToBucket(bucketKey, fileName) {
    if (bucketKey == "tmp") { throw new Error("Cannot move file into the temporary bucket"); }
+
+   const startingDirectory = findSubdirectory('tmp');
+   const startingPath = path.join(startingDirectory, fileName);
 
    const finalDirectory = findSubdirectory(bucketKey);
    const finalPath = path.join(finalDirectory, fileName);
 
+   checkFilePathSafety(startingPath);
    checkFilePathSafety(finalPath);
 
-   fs.renameSync(currentPath, finalPath);
+   fs.renameSync(startingPath, finalPath);
 
    return finalDirectory;
 }
