@@ -14,14 +14,14 @@ verifyVolumeLayout() // ensure volume is correctly setup
 //setup server
 const app = express();
 
-// Global error handlers
+// Process-level handlers
 process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
-  process.exit(1);
+   console.error('Uncaught Exception:', err);
+   process.exit(1);
 });
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection:', reason);
-  process.exit(1);
+   console.error('Unhandled Rejection:', reason);
+   process.exit(1);
 });
 
 // Helper function to serve static files with CORS and error handling
@@ -92,6 +92,16 @@ app.use('/user', userRouter)
 
 const errorHandler = require('./middleware/debugging/errorHandler');
 app.use(errorHandler);
+
+// global exception handler
+app.use((error, req, res, _next) => {
+   // cleanup temp upload if present
+   if (req.file?.path) safeUnlink(req.file.path);
+
+   // hide reasons like AV hits behind a generic 500
+   console.error("\x1b[31m%s\x1b[0m", "Global exception handler called...\n" + "Error:", error);
+   res.status(500).json({ error: 'Internal server error' });
+});
 
 //listen to port
 const PORT = process.env.PORT || 4000

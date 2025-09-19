@@ -2,71 +2,119 @@ const fs = require('fs');
 const multer = require('multer');
 const NodeClam = require('clamscan');
 const path = require('path');
+const crypto = require('crypto');
 require('dotenv').config();
 
 const volumeDirectory = process.env.SERVER_DIRECTORY ? path.join(process.env.SERVER_DIRECTORY, 'mnt/volume') : '/mnt/volume';
 
+// Define the storage buckets
 const buckets = Object.freeze({
-  users: "uploads/users",
-  recipes: "uploads/recipes",
+   tmp: "uploads/.tmp",
+   users: "uploads/users",
+   recipes: "uploads/recipes",
 });
 
-let _avInit;
+// Allowed file extensions for deletion
+const ALLOWED_DELETE_EXTS = new Set(['.png', '.jpg', '.jpeg', '.webp', '.bin']);
+
+// Prevent path traversal or escape
+function checkFilePathSafety(filePath) {
+   const realDirectory = fs.realpathSync.native(volumeDirectory);
+   const realFilePath = fs.realpathSync.native(filePath);
+
+   if (realFilePath.startsWith(realDirectory + path.sep)) {return true; } 
+   else { throw new Error("Path escape attempt"); }
+}
+
+let avInit;
 async function getAV() {
-   if (!_avInit) {
-      _avInit = new NodeClam().init({
+   if (!avInit) {
+      avInit = new NodeClam().init({
          removeInfected: false,
          quarantineInfected: false,
          clamdscan: {
-         // Prefer a UNIX socket if you provide one; else host/port.
-         socket: process.env.CLAMD_SOCKET || false,
-         host: process.env.CLAMAV_HOST || 'clamav',              // e.g. your Railway service name
-         port: +(process.env.CLAMAV_PORT || 3310),
-         timeout: 120000
+            socket: process.env.CLAMD_SOCKET || false,
+            host: process.env.CLAMAV_HOST || 'clamav',
+            port: +(process.env.CLAMAV_PORT || 3310),
+            timeout: 120000
          },
          clamscan: { path: process.env.CLAMSCAN_PATH || '/usr/bin/clamscan' }, // fallback
          preference: 'clamdscan'
       });
    }
-   return _avInit;
+   return avInit;
 }
 
 async function isFileClean(filePath) {
    try {
       const av = await getAV();
-      const { isInfected/*, viruses*/ } = await av.isInfected(filePath);
+      const { isInfected } = await av.isInfected(filePath);
       return !isInfected;
    }
    catch (error) {
-      console.error('Antivirus scan failed:', error);
-      throw new Error('isFileClean function failed');
+      throw new Error('isFileClean function failed:', error);
    }
 }
 
-const TMP_REL = 'uploads/.tmp';
-
-function ensureTempDir() {
-   const base = path.resolve(volumeDirectory);
-   const tmpAbs = path.resolve(base, TMP_REL);
-
-   // create (race-safe)
-   fs.mkdirSync(tmpAbs, { recursive: true, mode: 0o755 });
-
-   const st = fs.lstatSync(tmpAbs);
-   if (st.isSymbolicLink()) throw new Error(`Temp dir must not be symlink: ${tmpAbs}`);
-   if (!st.isDirectory()) throw new Error(`Temp path is not dir: ${tmpAbs}`);
-
-   const realBase = fs.realpathSync.native(base);
-   const realTmp  = fs.realpathSync.native(tmpAbs);
-   if (!realTmp.startsWith(realBase + path.sep) && realTmp !== realBase) {
-      throw new Error('Temp dir escapes volume root');
-   }
-
-   fs.accessSync(realTmp, fs.constants.W_OK);
-   return realTmp;
+function fileFilter(_req, file, cb) {
+   if (/^image\/(png|jpe?g|webp)$/.test(file.mimetype)) { cb(null, true); }
+   else { cb(new Error("Only image uploads are allowed")); }
 }
 
-// Verify volume layout at startup
+function storage(destination) {
+   return multer.diskStorage({
+      destination: (_req, _file, cb) => {
+         try {
+            if (!fs.existsSync(destination)) { return cb(new Error("Upload folder not found")); }
+
+            const status = fs.lstatSync(destination);
+            if (!status.isDirectory()) { return cb(new Error("Upload folder is not a directory")); }
+            if (status.isSymbolicLink()) { return cb(new Error("Upload folder must not be a symlink")); }
+
+            const base = path.resolve(volumeDirectory);
+            const realBase = fs.realpathSync.native(base);
+            const realDestination = fs.realpathSync.native(destination);
+            if (!realDestination.startsWith(realBase + path.sep) && realDestination !== realBase) { return cb(new Error("Upload directory escapes volume root")); }
+
+            fs.accessSync(realDestination, fs.constants.W_OK);
+            cb(null, realDestination);
+         }
+         catch (error) { 
+            cb(error); 
+         }
+      },
+      filename: (_req, file, cb) => {
+         const ext = (path.extname(file.originalname || "") || "").toLowerCase();
+         const allowed = new Set([".png", ".jpg", ".jpeg", ".webp"]);
+         const safeExt = allowed.has(ext) ? ext : ".bin";
+         cb(null, `${crypto.randomUUID()}-${Date.now()}${safeExt}`);
+      },
+   });
+}
+
+function isSafeBasename(name) {
+   if (typeof name !== "string" || name.length === 0 || name.length > 255) { return false; }
+   // Make sure there are no path separators (/, \) or other path-related issues
+   if (path.basename(name) !== name) { return false; }
+   // Make sure there are no suspicious patterns
+   if (name.includes("..") || !/^[A-Za-z0-9._-]+$/.test(name)) { return false; }
+   // Ensure the file has an allowed extension
+   if (!ALLOWED_DELETE_EXTS.has(path.extname(name).toLowerCase())) { return false; }
+   return true;
+}
+
+// find the absolute path for a bucket key, ensuring it's valid
+function findSubdirectory(bucketKey) {
+   const subdirectory = buckets[bucketKey];
+   if (!subdirectory) { throw new Error(`Invalid bucket: ${bucketKey}`); }
+   const basePath = path.resolve(volumeDirectory);
+   const absolutePath = path.resolve(basePath, subdirectory);
+
+   if (!absolutePath.startsWith(basePath + path.sep) && absolutePath !== basePath) { throw new Error("Invalid upload folder."); }
+   return absolutePath;
+}
+
+// this function should be called on startup to ensure the volume and buckets are correctly setup
 function verifyVolumeLayout() {
 
    // Ensure the volume root exists and is a directory
@@ -115,143 +163,102 @@ function verifyVolumeLayout() {
       try { fs.accessSync(bucketDirectory, fs.constants.W_OK); } 
       catch { throw new Error(`Bucket "${key}" not writable: ${bucketDirectory}`); }
    }
-
-   ensureTempDir();
 }
 
-// find the absolute path for a bucket key, ensuring it's valid
-function findSubdirectory(bucketKey) {
-   const subdirectory = buckets[bucketKey];
-   if (!subdirectory) { throw new Error(`Invalid bucket: ${bucketKey}`); }
-   const basePath = path.resolve(volumeDirectory);
-   const absolutePath = path.resolve(basePath, subdirectory);
+// this is the first step in the upload process for images provided by the client
+// saves the file to the tmp location and scans it for viruses
+// IMPORTANT: to avoid memory leaks in between garbage collection, any route that uses this middleware should delete the file from tmp if the request fails later in the chain
+// use { if (req.file) { volumeUtils.deleteVolumeFile("tmp", req.file.filename) } } to delete the file
+function uploadVolumeFile() {
 
-   if (!absolutePath.startsWith(basePath + path.sep) && absolutePath !== basePath) { throw new Error("Invalid upload folder."); }
-   return absolutePath;
-}
+   const temporaryDirectory = findSubdirectory('tmp');
 
-function fileFilter(_req, file, cb) {
-   if (/^image\/(png|jpe?g|webp)$/.test(file.mimetype)) { cb(null, true); }
-   else { cb(new Error("Only image uploads are allowed")); }
-}
-
-function storage(destination) {
-   return multer.diskStorage({
-      destination: (_req, _file, cb) => {
-         try {
-            if (!fs.existsSync(destination)) { return cb(new Error("Upload folder not found")); }
-
-            const status = fs.lstatSync(destination);
-            if (!status.isDirectory()) { return cb(new Error("Upload folder is not a directory")); }
-            if (status.isSymbolicLink()) { return cb(new Error("Upload folder must not be a symlink")); }
-
-            const base = path.resolve(volumeDirectory);
-            const realBase = fs.realpathSync.native(base);
-            const realDestination = fs.realpathSync.native(destination);
-            if (!realDestination.startsWith(realBase + path.sep) && realDestination !== realBase) { return cb(new Error("Upload directory escapes volume root")); }
-
-            fs.accessSync(realDestination, fs.constants.W_OK);
-            cb(null, realDestination);
-         }
-         catch (error) { 
-            cb(error); 
-         }
-      },
-      filename: (req, file, cb) => {
-         const ext = (path.extname(file.originalname || "") || "").toLowerCase();
-         const allowed = new Set([".png", ".jpg", ".jpeg", ".webp"]);
-         const safeExt = allowed.has(ext) ? ext : ".bin";
-         const userId = (req.user && (req.user._id || req.user.id)) || "anon";
-         cb(null, `${userId}-${Date.now()}${safeExt}`);
-      },
-   });
-}
-
-function uploadVolumeFile(bucketKey) {
-   const temporaryDirectory = ensureTempDir();
    const toTemp = multer({
       storage: storage(temporaryDirectory),
       fileFilter,
       limits: { fileSize: 5 * 1024 * 1024, files: 1 },
    }).single('image');
 
-   // 2) after write, scan -> move or delete
-   return [
-      // function for handling the upload and scanning
-      (req, res, next) => {
+   function moveFileToTemp(req, res, next) {
 
-         // only users are allowed to upload files
-         if (!req.user) { return res.status(401).json({ error: "No user authenticated" }); }
+      toTemp(req, res, async (multerError) => {
+         if (multerError) { return next(multerError); }
 
-         toTemp(req, res, async (error) => {
-            if (error) { return next(error); }
-            try {
-               if (!req.file?.path || !req.file?.filename) {
-                  return next(); // no file uploaded, nothing to do
-               }
+         // check if file was provided for upload
+         if (!req.file?.path || !req.file?.filename) { return next(); }
 
-               const clean = await isFileClean(req.file.path);
-               if (!clean) {
-                  console.warn('Upload blocked: antivirus detected malware');
-                  // infected: delete from temp and block
-                  try { fs.unlinkSync(req.file.path); } 
-                  catch { console.error('Server failed to delete infected temp file'); }
-                  return next(new Error('Upload blocked by antivirus'));
-               }
-
-               // clean: move into final bucket (atomic rename within same volume)
-               const finalDirectory = findSubdirectory(bucketKey);
-               const finalPath = path.join(finalDirectory, req.file.filename);
-               fs.renameSync(req.file.path, finalPath);
-
-               // update req.file so downstream code still works
-               req.file.destination = finalDirectory;
-               req.file.path = finalPath;
-
-               return next();
-            } 
-            catch (error) {
-               // on any error, try to clean up temp file if it exists
-               try { if (req.file?.path && fs.existsSync(req.file.path)) { fs.unlinkSync(req.file.path); } }
-               catch (error) { console.error('Temp cleanup failed:', error); }
-               return next(error);
-            }
-         });
-      },
-      // error handler for multer issues
-      (error, _req, res, _next) => {
-         console.error('File upload error:', error);
-         if (error instanceof multer.MulterError) {
-            if (error.code === 'LIMIT_FILE_SIZE') { return res.status(400).json({ error: 'File too large' }); }
-            if (error.code === 'LIMIT_FILE_COUNT') { return res.status(400).json({ error: 'Too many files' }); }
-            return res.status(500).json({ error: 'Issue uploading file' });
+         // ensure user is authenticated
+         if (!req.user) {
+            try { fs.unlinkSync(req.file.path); }
+            catch(error) { console.error('Server failed to delete temp file from unauthenticated user:', error); }
+            return res.status(401).json({ error: "Unauthenticated users cannot upload files" }); 
          }
+
+         try {
+            const clean = await isFileClean(req.file.path);
+            if (!clean) {
+               console.warn('Upload blocked: antivirus detected malware');
+               // infected: delete from temp and block
+               try { fs.unlinkSync(req.file.path); } 
+               catch(error) { console.error('Server failed to delete infected temp file:', error); }
+               return res.status(500).json({ error: "Internal server error" }); // generic error to avoid info leak
+            }
+
+            req.file.directory = temporaryDirectory;
+            req.file.fileName = req.file.filename;
+
+            return next();
+         } 
+         catch (error) {
+            // on any error, try to clean up temp file if it exists
+            try { if (req.file?.path && fs.existsSync(req.file.path)) { fs.unlinkSync(req.file.path); } }
+            catch (error) { console.error('Temp cleanup failed:', error); }
+            return next(error);
+         }
+      });
+   }
+
+   // error handler for multer issues
+   function uploadErrorHandler(error, _req, res, next) {
+      console.error('File upload error:', error);
+      
+      if (error instanceof multer.MulterError) {
+         if (error.code === 'LIMIT_FILE_SIZE') { return res.status(400).json({ error: 'File too large' }); }
+         if (error.code === 'LIMIT_FILE_COUNT') { return res.status(400).json({ error: 'Too many files' }); }
+         return res.status(500).json({ error: 'File upload failed' });
       }
+      if (error) return res.status(500).json({ error: 'File upload failed' });
+      return next();
+   }
+
+   return [
+      moveFileToTemp,
+      uploadErrorHandler
    ];
 }
 
-// Allowed file extensions for deletion
-const ALLOWED_DELETE_EXTS = new Set(['.png', '.jpg', '.jpeg', '.webp', '.bin']);
+// this is the second step in the upload process for images provided by the client
+// moves a file from the tmp bucket to its final bucket
+function moveFileToBucket(fileName, currentPath, bucketKey) {
+   if (bucketKey == "tmp") { throw new Error("Cannot move file into the temporary bucket"); }
 
-function isSafeBasename(name) {
-   if (typeof name !== "string" || name.length === 0 || name.length > 255) { return false; }
-   // Make sure there are no path separators (/, \) or other path-related issues
-   if (path.basename(name) !== name) { return false; }
-   // Make sure there are no suspicious patterns
-   if (name.includes("..") || !/^[A-Za-z0-9._-]+$/.test(name)) { return false; }
-   // Ensure the file has an allowed extension
-   if (!ALLOWED_DELETE_EXTS.has(path.extname(name).toLowerCase())) { return false; }
-   return true;
+   const finalDirectory = findSubdirectory(bucketKey);
+   const finalPath = path.join(finalDirectory, fileName);
+
+   checkFilePathSafety(finalPath);
+
+   fs.renameSync(currentPath, finalPath);
+
+   return finalDirectory;
 }
 
-function deleteVolumeFile(bucketKey, filename) {
+function deleteVolumeFile( bucketKey, filename) {
    if (!isSafeBasename(filename)) { throw new Error("Unsafe filename for deletion"); }
 
    const directory = findSubdirectory(bucketKey);
    const filePath = path.join(directory, filename);
 
-   // Prevent path traversal or escape
-   if (!filePath.startsWith(directory + path.sep)) { throw new Error("Path escape attempt"); }
+   checkFilePathSafety(filePath);
 
    // attempt to delete the file if it exists
    try {
@@ -269,5 +276,6 @@ function deleteVolumeFile(bucketKey, filename) {
 module.exports = {
    verifyVolumeLayout,
    uploadVolumeFile,
+   moveFileToBucket,
    deleteVolumeFile
 }

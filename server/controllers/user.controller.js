@@ -163,15 +163,14 @@ updates the information inside database for the signed in user
 */
 exports.updateAccount = async (req, res) => {
    if (!req.user) { return res.status(401).json({ error: "user not signed in" }); }
-
    const { username, email, bio } = req.body;
 
    // check for any missing fields in the request
    if (!username) return res.status(400).json({error: 'missing username filed provided in body'});
    if (!email) return res.status(400).json({error: 'missing email field provided in body'});
 
+   //make sure username or email isn't already taken
    try{
-      //make sure username or email isn't already taken
       const foundUsername = await User.findOne({ username: new RegExp(`^${username}$`, 'i') });
       if (foundUsername && foundUsername._id != req.user._id) { return res.status(400).json({ error: "username already taken" }); }
       const foundEmail = await User.findOne({ email: new RegExp(`^${email}$`, 'i') }) 
@@ -179,52 +178,51 @@ exports.updateAccount = async (req, res) => {
    }
    // handle any errors caused by checking for already existing data
    catch(error){
+      if (req.file) { volumeUtils.deleteVolumeFile("users", req.file?.filename); }
       console.error(error);
       return res.status(500).json({ error: "server failed to update user account" });
    }
 
-   let updatedUserData = {
+   // create json object for the updated user
+   const updatedUserData = {
       username: username,
       email: email,
-      bio: bio || ""
+      bio: bio || "",
+      image: req.file ? {
+         filename: req.file.filename,
+         url: path.join("/uploads/users", req.file.filename),
+         size: req.file.size,
+         mimetype: req.file.mimetype,
+         uploadedAt: new Date()
+      } : undefined
    };
 
-   try {
-      // check if a file has been uploaded with the request 
-      if (req.file) {
-
-         // add image data to the updated user data
-         updatedUserData.image = {
-            filename: req.file.filename,
-            url: path.join("/uploads/users", req.file.filename),
-            size: req.file.size,
-            mimetype: req.file.mimetype,
-            uploadedAt: new Date()
-         }
-
-         // delete the old image file from the server if it exists
+   // replace the old profile photo if a new one was uploaded
+   if (req.file) {
+      try {
          const existingImage = await User.findOne({ _id: req.user._id }, { image: 1 });
-         if (existingImage && existingImage.image) {
-            volumeUtils.deleteVolumeFile("users", existingImage.image.filename);
-         }
+         if (existingImage && existingImage.image) { volumeUtils.deleteVolumeFile("users", existingImage.image.filename); }
+         volumeUtils.moveFileToBucket("users", req.file.filename);
+      }
+      catch(error) {
+         if (req.file) { volumeUtils.deleteVolumeFile("users", req.file?.filename); }
+         console.error(error);
+         return res.status(500).json({ error: "server failed to handle replacing profile photo" });
       }
    }
-   catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "server failed to handle replacing profile photo" });
-   }
 
+   // update the user data inside the database
    try {
-      // update new user data inside the database
       const updatedUserObject = await userUtils.verifyObject(updatedUserData, false);
       await User.updateOne({ _id: req.user._id }, { $set: updatedUserObject });
-
-      return res.status(200).json({ message: "user account updated successfully" });
    }
    catch (error) {
+      if (req.file) { volumeUtils.deleteVolumeFile("users", req.file?.filename); }
       console.error(error);
       return res.status(500).json({ error: "server failed to update user account" });
    }
+
+   return res.status(200).json({ message: "user account updated successfully" });
 }
 
 

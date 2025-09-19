@@ -125,7 +125,7 @@ Returns:
 
 router.route('/edit')
    .all(
-      uploadVolumeFile("recipes"),
+      uploadVolumeFile(),
       [
          body("_id").optional().isString().isLength({ min: 24, max: 24 }).withMessage("_id must be a string of 24 characters"),
          body("title").isString().isLength({ min: 3, max: 900 }).withMessage("Your recipe must contain a title between 1 and 900 characters long"),

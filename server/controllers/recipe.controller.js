@@ -148,32 +148,32 @@ exports.packageIncoming = async (req, res, next) => {
    // make sure user is signed in
    if (!req.user) { return res.status(401).json({ error: 'user not signed in' }); }
 
-   let recipe = req.body;
-   if (!recipe.owner) { recipe.owner = req.user._id; }
+   const recipeData = {
+      ...req.body,
+      image: req.file ? {
+         filename: req.file.filename,
+         url: `/uploads/recipes/${req.file.filename}`,
+         size: req.file.size,
+         mimetype: req.file.mimetype,
+         uploadedAt: new Date()
+      } : undefined
+   }
+
+   // if no owner exists, set the owner to the current user
+   if (!recipeData.owner) { recipeData.owner = req.user._id; }
+   // if no visibility exists, set the visibility to public
+   if (!recipeData.visibility) { recipeData.visibility = "public"; }
 
    try {
-      // if an image was uploaded, add the image data to the recipe object
-      if (req.file) {
-         recipe.image = {
-            filename: req.file.filename,
-            url: `/uploads/recipes/${req.file.filename}`,
-            size: req.file.size,
-            mimetype: req.file.mimetype,
-            uploadedAt: new Date()
-         };
-      }
-
-      if (!recipe.visibility) { recipe.visibility = "public"; }
-      const recipeObject = await recipeUtils.verifyObject(recipe, false);
-      req.recipeObject = recipeObject;
-      next();
+      req.recipeObject = await recipeUtils.verifyObject(recipeData, false);  
    }
-
    catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "recipe.controller.packageIncoming failed... unable to create recipe object");
-      console.error(error);
+      if (req.file) { volumeUtils.deleteVolumeFile("tmp", req.file.filename); }
+      console.error("\x1b[31m%s\x1b[0m", "recipe.controller.packageIncoming failed...\n" + "Error:", error);
       return res.status(500).json({ error: 'server failed to convert provided data into a recipe object' })
    }
+
+   next();
 }
 
 /*
@@ -181,22 +181,23 @@ adds a new recipe to the database
 @route: POST /recipe/edit
 */
 exports.add = async (req, res) => {
+
+   // add recipe object to database and set current user as the owner
    try {
-      // create new recipe and save to database
       const newRecipe = await new Recipe(req.recipeObject)
-      .save();
-
-      // add recipe to user's ownedRecipes list in database
-      await User.updateOne({ _id: req.user._id }, { $push: { ownedRecipes: newRecipe._id } })
-
-      return res.status(201).json({ message: 'new recipe created' });
+         .save();
+      await User.updateOne({ _id: req.user._id }, { $push: { ownedRecipes: newRecipe._id } });
    }
-   // handle any errors caused by the controller
    catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "recipe.controller.add failed... unable to save recipeObject to database");
-      console.error(error);
+      if (req.file) { volumeUtils.deleteVolumeFile("recipes", req.file.filename); }
+      console.error("\x1b[31m%s\x1b[0m", "recipe.controller.add failed...\n" + "Error:", error);
       return res.status(500).json({ error: 'server failed to save new recipe in the database' });
    }
+
+   // move image to permanent location inside the volume
+   if (req.file) { volumeUtils.moveFileToBucket("tmp", req.file.filename); }
+
+   return res.status(201).json({ message: 'new recipe created' });
 }
 
 /*
@@ -209,28 +210,35 @@ exports.update = async (req, res) => {
 
    // check if recipe _id was provided
    const recipeId = req.body._id;  
-   if (!recipeId) { return res.status(400).json({ error: 'recipe _id needs to be provided' }); }
+   if (!recipeId) { return res.status(400).json({ error: 'recipe _id must be provided to update a recipe' }); }
 
+   let oldRecipeData;
+   // make sure current user is the owner of the recipe being updated
    try {
-      // make sure current user is the owner of found recipe
-      const recipeData = await Recipe.findOne({ _id: recipeId });
-      if (!recipeData) { return res.status(404).json({ error: 'no recipe found with provided _id' }); }
-      if (recipeData.owner != req.user._id) { return res.status(403).json({ error: 'current user does not have write access to this recipe' }); }
-
-      // remove old images from server if a new image was uploaded
-      if (req.file && recipeData.image) { volumeUtils.deleteVolumeFile("recipes", recipeData.image.filename); }
-
-      // update recipe in database and return
-      await Recipe.updateOne({ _id: recipeId }, { $set: recipeObject });
-      return res.status(200).json({ message: 'recipe updated successfully' });
+      oldRecipeData = await Recipe.findOne({ _id: recipeId }, { owner: 1, image: 1 });
+      if (!oldRecipeData) { return res.status(404).json({ error: 'no recipe found with provided _id' }); }
+      if (oldRecipeData.owner != req.user._id) { return res.status(403).json({ error: 'current user does not have write access to this recipe' }); }
+   }
+   catch (error) {
+      if (req.file) { volumeUtils.deleteVolumeFile("tmp", req.file.filename); }
+      console.log("\x1b[31m%s\x1b[0m", "recipe.controller.update failed...\n" + "Error:", error);
+      return res.status(500).json({ error: 'server failed to verify recipe ownership' });
    }
 
-   // handle any errors caused by the controller
+   // remove old images from server if a new image was uploaded
+   if (req.file && oldRecipeData.image) { volumeUtils.deleteVolumeFile("recipes", oldRecipeData.image.filename); }
+
+   // update recipe inside the database
+   try {
+      await Recipe.updateOne({ _id: recipeId }, { $set: recipeObject });
+   }
    catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "recipe.controller.update failed... unable to save recipeObject to database");
-      console.error(error);
+      if (req.file) { volumeUtils.deleteVolumeFile("tmp", req.file.filename); }
+      console.log("\x1b[31m%s\x1b[0m", "recipe.controller.update failed...\n" + "Error:", error);
       return res.status(500).json({ error: 'server failed to update recipe' });
    }
+
+   return res.status(200).json({ message: 'recipe updated successfully' });
 }
 
 
