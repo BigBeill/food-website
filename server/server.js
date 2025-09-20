@@ -96,7 +96,7 @@ app.use(errorHandler);
 // global exception handler
 app.use((error, req, res, _next) => {
    // cleanup temp upload if present
-   if (req.file?.path) safeUnlink(req.file.path);
+   if (req.file) { volumeUtils.deleteVolumeFile('tmp', req.file.filename) }
 
    // hide reasons like AV hits behind a generic 500
    console.error("\x1b[31m%s\x1b[0m", "Global exception handler called...\n" + "Error:", error);

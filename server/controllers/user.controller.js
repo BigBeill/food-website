@@ -185,12 +185,12 @@ exports.updateAccount = async (req, res) => {
 
    // create json object for the updated user
    const updatedUserData = {
-      username: username,
-      email: email,
+      username,
+      email,
       bio: bio || "",
       image: req.file ? {
          filename: req.file.filename,
-         url: path.join("/uploads/users", req.file.filename),
+         url: `/uploads/users/${req.file.filename}`,
          size: req.file.size,
          mimetype: req.file.mimetype,
          uploadedAt: new Date()
@@ -214,7 +214,8 @@ exports.updateAccount = async (req, res) => {
    // update the user data inside the database
    try {
       const updatedUserObject = await userUtils.verifyObject(updatedUserData, false);
-      await User.updateOne({ _id: req.user._id }, { $set: updatedUserObject });
+      const { matchedCount } = await User.updateOne({ _id: req.user._id }, { $set: updatedUserObject });
+      if (!matchedCount) { return res.status(404).json({ error: "user not found in database" }); }
    }
    catch (error) {
       if (req.file) { volumeUtils.deleteVolumeFile("users", req.file?.filename); }

@@ -48,7 +48,7 @@ export const routes = [
       requireUser: true
    },
    {
-      path: '/searchRecipes/:category', // category can be 'public', 'friends', or 'personals'
+      path: '/searchRecipes/:category', // category can be 'public', 'friends', or 'personal'
       element: withSuspense(SearchRecipes),
       requireUser: false
    },
@@ -68,7 +68,7 @@ export const routes = [
       requireUser: false
    },
    {
-      path: 'searchUser/:category/:folderId?', // category can be 'friends', 'requests', or 'all'
+      path: '/searchUser/:category/:folderId?', // category can be 'friends', 'requests', or 'all'
       element: withSuspense(SearchUser),
       requireUser: false
    },

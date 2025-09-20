@@ -217,7 +217,7 @@ exports.update = async (req, res) => {
    try {
       oldRecipeData = await Recipe.findOne({ _id: recipeId }, { owner: 1, image: 1 });
       if (!oldRecipeData) { return res.status(404).json({ error: 'no recipe found with provided _id' }); }
-      if (oldRecipeData.owner != req.user._id) { return res.status(403).json({ error: 'current user does not have write access to this recipe' }); }
+      if (oldRecipeData.owner !== req.user._id) { return res.status(403).json({ error: 'current user does not have write access to this recipe' }); }
    }
    catch (error) {
       if (req.file) { volumeUtils.deleteVolumeFile("tmp", req.file.filename); }
@@ -228,12 +228,13 @@ exports.update = async (req, res) => {
    // replace old image with new image if a new image was provided
    if (req.file) { 
       if (oldRecipeData.image) { volumeUtils.deleteVolumeFile("recipes", oldRecipeData.image.filename); }
-      volumeUtils.moveFileToBucket("recipes", req.file.filename); 
+      volumeUtils.moveFileToBucket("recipes", req.file.filename);
    }
 
    // update recipe inside the database
    try {
-      await Recipe.updateOne({ _id: recipeId }, { $set: recipeObject });
+      const { matchedCount } = await Recipe.updateOne({ _id: recipeId }, { $set: recipeObject });
+      if (!matchedCount) { return res.status(404).json({ error: "recipe not found in database" }); }
    }
    catch (error) {
       if (req.file) { volumeUtils.deleteVolumeFile("recipes", req.file.filename); }

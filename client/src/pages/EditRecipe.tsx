@@ -56,7 +56,11 @@ export default function NewEditRecipe () {
 				setRecipeObject(data);
 				setLoadingContent(false);
 			})
-			.catch(console.error);
+			.catch((error) => {
+				console.error(error);
+				setLoadingContent(false);
+				setErrorMessage('Failed to load recipe');
+			});
 		}
 		else {
 			setRecipeObject({_id: 'unsavedRecipe', title: '', description: '', ingredients: [], instructions: [], visibility: 'public'});
@@ -231,7 +235,6 @@ interface AdditionalInfoPageProps {
 }
 
 function AdditionalInfoPage ({imageBuffer, setImageBuffer, oldImageUrl, visibility, setVisibility}: AdditionalInfoPageProps) {
-	console.log("oldImageUrl:", oldImageUrl);
 	return (
 		<div className='standardContent'>
 			<h2>Additional Information</h2>
@@ -308,7 +311,13 @@ function IngredientPage ({ingredients, setIngredients}: IngredientPageProps) {
 	}
 
 	function addIngredient () {
-		if (!newIngredient.foodId || !newIngredient.portion?.measureDescription || !newIngredient.portion?.measureDescription) { return }
+		if (
+			!newIngredient.foodId || 
+			!newIngredient.portion?.measureDescription || 
+			!newIngredient.portion?.amount == null
+		) { 
+			return;
+		}
 
 		// add new ingredient to ingredientList
 		setIngredientList([

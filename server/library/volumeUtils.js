@@ -19,7 +19,7 @@ const ALLOWED_DELETE_EXTS = new Set(['.png', '.jpg', '.jpeg', '.webp', '.bin']);
 
 // Prevent path traversal or escape
 function checkFilePathSafety(filePath) {
-   resolvedPath = path.resolve(filePath);
+   const resolvedPath = path.resolve(filePath);
    if (resolvedPath.startsWith(volumeDirectory + path.sep)) {return true; } 
    else { throw new Error("Path escape attempt"); }
 }
@@ -240,6 +240,7 @@ function uploadVolumeFile() {
 // moves a file from the tmp bucket to its final bucket
 function moveFileToBucket(bucketKey, fileName) {
    if (bucketKey == "tmp") { throw new Error("Cannot move file into the temporary bucket"); }
+   if (!isSafeBasename(fileName)) { throw new Error("Unsafe filename for moving"); }
 
    const startingDirectory = findSubdirectory('tmp');
    const startingPath = path.join(startingDirectory, fileName);
@@ -252,7 +253,7 @@ function moveFileToBucket(bucketKey, fileName) {
 
    fs.renameSync(startingPath, finalPath);
 
-   return finalDirectory;
+   return finalPath;
 }
 
 function deleteVolumeFile( bucketKey, filename) {
