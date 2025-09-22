@@ -4,10 +4,10 @@ import { createPortal } from "react-dom";
 interface PopupProps {
    Child: React.ComponentType<any>;
    childProps?: { [key: string]: any; }
-   closePopup: (show: boolean) => void;
+   exitPopup: () => void;
 }
 
-export default function Popup({Child, childProps, closePopup}: PopupProps) {
+export default function Popup({Child, childProps, exitPopup}: PopupProps) {
    const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
 
    useEffect(() => {
@@ -17,14 +17,16 @@ export default function Popup({Child, childProps, closePopup}: PopupProps) {
    if (!portalRoot) { return null;}
 
    return createPortal(
-      <div className="displayPopup fadeIn">
-         <div className="popupContent slideUp">
-            <div className="splitSpace">
-               <button className="closePopup" onClick={() => {closePopup(false)}}>&larr; Return</button>
-               <div></div>
-            </div>
+      <div 
+         className="displayPopup fadeIn"
+         onClick={() => { exitPopup() } }
+      >
+         <div
+            className="popupContent slideUp"
+            onClick={(event: React.MouseEvent) => { event.stopPropagation(); }}
+         >
             <Child {...childProps} />
-         </div>
+            </div>
       </div>,
       portalRoot
    );

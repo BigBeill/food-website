@@ -78,24 +78,33 @@
    box-sizing: border-box;
    width: 100vw;
    height: 100vh;
-   padding: 0rem 6rem;
+   padding: 0rem 3rem;
    background-color: rgba(0, 0, 0, 0.5);
    z-index: 10;
    overflow-y: scroll;
 
+   &:hover {
+      cursor: pointer;
+   }
+
    .popupContent {
-      position: relative;
       margin: 1.2rem auto;
-      box-sizing: border-box;
-      width: 100%;
-      max-width: 45rem;
-      padding: 0.3rem 1.2rem;
-      background-color: var(--background-color);
-      border-radius: 0.15rem;
+      width: fit-content;
+      display: block;
       box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-      display: flex;
       flex-direction: column;
+      overflow-x: hidden;
       overflow-y: auto;
+      border: 1px solid black;
+
+      > * {
+         margin: 0rem !important;
+         width: 100% !important;
+      }
+
+      &:hover {
+         cursor: default;
+      }
 
       .closeButton {
          font-weight: bold;
