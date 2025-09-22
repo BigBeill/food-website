@@ -40,10 +40,15 @@ function GrowingText({ text, parentDiv }: GrowingTextProps) {
          textRef.current.style.fontSize = `${fontSize}rem`;
          while (textRef.current.scrollHeight < parentDiv.current.scrollHeight) {
             fontSize += 0.1;
+            if (fontSize > 64) { 
+               console.warn("Growing Text component hit its maximum font size of 64rem, text may be overflowing parent div");
+               break; 
+            } // maximum font size, should never realistically hit this
             textRef.current.style.fontSize = `${fontSize}rem`;
          }
          while( textRef.current.scrollHeight > textRef.current.offsetHeight || textRef.current.scrollWidth > textRef.current.offsetWidth) {
             fontSize -= 0.1;
+            if (fontSize < 1.2) { break; } // minimum font size
             textRef.current.style.fontSize = `${fontSize}rem`;
          }
       }
