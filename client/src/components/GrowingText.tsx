@@ -56,9 +56,9 @@ function GrowingText({ text, parentDiv }: GrowingTextProps) {
    }, [text, parentDiv]);
 
    return (
-      <h4 className="growingText" ref={textRef}>
+      <h2 className="growingText" ref={textRef}>
          {text}
-      </h4>
+      </h2>
    );
 }
 
