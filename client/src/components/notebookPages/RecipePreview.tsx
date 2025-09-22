@@ -26,7 +26,7 @@ export default function RecipePreview({ recipe }: RecipePreviewProps) {
       setShowRecipe(true);
    }
 
-   function exitPopup() {
+   function closePopup() {
       window.history.pushState({}, '', baseUrl);
       setShowRecipe(false);
    }
@@ -83,7 +83,7 @@ export default function RecipePreview({ recipe }: RecipePreviewProps) {
       </div>
       
       {showRecipe && (
-         <Popup Child={Recipe} childProps={{recipe: recipe}} exitPopup={exitPopup} />
+         <Popup Child={Recipe} childProps={{recipe: recipe}} closePopup={closePopup} />
       )}
 
       </>
