@@ -26,13 +26,13 @@ function MyComponent() {
 */
 
 interface GrowingTextProps {
-text: string;
-parentDiv: React.RefObject<HTMLDivElement> | React.RefObject<null>;
+   text: string;
+   parentDiv: React.RefObject<HTMLDivElement | null>;
 }
 
 function GrowingText({ text, parentDiv }: GrowingTextProps) {
 
-   const textRef = useRef<HTMLDivElement>(null);
+   const textRef = useRef<HTMLHeadingElement>(null);
 
    function adjustFontSize() {
       if (textRef.current && parentDiv.current) {

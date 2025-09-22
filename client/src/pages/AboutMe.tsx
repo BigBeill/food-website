@@ -66,7 +66,7 @@ function AgentChat() {
    }
 
    return (
-      <div className='displayAgentChat'>
+      <div className='chatContainer'>
          <h2>Chat with Mackenzie Neill</h2>
          <div className='ChatLog'>
             {history.map((msg, i) => (

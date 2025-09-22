@@ -14,6 +14,15 @@ export default function Popup({Child, childProps, closePopup}: PopupProps) {
 
    useEffect(() => {
       setPortalRoot(document.getElementById("portal-root"));
+
+      const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') { closePopup(); }  };
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', onKey);
+      return () => {
+         window.removeEventListener('keydown', onKey);
+         document.body.style.overflow = prev;
+      };
    }, []);
 
    if (!portalRoot) { return null;}
@@ -21,17 +30,21 @@ export default function Popup({Child, childProps, closePopup}: PopupProps) {
    return createPortal(
       <div 
          className="displayPopup fadeIn"
+         role="dialog"
+         aria-modal="true"
          onClick={() => { closePopup() } }
       >
          <div
             className="popupContent slideUp"
             onClick={(event: React.MouseEvent) => { event.stopPropagation(); }}
+            aria-label="Popup content"
          >
             <Child {...childProps} />
 
             <button
                className="closePopupButton"
-               aria-label="Close popup button"
+               aria-label="Close"
+               title="Close"
                onClick={() => { closePopup() }}
             >
                <FontAwesomeIcon icon={faXmark} />

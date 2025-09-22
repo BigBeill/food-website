@@ -16,7 +16,7 @@ export default function RecipePreview({ recipe }: RecipePreviewProps) {
    const navigate = useNavigate();
    const { userId } = useOutletContext<{userId: string}>();
 
-   const titleRef = useRef(null);
+   const titleRef = useRef<HTMLDivElement>(null);
    const [showRecipe, setShowRecipe] = useState<boolean>(false);
    const [baseUrl, setBaseUrl] = useState<string>("");
 
@@ -39,7 +39,8 @@ export default function RecipePreview({ recipe }: RecipePreviewProps) {
          </div>
          <img
             src={recipe.image?.url ? `${database}${recipe.image.url}` : "/recipe-image-fallback.png"} 
-            alt='profile picture'
+            alt='recipe image'
+            loading="lazy"
             onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => {
                error.currentTarget.onerror = null; // Prevents looping
                error.currentTarget.src = "/recipe-image-fallback.png"; 
@@ -56,7 +57,7 @@ export default function RecipePreview({ recipe }: RecipePreviewProps) {
                ))}
             </ul>
          </div>
-         <div className="displayNutritionalInformation">
+         <div className="nutrition">
             { recipe.nutrition ? 
             <>
                <p>Calories: {recipe.nutrition.calories.toFixed(2)}</p>

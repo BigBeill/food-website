@@ -45,10 +45,12 @@
    }
 
    input {
+      font-size: 1rem;
       border-bottom: 1px solid var(--text-color-dark);
    }
 
    textarea {
+      font-size: 1rem;
       border-left: 1px solid var(--text-color-dark);
       border-right: 1px solid var(--text-color-dark);
       margin-top: .3rem;

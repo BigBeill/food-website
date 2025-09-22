@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import axios from "../api/axios";
 import GrowingText from "../components/GrowingText";
+import Loading from "../components/Loading";
 import RecipeObject from "../interfaces/RecipeObject";
 
 const database = import.meta.env.VITE_SERVER_LOCATION;
@@ -36,7 +37,7 @@ export default function Recipe({recipe}: RecipeParams) {
    }, [recipeId, recipe]);
 
    if ( !recipeObject ) {
-      return <p>Error: Recipe ID not found.</p>;
+      return <Loading />;
    }
 
    return (
