@@ -82,6 +82,7 @@
    background-color: rgba(0, 0, 0, 0.5);
    z-index: 10;
    overflow-y: scroll;
+   overscroll-behavior: contain;
 
    &:hover {
       cursor: pointer;

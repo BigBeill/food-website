@@ -3,7 +3,7 @@ import { faCircleNotch } from '@fortawesome/free-solid-svg-icons';
 
 export default function Loading() {
     return(
-        <div className="standardPage">
+        <div className="standardPage" role="status" aria-live="polite">
             <p> <FontAwesomeIcon className="loadingIcon" icon={faCircleNotch} /> Loading...</p>
             <p>
                 If its been over 15 minutes since you last accessed this site the <br />

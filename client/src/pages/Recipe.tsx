@@ -14,11 +14,12 @@ interface RecipeParams {
 
 export default function Recipe({recipe}: RecipeParams) {
 
-   const titleRef = useRef<HTMLHeadingElement | null>(null);
+   const titleRef = useRef<HTMLDivElement | null>(null);
    const navigate = useNavigate();
 
    const { recipeId } = useParams<{ recipeId: string }>();
    const [recipeObject, setRecipeObject] = useState<RecipeObject | null>(null);
+   const [error, setError] = useState<string | null>(null);
 
    useEffect(() => {
       // If recipe is passed as a prop, use it directly
@@ -33,9 +34,19 @@ export default function Recipe({recipe}: RecipeParams) {
       }
       axios({ method:'get', url:`/recipe/getObject/${recipeId}/true` })
       .then((response) => { setRecipeObject(response); })
-      .catch((error) => { console.error(error); });
+      .catch((error) => { 
+         console.error(error);
+         setError("Failed to load recipe. Please try again later.");
+      });
    }, [recipeId, recipe]);
 
+   if (error) {
+      return <div className="standardPage">
+         <h1>Error</h1>
+         <p>{error}</p>
+      </div>;
+   }
+   
    if ( !recipeObject ) {
       return <Loading />;
    }
@@ -67,7 +78,7 @@ export default function Recipe({recipe}: RecipeParams) {
             <ul>
                {recipeObject.ingredients.map((ingredient, index) => (
                   <li key={index}>
-                     {ingredient.label ? ingredient.label : ingredient.portion?.amount + " " + ingredient.portion?.measureDescription + " of [" + ingredient.foodDescription + "]"}
+                     {ingredient.label ? ingredient.label : `${ingredient.portion?.amount} ${ingredient.portion?.measureDescription} of [${ingredient.foodDescription}]`}
                   </li>
                ))}
             </ul>

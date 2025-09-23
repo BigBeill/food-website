@@ -45,7 +45,7 @@ export default function NewEditRecipe () {
 		// if recipeId exists, populate the page with data from server for associated recipe
 		if (recipeId) {
 			setLoadingContent(true);
-			axios({ method:'get', url:`recipe/getObject/${recipeId}/false` })
+			axios({ method:'get', url:`/recipe/getObject/${recipeId}/false` })
 			.then ((returnObject) => {
 				setRecipeObject(returnObject);
 				setLoadingContent(false);
