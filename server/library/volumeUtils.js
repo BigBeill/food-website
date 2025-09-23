@@ -224,8 +224,8 @@ function uploadVolumeFile(bucketKey) {
          if (error instanceof multer.MulterError) {
             if (error.code === 'LIMIT_FILE_SIZE') { return res.status(400).json({ error: 'File too large' }); }
             if (error.code === 'LIMIT_FILE_COUNT') { return res.status(400).json({ error: 'Too many files' }); }
-            return res.status(500).json({ error: 'Issue uploading file' });
          }
+         return res.status(500).json({ error: 'Issue uploading file' });
       }
    ];
 }
