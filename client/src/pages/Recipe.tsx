@@ -60,7 +60,7 @@ export default function Recipe({recipe}: RecipeParams) {
 
          <img
             src={recipeObject.image?.url ? `${database}${recipeObject.image.url}` : "/recipe-image-fallback.png"} 
-            alt='Recipe image'
+            alt={recipeObject.title ? `${recipeObject.title} image` : 'Recipe image'}
             loading='lazy'
             onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => {
                error.currentTarget.onerror = null; // Prevents looping

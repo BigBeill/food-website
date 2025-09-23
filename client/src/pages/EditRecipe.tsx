@@ -35,6 +35,7 @@ export default function NewEditRecipe () {
 
 	const [imageBuffer, setImageBuffer] = useState<File | null>(null);
 
+	const [loadingError, setLoadingError] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string>("");
 
 	//run useEffect on page start
@@ -50,7 +51,10 @@ export default function NewEditRecipe () {
 				setRecipeObject(returnObject);
 				setLoadingContent(false);
 			})
-			.catch(console.error);
+			.catch((error) => {
+				console.error(error);
+				setLoadingError("Failed to load recipe. Please try again later.");
+			});
 		}
 		else {
 			setRecipeObject({_id: 'unsavedRecipe', title: '', description: '', ingredients: [], instructions: [], visibility: 'public'});
@@ -169,6 +173,13 @@ export default function NewEditRecipe () {
 			}
 		}
 	]
+
+	if (loadingError) {
+		return <div className="standardPage">
+			<h1>Error</h1>
+			<p>{loadingError}</p>
+		</div>;
+	}
 
 	// don't load the actual page if content is being grabbed from the server
 	if (loadingContent) { return <LoadingPage /> }
