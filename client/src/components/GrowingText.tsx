@@ -26,13 +26,13 @@ function MyComponent() {
 */
 
 interface GrowingTextProps {
-text: string;
-parentDiv: React.RefObject<HTMLDivElement> | React.RefObject<null>;
+   text: string;
+   parentDiv: React.RefObject<HTMLDivElement | null>;
 }
 
 function GrowingText({ text, parentDiv }: GrowingTextProps) {
 
-   const textRef = useRef<HTMLDivElement>(null);
+   const textRef = useRef<HTMLHeadingElement>(null);
 
    function adjustFontSize() {
       if (textRef.current && parentDiv.current) {
@@ -40,10 +40,15 @@ function GrowingText({ text, parentDiv }: GrowingTextProps) {
          textRef.current.style.fontSize = `${fontSize}rem`;
          while (textRef.current.scrollHeight < parentDiv.current.scrollHeight) {
             fontSize += 0.1;
+            if (fontSize > 64) { 
+               console.warn("Growing Text component hit its maximum font size of 64rem, text may be overflowing parent div");
+               break; 
+            } // maximum font size, should never realistically hit this
             textRef.current.style.fontSize = `${fontSize}rem`;
          }
          while( textRef.current.scrollHeight > textRef.current.offsetHeight || textRef.current.scrollWidth > textRef.current.offsetWidth) {
             fontSize -= 0.1;
+            if (fontSize < 1.2) { break; } // minimum font size
             textRef.current.style.fontSize = `${fontSize}rem`;
          }
       }
@@ -56,9 +61,9 @@ function GrowingText({ text, parentDiv }: GrowingTextProps) {
    }, [text, parentDiv]);
 
    return (
-      <h4 className="growingText" ref={textRef}>
+      <h2 className="growingText" ref={textRef}>
          {text}
-      </h4>
+      </h2>
    );
 }
 

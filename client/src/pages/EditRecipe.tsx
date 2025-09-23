@@ -35,6 +35,7 @@ export default function NewEditRecipe () {
 
 	const [imageBuffer, setImageBuffer] = useState<File | null>(null);
 
+	const [loadingError, setLoadingError] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string>("");
 
 	//run useEffect on page start
@@ -45,12 +46,15 @@ export default function NewEditRecipe () {
 		// if recipeId exists, populate the page with data from server for associated recipe
 		if (recipeId) {
 			setLoadingContent(true);
-			axios({ method:'get', url:`recipe/getObject/${recipeId}/false` })
+			axios({ method:'get', url:`/recipe/getObject/${recipeId}/false` })
 			.then ((returnObject) => {
 				setRecipeObject(returnObject);
 				setLoadingContent(false);
 			})
-			.catch(console.error);
+			.catch((error) => {
+				console.error(error);
+				setLoadingError("Failed to load recipe. Please try again later.");
+			});
 		}
 		else {
 			setRecipeObject({_id: 'unsavedRecipe', title: '', description: '', ingredients: [], instructions: [], visibility: 'public'});
@@ -98,7 +102,10 @@ export default function NewEditRecipe () {
 		//send request to the server
 		axios({ method: method, url: 'recipe/edit', data: formData })
 			.then(() => { navigate('/'); })
-			.catch(console.error);
+			.catch((error) => {
+				console.error('Error submitting recipe:', error);
+				setErrorMessage('Failed to submit recipe. Please try again later.');
+			});
 	}
 
 	function deleteRecipe() {
@@ -170,6 +177,13 @@ export default function NewEditRecipe () {
 		}
 	]
 
+	if (loadingError) {
+		return <div className="standardPage">
+			<h1>Error</h1>
+			<p>{loadingError}</p>
+		</div>;
+	}
+
 	// don't load the actual page if content is being grabbed from the server
 	if (loadingContent) { return <LoadingPage /> }
 
@@ -225,7 +239,7 @@ interface AdditionalInfoPageProps {
 }
 
 function AdditionalInfoPage ({imageBuffer, setImageBuffer, oldImageUrl, visibility, setVisibility}: AdditionalInfoPageProps) {
-	console.log("oldImageUrl:", oldImageUrl);
+
 	return (
 		<div className='standardContent'>
 			<h2>Additional Information</h2>
@@ -287,22 +301,21 @@ function IngredientPage ({ingredients, setIngredients}: IngredientPageProps) {
 
 	//fetch up to 12 ingredients from database that have similar names to value given
 	function searchIngredients (value: string) { 
-		axios({ method: 'get', url:`ingredient/find?foodDescription=${value}&limit=12` })
-		.then((response) => {
-			setIngredientsAvailable(response.ingredientObjectArray);
-		})
-		.catch(error => { console.error('unable to fetch ingredients:', error); });
+		axios({ method: 'get', url:`ingredient/find?foodDescription=${encodeURIComponent(value)}&limit=12` })
+			.then((response) => { setIngredientsAvailable(response.ingredientObjectArray); })
+			.catch((error) => { console.error('unable to fetch ingredients:', error); });
 	}
 
 	function ingredientSelected (ingredient: IngredientObject) {
 		setNewIngredient((oldIngredient) => ({ ...oldIngredient, foodId: ingredient.foodId, foodDescription: ingredient.foodDescription }));
 		axios({ method: 'get', url:`ingredient/conversionOptions/${ingredient.foodId}` })
-		.then((response) => { setConversionFactorsAvailable(response); });
+			.then((response) => { setConversionFactorsAvailable(response); })
+			.catch((error) => { console.error('unable to fetch conversion options:', error); });
 		setIngredientsAvailable([]);
 	}
 
 	function addIngredient () {
-		if (!newIngredient.foodId || !newIngredient.portion?.measureDescription || !newIngredient.portion?.measureDescription) { return }
+		if (!newIngredient.foodId || !newIngredient.portion?.measureDescription || !newIngredient.portion?.amount) { return }
 
 		// add new ingredient to ingredientList
 		setIngredientList([
@@ -335,7 +348,14 @@ function IngredientPage ({ingredients, setIngredients}: IngredientPageProps) {
 				{ingredientList.map((item, index) => (
 					<Reorder.Item key={item.id} value={item} className='listItem'>
 						<div className='options'>
-							<FontAwesomeIcon icon={faCircleXmark} style={{color: "#575757",}} onClick={() => removeIngredient(index)} />
+							<FontAwesomeIcon 
+								role='button'
+								tabIndex={0}
+								aria-label={`Remove ingredient ${index + 1}`}
+								icon={faCircleXmark} 
+								style={{color: "#575757",}} 
+								onClick={() => removeIngredient(index)} 
+							/>
 						</div>
 						{ item.content.label ? (
 							<p>{item.content.label}</p>
@@ -354,8 +374,16 @@ function IngredientPage ({ingredients, setIngredients}: IngredientPageProps) {
 				<input type='text' placeholder='Ingredient Label (optional)' value={newIngredient.label} onChange={(event) => setNewIngredient({...newIngredient, label: event.target.value})}/>
 
 				<div className='inputs'>
-					<input type='number'  placeholder='Amount' value={newIngredient.portion?.amount ?? ''} onChange={(event) => setNewIngredient({...newIngredient, portion: { measureId: newIngredient.portion?.measureId || "", measureDescription: newIngredient.portion?.measureDescription || "", amount: event.target.value }})}/>
-					<select value={newIngredient.portion?.measureDescription} onChange={(event) => setNewIngredient({...newIngredient, portion: { measureId: event.target.options[event.target.selectedIndex].id, measureDescription: event.target.value, amount: newIngredient.portion?.amount || null }})} >
+					<input 
+						type='number'  
+						placeholder='Amount' 
+						value={newIngredient.portion?.amount ?? ''} 
+						onChange={(event) => setNewIngredient({...newIngredient, portion: { measureId: newIngredient.portion?.measureId || "", measureDescription: newIngredient.portion?.measureDescription || "", amount: event.target.value }})}
+					/>
+					<select 
+						value={newIngredient.portion?.measureDescription} 
+						onChange={(event) => setNewIngredient({...newIngredient, portion: { measureId: event.target.options[event.target.selectedIndex].id, measureDescription: event.target.value, amount: newIngredient.portion?.amount || null }})} 
+					>
 						<option value="" disabled hidden className='light'>Units</option>
 						{conversionFactorsAvailable.map((conversionFactor, index) => (
 						<option key={index} id={conversionFactor.measureId}>{conversionFactor.measureDescription}</option>
@@ -448,8 +476,22 @@ function InstructionPage ({instructions, setInstructions}: InstructionPageProps)
 							<p>{item.content}</p>
 						</div>
 							<div className='options'>
-							<FontAwesomeIcon icon={faTrash} style={{color: "#575757",}} onClick={() => { removeInstruction(index) }} />
-							<FontAwesomeIcon icon={faPen} style={{color: "#575757",}} onClick={() => { updateInstruction(index, item.content) }} />
+							<FontAwesomeIcon 
+								role='button'
+								tabIndex={0}
+								aria-label={`Remove instruction ${index + 1}`}
+								icon={faTrash} 
+								style={{color: "#575757",}} 
+								onClick={() => { removeInstruction(index) }} 
+							/>
+							<FontAwesomeIcon
+								role='button'
+								tabIndex={0}
+								aria-label={`Edit instruction ${index + 1}`} 
+								icon={faPen} 
+								style={{color: "#575757",}} 
+								onClick={() => { updateInstruction(index, item.content) }} 
+							/>
 						</div>
 					</Reorder.Item>
 				))}

@@ -6,7 +6,7 @@ export default function LandingPage() {
 
    return (
       <>
-         <div className="landingPage">
+         <div className="standardPage">
             <h1>Welcome to Beill's Greenhouse</h1>
             <p>
                My name is Mackenzie Neill, I graduated from computer science at trent university.
