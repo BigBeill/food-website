@@ -73,7 +73,7 @@ export default function Notebook ({
 
    // pages are grouped into pairs, so changing the grouping by 1 changes the page index by 2 
    function handleGroupingChange(newGrouping: number) {
-      handlePageChange((newGrouping * 2) - startingPageNumber);
+      handlePageChange(((newGrouping - 1) * 2) - (startingPageNumber - 1));
    }
 
    function handlePageChange(newPageIndex: number) {
