@@ -36,21 +36,20 @@ export default async function sendRequest( configuration: sendRequestProps ) {
       // attempt to send request
       axiosInstance(configuration)
       .then((response) => {
-         console.log("RESPONSE FROM SERVER!", "\n url:", configuration.url, "\n response:", response);
+         console.debug("Response From Server", "\n url:", configuration.url, "\n response:", response);
          return resolve(response.data.payload);
       })
       .catch((error) => {
          // check if request was rejected due to accessToken
          if (error.status == 401) {
             //attempt to request a new access token
-            console.log("accessToken rejected, requesting new accessToken");
+            console.warn("accessToken rejected, requesting new accessToken");
             axiosInstance({ method: 'post', url: 'authentication/refresh' })
             .then(() => {
                // if new access token was successfully received, retry request
-               console.log("accessToken refreshed, retrying request");
                axiosInstance(configuration)
                .then((response) => {
-                  console.log("RESPONSE FROM SERVER!", "\n url:", configuration.url, "\n response:", response);
+                  console.debug("Response From Server", "\n url:", configuration.url, "\n response:", response);
                   return resolve(response.data.payload);
                })
                .catch((error) => {
@@ -62,10 +61,9 @@ export default async function sendRequest( configuration: sendRequestProps ) {
             })
             .catch((refreshError) => {
                // if request for new access token was rejected, return error
-               console.error('issue refreshing token:', refreshError);
-               console.error('issue processing request:', error);
-               if (error.response) { return reject(error.response.data); } 
-               else { return reject(error); }
+               console.error('issue refreshing token:', refreshError, "\n original error:", error);
+               if (refreshError.response) { return reject(refreshError.response.data); } 
+               else { return reject(refreshError); }
             });
          }
          else {
