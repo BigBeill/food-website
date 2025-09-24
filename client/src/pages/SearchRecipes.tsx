@@ -15,7 +15,7 @@ export default function PublicRecipes() {
 
    const { category } = useParams<{ category: "public" | "friends" | "personal" }>();
    const [searchParams, setSearchParams] = useSearchParams();
-   const pageNumber: number = Number(searchParams.get('pageNumber')) || 1;
+   const pageGroupNumber: number = Number(searchParams.get('pageGroupNumber')) || 1;
    const titleParam: string | null = searchParams.get('title') || null;
    const foodIdParam: string | null = searchParams.get('foodIdList') || null;
    const foodIdList: number[] | null = foodIdParam ? foodIdParam.split(',').map(Number) : null;
@@ -48,15 +48,15 @@ export default function PublicRecipes() {
    }
 
    // fetches the recipes being displayed on a given page and places them directly into the recipeList state variable
-   function fetchPageContent(requestPage: number) {
+   function fetchPageContent(requestGroup: number) {
       let url = `recipe/find?category=${category}`
       if (recipeTitle) { url += `&title=${recipeTitle}`; }
       if (foodIdList && foodIdList.length > 0) { 
          const foodIdParams = foodIdList.map(id => `foodIdList[]=${encodeURIComponent(id)}`).join('&');
          url += `&${foodIdParams}`;
       }
-      if (requestPage == 1) { url += `&limit=1&skip=0`; }
-      else { url += `&limit=2&skip=${((requestPage - 1) * 2) - 1}`; }
+      if (requestGroup == 1) { url += `&limit=1&skip=0`; }
+      else { url += `&limit=2&skip=${((requestGroup - 1) * 2) - 1}`; }
       url += `&count=true&includeNutrition=true`
       axios({method: 'get', url})
       .then((response) => {
@@ -65,7 +65,7 @@ export default function PublicRecipes() {
             return;
          }
          const maxPages = Math.round(((response.count + 1) / 2));
-         if (maxPages >= requestPage) {
+         if (maxPages >= requestGroup) {
             setRecipeList(response.recipeObjectArray);
             setRecipeCount(response.count);
          }
@@ -74,12 +74,11 @@ export default function PublicRecipes() {
    }
 
    // handle the logic for changing the page
-   function handlePageChange(newPage: number) {
+   function handlePageChange(newPageNumber: number) {
+      console.log("Changing page to:", newPageNumber);
       const newParam = new URLSearchParams(searchParams.toString());
-      newParam.set('pageNumber', newPage.toString());
+      newParam.set('pageGroupNumber', Math.ceil(newPageNumber / 2).toString());
       setSearchParams(newParam);
-
-      fetchPageContent(newPage); // fetch the recipes for the new page
    }
 
    // set the recipe filters when the the url is set/changed
@@ -110,7 +109,7 @@ export default function PublicRecipes() {
    // triggers fetchPageContent when filters have been set/changed
    useEffect(() => {
       if (!useStatesDefined) { return; } // if the useStates are not defined, do not run this useEffect
-      fetchPageContent(pageNumber); // fetch the recipes for the current page
+      fetchPageContent(pageGroupNumber); // fetch the recipes for the current page
    }, [recipeTitle, ingredientList, useStatesDefined]);
 
    // converts the contents of recipeList to a PageObject array and saving it to pageList
@@ -119,7 +118,7 @@ export default function PublicRecipes() {
       if (!useStatesDefined) { return; }
 
       let newPageList: PageObject[] = [];
-      if (pageNumber == 1) {
+      if (pageGroupNumber == 1) {
          newPageList = [{
             content: FilterSearchPage,
             props: {
@@ -145,7 +144,7 @@ export default function PublicRecipes() {
    // if the useStates are not defined, show loading
    if (!useStatesDefined) { return <Loading /> }
 
-   return <Notebook pageList={pageList} parentPageNumber={pageNumber} requestNewPage={handlePageChange} pageCount={recipeCount + 1}/>
+   return <Notebook pageList={pageList} startingPageNumber={(pageGroupNumber * 2) - 1} requestNewPage={handlePageChange} pageCount={recipeCount + 1}/>
 }
 
 interface FilterSearchPageProps {
