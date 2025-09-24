@@ -13,6 +13,7 @@ import Loading from '../components/Loading';
 
 export default function PublicRecipes() {
 
+   // get url parameters
    const { category } = useParams<{ category: "public" | "friends" | "personal" }>();
    const [searchParams, setSearchParams] = useSearchParams();
    const pageGroupNumber: number = Number(searchParams.get('pageGroupNumber')) || 1;
@@ -20,11 +21,13 @@ export default function PublicRecipes() {
    const foodIdParam: string | null = searchParams.get('foodIdList') || null;
    const foodIdList: number[] | null = foodIdParam ? foodIdParam.split(',').map(Number) : null;
 
-   // state variables for saving the current search parameters
+   // state variables for changing the current search parameters (aren't moved to the url until handleSubmit function is called)
    const [recipeTitle, setRecipeTitle] = useState<string>('');
    const [ingredientList, setIngredientList] = useState<IngredientObject[]>([]);
 
    const [useStatesDefined, setUseStatesDefined] = useState<boolean>(false); // used to ensure that the useStates are defined before running the useEffects
+   const [loading, setLoading] = useState<boolean>(true);
+   const [error, setError] = useState<string | null>(null);
 
    // state variables for saving the current recipe information
    const [recipeList, setRecipeList] = useState<RecipeObject[]>([]);
@@ -35,6 +38,7 @@ export default function PublicRecipes() {
 
    // send parameters to the url
    function handleSubmit(title: string, ingredients: IngredientObject[]) {
+      setLoading(true);
 
       // create params object
       let newParams: {title?: string, foodIdList?: string } = {};
@@ -48,34 +52,35 @@ export default function PublicRecipes() {
    }
 
    // fetches the recipes being displayed on a given page and places them directly into the recipeList state variable
-   function fetchPageContent(requestGroup: number) {
+   function fetchPageContent(requestedGroup: number) {
       let url = `recipe/find?category=${category}`
       if (recipeTitle) { url += `&title=${recipeTitle}`; }
       if (foodIdList && foodIdList.length > 0) { 
          const foodIdParams = foodIdList.map(id => `foodIdList[]=${encodeURIComponent(id)}`).join('&');
          url += `&${foodIdParams}`;
       }
-      if (requestGroup == 1) { url += `&limit=1&skip=0`; }
-      else { url += `&limit=2&skip=${((requestGroup - 1) * 2) - 1}`; }
+      if (requestedGroup == 1) { url += `&limit=1&skip=0`; }
+      else { url += `&limit=2&skip=${((requestedGroup - 1) * 2) - 1}`; }
       url += `&count=true&includeNutrition=true`
       axios({method: 'get', url})
       .then((response) => {
-         if (response.count == undefined) { 
-            console.error("server failed to return count"); 
-            return;
-         }
-         const maxPages = Math.round(((response.count + 1) / 2));
-         if (maxPages >= requestGroup) {
+         if (response.count == undefined) { throw new Error("Response from server did not include recipe count"); }
+         if (requestedGroup > Math.ceil((response.count) / 2) && response.count != 0) { handlePageChange(response.count); }
+         else{
             setRecipeList(response.recipeObjectArray);
             setRecipeCount(response.count);
+            setLoading(false);
+            setError(null);
          }
-         else { handlePageChange(maxPages) }
+      })
+      .catch((error) => {
+         console.error("unable to fetch recipes:", error);
+         setError("Failed to fetch recipes from server, please try again later.");
       });
    }
 
    // handle the logic for changing the page
    function handlePageChange(newPageNumber: number) {
-      console.log("Changing page to:", newPageNumber);
       const newParam = new URLSearchParams(searchParams.toString());
       newParam.set('pageGroupNumber', Math.ceil(newPageNumber / 2).toString());
       setSearchParams(newParam);
@@ -113,7 +118,7 @@ export default function PublicRecipes() {
    }, [recipeTitle, ingredientList, useStatesDefined]);
 
    // converts the contents of recipeList to a PageObject array and saving it to pageList
-   useEffect(() => { 
+   useEffect(() => {
       // if the useStates are not defined, do not run this useEffect
       if (!useStatesDefined) { return; }
 
@@ -141,8 +146,15 @@ export default function PublicRecipes() {
       setPageList(newPageList);
    }, [recipeList]);
 
+   if (error) { return (
+      <div className='standardContent'>
+         <h1>Error</h1>
+         <p>{error}</p>
+      </div>
+   );}
+
    // if the useStates are not defined, show loading
-   if (!useStatesDefined) { return <Loading /> }
+   if (loading) { return <Loading /> }
 
    return <Notebook pageList={pageList} startingPageNumber={(pageGroupNumber * 2) - 1} requestNewPage={handlePageChange} pageCount={recipeCount + 1}/>
 }
