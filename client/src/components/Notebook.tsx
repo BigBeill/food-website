@@ -54,7 +54,8 @@ export default function Notebook ({
    useEffect(() => {
       // changes page if arrow key or a/d is pressed
       function handleKeyDown(event: KeyboardEvent) {
-         if (event.target && (event.target as HTMLElement).tagName == 'INPUT' || (event.target as HTMLElement).tagName == 'TEXTAREA'){ return; }
+         const focusedElement = (event.target as HTMLElement)?.tagName;
+         if (focusedElement === 'INPUT' || focusedElement === 'TEXTAREA') { return; }
          if (event.key == 'a' || event.key == 'ArrowLeft') { previousPage(); }
          if (event.key == 'd' || event.key == 'ArrowRight') { nextPage(); }
       }
@@ -65,7 +66,6 @@ export default function Notebook ({
 
    // keep currentIndex updated based on parentPageNumber changes
    useEffect(() => {
-      console.log("parent page number changed to: " + parentPageNumber + "\nsetting current index to: " + (parentPageNumber - 1) + "\nstarting page number is: " + startingPageNumber);
       setCurrentIndex(parentPageNumber - 1);
    }, [parentPageNumber])
 
@@ -75,12 +75,10 @@ export default function Notebook ({
 
    // pages are grouped into pairs, so changing the grouping by 1 changes the page index by 2 
    function handleGroupingChange(newGrouping: number) {
-      console.log("requesting grouping change to: " + newGrouping);
       handlePageChange((newGrouping - 1) * 2);
    }
 
    function handlePageChange(newPageIndex: number) {
-      console.log("current global index: " + currentIndex + "\nrequesting global index change to: " + newPageIndex);
       // check if the pageIndex being requested is out of bounds
       if (newPageIndex < startingPageNumber) {
          // page index is too low to be valid, request page indexed globally as 0

@@ -39,6 +39,7 @@ export default function PublicRecipes() {
    // send parameters to the url
    function handleSubmit(title: string, ingredients: IngredientObject[]) {
       setLoading(true);
+      setError(null);
 
       // create params object
       let newParams: {title?: string, foodIdList?: string } = {};
@@ -53,6 +54,8 @@ export default function PublicRecipes() {
 
    // fetches the recipes being displayed on a given page and places them directly into the recipeList state variable
    function fetchPageContent(requestedGroup: number) {
+      setError(null);
+
       let url = `recipe/find?category=${category}`
       if (recipeTitle) { url += `&title=${recipeTitle}`; }
       if (foodIdList && foodIdList.length > 0) { 
@@ -65,14 +68,14 @@ export default function PublicRecipes() {
       axios({method: 'get', url})
       .then((response) => {
          if (response.count == undefined) { throw new Error("Response from server did not include recipe count"); }
+         // if the requested page group is out of range, move to the largest page group in range
          if (requestedGroup > Math.ceil((response.count + 1) / 2) && response.count != 0) { 
             handlePageChange(response.count); 
          }
-         else{
+         else {
             setRecipeList(response.recipeObjectArray);
             setRecipeCount(response.count);
             setLoading(false);
-            setError(null);
          }
       })
       .catch((error) => {
@@ -117,7 +120,7 @@ export default function PublicRecipes() {
    useEffect(() => {
       if (!useStatesDefined) { return; } // if the useStates are not defined, do not run this useEffect
       fetchPageContent(pageGroupNumber); // fetch the recipes for the current page
-   }, [recipeTitle, ingredientList, useStatesDefined]);
+   }, [recipeTitle, ingredientList, pageGroupNumber, useStatesDefined]);
 
    // converts the contents of recipeList to a PageObject array and saving it to pageList
    useEffect(() => {
