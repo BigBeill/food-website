@@ -17,8 +17,6 @@ import axios from 'axios';
 
 const serverLocation = import.meta.env.VITE_SERVER_LOCATION;
 
-console.log("axios server location:", serverLocation);
-
 const axiosInstance =  axios.create({
    baseURL: serverLocation,
    withCredentials: true
