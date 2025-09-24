@@ -24,6 +24,10 @@ export default function NewEditRecipe () {
 	const { recipeId } = useParams(); //get recipeId if in url
 
 	const [loadingContent, setLoadingContent] = useState<boolean>(false);
+	const [loadingError, setLoadingError] = useState<string>("");
+	const [errorMessage, setErrorMessage] = useState<string>("");
+
+	const [currentPageNumber, setCurrentPageNumber] = useState<number>(1); //keeps track of what page the notebook is on (keeping the same page on notebook remount)
 
 	//define required useStates
 	const [recipeObject, setRecipeObject] = useState<RecipeObject>({_id: 'unsavedRecipe', title: '', description: '', ingredients: [], instructions: [], visibility: 'public'});
@@ -34,9 +38,6 @@ export default function NewEditRecipe () {
 	function setVisibility(visibility: 'public' | 'private' | 'personal') { setRecipeObject((oldRecipe) => ({ ...oldRecipe, visibility })); }
 
 	const [imageBuffer, setImageBuffer] = useState<File | null>(null);
-
-	const [loadingError, setLoadingError] = useState<string>("");
-	const [errorMessage, setErrorMessage] = useState<string>("");
 
 	//run useEffect on page start
 	useEffect (() => {
@@ -64,22 +65,27 @@ export default function NewEditRecipe () {
 	//function for sending recipe changes to server
 	function submitRecipe(){
 		setErrorMessage("");
+		setLoadingContent(true);
 
 		// check for any empty fields
 		if (!recipeObject.title) { 
 			setErrorMessage("your recipe must have a title");
+			setLoadingContent(false);
 			return; 
 		}
 		if (!recipeObject.description) { 
 			setErrorMessage("your recipe must have a description"); 
+			setLoadingContent(false);
 			return; 
 		}
 		if (recipeObject.ingredients.length == 0) { 
 			setErrorMessage("your recipe must have at least one ingredient");
+			setLoadingContent(false);
 			return;
 		}
 		if (recipeObject.instructions.length == 0) { 
 			setErrorMessage("your recipe must have at least one instruction");
+			setLoadingContent(false);
 			return; 
 		}
 
@@ -104,11 +110,14 @@ export default function NewEditRecipe () {
 			.then(() => { navigate('/'); })
 			.catch((error) => {
 				console.error('Error submitting recipe:', error);
-				setErrorMessage('Failed to submit recipe. Please try again later.');
+				setErrorMessage('Failed to submit recipe. Reason: ' + error.error || 'Unknown, Please try again later.');
+				setLoadingContent(false);
 			});
 	}
 
 	function deleteRecipe() {
+		setErrorMessage("");
+		setLoadingContent(true);
 
 		// if recipeId doesn't exist, don't delete
 		if (!recipeId) { 
@@ -123,6 +132,7 @@ export default function NewEditRecipe () {
 		.catch((error) => {
 			console.error('Error deleting recipe:', error);
 			setErrorMessage('Failed to delete recipe. Please try again later.');
+			setLoadingContent(false);
 		});
 	}
 
@@ -188,7 +198,7 @@ export default function NewEditRecipe () {
 	if (loadingContent) { return <LoadingPage /> }
 
 	// call notebook and give it pageList
-	return <Notebook pageList={pageList} />
+	return <Notebook pageList={pageList} parentPageNumber={currentPageNumber} setParentPageNumber={setCurrentPageNumber} />
 }
 
 

@@ -12,7 +12,6 @@ interface PaginationBarProps {
 export default function PaginationBar({ currentPage, totalPages, requestNewPage }: PaginationBarProps) {
 
    function handlePageChange(newPage: number) {
-      console.log(`Current Page: ${currentPage}, Total Pages: ${totalPages}`);
       if (newPage < 1 || newPage > totalPages) { return; }
       requestNewPage(newPage);
    }

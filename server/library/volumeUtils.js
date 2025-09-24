@@ -219,13 +219,14 @@ function uploadVolumeFile(bucketKey) {
          });
       },
       // error handler for multer issues
-      (error, _req, res, _next) => {
+      (error, _req, res, next) => {
          console.error('File upload error:', error);
          if (error instanceof multer.MulterError) {
             if (error.code === 'LIMIT_FILE_SIZE') { return res.status(400).json({ error: 'File too large' }); }
             if (error.code === 'LIMIT_FILE_COUNT') { return res.status(400).json({ error: 'Too many files' }); }
             return res.status(500).json({ error: 'Issue uploading file' });
          }
+         return next(error);
       }
    ];
 }
