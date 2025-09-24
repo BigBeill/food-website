@@ -65,7 +65,9 @@ export default function PublicRecipes() {
       axios({method: 'get', url})
       .then((response) => {
          if (response.count == undefined) { throw new Error("Response from server did not include recipe count"); }
-         if (requestedGroup > Math.ceil((response.count) / 2) && response.count != 0) { handlePageChange(response.count); }
+         if (requestedGroup > Math.ceil((response.count + 1) / 2) && response.count != 0) { 
+            handlePageChange(response.count); 
+         }
          else{
             setRecipeList(response.recipeObjectArray);
             setRecipeCount(response.count);
@@ -147,7 +149,7 @@ export default function PublicRecipes() {
    }, [recipeList]);
 
    if (error) { return (
-      <div className='standardContent'>
+      <div className='standardPage'>
          <h1>Error</h1>
          <p>{error}</p>
       </div>

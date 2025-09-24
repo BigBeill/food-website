@@ -27,6 +27,8 @@ export default function NewEditRecipe () {
 	const [loadingError, setLoadingError] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string>("");
 
+	const [currentPageNumber, setCurrentPageNumber] = useState<number>(1); //keeps track of what page the notebook is on (keeping the same page on notebook remount)
+
 	//define required useStates
 	const [recipeObject, setRecipeObject] = useState<RecipeObject>({_id: 'unsavedRecipe', title: '', description: '', ingredients: [], instructions: [], visibility: 'public'});
 	function setTitle(title: string) { setRecipeObject((oldRecipe) => ({ ...oldRecipe, title })); }
@@ -196,7 +198,7 @@ export default function NewEditRecipe () {
 	if (loadingContent) { return <LoadingPage /> }
 
 	// call notebook and give it pageList
-	return <Notebook pageList={pageList} />
+	return <Notebook pageList={pageList} parentPageNumber={currentPageNumber} setParentPageNumber={setCurrentPageNumber} />
 }
 
 
