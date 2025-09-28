@@ -402,6 +402,12 @@ export default function Profile() {
             >
               ⚙️ Edit Profile
             </button>
+            <a
+              href="/searchUser/friends"
+              className="action-btn secondary"
+            >
+              👥 Friend Requests
+            </a>
             <button className="action-btn danger" onClick={handleLogout}>
               🚪 Logout
             </button>
