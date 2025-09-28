@@ -9,12 +9,13 @@ createdb "Canadian Nutrient File"
 ```
 
 3. Create a new user
+   > set password to whatever you would like but ensure to keep it saved to include in .env variable `POSTGRES_DB_PASSWORD` under `./server/.env`
 
 ```
 createuser myuser --createdb --login --pwprompt
 ```
 
-4. (optional) Connect to new database to test successful creation
+1. (optional) Connect to new database to test successful creation
 
 ```
 psql "Canadian Nutrient File"

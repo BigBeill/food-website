@@ -1,5 +1,6 @@
 # Big Beill's Greenhouse
-*A showcase project demonstrating web-development, networking, and cybersecurity skills.*
+
+_A showcase project demonstrating web-development, networking, and cybersecurity skills._
 
 Big Beill's Greenhouse is a personalized project created by Mackenzie Neill, a graduate of Trent University's Computer Science program. This project serves as a platform to explore and refine skill's in web-development, networking, and cybersecurity. As an experimental project, it's a continuous work in progress and isn't being actively monitored for security vulnerabilities. Consequently, data protection is limited, and users should exercise caution when using the application.
 
@@ -7,23 +8,27 @@ More in depth documentation can be found at [https://bigbeill.github.io/Food-Rec
 A live demo can be found at: [www.big-beills-greenhouse.ca](https://www.big-beills-greenhouse.ca)
 
 ## General Overview
+
 Author: Mackenzie Neill <br>
 Start date: December 15th, 2023
 
 ### Features
-   - Create, read, update, and delete recipes
-   - User authentication (JWT, bcrypt password hashing)
-   - Responsive design (works on desktop + mobile)
-   - RESTful API design
+
+- Create, read, update, and delete recipes
+- User authentication (JWT, bcrypt password hashing)
+- Responsive design (works on desktop + mobile)
+- RESTful API design
 
 ### Tech Stack
-   - Frontend: React, Vite, TypeScript, SCSS
-   - Backend: Node.js, Express.js, Javascript
-   - Database: MongoDB, PostgreSQL
-   - Authentication: JSON Web Tokens (JWT), bcrypt
-   - Deployment: Vercel (frontend), Railway (backend)
+
+- Frontend: React, Vite, TypeScript, SCSS
+- Backend: Node.js, Express.js, Javascript
+- Database: MongoDB, PostgreSQL
+- Authentication: JSON Web Tokens (JWT), bcrypt
+- Deployment: Vercel (frontend), Railway (backend)
 
 ### Security Features
+
 - HTTPS connection (only on cloud deployment)
 - HTTP-only cookies
 - Sanitization of all data from clients (cookies, query, params, and body)
@@ -31,6 +36,7 @@ Start date: December 15th, 2023
 - Password requirements, masking and encryption
 
 ## Setting Up the Project
+
 <ol>
 	<li>Open the <code>run_website.txt</code> file in the root directory.</li>
 	<li>Set the URL to the path where you saved this project.</li>
@@ -44,11 +50,14 @@ Start date: December 15th, 2023
 		SESSION_SECRET=
 		LOCAL_ENVIRONMENT=true
 	</code></pre>
-	<li>Fill in a value for `SESSION_SECRET` (choose a strong secret).</li>
-	<li>Run the `.bat` file (assuming your on windows)</li>
+	<li>Fill in a value for `SESSION_SECRET` (choose a strong secret, use sha256 for best security).</li>
+	<li>Run the `.bat` file (assuming your on windows), or run npm run dev at root.</li>
 </ol>
 
 ### Setting up the databases
+
+#### MongoDB database
+
 <ol>
 	<li>Create your own MongoDB cluster online.</li>
 	<li>Update the connection string in `server/config/connectMongo.js`.</li>
@@ -59,3 +68,17 @@ Start date: December 15th, 2023
 	<li>Fill in your MongoDB password.</li>
 	<li>Go to `/canadian-nutrient-file/DB_Setup.md` for instructions and code.</li>
 </ol>
+
+#### PostgreSQL server
+
+1. refer to [setup docs](canadian-nutrient-file/DB_Setup.md)
+2. Set .env variables under `./server/.env`
+
+```
+# Assuming local development
+POSTGRES_DB_HOST="localhost"
+POSTGRES_DB_USER="myuser"
+POSTGRES_DB_DATABASE="Canadian Nutrient File"
+POSTGRES_DB_PASSWORD="<yourPasswordHere>"
+POSTGRES_DB_PORT="5432"
+```
