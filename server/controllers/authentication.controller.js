@@ -105,7 +105,7 @@ exports.login = async (req, res) => {
       if (!user) { return res.status(404).json({ error: "username not found" }); }
 
       // check if password is correct
-      if (!passwordUtils.correctPassword(password, user.hash, user.salt)) { return res.status(401).json({ error: "incorrect password" }); }
+      if (!passwordUtils.correctPassword(password, user.hash, user.salt)) { return res.status(404).json({ error: "incorrect password" }); }
 
       // create new refresh tokens
       const tokens = createToken(user);
