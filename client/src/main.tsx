@@ -12,6 +12,7 @@ import './styles/animations.scss';
 import './styles/objectView.scss';
 import './styles/landingPage.scss';
 import './styles/profilePage.scss';
+import './styles/searchUser.scss';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   localEnvironment == "true" ? (
