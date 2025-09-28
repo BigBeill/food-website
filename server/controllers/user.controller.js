@@ -12,13 +12,14 @@ returns a complete userObject depending on the parameters provided in the reques
 @route: GET /user/getObject/:userId?/:relationship?
 */
 exports.getObject = async (req, res) => {
-   // get necessary data from request
+
    const clientId = req.user?._id;
    const { userId = clientId, relationship = false } = req.params;
    if (!userId) { return res.status(401).json({ error: "no user signed in and missing userId field in params" }); }
 
+   // create the userObject based on the userId provided
+   let userObject;
    try {
-
       let userData = await User.findOne({ _id: userId });
       if (!userData) { return res.status(400).json({ error: "user not found in database" }); }
       userData = userData.toObject(); // convert userData to a plain object
@@ -26,17 +27,15 @@ exports.getObject = async (req, res) => {
       // attach current user as target if relationship is true
       if (relationship) { userData.relationship = {target: clientId}; }
 
-      // create userObject from data in database
-      const userObject = await userUtils.verifyObject(userData, true);
-      return res.status(200).json({ message: "user data collected successfully", payload: userObject });
+      // verify the userObject before returning to the client
+      userObject = await userUtils.verifyObject(userData, true);
    }
    catch(error){
-      console.log("\x1b[31m%s\x1b[0m", "user.controller.getObject failed... unable to create user object");
-      console.error(error);
+      console.log("\x1b[31m%s\x1b[0m", "user.controller.getObject failed..." + "\n Reason given: " + error);
       return res.status(500).json({ error: "server failed to get user data" });
    }
 
-   
+   return res.status(200).json({ message: "user data collected successfully", payload: userObject });
 }
 
 
@@ -56,22 +55,26 @@ exports.find = async (req, res) => {
 
    let userList = []; // create empty array to hold user objects
    let query = {}; // create query for searching the database with required user fields
-   try {
 
-      // add username and email fields to query if provided
-      if (username) query.username = { $regex: new RegExp(username, 'i') };
-      if (email) query.email = { $regex: new RegExp(email, 'i') };
-
-      if (category == 'friends') {
-         // collect a list of friendship relationships user is involved in
+   // add a list of user _ids that are friends with the current user to the query if the friends list is provided
+   if (category == 'friends') {
+      try {
+         // collect a list of friendship relationships user is apart of
          const friendshipList = await Friendship.find({ friendIds: _id });
          // extract the _ids of each non-signed in user
          const friendsList = friendshipList.map((friendship) => friendship.friendIds.filter((friend) => friend != _id) );
          // add the _ids to the query
          query._id = { $in: friendsList };
       }
+      catch (error) {
+         console.log("\x1b[31m%s\x1b[0m", "user.controller.find failed..." + "\n Reason given: " + error);
+         return res.status(500).json({ error: "server failed collect a list of friends inside the database" });
+      }
+   }
 
-      else if (category == 'requests') {
+   // add a list of user _ids that have sent the current user a friend request to the query if the requests list is provided
+   else if (category == 'requests') {
+      try {
          // collect a list of friend requests user has received
          const receivedRequests = await FriendRequest.find({ receiverId: _id });
          // extract the _ids of each non-signed in user
@@ -79,42 +82,51 @@ exports.find = async (req, res) => {
          // add the _ids to the query
          query._id = { $in: requestList };
       }
-
-      // use query to find users in database
-      userList = await User.find(query)
-      .skip(skip)
-      .limit(limit);
-   }
-   catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "user.controller.find failed... unable to find users in database");
-      console.error(error);
-      return res.status(500).json({ error: "server failed to find users in database" });
+      catch (error) {
+         console.log("\x1b[31m%s\x1b[0m", "user.controller.find failed..." + "\n Reason given: " + error);
+         return res.status(500).json({ error: "server failed collect a list of friend requests inside the database" });
+      }
    }
 
+   // add additional fields to the search query
+   if (username) query.username = { $regex: new RegExp(username, 'i') };
+   if (email) query.email = { $regex: new RegExp(email, 'i') };
 
+   // conduct the database search for users
+   let userObjectArray = [];
    try {
-      const userObjectList = await Promise.all( userList.map( async (user) => {
+      userList = await User.find(query)
+         .skip(skip)
+         .limit(limit);
+
+      // verify and complete each userObject before returning to the client
+      userObjectArray = await Promise.all( userList.map( async (user) => {
          userData = user.toObject();
          userData.relationship = { target: _id };
          const userObject = await userUtils.verifyObject(userData, true);
          return userObject;
       }));
+   }
+   catch (error) {
+      console.log("\x1b[31m%s\x1b[0m", "user.controller.find failed..." + "\n Reason given: " + error);
+      return res.status(500).json({ error: "server failed to find users in database" });
+   }
 
-      let payload = {userObjectList: userObjectList};
+   let payload = { userObjectArray };
 
-      // attach count if requested by the client
-      if (count) {
+   // attach the count field if requested by the client
+   if (count) {
+      try {
          const totalCount = await User.countDocuments(query);
          payload.count = totalCount;
       }
+      catch (error) {
+         console.log("\x1b[31m%s\x1b[0m", "user.controller.find failed..." + "\n Reason given: " + error);
+         return res.status(500).json({ error: "server failed to count users in database" });
+      }
+   }
 
-      return res.status(200).json({message: "List of users collected successfully", payload})
-   }
-   catch (error){
-      console.log("\x1b[31m%s\x1b[0m", "user.controller.find failed... unable confirm complete user objects before returning to client");
-      console.error(error);
-      return res.status(500).json({ error: "server failed to find users with provided parameters" });
-   }
+   return res.status(200).json({ message: "user list collected successfully", payload });
 }
 
 
@@ -130,29 +142,38 @@ exports.folder = async (req, res) => {
    const _id = req.user._id;
    const { folderId, count, limit, skip } = req.query;
 
+   // build the query
+   let query;
+   if (!folderId) { query = { owner: _id, parent: null }; }
+   else { query = { owner: _id, parent: folderId }; }
+
+   // find folders in database
+   let foldersList;
    try {
-      let query;
-      if (!folderId) { query = { owner: _id, parent: null }; }
-      else { query = { owner: _id, parent: folderId }; }
+      foldersList = await FriendFolder.find(query)
+         .skip(skip)
+         .limit(limit);
+   }
+   catch (error) {
+      console.log("\x1b[31m%s\x1b[0m", "user.controller.folder failed..." + "\n Reason given: " + error);
+      return res.status(500).json({ error: "server failed to find folders" });
+   }
 
-      // find folders in database
-      const foldersList = await FriendFolder.find(query)
-      .skip(skip)
-      .limit(limit);
-      let payload = { folders: foldersList };
+   let payload = { folders: foldersList };
 
-      // attach count if requested by the client
-      if (count) {
+   // attach count if requested by the client
+   if (count) {
+      try {
          const totalCount = await FriendFolder.countDocuments(query);
          payload.count = totalCount;
       }
+      catch (error) {
+         console.log("\x1b[31m%s\x1b[0m", "user.controller.folder failed..." + "\n Reason given: " + error);
+         return res.status(500).json({ error: "server failed to count folders" });
+      }
+   }
 
-      res.status(200).json({ message: "folders collected successfully", payload });
-   }
-   catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "server failed to find folders" });
-   }
+   res.status(200).json({ message: "folders collected successfully", payload });
 }
 
 
@@ -170,16 +191,15 @@ exports.updateAccount = async (req, res) => {
    if (!username) return res.status(400).json({error: 'missing username filed provided in body'});
    if (!email) return res.status(400).json({error: 'missing email field provided in body'});
 
+   //make sure username or email aren't already taken
    try{
-      //make sure username or email isn't already taken
       const foundUsername = await User.findOne({ username: new RegExp(`^${username}$`, 'i') });
       if (foundUsername && foundUsername._id != req.user._id) { return res.status(400).json({ error: "username already taken" }); }
       const foundEmail = await User.findOne({ email: new RegExp(`^${email}$`, 'i') }) 
       if (foundEmail && foundEmail._id != req.user._id) { return res.status(400).json({ error: "email already taken" }); }
    }
-   // handle any errors caused by checking for already existing data
    catch(error){
-      console.error(error);
+      console.log("\x1b[31m%s\x1b[0m", "user.controller.updateAccount failed..." + "\n Reason given: " + error);
       return res.status(500).json({ error: "server failed to update user account" });
    }
 
@@ -189,10 +209,9 @@ exports.updateAccount = async (req, res) => {
       bio: bio || ""
    };
 
-   try {
-      // check if a file has been uploaded with the request 
-      if (req.file) {
-
+   // check if a new profile photo has been uploaded with the request
+   if (req.file) {
+      try {
          // add image data to the updated user data
          updatedUserData.image = {
             filename: req.file.filename,
@@ -200,7 +219,7 @@ exports.updateAccount = async (req, res) => {
             size: req.file.size,
             mimetype: req.file.mimetype,
             uploadedAt: new Date()
-         }
+         };
 
          // delete the old image file from the server if it exists
          const existingImage = await User.findOne({ _id: req.user._id }, { image: 1 });
@@ -208,23 +227,24 @@ exports.updateAccount = async (req, res) => {
             volumeUtils.deleteVolumeFile("users", existingImage.image.filename);
          }
       }
-   }
-   catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "server failed to handle replacing profile photo" });
+      catch (error) {
+         console.log("\x1b[31m%s\x1b[0m", "user.controller.updateAccount failed..." + "\n Reason given: " + error);
+         return res.status(500).json({ error: "server failed to handle replacing profile photo" });
+      }
    }
 
+   // update new user data inside the database
+   let updatedUserObject;
    try {
-      // update new user data inside the database
-      const updatedUserObject = await userUtils.verifyObject(updatedUserData, false);
+      updatedUserObject = await userUtils.verifyObject(updatedUserData, false);
       await User.updateOne({ _id: req.user._id }, { $set: updatedUserObject });
-
-      return res.status(200).json({ message: "user account updated successfully" });
    }
    catch (error) {
       console.error(error);
       return res.status(500).json({ error: "server failed to update user account" });
    }
+
+   return res.status(200).json({ message: "user account updated successfully" });
 }
 
 
@@ -246,13 +266,13 @@ exports.sendFriendRequest = async (req, res) => {
       if (!targetData) { return res.status(404).json({ error: "user receiving friend request not found" }); }
    }
    catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "user.controller.sendFriendRequest failed... unable to find receiver in database");
-      console.error(error);
+      console.log("\x1b[31m%s\x1b[0m", "user.controller.sendFriendRequest failed..." + "\n Reason given: " + error);
       return res.status(500).json({ error: "server failed to find user receiving friend request" });
    }
 
    // check if friend request or friendship already exist inside the database
    try {
+      // make sure no outgoing or incoming friend requests already exist in the database
       const sentRequest = await FriendRequest.findOne({ senderId: userId, receiverId: targetId });
       if (sentRequest) return res.status(409).json({ error: "friend request already sent to this user" });
 
@@ -264,24 +284,23 @@ exports.sendFriendRequest = async (req, res) => {
       if (existingFriendship) return res.status(409).json({ error: "friendship already created with this user" });
    }
    catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "user.controller.sendFriendRequest failed... unable to check for existing friend requests or friendships in database");
-      console.error(error);
+      console.log("\x1b[31m%s\x1b[0m", "user.controller.sendFriendRequest failed..." + "\n Reason given: " + error);
       return res.status(500).json({ error: "server failed to check if friendRequest or friendship already exist" });
    }
 
    // create the friend request and save to the database
+   let friendship;
    try {
       const newRequest = { senderId: userId, receiverId: targetId };
-      const friendship = await new FriendRequest(newRequest)
-      .save();
-
-      return res.status(201).json({ message: "friend request sent", payload: friendship });
+      friendship = await new FriendRequest(newRequest)
+         .save();
    }
    catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "user.controller.sendFriendRequest failed... unable to create friend request in database");
-      console.error(error);
+      console.log("\x1b[31m%s\x1b[0m", "user.controller.sendFriendRequest failed..." + "\n Reason given: " + error);
       return res.status(500).json({ error: "server failed to create friend request inside the database" });
    }
+   
+   return res.status(201).json({ message: "friend request sent", payload: friendship });
 }
 
 
@@ -297,61 +316,61 @@ exports.processFriendRequest = async (req, res) => {
    const userId = req.user._id;
    const { requestId, accept } = req.body;
 
+   // find friend request inside the database
    let friendRequestData;
-
-   // find fiend request in the database
    try {
       friendRequestData = await FriendRequest.findOne({ _id: requestId });
       if (!friendRequestData) { return res.status(404).json({ error: "friend request not found in database" }); }      
    }
    catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "user.controller.processFriendRequest failed... unable to find friend request in database");
-      console.error(error);
+      console.log("\x1b[31m%s\x1b[0m", "user.controller.processFriendRequest failed..." + "\n Reason given: " + error);
       return res.status(500).json({ error: "server failed to find friend request in database" });
    }
 
-   // instructions for accepting the friend request
-   try {
-      if (accept) { 
-         if (friendRequestData.receiverId != userId) { return res.status(403).json({ error: "current user is not the receiver of this request" }); }
-         const existingFriendship = await Friendship.findOne({ friendIds: { $all: [friendRequestData.senderId, userId] } });
+   // logic for accepting the friend request
+   if (accept) {
+      // check if the client has write access to the friend request
+      if (friendRequestData.receiverId != userId) { return res.status(403).json({ error: "current user is not the receiver of this request" }); }
 
+      try {
+         // check if friendship already exists in the database
+         const existingFriendship = await Friendship.findOne({ friendIds: { $all: [friendRequestData.senderId, userId] } });
          if (existingFriendship) {
-            // delete friend request from database and return an error message
             await FriendRequest.deleteOne({ _id: requestId });
-            return res.status(409),json({ error: "friendship already exists inside the database" }); 
+            return res.status(409).json({ error: "friendship already exists inside the database" });
          }
 
          // add friendship to the database
          const newFriendship = await new Friendship({ friendIds: [friendRequestData.senderId, userId] })
-         .save();
+            .save();
          
          // delete friend request from database
          await FriendRequest.deleteOne({ _id: requestId });
-
-         return res.status(201).json({ message: "friendship  created successfully", payload: newFriendship });
       }
-   }
-   catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "user.controller.processFriendRequest failed... unable to approve friend request");
-      console.error(error);
-      return res.status(500).json({ error: "server failed to approve friend request" });
+      catch (error) {
+         console.log("\x1b[31m%s\x1b[0m", "user.controller.processFriendRequest failed..." + "\n Reason given: " + error);
+         return res.status(500).json({ error: "server failed to approve friend request" });
+      }
+
+      return res.status(201).json({ message: "friendship  created successfully", payload: newFriendship });
    }
 
-   // instructions for denying or canceling the friend request
-   try {
+   // instructions for rejecting or canceling the friend request
+   else {
       // check if the client has write access to the friend request
       if (friendRequestData.senderId != userId && friendRequestData.receiverId != userId) { return res.status(403).json({ error: "current user does not have write access to this request" }); }
 
       // delete friend request from database
-      await FriendRequest.deleteOne({ _id: requestId });
+      try {
+         await FriendRequest.deleteOne({ _id: requestId });
+      }
+      catch (error) {
+         console.log("\x1b[31m%s\x1b[0m", "user.controller.processFriendRequest failed..." + "\n Reason given: " + error);
+         return res.status(500).json({ error: "server failed to remove friend request from the database" });
+      }
 
       return res.status(204).json({ message: "friendRequest removed from the database" });
-   }
-   catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "user.controller.processFriendRequest failed... unable to remove friend request from database");
-      console.error(error);
-      return res.status(500).json({ error: "server failed to remove friend request from the database" });
+
    }
 }
 
@@ -372,8 +391,8 @@ exports.deleteFriend = async (req, res) => {
    // check for any missing fields in the request
    if (!relationshipId) return res.status(400).json({ error: 'missing relationshipId field in body' });
 
+   // find and delete the friendship from the database
    try {
-      // find friendship in the database
       const friendship = await Friendship.findOne({ _id: relationshipId });
       if (!friendship) { return res.status(400).json({ error: "friendship not found in database" }); }
 
@@ -382,13 +401,13 @@ exports.deleteFriend = async (req, res) => {
 
       // delete friendship from database
       await Friendship.deleteOne({ _id: relationshipId });
-      return res.status(204).json({ message: "friendship deleted successfully" });
    }
 
    // handle any errors caused by the controller
    catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "user.controller.deleteFriend failed... unable to delete friendship from database");
-      console.error(error);
+      console.log("\x1b[31m%s\x1b[0m", "user.controller.deleteFriend failed..." + "\n Reason given: " + error);
       return res.status(500).json({ error: "server failed to delete friendship" });
    }
+
+   return res.status(204).json({ message: "friendship deleted successfully" });
 }

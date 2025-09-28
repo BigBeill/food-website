@@ -1,7 +1,7 @@
 const postgresConnection = require('../config/postgres');
 const { conversionFactorList } = require('../library/canadianNutrientFileUtils');
 const ingredientUtils = require('../library/ingredientUtils');
-const { update } = require('./recipe.controller');
+
 
 
 /*
@@ -27,15 +27,16 @@ exports.getObject = async (req, res) => {
       };
    }
 
+   let ingredientObject;
    try {
-      const ingredientObject = await ingredientUtils.verifyObject(recipe, includeNutrition);
-      return res.status(200).json({ message: 'returning ingredientObject', payload: ingredientObject });
+      ingredientObject = await ingredientUtils.verifyObject(recipe, includeNutrition);
    }
    catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "ingredient.controller.getObject failed... unable to create ingredient object");
-      console.error(error);
+      console.log("\x1b[31m%s\x1b[0m", "ingredient.controller.getObject failed..." + "\n Reason given: " + error);
       return res.status(500).json({ error: 'server failed to convert provided data into a recipe object' });
    }
+
+   return res.status(200).json({ message: 'returning ingredientObject', payload: ingredientObject });
 }
 
 
@@ -107,8 +108,7 @@ exports.find = async (req, res) => {
       }
    }
    catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "ingredient.controller.find failed... unable to collect common ingredient names from database");
-      console.error(error);
+      console.log("\x1b[31m%s\x1b[0m", "ingredient.controller.find failed..." + "\n Reason given: " + error);
       return res.status(500).json({ error: 'server failed to collect ingredient list from database' });
    }
 
@@ -154,8 +154,7 @@ exports.find = async (req, res) => {
       }
    }
    catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "ingredient.controller.list failed... unable to collect ingredient list from database");
-      console.error(error);
+      console.log("\x1b[31m%s\x1b[0m", "ingredient.controller.list failed..." + "\n Reason given: " + error);
       return res.status(500).json({ error: 'server failed to collect ingredient list from database' });
    }
 
@@ -168,8 +167,7 @@ exports.find = async (req, res) => {
       }));
    }
    catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "ingredient.controller.list failed... unable to convert ingredient list into usable objects");
-      console.error(error);
+      console.log("\x1b[31m%s\x1b[0m", "ingredient.controller.list failed..." + "\n Reason given: " + error);
       return res.status(500).json({ error: 'server failed to convert ingredient list into usable objects' });
    }
 
@@ -188,15 +186,16 @@ returns a list of all conversion types found for given foodId in the canadian nu
 exports.conversionOptions = async (req, res) => {
    const { foodId } = req.params;
 
+   let conversionObjectArray;
    try {
-      const conversionObjectArray = await conversionFactorList(foodId);
-      return res.status(200).json({ message: "ingredient measurements collected from server", payload: conversionObjectArray });
+      conversionObjectArray = await conversionFactorList(foodId);
    }
    catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "ingredient.controller.measurements failed... unable to collect measurements from database");
-      console.error(error);
+      console.log("\x1b[31m%s\x1b[0m", "ingredient.controller.measurements failed..." + "\n Reason given: " + error);
       return res.status(500).json({ error: 'server failed to collect measurement information from database' });
    }
+
+   return res.status(200).json({ message: "ingredient measurements collected from server", payload: conversionObjectArray });
 }
 
 
@@ -205,9 +204,17 @@ exports.conversionOptions = async (req, res) => {
 returns a list of all food groups found in the canadian nutrient file database
 @route: GET /ingredient/groups
 */
-exports.groups = async (req, res) => {
-   const data = await postgresConnection.query('select * from food_group');
-   // change the data to make it usable by the client
-   data.rows = data.rows.map(row => { return { foodGroupId: row.food_group_id, foodGroupName: row.food_group_name } });
-   return (res.status(200).json({ message: "ingredient groups collected from server", payload: data.rows }));
+exports.groups = async (_req, res) => {
+   let recipeGroupsData;
+   try {
+      recipeGroupsData = await postgresConnection.query('select * from food_group');
+   }
+   catch (error) {
+      console.log("\x1b[31m%s\x1b[0m", "ingredient.controller.groups failed..." + "\n Reason given: " + error);
+      return res.status(500).json({ error: 'server failed to collect ingredient groups from database' });
+   }
+
+   // normalize the data to make it usable by the client
+   recipeGroupsData.rows = recipeGroupsData.rows.map(row => { return { foodGroupId: row.food_group_id, foodGroupName: row.food_group_name } });
+   return (res.status(200).json({ message: "ingredient groups collected from server", payload: recipeGroupsData.rows }));
 };

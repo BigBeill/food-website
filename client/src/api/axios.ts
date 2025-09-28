@@ -39,7 +39,7 @@ export default async function sendRequest( configuration: sendRequestProps ) {
       })
       .catch((error) => {
          // check if request was rejected due to accessToken
-         if (error.status == 401) {
+         if (error.status == 401  && !configuration.url.startsWith('authentication')) {
             //attempt to request a new access token
             console.warn("accessToken rejected, requesting new accessToken");
             axiosInstance({ method: 'post', url: 'authentication/refresh' })

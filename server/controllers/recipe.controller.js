@@ -2,7 +2,6 @@ const recipeUtils = require("../library/recipeUtils");
 const userUtils = require("../library/userUtils");
 const Recipe = require("../models/recipe");
 const User = require("../models/user");
-const path = require("path");
 const volumeUtils = require("../library/volumeUtils");
 
 // IMPORTANT: go to server/routes/recipe.router.js for a more detailed explanations
@@ -26,37 +25,37 @@ exports.getObject = async (req, res) => {
    let recipeObject;
    try {
       recipeObject = await recipeUtils.verifyObject(recipe, true, includeNutrition);
-
-      // return recipe if client is the owner or the recipe is public
-      if (recipeObject.visibility == "public") { return res.status(200).json({ message: "recipe object found", payload: recipeObject }); }
    }
    catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "recipe.controller.getObject failed... unable to create recipe object");
-      console.error(error);
+      console.log("\x1b[31m%s\x1b[0m", "recipe.controller.getObject failed..." + "\n Reason given: " + error);
       return res.status(500).json({ error: 'server failed to convert provided data into a recipe object' })
    }
 
-   // logic for handling the return of non-public recipes
+   // return recipe if client is the owner or the recipe is public
+   if (recipeObject.visibility == "public") { return res.status(200).json({ message: "recipe object found", payload: recipeObject }); }
+
+   //else: logic for handling the return of non-public recipes
+   
+   // check if the user is signed in, and return the recipe if they are the owner
+   if (!userId) { return res.status(401).json({ error: "user must be signed in to access a non public recipe" }); }
+   if (recipeObject.owner == userId) { return res.status(200).json({ message: "recipe object found", payload: recipeObject }); }
+
+   // reject the request if the recipe is personal
+   if (recipeObject.visibility == "personal") { return res.status(403).json({ error: "current user does not have read access to the recipe" }); }
+
+   // check if the user is friends with the owner of the recipe
+   let isFriend;
    try {
-      // check if the user is signed in
-      if (!userId) { return res.status(401).json({ error: "user must be signed in to access a non public recipe" }); }
-
-      // check if the user is the owner of the recipe
-      if (recipeObject.owner == userId) { return res.status(200).json({ message: "recipe object found", payload: recipeObject }); }
-
-      // check if the recipe is private
-      if (recipeObject.visibility == "personal") { return res.status(403).json({ error: "current user does not have read access to the recipe" }); }
-
-      // check if the user is friends with the owner of the recipe
-      const isFriend = await userUtils.isFriend({ _id: userId }, recipeObject.owner);
-      if (isFriend) { return res.status(200).json({ message: "recipe object found", payload: recipeObject }); }
-      else { return res.status(403).json({ error: "current user does not have read access to the recipe" }); }
+      isFriend = await userUtils.isFriend({ _id: userId }, recipeObject.owner);
    }
    catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "recipe.controller.getObject failed... unable to verify clients access to recipe object");
-      console.error(error);
+      console.log("\x1b[31m%s\x1b[0m", "recipe.controller.getObject failed..." + "\n Reason given: " + error);
       return res.status(500).json({ error: 'server failed to verify if the client has read access to the recipe' });
    }
+
+   // return recipe if they are friends
+   if (isFriend) { return res.status(200).json({ message: "recipe object found", payload: recipeObject }); }
+   else { return res.status(403).json({ error: "current user does not have read access to the recipe" }); }
 }
 
 
@@ -77,61 +76,65 @@ exports.find = async (req, res) => {
    let recipeData = [];
    let query = {};
 
-   if (category == "public") {
-      // only return public recipes
-      query.visibility = "public";
-   }
+   // only return public recipes if category is public
+   if (category == "public") { query.visibility = "public"; }
 
    // if searching the friends category, get an array of all friends and attach them to the query
    if (category == "friends") {
+      let friendList;
+      // get a list of user _ids that the current user is friends with
       try {
-         // get a list of user _ids that the current user is friends with
-         const friendList = await userUtils.getFriendList({_id: userId}, false);
-
-         // add the friend _ids to the query
-         query.owner = { $in: friendList };
-         query.visibility = { $in: ["public", "friends"] }; // only return public and friends recipes
+         friendList = await userUtils.getFriendList({_id: userId}, false);
       }
       catch (error) {
-         console.log("\x1b[31m%s\x1b[0m", "recipe.controller.find failed... unable to define valid user _ids for query");
-         console.error(error);
+         console.log("\x1b[31m%s\x1b[0m", "recipe.controller.find failed..." + "\n Reason given: " + error);
          return res.status(500).json({ error: "server failed to define valid user _ids for query" });
       }
+
+      // add the friend _ids to the query
+      query.owner = { $in: friendList };
+      query.visibility = { $in: ["public", "friends"] }; // only return public and friends recipes
    }
 
    // if searching the personal category, attach current users id to the query
    if (category == "personal") { query.owner = userId; }
 
+   // attach additional search fields to the query
+   if (title) { query.title = { $regex: new RegExp(title, 'i') } }
+   if (foodIdList) { query["ingredients.foodId"] = { $all: foodIdList }; }
+
+   // conduct the database search
+   let recipeObjectArray = [];
    try {
-      if (title) { query.title = { $regex: new RegExp(title, 'i') } }
-      if (foodIdList) { query["ingredients.foodId"] = { $all: foodIdList }; }
       recipeData = await Recipe.find(query)
-      .limit(limit)
-      .skip(skip);
+         .limit(limit)
+         .skip(skip);
+
+      // make sure each recipe found is converted into a recipeObject
+      recipeObjectArray = await Promise.all(recipeData.map((recipe) => { return recipeUtils.verifyObject(recipe, true, includeNutrition); }));
    }
    catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "recipe.controller.find failed... unable to fetch recipes from database");
-      console.error(error);
+      console.log("\x1b[31m%s\x1b[0m", "recipe.controller.find failed..." + "\n Reason given: " + error);
       return res.status(500).json({ error: "server failed to find recipes" });
    }
 
-   try {
-      const recipeObjectArray = await Promise.all(recipeData.map((recipe) => { return recipeUtils.verifyObject(recipe, true, includeNutrition); }));
-      let payload = { recipeObjectArray };
+   // prep the return payload
+   let payload = { recipeObjectArray };
 
-      if (count) {
+   // attach the count field to the payload if requested
+   if (count) {
+      try {
          const recipeCount = await Recipe.countDocuments(query);
          payload.count = recipeCount;
       }
-
-      return res.status(200).json({ message: "recipes found", payload });
-   }
-   catch (error) {
-      console.log("\x1b[31m%s\x1b[0m", "recipe.controller.find failed... unable to verify recipe objects before sending to client");
-      console.error(error);
-      return res.status(500).json({ error: "server failed to verify recipe objects" });
+      catch (error) {
+         console.log("\x1b[31m%s\x1b[0m", "recipe.controller.find failed..." + "\n Reason given: " + error);
+         return res.status(500).json({ error: "server failed to count recipes" });
+      }
    }
 
+   // return the payload to the client
+   return res.status(200).json({ message: "recipes found", payload });
 }
 
 

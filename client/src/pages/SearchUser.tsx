@@ -50,7 +50,7 @@ export default function SearchUser() {
          url += `limit=${pageSize - foldersGrabbed}&count=true`
          axios({ method: 'get', url})
          .then((response) => {
-            setUserList(response.userObjectList);
+            setUserList(response.userObjectArray);
             setUserCount(response.count);
             setLoadingPage(false);
          });

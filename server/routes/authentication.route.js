@@ -122,6 +122,7 @@ Route description:
 Returns:
    - 200 New user token sent
    - 400 Arguments were provided or valid refresh token not found
+   - 401 Refresh token is invalid or expired
 */
 router.post("/refresh", 
    [

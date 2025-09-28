@@ -23,7 +23,7 @@ export default function Folder({ folderDetails }: FolderProps) {
       // fetch the first 3 users in the folder from server
       if (folderDetails._id == "requests") {
          axios({ method: 'get', url: `/user/find?category=requests&limit=3` })
-         .then((response) => { setDisplayUsers(response.userObjectList) })
+         .then((response) => { setDisplayUsers(response.userObjectArray) })
          .catch((error) => { console.error(error) });
       }
       else {
