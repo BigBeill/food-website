@@ -127,24 +127,40 @@
 button{
    margin: 0rem 0.6rem;
    width: calc(100% - 1.2rem);
-   height: 2.1rem;
-   padding: .3rem .6rem;
+   height: 2.5rem;
+   padding: 0.75rem 1.5rem;
    color: var(--text-color-dark);
-   background-color: var(--background-color);
+   background: linear-gradient(135deg, var(--background-color) 0%, rgba(245, 248, 250, 0.8) 100%);
    overflow: hidden;
-   border: 2px solid var(--supporting-color);
-   border-radius: 3rem;
-   transition: .15s ease-in-out;
+   border: 1px solid var(--supporting-color);
+   border-radius: 0.75rem;
+   font-weight: 600;
+   box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1);
+   transition: all 0.2s ease-in-out;
 
    &:hover{
       color: var(--background-color);
-      background-color: var(--supporting-color);
+      background: linear-gradient(135deg, var(--supporting-color) 0%, var(--base-color) 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.15);
       cursor: pointer;
    }
 
    &.additionalMargin{
       margin: 0.6rem 4.5rem;
       width: calc(100% - 9rem);
+   }
+
+   &.darkText {
+      background: linear-gradient(135deg, var(--base-color) 0%, var(--supporting-color) 100%);
+      color: white;
+      border: 1px solid var(--base-color);
+
+      &:hover {
+         background: linear-gradient(135deg, var(--supporting-color) 0%, var(--base-color) 100%);
+         color: white;
+         border-color: var(--supporting-color);
+      }
    }
 }
 

@@ -61,48 +61,52 @@ export default function UserPin({ userObject: parentUserObject }: UserPinProps) 
 
    return (
       <div className='userObjectView pin'>
-         <div className="centredVertically" ref={titleRef} onClick={ () => { viewProfile() } }>
-            <GrowingText text={userObject.username} parentDiv={titleRef} />
-         </div>
-         <div onClick={ () => { viewProfile() } }>
-               <img 
-                  src={userObject.image?.url ? `${database}${userObject.image.url}` : "/user-image-fallback.png"} 
+         <div className="pin-header" onClick={ () => { viewProfile() } }>
+            <div className="username-container" ref={titleRef}>
+               <GrowingText text={userObject.username} parentDiv={titleRef} />
+            </div>
+            <div className="profile-image">
+               <img
+                  src={userObject.image?.url ? `${database}${userObject.image.url}` : "/user-image-fallback.png"}
                   alt='profile picture'
                   onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => {
                      error.currentTarget.onerror = null; // Prevents looping
                      error.currentTarget.src = "/user-image-fallback.png";
                   }}
                />
+            </div>
          </div>
 
-         <div className='styleDiv'></div>
+         <div className='pin-divider'></div>
 
-         <div className='contactInformation'>
-         <p>
-            Relationship: {
-            !userObject.relationship ? 'none' :
-            userObject.relationship.type == 'none' ? 'none' : 
-            userObject.relationship.type == 'friend' ? 'friends' : 
-            userObject.relationship.type == 'self' ? 'your account' : 
-            'friendship pending'}
-         </p>
-         </div>
-         <div className={`icons ${iconsHidden ? 'hidden' : ''}`}>
-         { !userObject.relationship ? null 
-         : userObject.relationship.type == 'none' ? (
-            <FontAwesomeIcon icon={faUserPlus} onClick={() => { sendFriendRequest() } } />
-         ) : userObject.relationship.type == 'friend' ? (
-            <FontAwesomeIcon icon={faUser} onClick={ () => { viewProfile() } } />
-         ) : userObject.relationship.type == 'requestReceived' ? (
-            <FontAwesomeIcon icon={faBan} onClick={ () => { rejectFriendRequest() } } />
-         ) : userObject.relationship.type == 'requestSent' ? (
-            <>
-               <FontAwesomeIcon icon={faCheck} onClick={ () => { acceptFriendRequest() } } />
-               <FontAwesomeIcon icon={faX} onClick={ () => { rejectFriendRequest() } } />
-            </>
-         ) : userObject.relationship.type == 'self' ? (
-            <FontAwesomeIcon icon={faUser} onClick={ () => { viewProfile() } } />
-         ) : null }
+         <div className='pin-bottom'>
+            <div className='contactInformation'>
+               <p>
+                  Relationship: {
+                  !userObject.relationship ? 'none' :
+                  userObject.relationship.type == 'none' ? 'none' :
+                  userObject.relationship.type == 'friend' ? 'friends' :
+                  userObject.relationship.type == 'self' ? 'your account' :
+                  'friendship pending'}
+               </p>
+            </div>
+            <div className={`icons ${iconsHidden ? 'hidden' : ''}`}>
+               { !userObject.relationship ? null
+               : userObject.relationship.type == 'none' ? (
+                  <FontAwesomeIcon icon={faUserPlus} onClick={() => { sendFriendRequest() } } />
+               ) : userObject.relationship.type == 'friend' ? (
+                  <FontAwesomeIcon icon={faUser} onClick={ () => { viewProfile() } } />
+               ) : userObject.relationship.type == 'requestReceived' ? (
+                  <FontAwesomeIcon icon={faBan} onClick={ () => { rejectFriendRequest() } } />
+               ) : userObject.relationship.type == 'requestSent' ? (
+                  <>
+                     <FontAwesomeIcon icon={faCheck} onClick={ () => { acceptFriendRequest() } } />
+                     <FontAwesomeIcon icon={faX} onClick={ () => { rejectFriendRequest() } } />
+                  </>
+               ) : userObject.relationship.type == 'self' ? (
+                  <FontAwesomeIcon icon={faUser} onClick={ () => { viewProfile() } } />
+               ) : null }
+            </div>
          </div>
       </div>
    )

@@ -47,19 +47,68 @@
    height: 100%;
    padding: 3rem;
    display: inline-grid;
-   grid-template-columns: repeat(auto-fill, 24rem);
-   grid-auto-rows: 12rem;
+   grid-template-columns: repeat(auto-fill, minmax(24rem, 1fr));
+   grid-auto-rows: min-content;
    justify-content: center;
    gap: 1.5rem;
    grid-template-areas: "filterPanel" "filterPanel" "filterPanel";
 
    .filterPanel {
-      padding: 0.6rem;
-      border-radius: 0.15rem;
-      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+      border-radius: 1rem;
+      box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
       background-color: var(--background-color);
+      border: 1px solid rgba(6, 95, 70, 0.1);
       grid-area: filterPanel;
-      padding: 0.6rem 1.8rem;
+      padding: 2rem;
+
+      h2 {
+         margin-top: 0;
+         margin-bottom: 2rem;
+         color: var(--text-color-dark);
+         text-decoration: underline var(--base-color);
+         text-decoration-thickness: 0.15rem;
+      }
+
+      .textInput {
+         margin-bottom: 1.5rem;
+
+         input {
+            border-radius: 0.5rem;
+            border: 1px solid rgba(6, 95, 70, 0.2);
+            background-color: rgba(255, 255, 255, 0.5);
+            padding: 0.75rem 1rem;
+            transition: all 0.2s ease-in-out;
+
+            &:focus {
+               border-color: var(--base-color);
+               background-color: rgba(255, 255, 255, 0.8);
+               box-shadow: 0 0 0 3px rgba(6, 95, 70, 0.1);
+            }
+         }
+
+         label {
+            font-weight: 600;
+            color: var(--text-color-dark);
+            margin-bottom: 0.5rem;
+         }
+      }
+
+      button {
+         border-radius: 0.75rem;
+         background: linear-gradient(135deg, var(--base-color) 0%, var(--supporting-color) 100%);
+         border: none;
+         color: white;
+         font-weight: 600;
+         padding: 0.875rem 2rem;
+         box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+         transition: all 0.2s ease-in-out;
+
+         &:hover {
+            background: linear-gradient(135deg, var(--supporting-color) 0%, var(--base-color) 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px -1px rgb(0 0 0 / 0.15);
+         }
+      }
    }
 }
 
