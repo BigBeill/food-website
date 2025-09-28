@@ -194,6 +194,105 @@
          background: rgba(6, 95, 70, 0.05);
          border-radius: 4px;
       }
+
+      // Loading and transition states
+      &.transitioning {
+         .notebookPage {
+            pointer-events: none;
+         }
+      }
+
+      .page-loading {
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         justify-content: center;
+         height: 100%;
+         gap: 1rem;
+         color: var(--text-color-main);
+
+         .loading-spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 3px solid rgba(6, 95, 70, 0.2);
+            border-top: 3px solid var(--base-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+         }
+
+         p {
+            font-size: 1.1rem;
+            font-weight: 500;
+         }
+      }
+
+      .empty-page {
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         height: 100%;
+         color: var(--text-color-main);
+         opacity: 0.7;
+
+         p {
+            font-size: 1.1rem;
+            font-style: italic;
+         }
+      }
+
+      .notebookPage.loading {
+         opacity: 0.7;
+         transition: opacity 0.3s ease;
+      }
+   }
+
+   // Error boundary styles
+   .notebook-error {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 50vh;
+      gap: 1.5rem;
+      padding: 2rem;
+      text-align: center;
+      background: var(--background-color);
+      border-radius: 1rem;
+      border: 2px solid rgba(239, 68, 68, 0.2);
+      background: rgba(239, 68, 68, 0.02);
+
+      h2 {
+         color: #dc2626;
+         margin: 0;
+         font-size: 1.5rem;
+      }
+
+      p {
+         color: var(--text-color-main);
+         margin: 0;
+      }
+
+      .retry-button {
+         background: linear-gradient(135deg, var(--base-color), var(--supporting-color));
+         color: white;
+         border: none;
+         padding: 0.75rem 1.5rem;
+         border-radius: 0.5rem;
+         cursor: pointer;
+         font-weight: 600;
+         transition: all 0.2s ease;
+
+         &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px -2px rgba(6, 95, 70, 0.3);
+         }
+      }
+   }
+
+   // Animations
+   @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
    }
 
    // mobile view

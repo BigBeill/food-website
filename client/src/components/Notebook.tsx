@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 
 import '../styles/componentSpecific/notebook.scss';
 import PageObject from '../interfaces/PageObject';
@@ -8,29 +8,36 @@ import PaginationBar from './PaginationBar';
 
 interface NotebookProps {
    pageList: PageObject[];
-   startingPageNumber?: number; // the page number of the first page in the pageList, defaults to 1
-   parentPageNumber?: number; // the page number that the parent component thinks is currently being displayed, defaults to startingPageNumber
-   setParentPageNumber?: (pageNumber: number) => void; // provide this if you want notebook to change the parents page number when it navigates to a different page
+   startingPageNumber?: number;
+   parentPageNumber?: number;
+   setParentPageNumber?: (pageNumber: number) => void;
    requestNewPage?: (pageNumber: number) => void;
    pageCount?: number;
+   isLoading?: boolean;
+   onPageChange?: (pageNumber: number) => void;
+}
+
+interface PageBounds {
+   min: number;
+   max: number;
+   isValid: (pageIndex: number) => boolean;
 }
 
 export default function Notebook ({
-   pageList, 
-   startingPageNumber=1, 
-   parentPageNumber = startingPageNumber, 
-   setParentPageNumber, 
-   requestNewPage, 
-   pageCount = pageList.length
+   pageList,
+   startingPageNumber = 1,
+   parentPageNumber = startingPageNumber,
+   setParentPageNumber,
+   requestNewPage,
+   pageCount = pageList.length,
+   isLoading = false,
+   onPageChange
 }: NotebookProps) {
 
-   // use States that keep track of whether the screen is too narrow to display both pages at once, and if so which page to display
    const [narrowScreen, setNarrowScreen] = useState<boolean>(false);
    const [displayRight, setDisplayRight] = useState<boolean>(false);
-
-   // useState that keeps track of the index of the current page being looked at
-   // this is the global index for the list of pages (if the startingPageNumber is 2,  current index should be set to 2 in order to display the first page in the list)
    const [currentIndex, setCurrentIndex] = useState<number>(parentPageNumber - 1);
+   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
 
    // monitors the screen size and sets narrowScreen accordingly
    useEffect(() => {
