@@ -102,7 +102,7 @@ exports.login = async (req, res) => {
          { username: new RegExp(`^${username}$`, 'i') },
          { _id: 1, username: 1, email: 1, bio: 1, hash: 1, salt: 1 }
       );
-      if (!user) return res.status(401).json({ error: "username not found" });
+      if (!user) { return res.status(404).json({ error: "username not found" }); }
 
       // check if password is correct
       if (!passwordUtils.correctPassword(password, user.hash, user.salt)) { return res.status(401).json({ error: "incorrect password" }); }
