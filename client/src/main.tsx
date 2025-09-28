@@ -11,6 +11,7 @@ import './styles/inputs.scss';
 import './styles/animations.scss';
 import './styles/objectView.scss';
 import './styles/landingPage.scss';
+import './styles/profilePage.scss';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   localEnvironment == "true" ? (
