@@ -166,7 +166,8 @@ exports.refresh = async (req, res) => {
 
    // validate the refresh token
    const validToken = verify(refreshToken, process.env.SESSION_SECRET);
-   if (!validToken || validToken._id !== databaseToken.user) { return res.status(401).json({ error: "invalid refresh token provided" }); }
+   const databaseUserAsString = String(databaseToken.user);
+   if (!validToken || validToken._id !== databaseUserAsString) { return res.status(401).json({ error: "invalid refresh token provided" }); }
 
    // create the send new access token
    const tokens = createToken({ _id: validToken._id});
