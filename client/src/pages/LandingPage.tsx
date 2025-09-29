@@ -1,43 +1,52 @@
+import { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
+
+import axios from "../api/axios";
+import Recipe from "./Recipe"
+import RecipeObject   from "../interfaces/RecipeObject";
 
 export default function LandingPage() {
 
    const { userId } = useOutletContext<{userId: string}>();
 
+   const [recipe, setRecipe] = useState<RecipeObject | undefined>(undefined);
+
+   //collect test recipe from the database
+   useEffect(() => {
+      console.log("Fetching test recipe...");
+      axios({ method: 'get', url: `recipe/getObject/6879a6901775cc14af3170ef/true` })
+         .then((response) => { 
+            console.log("Test recipe fetched:", response);
+            setRecipe(response); 
+         })
+         .catch((error) => { console.error("Error fetching recipe:", error); });
+   }, []);
+
    return (
       <>
-         <div className="standardPage">
-            <h1>Welcome to Beill's Greenhouse</h1>
-            <p>
-               My name is Mackenzie Neill, I graduated from computer science at trent university.
-               This is a personal project I have been working on to practice my web-development, networking, and cyber security skills.
-               Because this is an experimental project, Its not being monitored regularly and that limits how much I can protect your data.
-               So with that in mind, here are some general tips to keep your data safe:
-            </p>
-            <ul>
-               <li>Use a unique password for this site. DO NOT REUSE PASSWORDS!</li>
-               <li>Do not reveal any personal information you don't want being public.</li>
-               <li>Do not use this site to store sensitive information.</li>
-               <li>Do not use this site to store any information you do not want to be public.</li>
-               <li>*several other bullet points about not sharing sensitive information*</li>
-            </ul>
-            <p>The person I made that list for knows who they are</p>
-            <p>please enjoy, and if your interested in understanding how any of this is done check out https://github.com/BigBeill/food-website</p>
-
-            <ul>
-               <li><a href="/searchRecipes/public" className="button">Explore Recipes</a></li>
-               { userId ? <>
-                  <li><a href="/searchRecipes/personal" className="button">My Recipes</a></li>
-                  <li><a href="/searchRecipes/friends" className="button">Friends Recipes</a></li>
-                  <li><a href="/editRecipe" className="button">Create Recipe</a></li>
-                  <li><a href="/profile" className="button">My Profile</a></li>
-               </> : <>
-                  <li><a href="/login" className="button">Login</a></li>
-                  <li><a href="/register" className="button">Register</a></li>
-               </> }
-               <li><a href="/aboutMe" className="button">Learn About Me</a></li>
-            </ul>
-         </div>
+        <section className="splitSpace" style={{ paddingBottom: '6rem', }}>
+            {/* Main title card */}
+            <div className="standardPageNicer" style={{ marginTop: '6rem',}}>
+               <h1>Welcome to Big Beill's Greenhouse</h1>
+               <p style={{ fontSize: '1.2rem' }}> Discover, create, and share amazing recipes with a community of food enthusiasts </p>
+               <div>
+                  {!userId ? (
+                     <>
+                        <a href="/register" className="callToActionButton primary">Get Started</a>
+                        <a href="/login" className="callToActionButton secondary">Sign In</a>
+                     </>
+                  ) : (
+                     <>
+                        <a href="/editRecipe" className="callToActionButton primary">Create Recipe</a>
+                        <a href="/searchRecipes/personal" className="callToActionButton secondary">My Recipes</a>
+                     </>
+                  )}
+               </div>
+            </div>
+            <div className="miniModelWithFade alignOnFocus" style={{ width: 'calc(100% - 30em)', }}>
+               <Recipe recipe={recipe} />
+            </div>
+         </section>
       </>
    );
 }

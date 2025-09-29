@@ -73,13 +73,13 @@
    background-color: var(--background-color);
 
    &.fullPage {
-      margin: 3rem auto;
-      width: calc(100% - 3rem);
-      max-width: 60rem;
-      padding: 3rem;
-      gap: 1.2rem;
-      grid-template-columns: calc(100% - 16.2rem) 15rem;
-      grid-template-rows: 15rem 12rem 18rem 1fr;
+      margin: 3em auto;
+      width: calc(100% - 3em);
+      max-width: 60em;
+      padding: 3em;
+      gap: 1.2em;
+      grid-template-columns: calc(100% - 16.2em) 15em;
+      grid-template-rows: 15em 12em 18em 1fr;
       grid-template-areas: "titleContainer image" "description description" "ingredients nutrientInformation" "instructions instructions";
    }
 
@@ -135,7 +135,7 @@
       height: 100%;
       box-sizing: border-box;
       background-color: white;
-      border: 0.03rem solid black;
+      border: 0.03em solid black;
       object-fit: cover;
       object-position: center;
    }
@@ -144,7 +144,7 @@
       grid-area: description;
       width: 100%;
       height: 100%;
-      padding-right: 0.3rem;
+      padding-right: 0.3em;
       overflow-y: auto;
    }
 
@@ -157,7 +157,7 @@
       overflow-y: hidden;
 
       ul {
-         padding-right: 0.3rem;
+         padding-right: 0.3em;
          overflow-y: auto;
       }
    }
@@ -174,11 +174,15 @@
       width: 100%;
       height: 100%;
       overflow-y: auto;
-      padding-right: 0.3rem;
+      padding-right: 0.3em;
 
       li {
-         margin-bottom: 0.9rem;
+         margin-bottom: 0.9em;
       }
+   }
+
+   ul, ol{
+      padding-left: 2.4em;
    }
 
    h2 {
@@ -186,11 +190,37 @@
    }
 
    h3 {
-      margin-top: 0rem;
+      margin-left: 0.5em;
+      margin-bottom: 0.2em;
+      font-size: 2em;
+      margin-top: 0em;
       font-weight: bold;
       text-decoration: underline #065F46;
-      text-decoration-thickness: 0.2rem;
+      text-decoration-thickness: 0.1em;
    }
+
+   
+   // scrollbar styles
+      ::-webkit-scrollbar {
+         width: 0.15rem;
+      }
+
+      ::-webkit-scrollbar-thumb {
+         background-color: var(--text-color-main);
+         border-radius: 0.3rem;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+         background-color: var(--text-color-main);
+      }
+
+      ::-webkit-scrollbar-thumb:active {
+         background-color: var(--text-color-main);
+      }
+      ::-webkit-scrollbar-track {
+         // fake margin
+         border-left: 0.3rem solid transparent;
+      }
 }
 
 .userObjectView {
