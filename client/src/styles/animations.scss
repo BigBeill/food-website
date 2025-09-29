@@ -20,14 +20,23 @@
    }
 }
 
-.alignOnFocus {
-   transform: rotate(5deg);
-   transition: 
-      transform 0.3s ease,
-      box-shadow 0.3s ease;
+.growOnHover {
+      transition: 
+         transform 0.3s ease,
+         box-shadow 0.3s ease;
 
    &:hover {
-      transform: rotate(0deg) scale(1.05);
+      transform: scale(1.05);
+      box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+   }
+}
+
+.alignOnHover {
+   @extend .growOnHover;
+   transform: rotate(5deg);
+
+   &:hover {
+      transform: rotate(0deg);
       box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
    }
 }

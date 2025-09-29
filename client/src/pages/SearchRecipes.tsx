@@ -220,7 +220,7 @@ function FilterSearchPage({parentTitle, parentIngredientList, handleSubmit}: Fil
    }
 
    return (
-      <div className='standardContent'>
+      <div className='consumeSpaceWithFlex'>
          <h1>Public Recipes</h1>
 
          <div className='textInput additionalMargin'>
