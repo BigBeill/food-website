@@ -10,7 +10,7 @@ const { uploadVolumeFile } = require("../library/volumeUtils");
 Type:
    GET - returns a completed recipe object
 
-Expects 2 argument from params:
+Expects 2 arguments from params:
    recipeId: integer
    includeNutrition: boolean (optional, default false)
 

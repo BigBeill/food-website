@@ -10,8 +10,9 @@ export default function LandingPage() {
 
    const { userId } = useOutletContext<{userId: string}>();
 
-   const [recipe, setRecipe] = useState<RecipeObject | undefined>(undefined);
+   const [recipe, setRecipe] = useState<RecipeObject | null>(null);
    const [loading, setLoading] = useState(true);
+   const [error, setError] = useState<string | null>(null);
 
    //collect test recipe from the database
    useEffect(() => {
@@ -19,12 +20,24 @@ export default function LandingPage() {
       axios({ method: 'get', url: `recipe/getObject/6879a6901775cc14af3170ef/true` })
          .then((response) => { 
             setRecipe(response); 
-            setLoading(false);
          })
-         .catch((error) => { console.error("Error fetching recipe:", error); });
+         .catch((error) => { 
+            console.error("Error fetching recipe:", error); 
+            setError("Failed to load featured recipe. Please try again later.");
+         })
+         .then(( ) => { setLoading(false); });
    }, []);
 
    if (loading) { return <Loading />; }
+
+   if (error) {
+      return (
+         <div className="standardPage">
+            <h1>Error</h1>
+            <p>{error}</p>
+         </div>
+      );
+   }
 
    return (
       <>
@@ -47,9 +60,13 @@ export default function LandingPage() {
                   )}
                </div>
             </div>
-            <div className="miniModelWithFade alignOnHover" style={{ width: 'calc(100% - 30em)', }}>
-               <Recipe recipe={recipe} />
-            </div>
+            {recipe ? (
+               <div className="miniModelWithFade alignOnHover" style={{ width: 'calc(100% - 30em)', }}>
+                  <Recipe recipe={recipe} />
+               </div>
+            ) : (
+               <p>No featured recipe available.</p>
+            )}
          </section>
 
          {/* Features Section */}
