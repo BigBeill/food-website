@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import axios from "../api/axios";
 import GrowingText from "../components/GrowingText";
@@ -15,13 +15,13 @@ interface RecipeParams {
 export default function Recipe({recipe}: RecipeParams) {
 
    const titleRef = useRef<HTMLDivElement | null>(null);
-   const navigate = useNavigate();
 
    const { recipeId } = useParams<{ recipeId: string }>();
    const [recipeObject, setRecipeObject] = useState<RecipeObject | null>(null);
    const [error, setError] = useState<string | null>(null);
 
    useEffect(() => {
+      setError(null);
       // If recipe is passed as a prop, use it directly
       if (recipe) { 
          setRecipeObject(recipe);
@@ -29,7 +29,7 @@ export default function Recipe({recipe}: RecipeParams) {
       }
       // Otherwise, fetch the recipe by ID from the URL
       if (!recipeId){ 
-         navigate("/home"); 
+         setError("No recipe object or ID provided in URL.");
          return;
       }
       axios({ method:'get', url:`/recipe/getObject/${recipeId}/true` })
