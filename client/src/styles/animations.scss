@@ -36,6 +36,6 @@
    transform: rotate(5deg);
 
    &:hover {
-      transform: rotate(0deg);
+      transform: rotate(0deg) scale(1.05);
    }
 }

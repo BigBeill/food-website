@@ -140,7 +140,7 @@ export default function LandingPage() {
                   create, share, and discover amazing recipes.
                </p>
                <div className="info-links">
-                  <a className="callToActionButton primary" href="https://github.com/BigBeill/food-website" target="_blank" rel="noopener noreferrer">
+                  <a className="callToActionButton primary" href="https://github.com/BigBeill/Food-Recipe-Sharing-Platform" target="_blank" rel="noopener noreferrer">
                      View on GitHub
                   </a>
                   <a className="callToActionButton secondary" href="/aboutMe">
