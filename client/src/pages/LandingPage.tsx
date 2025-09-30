@@ -61,7 +61,7 @@ export default function LandingPage() {
                </div>
             </div>
             {recipe ? (
-               <div className="miniModelWithFade alignOnHover" style={{ width: 'calc(100% - 30em)', }}>
+               <div className="miniModelWithFade alignOnHover" style={{ width: '24rem', }}>
                   <Recipe recipe={recipe} />
                </div>
             ) : (
@@ -71,67 +71,71 @@ export default function LandingPage() {
 
          {/* Features Section */}
          <section className="contentCollection centerText">
-            <div className="standardContent">
-               <div className="icon">🍳</div>
-               <h3>Create Recipes</h3>
-               <p>Build and organize your personal recipe collection with detailed ingredients and instructions</p>
-               <a href="/editRecipe" className="feature-link">Start Creating →</a>
-            </div>
-            <div className="standardContent">
-               <div className="icon">🌍</div>
-               <h3>Explore Public Recipes</h3>
-               <p>Discover amazing recipes shared by the community and find inspiration for your next meal</p>
-               <a href="/searchRecipes/public" className="feature-link">Explore Now →</a>
-            </div>
-            <div className="standardContent">
-               <div className="icon">👥</div>
-               <h3>Connect with Friends</h3>
-               <p>Share recipes with friends and discover what they're cooking in their kitchen</p>
-               <a href="/searchUser/friends" className="feature-link">Find Friends →</a>
+            <div className="collection">
+               <div className="standardContent">
+                  <div className="icon">🍳</div>
+                  <h3>Create Recipes</h3>
+                  <p>Build and organize your personal recipe collection with detailed ingredients and instructions</p>
+                  <a href="/editRecipe" className="feature-link">Start Creating →</a>
+               </div>
+               <div className="standardContent">
+                  <div className="icon">🌍</div>
+                  <h3>Explore Public Recipes</h3>
+                  <p>Discover amazing recipes shared by the community and find inspiration for your next meal</p>
+                  <a href="/searchRecipes/public" className="feature-link">Explore Now →</a>
+               </div>
+               <div className="standardContent">
+                  <div className="icon">👥</div>
+                  <h3>Connect with Friends</h3>
+                  <p>Share recipes with friends and discover what they're cooking in their kitchen</p>
+                  <a href="/searchUser/friends" className="feature-link">Find Friends →</a>
+               </div>
             </div>
          </section>
 
          {/* Quick Access Section */}
          <section className="contentCollection centerText">
-            <div className="standardContentAsButton growOnHover">
-               <div className="icon">📖</div>
-               <a  href="/searchRecipes/public">Browse Recipes</a>
-            </div>
-            {userId ? (
-               <>
-                  <div className="standardContentAsButton growOnHover">
-                     <div className="icon">📋</div>
-                     <a href="/searchRecipes/personal">My Recipes</a>
-                  </div>
-                  <div className="standardContentAsButton growOnHover">
-                     <div className="icon">👫</div>
-                     <a href="/searchRecipes/friends">Friend's Recipes</a>
-                  </div>
-                  <div className="standardContentAsButton growOnHover">
-                     <div className="icon">👤</div>
-                     <a href="/profile">My Profile</a>
-                  </div>
-               </>
-            ) : (
-               <>
-                  <div className="standardContentAsButton growOnHover">
-                     <div className="icon">🔐</div>
-                     <a href="/login">Login</a>
-                  </div>
-                  <div className="standardContentAsButton growOnHover">
-                     <div className="icon">✨</div>
-                     <a href="/register">Register</a>
-                  </div>
-               </>
-            )}
-            <div className="standardContentAsButton growOnHover">
-               <div className="icon">ℹ️</div>
-               <a href="/aboutMe">About</a>
+            <div className="collection">
+               <div className="standardContentAsButton growOnHover">
+                  <div className="icon">📖</div>
+                  <a  href="/searchRecipes/public">Browse Recipes</a>
+               </div>
+               {userId ? (
+                  <>
+                     <div className="standardContentAsButton growOnHover">
+                        <div className="icon">📋</div>
+                        <a href="/searchRecipes/personal">My Recipes</a>
+                     </div>
+                     <div className="standardContentAsButton growOnHover">
+                        <div className="icon">👫</div>
+                        <a href="/searchRecipes/friends">Friend's Recipes</a>
+                     </div>
+                     <div className="standardContentAsButton growOnHover">
+                        <div className="icon">👤</div>
+                        <a href="/profile">My Profile</a>
+                     </div>
+                  </>
+               ) : (
+                  <>
+                     <div className="standardContentAsButton growOnHover">
+                        <div className="icon">🔐</div>
+                        <a href="/login">Login</a>
+                     </div>
+                     <div className="standardContentAsButton growOnHover">
+                        <div className="icon">✨</div>
+                        <a href="/register">Register</a>
+                     </div>
+                  </>
+               )}
+               <div className="standardContentAsButton growOnHover">
+                  <div className="icon">ℹ️</div>
+                  <a href="/aboutMe">About</a>
+               </div>
             </div>
          </section>
 
          {/* Info Section */}
-         <section className="contentCollection" style={{marginTop: '6rem',}}>
+         <section className="splitSpace" style={{marginTop: '6rem',}}>
             <div className="standardContent">
                <h3>About This Project</h3>
                <p>

@@ -82,6 +82,7 @@
    background-color: rgba(0, 0, 0, 0.5);
    z-index: 10;
    overflow-y: scroll;
+   overflow-x: hidden;
    overscroll-behavior: contain;
 
    &:hover {
@@ -91,10 +92,12 @@
    .popupContent {
       position: relative;
       margin: 1.2rem auto;
-      width: fit-content;
+      width: 100%;
+      max-width: fit-content;
       display: block;
       box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
       overflow: visible;
+      overflow-x: hidden;
       border: 1px solid black;
 
       > div {
