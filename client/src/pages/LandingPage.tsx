@@ -96,38 +96,38 @@ export default function LandingPage() {
          {/* Quick Access Section */}
          <section className="contentCollection centerText">
             <div className="collection">
-               <div className="standardContentAsButton growOnHover">
+               <div className="buttonContent growOnHover">
                   <div className="icon">📖</div>
                   <a  href="/searchRecipes/public">Browse Recipes</a>
                </div>
                {userId ? (
                   <>
-                     <div className="standardContentAsButton growOnHover">
+                     <div className="buttonContent growOnHover">
                         <div className="icon">📋</div>
                         <a href="/searchRecipes/personal">My Recipes</a>
                      </div>
-                     <div className="standardContentAsButton growOnHover">
+                     <div className="buttonContent growOnHover">
                         <div className="icon">👫</div>
                         <a href="/searchRecipes/friends">Friend's Recipes</a>
                      </div>
-                     <div className="standardContentAsButton growOnHover">
+                     <div className="buttonContent growOnHover">
                         <div className="icon">👤</div>
                         <a href="/profile">My Profile</a>
                      </div>
                   </>
                ) : (
                   <>
-                     <div className="standardContentAsButton growOnHover">
+                     <div className="buttonContent growOnHover">
                         <div className="icon">🔐</div>
                         <a href="/login">Login</a>
                      </div>
-                     <div className="standardContentAsButton growOnHover">
+                     <div className="buttonContent growOnHover">
                         <div className="icon">✨</div>
                         <a href="/register">Register</a>
                      </div>
                   </>
                )}
-               <div className="standardContentAsButton growOnHover">
+               <div className="buttonContent growOnHover">
                   <div className="icon">ℹ️</div>
                   <a href="/aboutMe">About</a>
                </div>
@@ -152,7 +152,7 @@ export default function LandingPage() {
                   </a>
                </div>
             </div>
-            <div className="standardContent warningBox">
+            <div className="warningContent">
                <h3>Security Notice</h3>
                <p>As this is an experimental side project, servers are not regularly monitored for security vulnerabilities. Please follow general best practices for keeping your data safe on the internet:</p>
                <ul>

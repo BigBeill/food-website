@@ -148,10 +148,7 @@ export default function SearchUser() {
                   onKeyDown={ (event) => { if(event.key == "Enter") submitSearch(); } }
                   />
                </div>
-               <button 
-               className="moveToBottom"
-               onClick={() => submitSearch()}
-               >
+               <button onClick={() => submitSearch()}>
                   Search
                </button>
             </div>
