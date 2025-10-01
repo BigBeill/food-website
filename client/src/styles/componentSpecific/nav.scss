@@ -7,7 +7,7 @@ nav{
   padding: 0rem .9rem;
   top: 0;
   width: 12rem;
-  border-right: 0.3rem solid var(--base-color);
+  border-right: 0.3rem solid var(--primary-color);
   box-shadow: 0.06rem 0.06rem 0.15rem #2C1A1D;
   display: flex;
   flex-direction: column;
@@ -53,7 +53,7 @@ nav{
     left: 13.8rem;
     width: 2.4rem;
     height: 6rem;
-    background-color: var(--base-color);
+    background-color: var(--primary-color);
     box-shadow: 0.06rem 0.06rem 0.15rem #2C1A1D;
     top: 50%;
     transform: translate(0%, -50%);

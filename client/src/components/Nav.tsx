@@ -33,11 +33,9 @@ function Nav({userId}: NavProps) {
     }, []);
 
     return(
-        <>
-        <nav ref={navRef} className={`navBar ${open ? 'open' : ''}`} id="navBar">
+        <nav aria-label="Main Navigation" ref={navRef} className={`navBar ${open ? 'open' : ''}`} id="navBar">
 
             <img className="logo" src="/BigBeill-logo_black.png" alt="Beill Greenhouse Logo" onClick={() => {navigate('/')}}/>
-
 
             <h3>Find Recipes</h3>
             <NavLink className="navLink" to="/searchRecipes/public" onClick={() => setOpen(false)}>Public Recipes</NavLink>
@@ -80,7 +78,6 @@ function Nav({userId}: NavProps) {
             </div>
 
         </nav>
-        </>
     )
 }
 
