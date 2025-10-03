@@ -12,10 +12,11 @@
 
 
    // define color variables used throughout the scss files
-   --base-color: #065F46;
+   --primary-color: #065F46;
+   --secondary-color: #065f46;
 
    --background-color: #f5f8fa;
-   --supporting-color: #065f46;
+   --supporting-color: #e2e2e2;
    --text-color-main: grey;
    --text-color-dark: black;
 }
@@ -60,6 +61,11 @@ main{
 
 /* ------------ general css classes ------------ */
 
+/*
+Standard page class
+this applies a very simple page design to any blocks that use this class
+the design resembles a sheet of printed paper (large, squared corners, plain background, some margin)
+*/
 .standardPage {
    margin: 3rem auto;
    width: calc(100% - 3rem);
@@ -71,41 +77,11 @@ main{
    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
-.standardContent {
-   @extend .standardPage;
-   height: fit-content;
-   border-radius: 0.6rem;
-   padding-bottom: 2.4rem;
-
-   .icon {
-      width: fit-content;
-      font-size: 3rem;
-      margin: auto;
-   }
-   
-   > * {
-      display: block;
-      margin-left: 0rem;
-      margin-right: 0rem;
-      width: 100%;
-   }
-
-   > a {
-      text-decoration: none;
-      font-weight: bold;
-   }
-}
-
-.standardContentAsButton {
-   @extend .standardContent;
-   cursor: pointer;
-   padding-bottom: 1.2rem;
-   
-   a {
-      margin-top: 0.6rem;
-   }
-}
-
+/*
+Chat container class
+this extends the 'standardPage' class, specifically designed for chat log containers
+adds a fixed height, flexbox layout, and custom scrollbar styling
+*/
 .chatContainer {
    @extend .standardPage;
    height: 45rem;
@@ -132,25 +108,97 @@ main{
    }
 
    ::-webkit-scrollbar-thumb {
-      background-color: var(--base-color); /* color of the scrollbar thumb */
+      background-color: var(--primary-color); /* color of the scrollbar thumb */
       border-radius: 0.3rem; /* rounded corners */
    }
    
    /* Hover state of the thumb */
    ::-webkit-scrollbar-thumb:hover {
-      background-color: var(--base-color);
+      background-color: var(--primary-color);
       cursor: pointer;
    }
    
    /* Handle when scrollbar is in a drag state */
    ::-webkit-scrollbar-thumb:active {
-      background-color: var(--base-color);
+      background-color: var(--primary-color);
    }
    ::-webkit-scrollbar-track {
       background: transparent; /* color of the scrollbar track */
    }
 }
 
+/*
+Standard content class
+this applies a very simple content block design to any blocks that use this class
+the design follows a more modern aesthetic (rounded corners, shadow, plain background)
+*/
+.standardContent {
+   margin: 3rem auto;
+   height: fit-content;
+   width: calc(100% - 3rem);
+   max-width: min(calc(100% - 3rem), 45rem);
+   box-sizing: border-box;
+   display: block;
+   padding: 0.6rem 3rem 3.4rem 3rem;
+   background-color: var(--background-color);
+   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+   border-radius: 0.6rem;
+
+   .icon {
+      width: fit-content;
+      font-size: 3rem;
+      margin: auto;
+   }
+   
+   > * {
+      display: block;
+      margin-left: 0rem;
+      margin-right: 0rem;
+      width: 100%;
+   }
+
+   > a {
+      text-decoration: none;
+      font-weight: bold;
+   }
+}
+
+/*
+Button content class
+this extends the standard content class with additional styles for button-like elements
+adds {cursor: pointer;}, and specific padding
+*/
+.buttonContent {
+   @extend .standardContent;
+   cursor: pointer;
+   padding-bottom: 1.2rem;
+   
+   a {
+      margin-top: 0.6rem;
+   }
+}
+
+/*
+Warning content class
+this extends the standard content class with additional styles to represent a warning message
+adds an reddish-orange design to the block
+*/
+.warningContent {
+   @extend .standardContent;
+   border-left: 0.3rem solid #9f0712;
+   background-color: color-mix(in oklch, var(--background-color) 90%, #FF8904 10%);
+
+   h3 {
+      color: #9f0712;
+      font-weight: bold;
+   }
+}
+
+/*
+Content collection class
+this is a container class for displaying an array of content blocks
+to use: must add a direct child with the class 'collection' which will be the flexbox container for the content blocks
+*/
 .contentCollection {
 
    width: 100%;
@@ -185,6 +233,11 @@ main{
    }
 }
 
+/*
+Mini model class
+this is a container class for displaying a mini version of the component it contains
+usually used for displaying previews of the real item
+*/
 .miniModel {
    @extend .shielded;
    margin: 3rem auto;
@@ -199,6 +252,11 @@ main{
    }
 }
 
+/*
+Mini model with fade class
+this is an extends the mini model class with an added fade effect at the bottom
+usually used to indicate that there is more content to be seen in the full version of the component
+*/
 .miniModelWithFade {
    @extend .miniModel;
    position: relative;
@@ -215,51 +273,46 @@ main{
    }
 }
 
-.warningBox{
-   border-left: 0.3rem solid #9f0712;
-   background-color: color-mix(in oklch, var(--background-color) 90%, #FF8904 10%);
-
-   h3 {
-      color: #9f0712;
-      font-weight: bold;
-   }
-}
-
-.loadingIcon {
-   color: var(--supporting-color);
-   animation: spin 1.5s cubic-bezier(0.7, 0, 0.3, 1) infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
+/*
+Hidden class
+this class can be applied to any element to hide it from view
+usually used by javascript to toggle the visibility of elements
+*/
 .hidden{
    display: none !important;
 }
 
-.invisible{
-   visibility: hidden;
-}
-
+/*
+Shielded class
+this class can be applied to any element to prevent user interaction with it and its children
+usually used to visually show entire components without any of the interaction functionality
+*/
 .shielded *{
    pointer-events: none;
 }
 
-.centred{
-   margin-left: auto;
-   margin-right: auto;
-}
-
+/* 
+Centred vertically class
+used to vertically centre the immediate children of an element
+*/
 .centredVertically{
    display: flex;
    align-items: center;
 }
 
+/*
+Center text class
+used to center text inside an element
+*/
 .centerText{
    text-align: center;
 }
 
+/*
+Split space class
+used to split the immediate children of an element into two equal columns using css grid
+on screens smaller than 48rem the layout switches to inline with a gap of 0.9rem
+*/
 .splitSpace{
    width: 100%;
    margin: 0rem;
@@ -268,6 +321,7 @@ main{
    grid-template-columns: 50% 50%;
 }
 
+// responsive design for split space class
 @media only screen and (max-width: 48rem) {
    .splitSpace {
       display: inline;
@@ -275,36 +329,27 @@ main{
    }
 }
 
-.displayData{
-   margin-left: 1.2rem;
-}
-
-.displayData p{
-   display: inline-block;
-   margin: .3rem 0rem;
-}
-
-.softText{
-   color: #4b4b4b;
-   font-style: italic;
-}
-
+/*
+Consume space class
+makes an element take up all available space inside a container (using flexbox)
+immediate children can be given the class 'priorityChild' to give them {flex: 1;}
+*/
 .consumeSpace{
-   display: inline-block;
-   width: 100%;
    height: 100%;
-}
-
-.consumeSpaceWithFlex {
-   @extend .consumeSpace;
+   width: 100%;
    display: flex;
    flex-direction: column;
+
+   > .priorityChild {
+      flex: 1;
+   }
 }
 
-.notIntractable{
-   pointer-events: none;
-}
-
+/*
+Error class
+used to add error message blocks directly into the component
+typical usage includes pairing this class with the 'hidden' class, to hide the error message when there is no error
+*/
 .error {
    margin: 0rem !important;
    padding: .3rem !important;
@@ -314,23 +359,29 @@ main{
    background-color: rgb(153, 27, 27, .5);
 }
 
-.halfVerticalSpace {
-   width: 100%;
-   height: 50%;
-}
-
+/*
+Extra bottom class
+adds extra bottom margin to an element
+*/
 .extraBottom {
    margin-bottom: 3rem;
 }
 
-.moveToBottom {
-   margin-top: auto;
-   bottom: 0;
+/*
+screen reader only class
+hides an element visually but keeps it accessible to screen readers
+*/
+.screenReaderOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
-
-
-
-
 
 /* ------------ universally applied css ------------ */
 
@@ -390,7 +441,7 @@ input[type=number] {
 
 /* Customize the track */
 ::-webkit-scrollbar-track {
-   background: var(--base-color); /* color of the scrollbar track */
+   background: var(--primary-color); /* color of the scrollbar track */
 }
 
 .growingText{

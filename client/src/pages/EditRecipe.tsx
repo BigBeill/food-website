@@ -218,7 +218,7 @@ interface GeneralInfoPageProps {
 
 function GeneralInfoPage ({newRecipe, title, setTitle, description, setDescription}: GeneralInfoPageProps) {
 	return (
-		<div className='standardContent'>
+		<div className='consumeSpace'>
 			<h1>{newRecipe ? 'New Recipe' : 'Edit Recipe'}</h1>
 
 			<div className='textInput center extraBottom additionalMargin'>
@@ -251,7 +251,7 @@ interface AdditionalInfoPageProps {
 function AdditionalInfoPage ({imageBuffer, setImageBuffer, oldImageUrl, visibility, setVisibility}: AdditionalInfoPageProps) {
 
 	return (
-		<div className='standardContent'>
+		<div className='consumeSpace'>
 			<h2>Additional Information</h2>
 
 			<div style={{ width: '12rem', height: '12rem', margin: '0rem 0rem 3rem 3rem' }}>
@@ -350,7 +350,7 @@ function IngredientPage ({ingredients, setIngredients}: IngredientPageProps) {
 	}
 
 	return (
-		<div className='standardContent'>
+		<div className='consumeSpace'>
 			<h2>Recipe Ingredients</h2>
 
 			{/* ingredients list */}
@@ -476,7 +476,7 @@ function InstructionPage ({instructions, setInstructions}: InstructionPageProps)
 	}
 
 	return (
-		<div className='standardContent'>
+		<div className='consumeSpace'>
 			<h2>Recipe Instructions</h2>
 			<Reorder.Group className='displayList' axis='y' values={instructionList} onReorder={setInstructionList}>
 				{instructionList.map((item, index) => (
@@ -558,7 +558,7 @@ function FinalizeChangesPage({errorMessage, submitRecipe, deleteRecipe, revertCh
 	}
 
 	return (
-		<div className='standardContent'>
+		<div className='consumeSpace'>
 			<h2>Finalize Recipe Changes</h2>
 			<button className="darkText additionalMargin" onClick={() => submitRecipe()}>Save recipe</button>
 			<p className={errorMessage ? "error" : "hidden"} aria-live="assertive">{errorMessage}</p>

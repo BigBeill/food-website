@@ -8,10 +8,13 @@
    gap: 0.6rem;
 
    .notebook {
+      --secondary-color: #4a4a4a;
+
       --background-color: #f6eee3;
-      --supporting-color: #4a4a4a;
+      --supporting-color: #e2dbd0;
       --text-color-main: #575757;
       --text-color-dark: #4a4a4a;
+      
       color: var(--text-color-main);
 
       flex: 1;

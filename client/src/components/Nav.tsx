@@ -3,7 +3,7 @@ import { useState, useEffect, useRef} from 'react'
 
 // internal imports
 import '../styles/componentSpecific/nav.scss'
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 interface NavProps {
     userId: string | null;
@@ -12,7 +12,6 @@ interface NavProps {
 function Nav({userId}: NavProps) {
     const [open, setOpen] = useState<boolean>(false);
     const navRef = useRef<HTMLDivElement>(null);
-    const navigate = useNavigate();
     
     // open/close the nav bar whenever the handle on the side of the nav panel is clicked
     function openNav() {
@@ -32,55 +31,71 @@ function Nav({userId}: NavProps) {
         return () => { document.removeEventListener("mousedown", handleOutsideClick); }
     }, []);
 
+    useEffect(() => {
+        if (open && navRef.current) {
+            const firstLink = navRef.current.querySelector('a, button');
+            (firstLink as HTMLElement)?.focus();
+        }
+    }, [open])
+
     return(
-        <>
-        <nav ref={navRef} className={`navBar ${open ? 'open' : ''}`} id="navBar">
+        <nav aria-label="Main Navigation" ref={navRef} className={`navBar ${open ? 'open' : ''}`} id="navBar" tabIndex={-1}>
+            <NavLink className="logo" to="/">
+                <img src="/BigBeill-logo_black.png" alt="Beill's Greenhouse Logo - Return to home page" />
+            </NavLink>
 
-            <img className="logo" src="/BigBeill-logo_black.png" alt="Beill Greenhouse Logo" onClick={() => {navigate('/')}}/>
-
-
-            <h3>Find Recipes</h3>
-            <NavLink className="navLink" to="/searchRecipes/public" onClick={() => setOpen(false)}>Public Recipes</NavLink>
-
-            { userId ?
+            <section aria-labelledby="findRecipesHeading">
+                <h3 id="findRecipesHeading">Find Recipes</h3>
+                <NavLink to="/searchRecipes/public" onClick={() => setOpen(false)}>Public Recipes</NavLink>
+                { userId && (
+                    <NavLink to="/searchRecipes/friends" onClick={() => setOpen(false)}>Friends Recipes</NavLink>
+                )}
+            </section>
+            { userId && (
                 <>
-                    <NavLink className="navLink" to="/searchRecipes/friends" onClick={() => setOpen(false)}>Friends Recipes</NavLink>
+                    <section aria-labelledby="yourRecipesHeading">
+                        <h3 id="yourRecipesHeading">Your Recipes</h3>
+                        <NavLink to="/searchRecipes/personal" onClick={() => setOpen(false)}>My Recipes</NavLink>
+                        <NavLink to="/index" onClick={() => setOpen(false)}>Saved Recipes</NavLink>
+                        <NavLink to="/editRecipe" onClick={() => setOpen(false)}>Create Recipe</NavLink>
+                    </section>
 
-                    <h3>Your Recipes</h3>
-                    <NavLink className="navLink" to="/searchRecipes/personal" onClick={() => setOpen(false)}>My Recipes</NavLink>
-                    <NavLink className="navLink" to="/index" onClick={() => setOpen(false)}>Saved Recipes</NavLink>
-                    <NavLink className="navLink" to="/editRecipe" onClick={() => setOpen(false)}>Create Recipe</NavLink>
-
-                    <h3>Social</h3>
-                    <NavLink className="navLink" to="/searchUser/friends" onClick={() => setOpen(false)}>My Friends</NavLink>
-                    <NavLink className="navLink" to="/searchUser/all" onClick={() => setOpen(false)}>Search Users</NavLink>
-
-                    <h3>Account</h3>
-                    <NavLink className="navLink" to="/profile" onClick={() => setOpen(false)}>Profile</NavLink>
-                </> 
-            :
-                <>
-                    <h3>Account</h3>
-                    <NavLink className="navLink" to="/login" onClick={() => setOpen(false)}>Login</NavLink>
-                    <NavLink className="navLink" to="/register" onClick={() => setOpen(false)}>Create Account</NavLink>
+                    <section aria-labelledby="socialHeading">
+                        <h3 id="socialHeading">Social</h3>
+                        <NavLink to="/searchUser/friends" onClick={() => setOpen(false)}>My Friends</NavLink>
+                        <NavLink to="/searchUser/all" onClick={() => setOpen(false)}>Search Users</NavLink>
+                    </section>
                 </>
-            }
+            )}
 
-            <h3>Info</h3>
-            <NavLink className="navLink" to="/ingredients" onClick={() => setOpen(false)}>Ingredients List</NavLink>
-            <NavLink className="navLink" to="/aboutMe" onClick={() => setOpen(false)}>About Me</NavLink>
+            <section aria-labelledby="accountHeading">
+                <h3 id="accountHeading">Account</h3>
+                { userId ? (
+                    <NavLink to="/profile" onClick={() => setOpen(false)}>Profile</NavLink>
+                ):(
+                    <>
+                        <NavLink to="/login" onClick={() => setOpen(false)}>Login</NavLink>
+                        <NavLink to="/register" onClick={() => setOpen(false)}>Create Account</NavLink>
+                    </>
+                )}
+            </section>
 
-            <div className='navButton' onClick={openNav}>
-                <div className={`hamburgerButton ${open ? 'open' : ''}`}>
+            <section aria-labelledby="infoHeading">
+                <h3 id="infoHeading">Info</h3>
+                <NavLink to="/ingredients" onClick={() => setOpen(false)}>Ingredients List</NavLink>
+                <NavLink to="/aboutMe" onClick={() => setOpen(false)}>About Me</NavLink>
+            </section>
+
+            <button className='navButton' onClick={openNav} aria-label={open ? "Close navigation menu" : "Open navigation menu"} aria-expanded={open} aria-controls="navBar">
+                <div className={`hamburgerButton ${open ? 'open' : ''}`} aria-hidden="true">
                     <span className="bar"></span>
                     <span className="bar"></span>
                     <span className="bar"></span>
                     <span className="bar"></span>
                 </div>
-            </div>
+            </button>
 
         </nav>
-        </>
     )
 }
 
