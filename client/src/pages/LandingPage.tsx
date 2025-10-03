@@ -12,7 +12,6 @@ export default function LandingPage() {
 
    const [recipe, setRecipe] = useState<RecipeObject | null>(null);
    const [loading, setLoading] = useState(true);
-   const [error, setError] = useState<string | null>(null);
 
    //collect test recipe from the database
    useEffect(() => {
@@ -23,21 +22,11 @@ export default function LandingPage() {
          })
          .catch((error) => { 
             console.error("Error fetching recipe:", error); 
-            setError("Failed to load featured recipe. Please try again later.");
          })
          .then(( ) => { setLoading(false); });
    }, []);
 
    if (loading) { return <Loading />; }
-
-   if (error) {
-      return (
-         <div role="alert" className="standardPage">
-            <h1>Error</h1>
-            <p>{error}</p>
-         </div>
-      );
-   }
 
    return (
       <>
@@ -67,7 +56,7 @@ export default function LandingPage() {
                   <Recipe recipe={recipe} />
                </div>
             ) : (
-               <p>No featured recipe available.</p>
+               <p className="standardContent">No featured recipe available.</p>
             )}
          </section>
 
