@@ -124,7 +124,7 @@ export default function Notebook ({
             <div className={`notebookPage ${(displayRight && narrowScreen) ? 'shielded' : ''}`} onClick={() => setDisplayRight(false)}>
                {firstPage ? (<firstPage.content {...firstPage.props} />) : null}
             </div>
-            <img className="notebookSpine" src="/notebookSpine.png" alt="notebookSpine" />
+            <img className="notebookSpine" src="/notebookSpine.png" alt="notebookSpine" aria-hidden="true" />
             <div className={`notebookPage ${(!displayRight && narrowScreen) ? 'shielded' : ''}`} onClick={() => setDisplayRight(true)}>
                {secondPage ? (<secondPage.content {...secondPage.props} />) : null}
             </div>

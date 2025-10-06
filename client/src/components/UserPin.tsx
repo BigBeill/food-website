@@ -67,7 +67,7 @@ export default function UserPin({ userObject: parentUserObject }: UserPinProps) 
          <div onClick={ () => { viewProfile() } }>
                <img 
                   src={userObject.image?.url ? `${database}${userObject.image.url}` : "/user-image-fallback.png"} 
-                  alt='profile picture'
+                  alt={`profile picture for ${userObject.username}`}
                   onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => {
                      error.currentTarget.onerror = null; // Prevents looping
                      error.currentTarget.src = "/user-image-fallback.png";
@@ -78,14 +78,14 @@ export default function UserPin({ userObject: parentUserObject }: UserPinProps) 
          <div className='styleDiv'></div>
 
          <div className='contactInformation'>
-         <p>
-            Relationship: {
-            !userObject.relationship ? 'none' :
-            userObject.relationship.type == 'none' ? 'none' : 
-            userObject.relationship.type == 'friend' ? 'friends' : 
-            userObject.relationship.type == 'self' ? 'your account' : 
-            'friendship pending'}
-         </p>
+            <p>
+               Relationship: {
+               !userObject.relationship ? 'none' :
+               userObject.relationship.type == 'none' ? 'none' : 
+               userObject.relationship.type == 'friend' ? 'friends' : 
+               userObject.relationship.type == 'self' ? 'your account' : 
+               'friendship pending'}
+            </p>
          </div>
          <div className={`icons ${iconsHidden ? 'hidden' : ''}`}>
          { !userObject.relationship ? null 

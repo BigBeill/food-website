@@ -23,14 +23,14 @@ export default function Folder({ folderDetails }: FolderProps) {
       // fetch the first 3 users in the folder from server
       if (folderDetails._id == "requests") {
          axios({ method: 'get', url: `/user/find?category=requests&limit=3` })
-         .then((response) => { setDisplayUsers(response.userObjectArray) })
-         .catch((error) => { console.error(error) });
+            .then((response) => { setDisplayUsers(response.userObjectArray) })
+            .catch((error) => { console.error(error) });
       }
       else {
          folderDetails.content.slice(0, 3).forEach((userId) => {
             axios({ method: 'get', url: `/user/getObject/${userId}` })
-            .then((response) => { setDisplayUsers((prev) => [...prev, response]) })
-            .catch((error) => { console.error(error) });
+               .then((response) => { setDisplayUsers((prev) => [...prev, response]) })
+               .catch((error) => { console.error(error) });
          });
       }
    }, []);
@@ -43,32 +43,33 @@ export default function Folder({ folderDetails }: FolderProps) {
    return (
       <div className="folderObjectView">
 
-         <div className="userCards shielded">
-         { displayUsers[2] ? (
-            <div className="cardContainer">
-               <UserPin userObject={displayUsers[2]} />
-            </div>
-         ) : <div style={ {display: 'none'} }></div>}
-         { displayUsers[0] ? (
-            <div className="cardContainer">
-               <UserPin userObject={displayUsers[0]} />
-            </div>
-         ) : <div style={ {display: 'none'} }></div> }
-         { displayUsers[1] ? (
-            <div className="cardContainer">
-               <UserPin userObject={displayUsers[1]} />
-            </div>
-         ) : <div style={ {display: 'none'} }></div> }
-
+         {/* this is visual stuff, not useful to screen readers*/}
+         <div className="userCards shielded" aria-hidden="true">
+            { displayUsers[2] ? (
+               <div className="cardContainer">
+                  <UserPin userObject={displayUsers[2]} />
+               </div>
+            ) : <div style={ {display: 'none'} }></div>}
+            { displayUsers[0] ? (
+               <div className="cardContainer">
+                  <UserPin userObject={displayUsers[0]} />
+               </div>
+            ) : <div style={ {display: 'none'} }></div> }
+            { displayUsers[1] ? (
+               <div className="cardContainer">
+                  <UserPin userObject={displayUsers[1]} />
+               </div>
+            ) : <div style={ {display: 'none'} }></div> }
          </div>
          
          <FontAwesomeIcon 
-         className="folder" 
-         icon={faFolder}
-         onClick={ () => { openFolder() } }
+            icon={faFolder}
+            className="folder" 
+            aria-hidden="true"
+            onClick={ () => { openFolder() } }
          />
 
-         <p className="folderCover"> Friend Requests </p>
+         <p className="folderCover" aria-label="Friend requests folder"> Friend Requests </p>
 
       </div>
    )

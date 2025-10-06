@@ -23,7 +23,7 @@ export default function NewEditRecipe () {
 	const { userId } = useOutletContext<{userId: string}>();
 	const { recipeId } = useParams(); //get recipeId if in url
 
-	const [loadingContent, setLoadingContent] = useState<boolean>(false);
+	const [loading, setLoading] = useState<boolean>(false);
 	const [loadingError, setLoadingError] = useState<string>("");
 	const [errorMessage, setErrorMessage] = useState<string>("");
 
@@ -46,11 +46,11 @@ export default function NewEditRecipe () {
 
 		// if recipeId exists, populate the page with data from server for associated recipe
 		if (recipeId) {
-			setLoadingContent(true);
+			setLoading(true);
 			axios({ method:'get', url:`/recipe/getObject/${recipeId}/false` })
 			.then ((returnObject) => {
 				setRecipeObject(returnObject);
-				setLoadingContent(false);
+				setLoading(false);
 			})
 			.catch((error) => {
 				console.error(error);
@@ -65,27 +65,27 @@ export default function NewEditRecipe () {
 	//function for sending recipe changes to server
 	function submitRecipe(){
 		setErrorMessage("");
-		setLoadingContent(true);
+		setLoading(true);
 
 		// check for any empty fields
 		if (!recipeObject.title) { 
 			setErrorMessage("your recipe must have a title");
-			setLoadingContent(false);
+			setLoading(false);
 			return; 
 		}
 		if (!recipeObject.description) { 
 			setErrorMessage("your recipe must have a description"); 
-			setLoadingContent(false);
+			setLoading(false);
 			return; 
 		}
 		if (recipeObject.ingredients.length == 0) { 
 			setErrorMessage("your recipe must have at least one ingredient");
-			setLoadingContent(false);
+			setLoading(false);
 			return;
 		}
 		if (recipeObject.instructions.length == 0) { 
 			setErrorMessage("your recipe must have at least one instruction");
-			setLoadingContent(false);
+			setLoading(false);
 			return; 
 		}
 
@@ -111,13 +111,13 @@ export default function NewEditRecipe () {
 			.catch((error) => {
 				console.error('Error submitting recipe:', error);
 				setErrorMessage('Failed to submit recipe. Reason: ' + error.error || 'Unknown, Please try again later.');
-				setLoadingContent(false);
+				setLoading(false);
 			});
 	}
 
 	function deleteRecipe() {
 		setErrorMessage("");
-		setLoadingContent(true);
+		setLoading(true);
 
 		// if recipeId doesn't exist, don't delete
 		if (!recipeId) { 
@@ -132,7 +132,7 @@ export default function NewEditRecipe () {
 		.catch((error) => {
 			console.error('Error deleting recipe:', error);
 			setErrorMessage('Failed to delete recipe. Please try again later.');
-			setLoadingContent(false);
+			setLoading(false);
 		});
 	}
 
@@ -140,8 +140,8 @@ export default function NewEditRecipe () {
 		window.location.reload();
 	}
 
-	// create pageList, a list of all function (plus associated variables) that are apart of the edit recipe page.
-	const pageList = [
+	// create the list of pages for notebook to display (show the loading component if loading is true )
+	const pageList = loading ? [ { content: LoadingPage, props: {} } ] : [
 		{
 			content: GeneralInfoPage,
 			props: {
@@ -195,7 +195,6 @@ export default function NewEditRecipe () {
 	}
 
 	// don't load the actual page if content is being grabbed from the server
-	if (loadingContent) { return <LoadingPage /> }
 
 	// call notebook and give it pageList
 	return <Notebook pageList={pageList} parentPageNumber={currentPageNumber} setParentPageNumber={setCurrentPageNumber} />
@@ -218,19 +217,19 @@ interface GeneralInfoPageProps {
 
 function GeneralInfoPage ({newRecipe, title, setTitle, description, setDescription}: GeneralInfoPageProps) {
 	return (
-		<div className='consumeSpace'>
+		<section className='consumeSpace'>
 			<h1>{newRecipe ? 'New Recipe' : 'Edit Recipe'}</h1>
 
 			<div className='textInput center extraBottom additionalMargin'>
-			<label htmlFor='title'>Title</label>
-			<input id='title' type='text' value={title} onChange={(event) => setTitle(event.target.value)} placeholder='give your recipe a title'/>
+				<label htmlFor='title'>Title</label>
+				<input id='title' type='text' value={title} onChange={(event) => setTitle(event.target.value)} placeholder='give your recipe a title'/>
 			</div>
 
 			<div className='textInput center additionalMargin'>
-			<label htmlFor='description'>Description</label>
-			<textarea id='description' rows={9} value={description} onChange={(event) => setDescription(event.target.value)} placeholder='describe your recipe' />
+				<label htmlFor='description'>Description</label>
+				<textarea id='description' rows={9} value={description} onChange={(event) => setDescription(event.target.value)} placeholder='describe your recipe' />
 			</div>
-		</div>
+		</section>
 	)
 }
 
@@ -251,7 +250,7 @@ interface AdditionalInfoPageProps {
 function AdditionalInfoPage ({imageBuffer, setImageBuffer, oldImageUrl, visibility, setVisibility}: AdditionalInfoPageProps) {
 
 	return (
-		<div className='consumeSpace'>
+		<section className='consumeSpace'>
 			<h2>Additional Information</h2>
 
 			<div style={{ width: '12rem', height: '12rem', margin: '0rem 0rem 3rem 3rem' }}>
@@ -275,7 +274,7 @@ function AdditionalInfoPage ({imageBuffer, setImageBuffer, oldImageUrl, visibili
 					</div>
 				</div>
 			</div>
-		</div>
+		</section>
 	)
 }
 
@@ -350,7 +349,7 @@ function IngredientPage ({ingredients, setIngredients}: IngredientPageProps) {
 	}
 
 	return (
-		<div className='consumeSpace'>
+		<section className='consumeSpace'>
 			<h2>Recipe Ingredients</h2>
 
 			{/* ingredients list */}
@@ -411,7 +410,7 @@ function IngredientPage ({ingredients, setIngredients}: IngredientPageProps) {
 			</div>
 			<button className="darkText additionalMargin" onClick={() => addIngredient()}>Add Ingredient</button>
 
-		</div>
+		</section>
 	)
 }
 
@@ -476,7 +475,7 @@ function InstructionPage ({instructions, setInstructions}: InstructionPageProps)
 	}
 
 	return (
-		<div className='consumeSpace'>
+		<section className='consumeSpace'>
 			<h2>Recipe Instructions</h2>
 			<Reorder.Group className='displayList' axis='y' values={instructionList} onReorder={setInstructionList}>
 				{instructionList.map((item, index) => (
@@ -515,7 +514,7 @@ function InstructionPage ({instructions, setInstructions}: InstructionPageProps)
 				<button onClick={() => { addInstruction(); }}>{changingInstructionIndex != null ? "Update" : "Add" } Instruction</button>
 				<button className={changingInstructionIndex != null ? 'showButton' : 'hideButton'} onClick={() => { cancelUpdateInstruction() }} >Revert Changes</button>
 			</div>
-		</div>
+		</section>
 	)
 }
 
@@ -558,7 +557,7 @@ function FinalizeChangesPage({errorMessage, submitRecipe, deleteRecipe, revertCh
 	}
 
 	return (
-		<div className='consumeSpace'>
+		<section className='consumeSpace'>
 			<h2>Finalize Recipe Changes</h2>
 			<button className="darkText additionalMargin" onClick={() => submitRecipe()}>Save recipe</button>
 			<p className={errorMessage ? "error" : "hidden"} aria-live="assertive">{errorMessage}</p>
@@ -572,6 +571,6 @@ function FinalizeChangesPage({errorMessage, submitRecipe, deleteRecipe, revertCh
 				<button onClick={() => attemptDeleteRecipe()}>{!deleteConfirmation? "Delete Recipe" : "Confirm Delete"}</button>
 				<button className={deleteConfirmation ? 'showButton' : 'hideButton'} onClick={() => { setDeleteConfirmation(false); }}>Cancel</button>
 			</div>
-		</div>
+		</section>
 	)
 }

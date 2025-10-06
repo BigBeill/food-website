@@ -17,8 +17,9 @@ export default function PaginationBar({ currentPage, totalPages, requestNewPage 
    }
 
    return (
-      <div className="paginationBar">
-         <button onClick={() => handlePageChange(currentPage - 1)} > <FontAwesomeIcon icon={faArrowLeft} /> </button>
+      <section className="paginationBar">
+         <h2 className="screenReaderOnly">Page Navigation Bar</h2>
+         <button aria-label="Previous page" onClick={() => handlePageChange(currentPage - 1)} > <FontAwesomeIcon icon={faArrowLeft} /> </button>
          { currentPage == 4 ? (
             <>
                <button onClick={() => handlePageChange(1)}> 1 </button>
@@ -43,10 +44,10 @@ export default function PaginationBar({ currentPage, totalPages, requestNewPage 
          ) : currentPage < (totalPages - 3)? (
             <>
               <button  onClick={() => handlePageChange(totalPages - 1)}> {totalPages - 1} </button>
-              <button onClick={() => handlePageChange(totalPages)}> {totalPages} </button> 
+              <button onClick={() => handlePageChange(totalPages)}> {totalPages} </button>
             </>
          ) : null}
-         <button onClick={() => handlePageChange(currentPage + 1)} > <FontAwesomeIcon icon={faArrowRight} /> </button>
-      </div>
+         <button aria-label="Next page" onClick={() => handlePageChange(currentPage + 1)} > <FontAwesomeIcon icon={faArrowRight} /> </button>
+      </section>
    )
 }

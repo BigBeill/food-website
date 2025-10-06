@@ -5,7 +5,7 @@ import axios from '../api/axios';
 export default function AboutMe() {
    return (
       <>
-         <div className='standardPage'>
+         <section className='standardPage'>
             <h1>About Me</h1>
             <p>
                My name is Mackenzie Neill, I'm currently graduating from Trent University with a degree in Computer Science. 
@@ -18,7 +18,7 @@ export default function AboutMe() {
                <li><a href="https://www.linkedin.com/in/mackenzie-neill/" target="_blank" rel="noopener noreferrer">My LinkedIn Profile</a></li>
                <li><a href="https://github.com/BigBeill" target="_blank" rel="noopener noreferrer">My GitHub Profile</a></li>
             </ul>
-         </div>
+         </section>
 
          <AgentChat />
       </>
@@ -31,24 +31,35 @@ function AgentChat() {
    const [loading, setLoading] = useState(false);
 
    const chatEndRef = useRef<HTMLDivElement | null>(null);
+   const liveRegionRef = useRef<HTMLDivElement | null>(null);
 
    useEffect(() => {
-      chatEndRef.current?.scrollIntoView({ behavior: 'instant' });
+      if (history.length > 1) { chatEndRef.current?.scrollIntoView({ behavior: 'instant' }); }
    }, [history, loading]);
 
-   function handleSendMessage() {
-      if (!message.trim()) return;
+   // announces new messages to screen readers
+   useEffect(() => {
+      if (history.length > 1 && liveRegionRef.current) {
+         const lastMessage = history[history.length - 1];
+         const senderRole = lastMessage.role === 'assistant' ? 'Mackenzie Neill says' : lastMessage.role === 'user' ? 'You said' : 'system update';
+         liveRegionRef.current.textContent = `${senderRole}: ${lastMessage.content}`;
+      }
+   }, [history]);
 
-      setLoading(true);
+   function handleSendMessage() {
+      if (!message.trim()) { return; }
+
+      const currentMessage = message;
       setMessage('');
 
-      let updatedHistory = [...history, { role: 'user', content: message }];
+      setLoading(true);
 
+      let updatedHistory = [...history, { role: 'user', content: currentMessage }];
 
       axios({
          method: 'post',
          url: '/ai/sendMessage',
-         data: { message, history },
+         data: { currentMessage, history },
       })
       .then((response) => {
          const assistantResponse = { role: 'assistant', content: response };
@@ -66,18 +77,35 @@ function AgentChat() {
    }
 
    return (
-      <div className='chatContainer'>
+      <section className='chatContainer'>
          <h2>Chat with Mackenzie Neill</h2>
-         <div className='ChatLog'>
-            {history.map((msg, i) => (
-               <p key={i}><strong>{msg.role}:</strong> {msg.content}</p>
+
+         {/* live region for announcements for screen readers */}
+         <div ref={liveRegionRef} role="status" aria-live="polite" aria-atomic="true" className="screenReaderOnly"/>
+
+         <div className='ChatLog' role="log" aria-label="chat conversation" aria-live="off">
+            {history.map((message, i) => (
+               <p key={i} ><strong>{message.role}:</strong> {message.content}</p>
             ))}
-            {loading && <p><em>Thinking...</em></p>}
+            {loading && (
+               <div role="status" aria-live="polite">
+                  <p><em>Thinking...</em></p>
+               </div>
+            )}
+            <div ref={chatEndRef} />
          </div>
-         <div className='textInput'>
-            <input value={message} onChange={(event) => setMessage(event.target.value)} onKeyDown={(event) => { if (event.key == "Enter") { handleSendMessage(); } }} placeholder="Type your question..."/>
-            <button onClick={handleSendMessage}>Send</button>
+         <div className='textInput' aria-label="Send a message to the AI chat bot">
+            <input 
+               id="chatInput" 
+               value={message} 
+               onChange={(event) => setMessage(event.target.value)} 
+               onKeyDown={(event) => { if (event.key == "Enter") { handleSendMessage(); } }}
+               placeholder="Type your question..."
+               aria-label="Type your message here"
+               disabled={loading}
+            />
+            <button onClick={handleSendMessage} disabled={loading || !message.trim()}>Send</button>
          </div>
-      </div>
+      </section>
    )
 }

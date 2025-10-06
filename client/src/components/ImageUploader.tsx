@@ -99,19 +99,16 @@ export default function ImageUploader({ imageBuffer, setImageBuffer, oldImageUrl
             }}
          />
 
-         { previewUrl ? (
-            <img className="consumeSpace" alt="preview of uploaded file" src={previewUrl}/>
-         ) : ( 
-            <img 
-               className="consumeSpace" 
-               src={oldImageUrl ? oldImageUrl : fallbackImageUrl} 
-               alt="user profile" 
-               onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                  error.currentTarget.onerror = null; // Prevents looping
-                  error.currentTarget.src = fallbackImageUrl; 
-               }}
-            />
-         ) }
+         <img 
+            className="consumeSpace"
+            src={ previewUrl || oldImageUrl || fallbackImageUrl }
+            alt="preview of currently used image"
+            onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => {
+               error.currentTarget.onerror = null; // Prevents looping
+               error.currentTarget.src = fallbackImageUrl; 
+            }}
+         />
+
          <FontAwesomeIcon icon={faCamera} className={isDragging ? 'makeVisible' : ''}/>
       </div>
    )

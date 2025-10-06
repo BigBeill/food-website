@@ -38,7 +38,6 @@ export default function PublicRecipes() {
 
    // send parameters to the url
    function handleSubmit(title: string, ingredients: IngredientObject[]) {
-      setLoading(true);
       setError(null);
 
       // create params object
@@ -119,6 +118,7 @@ export default function PublicRecipes() {
    // triggers fetchPageContent when filters have been set/changed
    useEffect(() => {
       if (!useStatesDefined) { return; } // if the useStates are not defined, do not run this useEffect
+      setLoading(true);
       fetchPageContent(pageGroupNumber); // fetch the recipes for the current page
    }, [recipeTitle, ingredientList, pageGroupNumber, useStatesDefined]);
 
@@ -174,7 +174,9 @@ function FilterSearchPage({parentTitle, parentIngredientList, handleSubmit}: Fil
 
    // variables for saving whats currently being typed into the text inputs
    const [recipeTitle, setRecipeTitle] = useState<string>(parentTitle || '');
+   useEffect(() => { setRecipeTitle(parentTitle || ''); }, [parentTitle]);
    const [ingredientList, setIngredientList] = useState<IngredientObject[]>(parentIngredientList || []);
+   useEffect(() => { setIngredientList(parentIngredientList || []); }, [parentIngredientList]);
    
    const [newIngredient, setNewIngredient] = useState<IngredientObject>({foodId:"", foodDescription:""});
    const [ingredientsAvailable, setIngredientsAvailable] = useState<IngredientObject[]>([]);

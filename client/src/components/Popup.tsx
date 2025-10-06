@@ -43,7 +43,7 @@ export default function Popup({Child, childProps, closePopup}: PopupProps) {
 
             <button
                className="closePopupButton"
-               aria-label="Close"
+               aria-label="Close popup"
                title="Close"
                onClick={() => { closePopup() }}
             >
