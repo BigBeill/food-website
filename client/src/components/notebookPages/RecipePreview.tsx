@@ -48,7 +48,7 @@ export default function RecipePreview({ recipe }: RecipePreviewProps) {
          />
          <p className="description">{recipe.description}</p>
          <div className="ingredients">
-            <p>Ingredients:</p>
+            <h4>Ingredients:</h4>
             <ul>
                {recipe.ingredients.map((ingredient, index) => (
                   <li key={index}>
@@ -58,19 +58,20 @@ export default function RecipePreview({ recipe }: RecipePreviewProps) {
             </ul>
          </div>
          <div className="nutrition">
+            <h4>Nutrition:</h4>
             { recipe.nutrition ? 
-            <>
-               <p>Calories: {recipe.nutrition.calories.toFixed(2)}</p>
-               <p>Fat: {recipe.nutrition.fat.toFixed(2)}</p>
-               <p>Cholesterol: {recipe.nutrition.cholesterol.toFixed(2)}</p>
-               <p>Sodium: {recipe.nutrition.sodium.toFixed(2)}</p>
-               <p>Potassium: {recipe.nutrition.potassium.toFixed(2)}</p>
-               <p>Carbohydrates: {recipe.nutrition.carbohydrates.toFixed(2)}</p>
-               <p>Fibre: {recipe.nutrition.fibre.toFixed(2)}</p>
-               <p>Sugar: {recipe.nutrition.sugar.toFixed(2)}</p>
-               <p>Protein: {recipe.nutrition.protein.toFixed(2)}</p>
-            </>
-            : null }
+            <ul className="flattenedList">
+               <li>Calories: {recipe.nutrition.calories.toFixed(2)}</li>
+               <li>Fat: {recipe.nutrition.fat.toFixed(2)}</li>
+               <li>Cholesterol: {recipe.nutrition.cholesterol.toFixed(2)}</li>
+               <li>Sodium: {recipe.nutrition.sodium.toFixed(2)}</li>
+               <li>Potassium: {recipe.nutrition.potassium.toFixed(2)}</li>
+               <li>Carbohydrates: {recipe.nutrition.carbohydrates.toFixed(2)}</li>
+               <li>Fibre: {recipe.nutrition.fibre.toFixed(2)}</li>
+               <li>Sugar: {recipe.nutrition.sugar.toFixed(2)}</li>
+               <li>Protein: {recipe.nutrition.protein.toFixed(2)}</li>
+            </ul>
+            : <p>Nutrition information is not available.</p> }
          </div>
 
          <div className="bottomButtons splitSpace">
