@@ -5,7 +5,7 @@ import { logger } from './common/middleware/logger';
 import { authController } from './modules/auth/auth.controller';
 import { usersController } from './modules/users/users.controller';
 import { removeMongooseNoise } from './common/utils/db.mapper';
-import { ingredientController } from './modules/ingredients/ingredients.controller';
+import { ingredientsController } from './modules/ingredients/ingredients.controller';
 import { imagesController } from './modules/images/images.controller';
 import { recipesController } from './modules/recipes/recipes.controller';
 
@@ -26,7 +26,7 @@ export const app = new Elysia()
       api
          .use(authController)
          .use(imagesController)
-         .use(ingredientController)
+         .use(ingredientsController)
          .use(recipesController)
          .use(usersController),
    );

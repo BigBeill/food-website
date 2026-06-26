@@ -8,6 +8,7 @@ import type { UsersService } from "../users/users.service";
 import type { RecipesRepository } from "./recipes.repository";
 import type { NutritionType, RecipeType } from "./recipes.types";
 import type PaginationParams from "../../common/parameters/pagination.parameters";
+import type { PermissionsService } from "../permissions/permissions.service";
 
 interface GetRecipeListParams extends PaginationParams { 
    authId?: string,
@@ -21,14 +22,14 @@ interface GetRecipeListParams extends PaginationParams {
 export class RecipesService { 
    private readonly repository: RecipesRepository;
    private readonly imagesService: ImagesService;
-   private readonly usersService: UsersService;
-   private readonly ingredientsService: IngredientsService
+   private readonly ingredientsService: IngredientsService;
+   private readonly permissionsService: PermissionsService;
 
-   constructor(recipesRepository: RecipesRepository, imagesService: ImagesService, usersService: UsersService, ingredientsService: IngredientsService) {
+   constructor(recipesRepository: RecipesRepository, imagesService: ImagesService, ingredientsService: IngredientsService, permissionsService: PermissionsService) {
       this.repository = recipesRepository;
       this.imagesService = imagesService;
-      this.usersService = usersService;
       this.ingredientsService = ingredientsService;
+      this.permissionsService = permissionsService;
    }
 
    async createRecipe(recipe: Omit<RecipeType, '_id' | 'ownerId' | 'nutrition'> & {nutrition?: NutritionType}, params: AuthIdParams): Promise<RecipeType> {
@@ -90,7 +91,7 @@ export class RecipesService {
          if (!authId) { throw new UnauthorizedError(); }
          if ( mongooseRecord.visibility === 'personal' && mongooseRecord.ownerId.toString() !== authId) { throw new UnauthorizedError(); }
          if ( mongooseRecord.visibility === 'private' ) {
-            const relationship = await this.usersService.defineRelationship({ authId, userId: mongooseRecord.ownerId.toString() });
+            const relationship = await this.permissionsService.defineRelationship(authId, mongooseRecord.ownerId.toString());
             if (relationship.type !== 'friend') { throw new UnauthorizedError(); }
          }
       }
@@ -109,7 +110,7 @@ export class RecipesService {
       }
       else if (visibilityList.includes('private')) {
          if (!authId) { throw new UnauthorizedError(); }
-         allowedOwnerIdList = await this.usersService.getFriendIdList({ userId: authId });
+         allowedOwnerIdList = await this.permissionsService.getFriendIdList(authId);
          allowedOwnerIdList.push(authId);
       }
       else {

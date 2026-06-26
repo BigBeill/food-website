@@ -1,6 +1,6 @@
 import type { IngredientRecord } from "../../common/mongo-db/schemas/recipe.schema";
 import type PaginationParams from "../../common/parameters/pagination.parameters";
-import type { NutritionType, RecipeType } from "../recipes/recipes.types";
+import type { NutritionType } from "../recipes/recipes.types";
 import type { IngredientsRepository } from "./ingredients.repository";
 import type { IngredientConversionType, IngredientGroupType, IngredientType } from "./ingredients.types";
 import { breakupMeasureDescription } from "./ingredients.utils";
@@ -70,7 +70,7 @@ export class IngredientsService {
       }
    }
 
-   async searchConversion (food_id: number, params: paginationParams): Promise<IngredientConversionType[]> {
+   async searchConversion (food_id: number, params: PaginationParams): Promise<IngredientConversionType[]> {
       const { skip, limit } = params;
       const conversionList = await this.repository.getConversionList(food_id, { skip, limit });
       return conversionList;

@@ -42,13 +42,13 @@ export class UsersService {
    private readonly repository: UsersRepository;
    private readonly authService: AuthService;
    private readonly recipesService: RecipesService;
-   private readonly imageService: ImagesService;
+   private readonly imagesService: ImagesService;
 
-   constructor(usersRepository: UsersRepository, authService: AuthService, recipesService: RecipesService, imageService: ImagesService) {
+   constructor(usersRepository: UsersRepository, authService: AuthService, recipesService: RecipesService, imagesService: ImagesService) {
       this.repository = usersRepository;
       this.authService = authService;
       this.recipesService = recipesService;
-      this.imageService = imageService;
+      this.imagesService = imagesService;
    }
 
    async defineRelationship(authId: string, userId: string): Promise<RelationshipType> {
@@ -81,7 +81,7 @@ export class UsersService {
       if (!authId) { throw new UnauthorizedError(); }
 
       // make sure the client know the password of the signed in account
-      const validPassword = await this.authService.verifyPassword({ _id: authId, password });
+      const validPassword = await this.authService.verifyPassword(authId, password);
       if (!validPassword) { throw new UnauthorizedError('Invalid Credentials'); }
 
       // delete any recipes associated with the account
@@ -90,7 +90,7 @@ export class UsersService {
       // delete users avatar image
       const user = await this.repository.getUser(authId);
       if (user?.image) {
-         await this.imageService.deleteImage('avatars', user.image.filename)
+         await this.imagesService.deleteImage('avatars', user.image.filename)
       }
 
       await this.repository.deleteUser(authId);
@@ -220,9 +220,9 @@ export class UsersService {
       if (image){
          const oldUser = await this.repository.getUser(authId);
          if (oldUser?.image) {
-            await this.imageService.deleteImage('avatars', oldUser.image.filename)
+            await this.imagesService.deleteImage('avatars', oldUser.image.filename)
          }
-         savedImage = await this.imageService.saveImage('avatars', image.filename, authId)
+         savedImage = await this.imagesService.saveImage('avatars', image.filename, authId)
       }
 
       const updatedUser = this.repository.updateUser({ _id: authId, name, email, bio, image: savedImage });

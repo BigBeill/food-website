@@ -8,6 +8,7 @@ import { RecipesService } from "./modules/recipes/recipes.service";
 import { UsersService } from "./modules/users/users.service";
 import { IngredientsRepository } from "./modules/ingredients/ingredients.repository";
 import { IngredientsService } from "./modules/ingredients/ingredients.service";
+import { PermissionsService } from "./modules/permissions/permissions.service";
 
 const container = createContainer({ injectionMode: InjectionMode.CLASSIC });
 
@@ -17,14 +18,16 @@ container.register({
   usersRepository: asClass(UsersRepository).singleton(),
   ingredientsRepository: asClass(IngredientsRepository).singleton(),
   authService: asClass(AuthService).singleton(),
-  imageService: asClass(ImagesService).singleton(),
+  imagesService: asClass(ImagesService).singleton(),
   recipesService: asClass(RecipesService).singleton(),
   usersService: asClass(UsersService).singleton(),
   ingredientsService: asClass(IngredientsService).singleton(),
+  permissionsService: asClass(PermissionsService).singleton(),
 });
 
 export const authService = container.resolve<AuthService>("authService");
-export const imagesService = container.resolve<ImagesService>("imageService");
+export const imagesService = container.resolve<ImagesService>("imagesService");
 export const recipesService = container.resolve<RecipesService>("recipesService");
 export const usersService = container.resolve<UsersService>("usersService");
 export const ingredientsService = container.resolve<IngredientsService>("ingredientsService");
+export const permissionsService = container.resolve<PermissionsService>("permissionsService");

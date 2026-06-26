@@ -85,8 +85,6 @@ export const authController = new Elysia({ prefix: '/auth' })
       }
    )
 
-
-
    //* Routes past this point require a valid accessToken to use
    .use(authorizeMiddleware)
    .post(
