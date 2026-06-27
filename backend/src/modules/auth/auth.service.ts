@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { ConflictError, NotFoundError, UnauthorizedError } from "../../common/errors/app-error";
 import { hashPassword, verifyPassword } from "../../common/utils/password";
 import { AuthRepository } from "./auth.repository";
-import type { AuthResult, JwtPayload } from "./auth.types";
+import type { AuthResultType, JwtPayloadType } from "./auth.types";
 import { env } from '../../config/env';
 import { sendPasswordResetEmail } from './auth.emailServices';
 import type AuthIdParams from '../../common/parameters/authId.parameters';
@@ -32,7 +32,7 @@ export class AuthService {
       await this.repository.updatePassword(authId, passwordHash);
    }
 
-   async login(name: string, password: string, rememberMe: boolean = false): Promise<AuthResult> {
+   async login(name: string, password: string, rememberMe: boolean = false): Promise<AuthResultType> {
       const userAndPassword = await this.repository.getUserWithPassword({ name });
       if (!userAndPassword) { throw new UnauthorizedError('Invalid Username'); }
 
@@ -45,18 +45,15 @@ export class AuthService {
       return this.buildAuthResult(user);
    }
 
-   async register(name: string, email: string, password: string): Promise<AuthResult> {
+   async register(name: string, email: string, password: string): Promise<AuthResultType> {
 
       const conflictingUserList = await this.repository.getExactUserList({ name, email });
+
       if (conflictingUserList.length > 0) { 
-         const conflictingUser = {
-            _id: "0",
-            name,
-            email,
-         }
+         const conflictingUser = { _id: "0", name, email }
          throw new ConflictError(buildConflictString(conflictingUser, conflictingUserList)!);
       }
-
+      
       const passwordHash = await hashPassword(password);
       const user = await this.repository.createUser(name, email, passwordHash);
 
@@ -67,10 +64,10 @@ export class AuthService {
       return await this.repository.deleteRefreshTokensByUserId(userId);
    }
 
-   async refreshTokens(refreshToken: string): Promise<AuthResult> {
+   async refreshTokens(refreshToken: string): Promise<AuthResultType> {
 
-      let payload: JwtPayload;
-      try { payload = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as JwtPayload; }
+      let payload: JwtPayloadType;
+      try { payload = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as JwtPayloadType; }
       catch { throw new UnauthorizedError('invalid refresh token'); }
 
       const refreshTokenList = await this.repository.getRefreshTokenList(payload.authId);
@@ -131,7 +128,7 @@ export class AuthService {
       await this.repository.updatePassword(userId, hashedPassword);
    }
 
-   private async buildAuthResult(user: UserRecord, { excludeRefreshToken = false }: {excludeRefreshToken?: boolean } = {}): Promise<AuthResult> {
+   private async buildAuthResult(user: UserRecord, { excludeRefreshToken = false }: {excludeRefreshToken?: boolean } = {}): Promise<AuthResultType> {
       
       const accessToken = jwt.sign(
          { authId: user._id.toString() },

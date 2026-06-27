@@ -1,6 +1,6 @@
 import type { ImageType } from "../images/images.types";
 
-export interface PublicUserType {
+export interface UserType {
    _id: string;
    name: string;
    email?: string;
@@ -19,5 +19,5 @@ export interface RelationshipType {
 export interface FriendFolderType {
    _id: string;
    title: string;
-   content: PublicUserType[];
+   content: UserType[];
 }

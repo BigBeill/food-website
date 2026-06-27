@@ -5,12 +5,12 @@ import { RegisterValidator } from './validators/register.validator';
 import { LoginValidator } from './validators/login.validator';
 import { authorizeMiddleware } from './auth.middleware';
 import { requestPasswordResetValidator } from './validators/requestPasswordReset.validator';
+import { NotFoundError } from '../../common/errors/app-error';
 
 const service = new AuthService(new AuthRepository());
 
 export const authController = new Elysia({ prefix: '/auth' })
-   .post(
-      '/login',
+   .post( '/login',
       async ({ body, set, cookie: { accessToken, refreshToken } }) => {
          const { name, password, rememberMe } = body;
          const result = await service.login(name, password, rememberMe);
@@ -20,10 +20,13 @@ export const authController = new Elysia({ prefix: '/auth' })
          });
          refreshToken.set({
             value: result.tokens.refreshToken,
-            maxAge: 60 * 60 * 24 * 7 // 7 days in seconds
+            ...(rememberMe && { maxAge: 60 * 60 * 24 * 30 }) // 30 days in seconds if rememberMe is true
          });
          set.status = 200;
-         return { data: result.user };
+         return { 
+            message: "User logged in",
+            data: result.user
+         };
       },
       {
          body: LoginValidator,
@@ -33,8 +36,7 @@ export const authController = new Elysia({ prefix: '/auth' })
          })
       }
    )
-   .post(
-      '/refresh',
+   .post( '/refresh',
       async ({ set, cookie: { accessToken, refreshToken } }) => {
          const result = await service.refreshTokens(refreshToken.value);
          accessToken.set({
@@ -42,7 +44,9 @@ export const authController = new Elysia({ prefix: '/auth' })
             maxAge: 60 * 15 // 15 minutes in seconds
          });
          set.status = 200;
-         return { data: true };
+         return { 
+            message: "refresh successful"
+         };
       },
       {
          cookie: t.Object({
@@ -51,17 +55,7 @@ export const authController = new Elysia({ prefix: '/auth' })
          })
       }
    )
-   .post('/requestPasswordReset',
-      async ({ body }) => {
-         const { email } = body;
-         service.requestPasswordReset(email);
-      },
-      {
-         body: requestPasswordResetValidator,
-      }
-   )
-   .post(
-      '/register',
+   .post( '/register',
       async ({ body, set, cookie: { accessToken, refreshToken } }) => {
          const { name, email, password } = body;
          const result = await service.register(name, email, password);
@@ -71,10 +65,12 @@ export const authController = new Elysia({ prefix: '/auth' })
          });
          refreshToken.set({
             value: result.tokens.refreshToken,
-            maxAge: 60 * 60 * 24 * 7 // 7 days in seconds
          });
          set.status = 201;
-         return { data: result.user };
+         return {
+            message: "Account registered",
+            data: result.user,
+         };
       },
       {
          body: RegisterValidator,
@@ -84,17 +80,33 @@ export const authController = new Elysia({ prefix: '/auth' })
          })
       }
    )
+   .post('/requestPasswordReset',
+      async ({ set, body }) => {
+         const { email } = body;
+         try { await service.requestPasswordReset(email); }
+         // catch not found errors and return as if it was a success (prevents an enumeration attack)
+         catch (error) { if (!(error instanceof NotFoundError)) { throw error; } }
+         set.status = 201;
+         return {
+            message: "Password reset link sent if account exists"
+         }
+      },
+      {
+         body: requestPasswordResetValidator,
+      }
+   )
 
    //* Routes past this point require a valid accessToken to use
    .use(authorizeMiddleware)
-   .post(
-      '/logout',
+   .post( '/logout',
       async ({ set, cookie: { accessToken, refreshToken } }) => {
          await service.removeRefreshToken(refreshToken.value);
          accessToken.remove();
          refreshToken.remove();
          set.status = 201;
-         return { data: true };
+         return { 
+            message: "logout successful"
+         };
       },
       {
          cookie: t.Object({
