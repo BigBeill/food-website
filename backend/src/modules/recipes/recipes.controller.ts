@@ -25,7 +25,7 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
    .get( '/search', 
       async ({ authId, query }) => {
          const { title, ownerIdList, ingredientIdList, visibilityList, limit, skip } = query;
-         const recipes = service.getRecipeList({ authId, title, ownerIdList, ingredientIdList, visibilityList, skip, limit });
+         const recipes = service.searchRecipes({ authId, title, ownerIdList, ingredientIdList, visibilityList, skip, limit });
          return { data: recipes };
       },
       {

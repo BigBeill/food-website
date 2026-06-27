@@ -101,7 +101,21 @@ export class RecipesService {
       return recipe;
    }
 
-   async getRecipeList(params: GetRecipeListParams): Promise<PaginatedListType<RecipeType>> {
+   async hydrateRecipe(record: RecipeRecord): Promise<RecipeType> {
+      return {
+         _id: record._id.toString(),
+         ownerId: record.ownerId.toString(),
+         title: record.title,
+         description: record.description ?? '',
+         image: record.image ?? undefined,
+         ingredientList: await Promise.all(record.ingredientList.map(async (ingredient) => { return await this.ingredientsService.hydrateIngredient(ingredient); }) ),
+         instructionList: record.instructionList,
+         nutrition: record.nutrition ?? undefined,
+         visibility: record.visibility,
+      };
+   }
+
+   async searchRecipes(params: GetRecipeListParams): Promise<PaginatedListType<RecipeType>> {
       const { authId, title, ownerIdList, ingredientIdList, visibilityList = ['public'], skip = 0, limit = 12 } = params;
 
       let allowedOwnerIdList: string[] | undefined;
@@ -126,20 +140,6 @@ export class RecipesService {
       const recipes = await this.repository.getRecipeList({ title, ownerIdList: allowedOwnerIdList, visibilityList, skip, limit });
 
       return removeMongooseNoise(recipes) as PaginatedListType<RecipeType>;
-   }
-
-   async hydrateRecipe(record: RecipeRecord): Promise<RecipeType> {
-      return {
-         _id: record._id.toString(),
-         ownerId: record.ownerId.toString(),
-         title: record.title,
-         description: record.description ?? '',
-         image: record.image ?? undefined,
-         ingredientList: await Promise.all(record.ingredientList.map(async (ingredient) => { return await this.ingredientsService.hydrateIngredient(ingredient); }) ),
-         instructionList: record.instructionList,
-         nutrition: record.nutrition ?? undefined,
-         visibility: record.visibility,
-      };
    }
 
    async updateRecipe(recipe: Omit<RecipeType, 'nutrition'> & {nutrition?: NutritionType}, params: AuthIdParams): Promise<boolean> {
