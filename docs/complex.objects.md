@@ -67,6 +67,15 @@ interface NutritionType {
    protein: number;
 }
 ```
+### Paginated List
+```js
+interface PaginatedListType<T> {
+   ist: T[];
+   count: number;
+   groupNumber: number;
+   groupSize: number;
+};
+```
 ### Recipe
 ```js
 interface RecipeType {
@@ -134,16 +143,4 @@ interface TrackedImageType extends ImageType {
    status: 'pending' | 'active';
    uploadedAt: Date;
 }
-```
-## API Response Specific Objects
-Objects you will only see as responses from an API.
-
-### Paginated API Response
-```js
-interface PaginatedAPIResponseType<T> {
-  items: T[];
-  total: number;
-  group: number;
-  groupSize: number;
-};
 ```

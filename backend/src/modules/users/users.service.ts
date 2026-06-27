@@ -1,17 +1,17 @@
 import { ConflictError, NotFoundError, UnauthorizedError } from "../../common/errors/app-error";
-import type { FriendFolderRecord } from "../../common/mongo-db/schemas/friendFolder.schema";
 import type { FriendRequestRecord } from "../../common/mongo-db/schemas/friendRequest.schema";
 import type { FriendshipRecord } from "../../common/mongo-db/schemas/friendship.schema";
 import type { UserRecord } from "../../common/mongo-db/schemas/user.schema";
 import type AuthIdParams from "../../common/parameters/authId.parameters";
 import type PaginationParams from "../../common/parameters/pagination.parameters";
+import type { PaginatedListType } from "../../common/types/PaginatedList.type";
 import { removeMongooseNoise } from "../../common/utils/db.mapper";
 import type { AuthService } from "../auth/auth.service";
 import type { ImagesService } from "../images/images.service";
 import type { ImageType } from "../images/images.types";
 import type { RecipesService } from "../recipes/recipes.service";
 import { UsersRepository } from "./users.repository";
-import type { FriendFolderType, PublicUserType, RelationshipType } from "./users.types";
+import type { FriendFolderType, UserType, RelationshipType } from "./users.types";
 import { buildConflictString } from "./users.utils";
 
 interface GetUserParams extends AuthIdParams{
@@ -125,31 +125,25 @@ export class UsersService {
       return user;
    }
 
-   async searchFolders(params: SearchFoldersParams): Promise<{ list: FriendFolderType[], count: number }> {
+   async searchFolders(params: SearchFoldersParams): Promise<PaginatedListType<FriendFolderType>> {
       const { authId, parentId, skip, limit, } = params;
       const folders = await this.repository.getFolderList({ ownerId: authId, skip, limit, ...(parentId && { parentId }) });
-      return {
-         list: removeMongooseNoise(folders.list) as FriendFolderType[],
-         count: folders.count
-      };
+      return removeMongooseNoise(folders) as PaginatedListType<FriendFolderType>
    }
 
-   async searchUsers(params: SearchUsersParams): Promise<{ list: PublicUserType[], count: number }> {
+   async searchUsers(params: SearchUsersParams): Promise<PaginatedListType<UserType>> {
       const { authId, _id, name, skip, limit, includeRelationship } = params;
       const userRecords = await this.repository.getUserList({ _id, name, skip, limit });
-      let userList = removeMongooseNoise(userRecords.list) as PublicUserType[];
+      let users = removeMongooseNoise(userRecords.list) as PaginatedListType<UserType>;
       if (includeRelationship) {
          if (!authId) { throw new UnauthorizedError('Include relationship flag cannot be set to true if user is not signed in'); }
-         userList.map((user) => {
+         users.list.map((user) => {
             const relationship = this.defineRelationship(authId, user._id);
             return { ...user, relationship };
          });
       }
 
-      return {
-         list: userList,
-         count: userRecords.count,
-      }
+      return users;
    }
 
    async sendFriendRequest(targetId: string, params: AuthIdParams): Promise<RelationshipType> {
@@ -200,7 +194,7 @@ export class UsersService {
       else { throw new UnauthorizedError('Invalid credentials'); }
    }
 
-   async updateAccount(params: UpdateAccountParams): Promise<PublicUserType> {
+   async updateAccount(params: UpdateAccountParams): Promise<UserType> {
       const { authId, name, email, bio, image } = params;
       let savedImage: ImageType | undefined;
 
@@ -226,6 +220,6 @@ export class UsersService {
       }
 
       const updatedUser = this.repository.updateUser({ _id: authId, name, email, bio, image: savedImage });
-      return removeMongooseNoise(updatedUser) as PublicUserType;
+      return removeMongooseNoise(updatedUser) as UserType;
    }
 }

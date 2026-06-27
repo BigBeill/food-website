@@ -1,5 +1,7 @@
 import { RecipeModel, type RecipeRecord } from "../../common/mongo-db/schemas/recipe.schema";
+import type { PaginatedListType } from "../../common/types/PaginatedList.type";
 import { escapeRegex } from "../../common/utils/filter";
+import { mongooseAggregateToPaginatedList } from "../../common/utils/pagination.utils";
 import type { RecipeType } from "./recipes.types";
 import { toStoredRecipe } from "./recipes.utils";
 
@@ -27,7 +29,7 @@ export class RecipesRepository {
       return RecipeModel.findOne({ _id }).lean<RecipeRecord | null>();
    }
 
-   async getRecipeList(params: GetRecipeListParams): Promise<{ list: RecipeRecord[], count: number }> {
+   async getRecipeList(params: GetRecipeListParams): Promise<PaginatedListType<RecipeRecord>> {
       const { title, ownerIdList, ingredientIdList, visibilityList, skip, limit } = params;
 
       // quick safety check to make sure this function is being used correctly (not effective authorization)
@@ -37,7 +39,7 @@ export class RecipesRepository {
 
       // return the actual fetch
       const resultList = await RecipeModel.aggregate<{
-         recipeList: RecipeRecord[];
+         recordList: RecipeRecord[];
          countList: { count: number }[];
       }>([
          {
@@ -50,7 +52,7 @@ export class RecipesRepository {
          },
          {
             $facet: {
-               recipeList: [
+               recordList: [
                   ...(skip ? [{ $skip: skip }] : []), 
                   ...(limit ? [{ $limit: limit }] : []), 
                ],
@@ -59,12 +61,7 @@ export class RecipesRepository {
          }
       ]);
 
-      const result = resultList[0]!;
-
-      return {
-         list: result.recipeList,
-         count: result.countList[0]?.count ?? 0,
-      }
+      return mongooseAggregateToPaginatedList(resultList, skip, limit);
    }
 
    async updateRecipe(recipe: RecipeType): Promise<RecipeRecord | null> {

@@ -9,6 +9,7 @@ import type { RecipesRepository } from "./recipes.repository";
 import type { NutritionType, RecipeType } from "./recipes.types";
 import type PaginationParams from "../../common/parameters/pagination.parameters";
 import type { PermissionsService } from "../permissions/permissions.service";
+import type { PaginatedListType } from "../../common/types/PaginatedList.type";
 
 interface GetRecipeListParams extends PaginationParams { 
    authId?: string,
@@ -100,7 +101,7 @@ export class RecipesService {
       return recipe;
    }
 
-   async getRecipeList(params: GetRecipeListParams): Promise<{ list: RecipeType[], count: number }> {
+   async getRecipeList(params: GetRecipeListParams): Promise<PaginatedListType<RecipeType>> {
       const { authId, title, ownerIdList, ingredientIdList, visibilityList = ['public'], skip = 0, limit = 12 } = params;
 
       let allowedOwnerIdList: string[] | undefined;
@@ -124,10 +125,7 @@ export class RecipesService {
 
       const recipes = await this.repository.getRecipeList({ title, ownerIdList: allowedOwnerIdList, visibilityList, skip, limit });
 
-      return {
-         list: removeMongooseNoise(recipes.list) as RecipeType[],
-         count: recipes.count,
-      }
+      return removeMongooseNoise(recipes) as PaginatedListType<RecipeType>;
    }
 
    async hydrateRecipe(record: RecipeRecord): Promise<RecipeType> {
