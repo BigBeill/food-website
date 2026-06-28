@@ -6,7 +6,7 @@ import { SearchConversionValidator } from "./validators/searchConversion.validat
 
 const service = ingredientsService;
 
-export const ingredientsController = new Elysia({ prefix: '/recipes' })
+export const ingredientsController = new Elysia({ prefix: '/ingredients' })
    .get( '/get/:_id',
       async ({ params }) => {
          const { _id } = params;

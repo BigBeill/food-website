@@ -60,7 +60,7 @@ export const usersController = new Elysia({ prefix: '/users' })
          query: FolderListValidator,
       }
    )
-   .get( '/update',
+   .put( '/update',
       async ({ authId, body }) => {
          const { name, email, bio, image } = body;
          const updatedUser = await service.updateAccount({ authId, name, email, bio, image});

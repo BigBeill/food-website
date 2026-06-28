@@ -35,9 +35,14 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
 
    //* Routes past this point require an access token
    .use(authorizeMiddleware)
-   .post( '/add',
+   .post( '/create',
       async ({ authId, body }) => {
          const { recipe } = body;
+         const newRecipe = await service.createRecipe(recipe, { authId })
+         return {
+            message: "recipe created",
+            data: newRecipe,
+         }
       },
       {
          body: AddRecipeValidator
