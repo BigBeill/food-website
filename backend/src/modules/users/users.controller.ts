@@ -19,7 +19,10 @@ export const usersController = new Elysia({ prefix: '/users' })
          const { _id } = params;
          const { includeRelationship = false } = query;
          const user = await service.getUser(_id, { authId, includeRelationship });
-         return { data: user }
+         return { 
+            message: "user found",
+            data: user 
+         }
       },
       {
          params: IdValidator,
@@ -30,7 +33,10 @@ export const usersController = new Elysia({ prefix: '/users' })
       async ({ authId, query }) => {
          const { _id, name, skip = 0, limit = 32, includeRelationship } = query;
          const users = await service.searchUsers({ authId, _id, name, skip, limit, includeRelationship });
-         return { data: users }
+         return { 
+            message: "user list found",
+            data: users
+         }
       },
       {
          query: SearchValidator
@@ -44,7 +50,10 @@ export const usersController = new Elysia({ prefix: '/users' })
       async ({ params, authId }) => {
          const { _id } = params
          const definedRelationship = await service.defineRelationship(authId, _id);
-         return { data: definedRelationship }
+         return { 
+            message: "relationship defined",
+            data: definedRelationship
+         }
       },
       {
          params: IdValidator
@@ -54,27 +63,22 @@ export const usersController = new Elysia({ prefix: '/users' })
       async ({ authId, query }) => {
          const { parentId, skip = 0, limit = 32 } = query;
          const folderList = await service.searchFolders({ authId, parentId, skip, limit });
-         return { data: folderList }
+         return { 
+            message: "Folder list found",
+            data: folderList 
+         }
       },
       {
          query: FolderListValidator,
-      }
-   )
-   .put( '/update',
-      async ({ authId, body }) => {
-         const { name, email, bio, image } = body;
-         const updatedUser = await service.updateAccount({ authId, name, email, bio, image});
-         return { data: updatedUser }
-      },
-      {
-         body: UpdateValidator,
       }
    )
    .post( '/deleteFriendship/:_id',
       async ({ authId, params }) => {
          const { _id } = params;
          await service.deleteFriendship(_id, { authId });
-         return { data: true }
+         return { 
+            message: "Friendship removed"
+         }
       },
       {
          params: IdValidator
@@ -84,7 +88,9 @@ export const usersController = new Elysia({ prefix: '/users' })
       async ({ authId, params }) => {
          const{ _id, response } = params;
          await service.processFriendRequest(_id, response, { authId });
-         return { data: true }
+         return { 
+            message: `friendship ${response ? 'accepted' : 'declined'}`,
+         }
       },
       {
          params: ProcessFriendRequestValidator
@@ -94,9 +100,25 @@ export const usersController = new Elysia({ prefix: '/users' })
       async ({ authId, params }) => {
          const { _id } = params;
          const friendRequest = await service.sendFriendRequest(_id, { authId });
-         return { data: friendRequest }
+         return { 
+            message: "Friend request sent",
+            data: friendRequest 
+         }
       },
       {
          params: IdValidator
+      }
+   )
+   .put( '/update',
+      async ({ authId, body }) => {
+         const { name, email, bio, image } = body;
+         const updatedUser = await service.updateAccount({ authId, name, email, bio, image});
+         return {
+            message: "Account updated",
+            data: updatedUser
+         }
+      },
+      {
+         body: UpdateValidator,
       }
    )

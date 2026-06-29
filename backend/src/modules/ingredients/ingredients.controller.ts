@@ -11,7 +11,10 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
       async ({ params }) => {
          const { _id } = params;
          const ingredient = await service.getIngredient(_id);
-         return { data: ingredient };
+         return { 
+            message: "Ingredient found",
+            data: ingredient 
+         };
       },
       {
          params: PostgresIdValidator,
@@ -21,7 +24,10 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
       async ({ query }) => {
          const { description, food_group_id, skip = 0, limit = 32 } = query;
          const ingredientList = service.searchIngredient({ description, food_group_id, skip, limit });
-         return { data: ingredientList };
+         return { 
+            message: "Ingredient list found",
+            data: ingredientList 
+         };
       },
       {
          query: SearchValidator
@@ -31,7 +37,10 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
       async ({ query }) => {
          const { food_id, skip = 0, limit = 32  } = query;
          const conversionList = service.searchConversion(food_id, { skip, limit });
-         return { data: conversionList };
+         return { 
+            message: "conversion list found",
+            data: conversionList 
+         };
       },
       {
          query: SearchConversionValidator,
@@ -40,6 +49,9 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
    .get( '/searchGroup', 
       async () => {
          const groupList = await service.searchGroup({});
-         return { data: groupList };
+         return { 
+            message: "food group list found",
+            data: groupList 
+         };
       }
    )

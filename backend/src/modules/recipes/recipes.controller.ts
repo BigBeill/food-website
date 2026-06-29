@@ -16,7 +16,10 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
       async ({ authId, params }) => {
          const { _id } = params;
          const recipe = service.getRecipe(_id, { authId });
-         return { data: recipe };
+         return { 
+            message: "recipe found",
+            data: recipe 
+         };
       },
       {
          params: IdValidator
@@ -26,7 +29,10 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
       async ({ authId, query }) => {
          const { title, ownerIdList, ingredientIdList, visibilityList, limit, skip } = query;
          const recipes = service.searchRecipes({ authId, title, ownerIdList, ingredientIdList, visibilityList, skip, limit });
-         return { data: recipes };
+         return { 
+            message: "recipe list found",
+            data: recipes 
+         };
       },
       {
          query: SearchValidator
@@ -52,7 +58,10 @@ export const recipesController = new Elysia({ prefix: '/recipes' })
       async ({ authId, body }) => {
          const { recipe } = body;
          const updatedRecipe = await service.updateRecipe(recipe, { authId })
-         return { data: updatedRecipe }
+         return { 
+            message: "Recipe updated",
+            data: updatedRecipe 
+         }
       },
       {
          body: RecipeValidator

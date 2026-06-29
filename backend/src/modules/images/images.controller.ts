@@ -32,6 +32,7 @@ export const imagesController = new Elysia({ prefix: '/image' })
          return { data: imageLink };
       },
       {
+         massage: "image uploaded",
          body: UploadImageValidator
       }
    )

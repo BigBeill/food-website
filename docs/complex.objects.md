@@ -69,7 +69,7 @@ interface NutritionType {
 ```
 ### Paginated List
 ```js
-interface PaginatedListType<T> {
+type PaginatedListType<T> = {
    ist: T[];
    count: number;
    groupNumber: number;
