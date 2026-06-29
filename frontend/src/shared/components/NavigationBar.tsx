@@ -5,15 +5,15 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import useAuth from '@/features/auth/hooks/useAuth';
 import Image from 'next/image';
+import styles from './NavigationBar.module.scss';
 
-function Nav() {
+function NavigationBar() {
    const [open, setOpen] = useState<boolean>(false);
    const navRef = useRef<HTMLDivElement>(null);
    const pathname = usePathname();
    const { authUserId } = useAuth();
    
-   // open/close the nav bar whenever the handle on the side of the nav panel is clicked
-   function openNav() {
+   function toggleOpen() {
       setOpen(!open);
    }
 
@@ -50,16 +50,18 @@ function Nav() {
    }
 
    return(
-      <nav aria-label="Main Navigation" ref={navRef} className={`navBar ${open ? 'open' : ''}`} id="navBar" tabIndex={-1}>
+      <nav aria-label="Main Navigation" ref={navRef} className={`${styles.customNavigationBar} ${open ? styles.open : ''}`} id="navigationBar" tabIndex={-1}>
          <Link
             href="/"
-            className="logo"
+            className={styles.logo}
             onClick={() => setOpen(false)}
          >
-            <Image 
+            <Image
                src="/BigBeill-logo_black.png" 
                alt="Beill's Greenhouse Logo - Return to home page" 
-               fill
+               width={500}
+               height={500}
+               style={{ width: '100%', height: 'auto' }}
             />
          </Link>
 
@@ -106,12 +108,12 @@ function Nav() {
             <NavItem href="/aboutMe">About Me</NavItem>
          </section>
 
-         <button className='navButton' onClick={openNav} aria-label={open ? "Close navigation menu" : "Open navigation menu"} aria-expanded={open} aria-controls="navBar">
-            <div className={`hamburgerButton ${open ? 'open' : ''}`} aria-hidden="true">
-               <span className="bar"></span>
-               <span className="bar"></span>
-               <span className="bar"></span>
-               <span className="bar"></span>
+         <button className={styles.navButton} onClick={toggleOpen} aria-label={open ? "Close navigation menu" : "Open navigation menu"} aria-expanded={open} aria-controls="navigationBar">
+            <div className={`${styles.hamburgerButton} ${open ? styles.open : ''}`} aria-hidden="true">
+               <span className={styles.bar}></span>
+               <span className={styles.bar}></span>
+               <span className={styles.bar}></span>
+               <span className={styles.bar}></span>
             </div>
          </button>
 
@@ -119,4 +121,4 @@ function Nav() {
    )
 }
 
-export default Nav
+export default NavigationBar

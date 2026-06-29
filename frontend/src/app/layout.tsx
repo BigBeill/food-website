@@ -1,9 +1,9 @@
 import AuthProvider from '@/features/auth/providers/AuthProvider';
-import Nav from '@/shared/components/Navbar';
-import './globals.scss';
+import '../shared/styles/globals.scss';
 import './displayData.scss';
 import './inputs.scss';
 import './objectView.scss';
+import NavigationBar from '@/shared/components/NavigationBar';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,7 +14,7 @@ export default function Layout({children}: LayoutProps) {
       <html lang="en">
          <body>
             <AuthProvider>
-               <Nav/>
+               <NavigationBar/>
                <main>
                   {children}
                </main>

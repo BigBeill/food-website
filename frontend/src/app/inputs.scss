@@ -1,3 +1,5 @@
+@use '../shared/styles/variables' as *;
+
 .textInput {
    width: calc(100% - 1.2rem);
    margin: 0rem 0.6rem 1.8rem 0.6rem;
@@ -130,9 +132,9 @@ button {
    height: 2.1rem;
    padding: .3rem .6rem;
    color: var(--text-color-dark);
-   background-color: var(--background-color);
+   background-color: $color-primary;
    overflow: hidden;
-   border: 2px solid var(--secondary-color);
+   border: 2px solid $color-primary;
    border-radius: 3rem;
    transition: .15s ease-in-out;
 
