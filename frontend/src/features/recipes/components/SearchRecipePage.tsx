@@ -8,7 +8,7 @@ import FilterSearchPage from '@/features/recipes/components/FilterSearchPage';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/router';
 import { IngredientType } from '@/features/ingredients/domain/ingredient.types';
-import { recipeService } from '../services/recipe.service';
+import { recipeService } from '../services/recipes.service';
 import { ingredientService } from '@/features/ingredients/services/ingredient.service';
 
 interface SearchRecipePageProps {

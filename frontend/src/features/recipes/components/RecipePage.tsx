@@ -2,7 +2,7 @@ import { unpackImage } from "@/features/images/services/image.services";
 import { RecipeType } from "../domain/recipes.types";
 import { useEffect, useRef, useState } from "react";
 import GrowingText from "@/shared/components/GrowingText";
-import { recipeService } from "../services/recipe.service";
+import { recipeService } from "../services/recipes.service";
 import { useRouter } from "next/router";
 
 interface RecipePageInterface {

@@ -1,4 +1,4 @@
-const BASE_URL = process.env.PUBLIC_API_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface SendServerRequestProps {
    method: string;
@@ -10,7 +10,7 @@ async function request<T>(config: SendServerRequestProps): Promise<T> {
    const isGet = config.method.toLowerCase() === 'get';
    const isFormData = config.body instanceof FormData;
 
-   let url = `${BASE_URL}${config.url}`;
+   let url = `${BASE_URL}/api/v1${config.url}`;
    if (isGet && config.body && !isFormData) {
       const query = new URLSearchParams(
          Object.entries(config.body).filter(([_, v]) => v != null)
@@ -44,6 +44,7 @@ async function request<T>(config: SendServerRequestProps): Promise<T> {
 }
 
 export default async function sendServerRequest<T>(config: SendServerRequestProps): Promise<T> {
+   console.log(config);
    try {
       return await request(config);
    } catch (error: any) {

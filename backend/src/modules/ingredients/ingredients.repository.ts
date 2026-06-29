@@ -1,3 +1,4 @@
+import { NotFoundError } from "../../common/errors/app-error";
 import type paginationParams from "../../common/parameters/pagination.parameters";
 import postgresConnection from "../../config/postgres.database";
 import type { IngredientConversionType, IngredientGroupType, IngredientType } from "./ingredients.types";
@@ -107,10 +108,14 @@ export class IngredientsRepository {
 
    async getIngredient (_id: number): Promise<IngredientType | null> {
       const { rows } = await postgresConnection.query(
-         'SELECT _id, description FROM food WHERE id = $1 LIMIT 1',
+         'SELECT description FROM food WHERE _id = $1 LIMIT 1',
          [ _id ]
       );
-      return rows[0] ?? null;
+      if (!rows[0]) { throw new NotFoundError(`Ingredient with ${_id} not found`) }
+      return {
+         food_id: _id,
+         description: rows[0].description
+      }
    }
 
    async getIngredientList ({ description, food_group_id, skip, limit }: GetIngredientList): Promise<IngredientType[]> {

@@ -30,7 +30,7 @@ interface IngredientType {
    description: string;
    label?: string;
    commonName?: string;
-   portion: {
+   portion?: {
       measure_id: number;
       description: string;
       amount: number;

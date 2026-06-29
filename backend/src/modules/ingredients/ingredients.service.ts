@@ -1,6 +1,6 @@
 import type { IngredientRecord } from "../../common/mongo-db/schemas/recipe.schema";
 import type PaginationParams from "../../common/parameters/pagination.parameters";
-import type { NutritionType, RecipeType } from "../recipes/recipes.types";
+import type { NutritionType } from "../recipes/recipes.types";
 import type { IngredientsRepository } from "./ingredients.repository";
 import type { IngredientConversionType, IngredientGroupType, IngredientType } from "./ingredients.types";
 import { breakupMeasureDescription } from "./ingredients.utils";
@@ -17,8 +17,8 @@ interface SearchIngredientParams extends PaginationParams {
 export class IngredientsService {
    private readonly repository: IngredientsRepository;
 
-   constructor(recipesRepository: IngredientsRepository) {
-      this.repository = recipesRepository;
+   constructor(ingredientsRepository: IngredientsRepository) {
+      this.repository = ingredientsRepository;
    }
 
    async getIngredient (_id: number): Promise<IngredientType | null> {
@@ -32,12 +32,12 @@ export class IngredientsService {
       const nutritionList: NutritionType[] = await Promise.all( ingredientList.map(async (ingredient) => {
          const [ nutrition, conversion ] = await Promise.all([
             this.repository.getBaseNutrition(ingredient.food_id),
-            this.repository.getConversion(ingredient.food_id, ingredient.portion.measure_id),
+            this.repository.getConversion(ingredient.food_id, ingredient.portion!.measure_id),
          ]);
 
          const { number: measureNumber } = conversion ? breakupMeasureDescription(conversion.description): { number: 1 };
          
-         const totalConversion = ((conversion?.value || 1) / measureNumber) * ingredient.portion.amount;
+         const totalConversion = ((conversion?.value || 1) / measureNumber) * ingredient.portion!.amount;
 
          const scaledNutrition = Object.fromEntries(
             Object.entries(nutrition).map(([field, value]) => [field, value * totalConversion]),
@@ -58,8 +58,10 @@ export class IngredientsService {
    }
 
    async hydrateIngredient(record: IngredientRecord): Promise<IngredientType> {
-      const ingredient = await this.repository.getIngredient(record.food_id);
-      const conversion = await this.repository.getConversion(record.food_id, record.portion.measure_id);
+      const [ ingredient, conversion ] = await Promise.all([
+         this.repository.getIngredient(record.food_id),
+         this.repository.getConversion(record.food_id, record.portion.measure_id),
+      ]);
       return {
          ...record,
          description: ingredient?.description || "",

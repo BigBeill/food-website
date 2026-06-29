@@ -3,7 +3,7 @@ import { Elysia } from 'elysia';
 import jwt from 'jsonwebtoken';
 import { env } from '../../config/env';
 import { UnauthorizedError } from '../../common/errors/app-error';
-import type { JwtPayload } from './auth.types';
+import type { JwtPayloadType } from './auth.types';
 
 export const authenticateMiddleware = new Elysia({ name: 'authenticate' }).derive(
    { as: 'scoped' },
@@ -15,7 +15,7 @@ export const authenticateMiddleware = new Elysia({ name: 'authenticate' }).deriv
 
       const token = header.slice('Bearer '.length);
       try {
-         const payload = jwt.verify(token, env.JWT_ACCESS_SECRET) as JwtPayload;
+         const payload = jwt.verify(token, env.JWT_ACCESS_SECRET) as JwtPayloadType;
          return { authId: payload.authId };
       } catch {
          return { authId: undefined }

@@ -7,7 +7,7 @@ export interface AuthTokensType {
 
 export interface AuthResultType {
    user: UserRecord
-   tokens: AuthTokens;
+   tokens: AuthTokensType;
 }
 
 export interface JwtPayloadType {

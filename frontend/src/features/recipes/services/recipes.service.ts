@@ -26,20 +26,20 @@ interface updateParams {
 export const recipeService = {
    create: (params: createParams) =>
       sendServerRequest({
-         url: '/recipe/create',
+         url: '/recipes/create',
          method: 'post',
          body: params
       }),
    
    delete: (recipeId: string) => 
       sendServerRequest({
-         url: `/recipe/delete/${recipeId}`,
+         url: `/recipes/delete/${recipeId}`,
          method: 'delete'
       }),
 
    get: (recipeId: string, params?: getParams) =>
       sendServerRequest<RecipeType>({
-         url:`/recipe/get/${recipeId}`,
+         url:`/recipes/get/${recipeId}`,
          method: 'get',
          body: params,
       }),
@@ -47,14 +47,14 @@ export const recipeService = {
    // under normal conditions this function will return RecipeType[], if count: true is passed in the params {count: number, list: RecipeType[]} will be returned
    search: (params: searchParams) => 
       sendServerRequest<RecipeType[] | {count: number, list: RecipeType[]}>({
-         url:`/recipe/search`,
+         url:`/recipes/search`,
          method: 'get',
          body: params,
       }),
 
    update: (recipeId: string, params: updateParams) =>
       sendServerRequest({
-         url:`/recipe/update/${recipeId}`,
+         url:`/recipes/update/${recipeId}`,
          method: 'put',
          body: params,
       })

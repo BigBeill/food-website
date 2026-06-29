@@ -3,14 +3,14 @@
 import { useState, useEffect, useRef} from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAuth } from '@/features/auth/hooks/useAuth';
+import useAuth from '@/features/auth/hooks/useAuth';
 import Image from 'next/image';
 
 function Nav() {
    const [open, setOpen] = useState<boolean>(false);
    const navRef = useRef<HTMLDivElement>(null);
    const pathname = usePathname();
-   const { userId } = useAuth();
+   const { authUserId } = useAuth();
    
    // open/close the nav bar whenever the handle on the side of the nav panel is clicked
    function openNav() {
@@ -66,12 +66,12 @@ function Nav() {
          <section aria-labelledby="findRecipesHeading">
             <h3 id="findRecipesHeading">Find Recipes</h3>
             <NavItem href="/searchRecipes/public">Public Recipes</NavItem>
-            { userId && (
+            { authUserId && (
                <NavItem href="/searchRecipes/friends">Friends Recipes</NavItem>
             )}
          </section>
 
-         { userId && (
+         { authUserId && (
             <>
                <section aria-labelledby="yourRecipesHeading">
                   <h3 id="yourRecipesHeading">Your Recipes</h3>
@@ -90,7 +90,7 @@ function Nav() {
 
          <section aria-labelledby="accountHeading">
             <h3 id="accountHeading">Account</h3>
-            { userId ? (
+            { authUserId ? (
                <NavItem href="/profile">Profile</NavItem>
             ):(
                <>

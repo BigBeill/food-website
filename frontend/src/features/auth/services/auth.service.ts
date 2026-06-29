@@ -18,7 +18,7 @@ interface RequestPasswordResetParams {
 }
 
 interface ResetPasswordParams {
-  uniqueString: string;
+  token: string;
   password: string;
 }
 
@@ -33,7 +33,7 @@ export const authService = {
    logout: () => 
       sendServerRequest({
          url: '/auth/logout',
-         method: 'post',
+         method: 'POST',
       }),
 
    register: (params: RegisterParams) =>
@@ -45,14 +45,14 @@ export const authService = {
 
    requestPasswordReset: (params: RequestPasswordResetParams) =>
       sendServerRequest({
-         url: "/auth/request-password-reset",
+         url: "/auth/requestPasswordReset",
          method: "POST",
          body: params,
       }),
 
    resetPassword: (params: ResetPasswordParams) =>
       sendServerRequest({
-         url: "/auth/change-password",
+         url: "/auth/resetPassword",
          method: "POST",
          body: params,
       }),

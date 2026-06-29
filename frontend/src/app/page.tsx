@@ -1,13 +1,15 @@
+"use client"
+
 import { useState, useEffect } from "react";
-import { useAuth } from "@/features/auth/hooks/useAuth";
-import Recipe from "./Recipe"
+import useAuth from "@/features/auth/hooks/useAuth";
+import RecipePage from "@/features/recipes/components/RecipePage";
 import Loading from "@/shared/components/Loading";
-import serverRequest from "@/shared/lib/api";
 import { RecipeType } from "@/features/recipes/domain/recipes.types";
+import { recipeService } from "@/features/recipes/services/recipes.service";
 
 export default function LandingPage() {
 
-   const { userId } = useAuth();
+   const { authUserId } = useAuth();
 
    const [recipe, setRecipe] = useState<RecipeType | null>(null);
    const [loading, setLoading] = useState(true);
@@ -15,10 +17,7 @@ export default function LandingPage() {
    //collect featured recipe from the database
    async function fetchFeaturedRecipe() {
       try {
-         const response = await serverRequest({
-            method: 'get', 
-            url: `recipe/getObject/6879a6901775cc14af3170ef/true`,
-         });
+         const response = await recipeService.get('6879a6901775cc14af3170ef', { includeNutrients: true })
          setRecipe(response);
       }
       catch (error) {
@@ -43,7 +42,7 @@ export default function LandingPage() {
                <h1>Welcome to Big Beill's Greenhouse</h1>
                <p style={{ fontSize: '1.2rem' }}> Discover, create, and share amazing recipes with a community of food enthusiasts </p>
                <div>
-                  {!userId ? (
+                  {!authUserId ? (
                      <>
                         <a href="/register" className="callToActionButton primary">Get Started</a>
                         <a href="/login" className="callToActionButton secondary">Sign In</a>
@@ -60,7 +59,7 @@ export default function LandingPage() {
                // Featured Recipe Section is really more of for visual interest than anything else (text is too small to read).
                // hiding from screen readers for now as to not flood them with unnecessary information, will create a more permanent solution when interactivity is added
                <div className="miniModelWithFade alignOnHover" aria-hidden="true" style={{ width: '24rem', }}>
-                  <Recipe recipe={recipe} />
+                  <RecipePage initialRecipe={recipe} />
                </div>
             ) : (
                <p className="standardContent">No featured recipe available.</p>
@@ -100,7 +99,7 @@ export default function LandingPage() {
                   <div aria-hidden="true" className="icon">📖</div>
                   <a  href="/searchRecipes/public">Browse Recipes</a>
                </div>
-               {userId ? (
+               {authUserId ? (
                   <>
                      <div className="buttonContent growOnHover">
                         <div aria-hidden="true" className="icon">📋</div>
