@@ -6,6 +6,8 @@ import { LoginValidator } from './validators/login.validator';
 import { authorizeMiddleware } from './auth.middleware';
 import { requestPasswordResetValidator } from './validators/requestPasswordReset.validator';
 import { NotFoundError } from '../../common/errors/app-error';
+import { resetPasswordValidator } from './validators/resetPassword.validator';
+import { changePasswordValidator } from './validators/changePassword.validator';
 
 const service = new AuthService(new AuthRepository());
 
@@ -95,9 +97,33 @@ export const authController = new Elysia({ prefix: '/auth' })
          body: requestPasswordResetValidator,
       }
    )
+   .post('/resetPassword',
+      async ({ body }) => {
+         const { password, token } = body;
+         await service.resetPassword(password, token);
+         return {
+            message: "password reset",
+         }
+      },
+      {
+         body: resetPasswordValidator,
+      }
+   )
 
    //* Routes past this point require a valid accessToken to use
    .use(authorizeMiddleware)
+   .post( '/changePassword',
+      async ({ body, authId }) => {
+         const { oldPassword, newPassword } = body;
+         await service.changePassword(oldPassword, newPassword, { authId });
+         return {
+            message: "password reset",
+         }
+      },
+      {
+         body: changePasswordValidator,
+      }
+   )
    .post( '/logout',
       async ({ set, cookie: { accessToken, refreshToken } }) => {
          await service.removeRefreshToken(refreshToken.value);

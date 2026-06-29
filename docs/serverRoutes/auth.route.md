@@ -1,6 +1,45 @@
 # Auth Routes
 See [complex.objects.md](../complex.objects.md) for structure of any non primitive variable type referenced.
 
+## POST /auth/changePassword
+Changes the authenticated user's password.
+
+**URL:** /auth/changePassword  
+**Method:** POST  
+**Auth required:** Yes  
+**Content-Type:** application/json  
+
+### Body
+| Field         | Type   | Required | Constraints      |
+|---------------|--------|----------|------------------|
+| `oldPassword` | string | Yes      |                  |
+| `newPassword` | string | Yes      | Min 8 characters |
+
+### Responses
+
+**200 - OK**  
+Password changed successfully.
+```json
+{ "message": "password reset" }
+```
+
+**401 - Unauthorized**  
+Access token is missing or invalid, or `oldPassword` is incorrect.
+```json
+{ "error": string }
+```
+
+**422 - Unprocessable Entity**  
+Request body failed validation.
+```json
+{ "error": string }
+```
+
+### Notes
+- The new password is hashed with bcrypt before storage. The plain-text password is never saved.
+
+<br>
+
 ## POST /auth/login
 Logs in an existing user.
 
@@ -195,7 +234,9 @@ Asks the server to send a password reset link to the provided email.
 **201 - Created**  
 Server checked the database for a user with the provided email and sent a password reset link if the account exists.
 ```json
-{ "message": "Password reset link sent if account exists" }
+{ 
+   "message": "Password reset link sent if account exists" 
+}
 ```
 
 **422 - Unprocessable Entity**  
@@ -207,3 +248,44 @@ Request body failed validation.
 ### Notes
 - Not found errors (404) are swallowed and returned as 201 to prevent enumeration attacks.
 - A hashed reset token is saved to the database against the account if the email exists.
+
+<br>
+
+## POST /auth/resetPassword
+Resets a user's password using a valid password reset token.
+
+**URL:** /auth/resetPassword  
+**Method:** POST  
+**Auth required:** No  
+**Content-Type:** application/json  
+
+### Body
+| Field      | Type   | Required | Constraints      |
+|------------|--------|----------|------------------|
+| `password` | string | Yes      | Min 8 characters |
+| `token`    | string | Yes      |                  |
+
+### Responses
+
+**200 - OK**  
+Password reset successfully.
+```json
+{ "message": "password reset" }
+```
+
+**401 - Unauthorized**  
+Token is invalid or expired.
+```json
+{ "error": string }
+```
+
+**422 - Unprocessable Entity**  
+Request body failed validation.
+```json
+{ "error": string }
+```
+
+### Notes
+- The token is sourced from the link sent by `POST /auth/requestPasswordReset`.
+- The new password is hashed with bcrypt before storage. The plain-text password is never saved.
+- The reset token is invalidated after use.
