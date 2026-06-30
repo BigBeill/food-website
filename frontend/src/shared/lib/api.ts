@@ -40,7 +40,8 @@ async function request<T>(config: SendServerRequestProps): Promise<T> {
    if (!response.ok) throw { status: response.status, ...(await response.json().catch(() => ({}))) };
 
    const jsonResponse = await response.json();
-   return jsonResponse.payload;
+   console.log(jsonResponse);
+   return jsonResponse.data;
 }
 
 export default async function sendServerRequest<T>(config: SendServerRequestProps): Promise<T> {

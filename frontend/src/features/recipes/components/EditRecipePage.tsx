@@ -7,7 +7,7 @@ import useAuth from '@/features/auth/hooks/useAuth';
 import { useRouter } from 'next/router';
 import useNotebook from '@/shared/hooks/useNotebook';
 import { RecipeType } from '../domain/recipes.types';
-import { recipeService } from '../services/recipes.service';
+import { recipeService } from '../services/recipes.api';
 import checkRecipeRequirements from '../domain/recipeRequirements';
 import useTaggedList from '@/shared/hooks/useTaggedList';
 import { ingredientService } from '@/features/ingredients/services/ingredient.service';

@@ -1,37 +1,31 @@
-import { unpackImage } from "@/features/images/services/image.services";
 import { RecipeType } from "../domain/recipes.types";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import GrowingText from "@/shared/components/GrowingText";
-import { recipeService } from "../services/recipes.service";
-import { useRouter } from "next/router";
+import Loading from "@/shared/components/Loading";
+import NotFound from "@/shared/components/NotFound";
+import { useRecipe } from "../services/recipe.service";
+import ImageDisplay from "@/features/images/components/ImageDisplay";
 
-interface RecipePageInterface {
-   recipeId?: string;
-   initialRecipe?: RecipeType;
+type RecipeInput = RecipeType | Promise<RecipeType> | string;
+
+export default function RecipePage ({ recipe }: { recipe: RecipeInput }) {
+   const state = useRecipe(recipe ?? '');
+
+   switch (state.status) {
+      case 'loading':
+         return <Loading />
+      case 'not-found':
+         return <NotFound />
+      case 'error':
+         return <NotFound />
+      case 'ready':
+         return <RecipeView recipe={state.recipe}/>
+   }
 }
-export default function RecipePage({ initialRecipe, recipeId }: RecipePageInterface) {
 
-   const router = useRouter();
-
-   const [recipe, setRecipe] = useState<RecipeType>({_id: '', title:  '', description: '', ingredientList: [], instructionList: [], visibility: 'public'});
+function RecipeView({ recipe }: { recipe: RecipeType }) {
+   console.log("rendering recipe")
    const titleRef = useRef<HTMLDivElement | null>(null);
-
-   useEffect(() => {
-      if (initialRecipe) {
-         setRecipe(initialRecipe);
-      }
-      else if (recipeId) {
-         recipeService.get(recipeId, { includeNutrients: true })
-         .then((response) => {
-            setRecipe(response);
-         })
-         .catch((error) => console.error(error));
-      }
-      else {
-         router.replace('/searchRecipe')
-      }
-
-   }, [initialRecipe, recipeId])
 
    return (
       <div className="recipeObjectView fullPage">
@@ -40,7 +34,7 @@ export default function RecipePage({ initialRecipe, recipeId }: RecipePageInterf
             <GrowingText text={recipe.title} parentDiv={titleRef} />
          </div>
 
-         <img {...unpackImage({ category: "recipe", image: recipe.image })} />
+         <ImageDisplay packagedImage={recipe.image} />
 
          <div className="description">
             <h3>Description</h3>

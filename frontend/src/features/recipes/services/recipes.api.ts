@@ -23,7 +23,7 @@ interface updateParams {
    recipe: FormData;
 }
 
-export const recipeService = {
+export const recipeApi = {
    create: (params: createParams) =>
       sendServerRequest({
          url: '/recipes/create',

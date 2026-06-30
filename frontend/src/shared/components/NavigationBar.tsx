@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import useAuth from '@/features/auth/hooks/useAuth';
 import Image from 'next/image';
 import styles from './NavigationBar.module.scss';
+import { ButtonNavigationBar } from './Buttons';
 
 function NavigationBar() {
    const [open, setOpen] = useState<boolean>(false);
@@ -108,15 +109,7 @@ function NavigationBar() {
             <NavItem href="/aboutMe">About Me</NavItem>
          </section>
 
-         <button className={styles.navButton} onClick={toggleOpen} aria-label={open ? "Close navigation menu" : "Open navigation menu"} aria-expanded={open} aria-controls="navigationBar">
-            <div className={`${styles.hamburgerButton} ${open ? styles.open : ''}`} aria-hidden="true">
-               <span className={styles.bar}></span>
-               <span className={styles.bar}></span>
-               <span className={styles.bar}></span>
-               <span className={styles.bar}></span>
-            </div>
-         </button>
-
+         <ButtonNavigationBar isOpen={open} action={toggleOpen} />
       </nav>
    )
 }
