@@ -4,19 +4,19 @@ import { createContext, useState, useEffect, useCallback } from 'react';
 import { authService } from '../services/auth.service';
 
 type AuthContextType = {
-  authUserId: string | null;
+  authId: string | null;
   loading: boolean;
   logout: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType>({
-  authUserId: null,
+  authId: null,
   loading: true,
   logout: async () => {},
 });
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [authUserId, setAuthUserId] = useState<string | null>(null);
+  const [authId, setAuthId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       const res = await fetch('/api/authentication/status');
       if (res.ok) {
         const data = await res.json();
-        setAuthUserId(data.userId);
+        setAuthId(data.userId);
       }
       setLoading(false);
     }
@@ -33,12 +33,12 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
   const logout = useCallback(async () => {
     authService.logout()
-    .then(() => setAuthUserId(null))
+    .then(() => setAuthId(null))
     .catch((error) => console.error(error));
   }, []);
 
   return (
-    <AuthContext.Provider value={{ authUserId, loading, logout }}>
+    <AuthContext.Provider value={{ authId, loading, logout }}>
       {children}
     </AuthContext.Provider>
   );

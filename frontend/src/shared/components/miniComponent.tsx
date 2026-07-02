@@ -3,10 +3,10 @@
 import React from "react";
 import Styles from './miniComponent.module.scss';
 
-export default function MiniComponent ({ component }: { component: React.ReactNode }) {
+export default function MiniComponent ({ children }: { children: React.ReactNode }) {
    return (
       <div className={Styles.miniComponent}>
-         {component}
+         { children }
       </div>
    )
 }

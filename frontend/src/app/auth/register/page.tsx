@@ -1,5 +1,7 @@
+"use client"
+
 import RegisterPage from "@/features/auth/components/RegisterPage";
 
-export function register() {
+export default function register() {
    return <RegisterPage />
 }

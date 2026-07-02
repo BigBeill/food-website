@@ -2,14 +2,14 @@
 
 import useAuth from "@/features/auth/hooks/useAuth";
 import RecipePage from "@/features/recipes/components/RecipePage";
-import CrookedAnimation from "@/shared/animations/crooked.animation";
 import { ButtonPaired } from "@/shared/components/Buttons";
 import { useRouter } from "next/navigation";
 import MiniComponent from "@/shared/components/miniComponent";
+import AnimationCrooked from "@/shared/animations/crooked.animation";
 
 export default function LandingPage() {
 
-   const { authUserId } = useAuth();
+   const { authId } = useAuth();
    const router = useRouter();
 
    const featuredRecipeId = '6879a6901775cc14af3170ef';
@@ -21,23 +21,27 @@ export default function LandingPage() {
             <div className="standardContent" style={{ marginTop: '6rem',}}>
                <h1>Welcome to Big Beill's Kitchen</h1>
                <p style={{ fontSize: '1.2rem' }}> Discover, create, and share amazing recipes with a community of food enthusiasts </p>
-               {!authUserId ? (
+               {!authId ? (
                   <ButtonPaired 
                      firstText="Get started" 
-                     firstAction={ () => router.push("/register") }
+                     firstOnClick={ () => router.push("/auth/register") }
                      secondText="Sign In"
-                     secondAction={ () => router.push("/login") }
+                     secondOnClick={ () => router.push("/auth/login") }
                   />
                ) : (
                   <ButtonPaired
                      firstText="Create Recipe"
-                     firstAction={ () => router.push("/editRecipe") }
+                     firstOnClick={ () => router.push("/editRecipe") }
                      secondText="My Recipes"
-                     secondAction={ () => router.push("/searchRecipes/personal") }
+                     secondOnClick={ () => router.push("/searchRecipes/personal") }
                   />
                )}
             </div>
-            <CrookedAnimation component={ <MiniComponent component={ <RecipePage recipe={featuredRecipeId}/> }/> }/>
+            <AnimationCrooked>
+               <MiniComponent>
+                  <RecipePage recipe={featuredRecipeId}/>
+               </MiniComponent>
+            </AnimationCrooked>
          </section>
 
          {/* Features Section */}
@@ -73,7 +77,7 @@ export default function LandingPage() {
                   <div aria-hidden="true" className="icon">📖</div>
                   <a  href="/searchRecipes/public">Browse Recipes</a>
                </div>
-               {authUserId ? (
+               {authId ? (
                   <>
                      <div className="buttonContent growOnHover">
                         <div aria-hidden="true" className="icon">📋</div>
@@ -119,9 +123,9 @@ export default function LandingPage() {
                </p>
                <ButtonPaired
                   firstText="View on Github"
-                  firstAction={ () => window.location.href="https://github.com/BigBeill/Food-Recipe-Sharing-Platform" }
+                  firstOnClick={ () => window.location.href="https://github.com/BigBeill/Food-Recipe-Sharing-Platform" }
                   secondText="Learn More"
-                  secondAction={ () => router.push("/about") }
+                  secondOnClick={ () => router.push("/about") }
                />
             </div>
             <div className="warningContent">

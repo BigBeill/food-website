@@ -1,8 +1,8 @@
 import { RecipeType } from "../domain/recipes.types";
 import { useRef } from "react";
 import GrowingText from "@/shared/components/GrowingText";
-import Loading from "@/shared/components/Loading";
-import NotFound from "@/shared/components/NotFound";
+import Loading from "@/shared/components/stateComponents/Loading";
+import NotFound from "@/shared/components/stateComponents/NotFound";
 import { useRecipe } from "../services/recipe.service";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
 

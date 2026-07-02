@@ -2,34 +2,42 @@ import styles from './Buttons.module.scss';
 
 interface ButtonPairedParams {
    firstText: string
-   firstAction: () => void
+   firstOnClick: () => void
    secondText: string
-   secondAction: () => void
+   secondOnClick: () => void
 }
 
 interface NavigationBarButtonParams {
    isOpen: boolean,
-   action: () => void
+   onClick: () => void
 }
 
-export function ButtonPaired ({ firstText, firstAction, secondText, secondAction }: ButtonPairedParams) {
+export function ButtonPaired ({ firstText, firstOnClick, secondText, secondOnClick }: ButtonPairedParams) {
    return (
-      <div className={styles.buttonContent}>
-         <button className={styles.buttonPrimary} onClick={firstAction}>{firstText}</button>
-         <button className={styles.buttonSecondary} onClick={secondAction}>{secondText}</button>
+      <div className="splitSpace">
+         <button className={styles.buttonPrimary} onClick={firstOnClick}>{firstText}</button>
+         <button className={styles.buttonSecondary} onClick={secondOnClick}>{secondText}</button>
       </div>
    )
 }
 
-export function ButtonNavigationBar ({ isOpen, action }: NavigationBarButtonParams) {
+export function ButtonNavigationBar ({ isOpen, onClick }: NavigationBarButtonParams) {
    return (
-      <button className={styles.buttonNavigationBar} onClick={action} aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"} aria-expanded={isOpen} aria-controls="navigationBar">
+      <button className={styles.buttonNavigationBar} onClick={onClick} aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"} aria-expanded={isOpen} aria-controls="navigationBar">
          <div className={`${styles.hamburgerComponent} ${isOpen ? styles.open : ''}`} aria-hidden="true">
             <span className={styles.bar}></span>
             <span className={styles.bar}></span>
             <span className={styles.bar}></span>
             <span className={styles.bar}></span>
          </div>
+      </button>
+   );
+}
+
+export function ButtonOval({ className, children, ...rest }: React.ComponentPropsWithoutRef<'button'>) {
+   return (
+      <button className={[styles.buttonOval, className].filter(Boolean).join(' ')} {...rest}>
+         {children}
       </button>
    );
 }

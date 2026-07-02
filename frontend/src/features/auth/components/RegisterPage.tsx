@@ -1,15 +1,16 @@
 // external imports
 import { useRef, useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
 import useAuth from '@/features/auth/hooks/useAuth';
 import { authService } from '../services/auth.service';
 import checkPasswordRequirements from '../domain/passwordRequirements';
-import loginStyles from './login.module.scss';
+import styles from './login.module.scss';
+import { useRouter } from 'next/navigation';
+import { ButtonOval } from '@/shared/components/Buttons';
 
 export default function RegisterPage() {
    const errorRef = useRef(null);
    const router = useRouter();
-   const { userId } = useAuth();
+   const { authId } = useAuth();
 
    const [activeRegisterAttempt, setActiveRegisterAttempt] = useState<boolean>(false);
 
@@ -21,13 +22,13 @@ export default function RegisterPage() {
 
    // monitor userId and redirect the page if it contains a value
    useEffect(() => {
-      if (userId) { 
+      if (authId) { 
          router.replace('/');
          return;
       }
-      document.body.classList.add('loginBackground');
-      return () => { document.body.classList.remove('loginBackground'); }
-   }, [userId]);
+      document.body.classList.add(styles.loginBackground);
+      return () => { document.body.classList.remove(styles.loginBackground); }
+   }, [authId]);
 
    // clean up any error message once the input has changed
    useEffect(() => {
@@ -63,10 +64,10 @@ export default function RegisterPage() {
    }
 
    return (
-      <div className={loginStyles.loginForm} id="registerForm">
+      <div className={styles.loginForm} id="registerForm">
          <h1>Create Account</h1>
 
-         <div className='textInput'>
+         <div className={styles.textInput}>
             <input
                type="text"
                name="username"
@@ -80,7 +81,7 @@ export default function RegisterPage() {
             <label htmlFor="username">Username</label>
          </div>
 
-         <div className='textInput'>
+         <div className={styles.textInput}>
             <input
                type="text"
                name="email"
@@ -94,7 +95,7 @@ export default function RegisterPage() {
             <label htmlFor="email">Email</label>
          </div>
 
-         <div className='textInput'>
+         <div className={styles.textInput}>
             <input
                type="password"
                name="passwordOne"
@@ -107,7 +108,7 @@ export default function RegisterPage() {
             <label htmlFor="passwordOne">Password</label>
          </div>
 
-         <div className='textInput'>
+         <div className={styles.textInput}>
             <input
                type="password"
                name="passwordTwo"
@@ -120,16 +121,17 @@ export default function RegisterPage() {
             <label htmlFor="passwordTwo">Confirm Password</label>
          </div>
 
-         <button
+         <ButtonOval
             name="submit"
             id="submitButton"
+            style={{ margin: '0rem', width: '100%', padding: '0.6rem 2rem' }}
             onClick={attemptRegister}
-         > Create Account </button>
+         > Create Account </ButtonOval>
 
          <p ref={errorRef} className={errorMessage ? "error" : "hidden"} aria-live="assertive">{errorMessage}</p>
 
          <p>Already have an account?</p>
-         <a href='/login'>Login</a>
+         <a href='/auth/login'>Login</a>
 
       </div>
    )

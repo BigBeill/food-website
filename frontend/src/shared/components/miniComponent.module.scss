@@ -3,9 +3,9 @@
 .miniComponent {
    @extend .shielded;
    position: relative;
-   margin: 3rem auto;
+   margin: auto;
    width: fit-content;
-   max-height: 36rem; //33rem
+   max-height: 36rem;
    box-sizing: border-box;
    font-size: 0.5rem;
    overflow: hidden;

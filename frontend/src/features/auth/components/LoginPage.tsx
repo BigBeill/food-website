@@ -2,12 +2,13 @@ import { useRef, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation';
 import useAuth from '../hooks/useAuth';
 import { authService } from '../services/auth.service';
-import loginStyles from './login.module.scss';
+import styles from './login.module.scss';
+import { ButtonOval } from '@/shared/components/Buttons';
 
 export default function LoginPage() {
    const errorRef = useRef(null);
    const router = useRouter();
-   const { userId } = useAuth();
+   const { authId } = useAuth();
 
    // Tracks that a login attempt has been made and a response is being waited on
    const [activeLoginAttempt, setActiveLoginAttempt] = useState<boolean>(false);
@@ -19,13 +20,13 @@ export default function LoginPage() {
 
    // monitor userId and redirect the page if it contains a value
    useEffect(() => {
-      if (userId) { 
+      if (authId) { 
          router.replace('/');
          return;
       }
-      document.body.classList.add('loginBackground');
-      return () => { document.body.classList.remove('loginBackground'); }
-   }, [userId]);
+      document.body.classList.add(styles.loginBackground);
+      return () => { document.body.classList.remove(styles.loginBackground); }
+   }, [authId]);
 
    // clean up any error message once the input has changed
    useEffect(() => {
@@ -52,9 +53,9 @@ export default function LoginPage() {
    }
 
    return (
-      <div className={loginStyles.loginForm} id="loginForm">
+      <div className={styles.loginForm} id="loginForm">
          <h1>Login</h1>
-         <div className="textInput">
+         <div className={styles.inputWrapper}>
             <input
                type="text"
                name="username"
@@ -67,18 +68,16 @@ export default function LoginPage() {
             <label htmlFor="username">Username</label>
          </div>
 
-         <div className="textInput">
-            <input
-               type="password"
-               name="password"
-               id="password"
-               placeholder=' '
-               value={password}
-               onChange={(event) => setPassword(event.target.value)}
-               onKeyDown={(event) => { if (event.key === 'Enter') { attemptLogin() } }}
-            />
-            <label htmlFor="password">Password</label>
-         </div>
+         <input
+            type="password"
+            name="password"
+            id="password"
+            placeholder=' '
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            onKeyDown={(event) => { if (event.key === 'Enter') { attemptLogin() } }}
+         />
+         <label htmlFor="password">Password</label>
 
          <div className="splitSpace">
             <div className="checkboxInput">
@@ -93,15 +92,16 @@ export default function LoginPage() {
             </div>
          </div>
 
-         <button
+         <ButtonOval
             name="Submit"
             type="submit"
             id="submitButton"
+            style={{ margin: '0rem', width: '100%', padding: '0.6rem 2rem' }}
             onClick={attemptLogin}
-         > Login </button>
+         > Login </ButtonOval>
          <p ref={errorRef} className={errorMessage ? "error" : "hidden"} area-live="assertive" role="alert">{errorMessage}</p>
          <p>Don&apos;t have an account?</p>
-         <a href='/register'>create account</a>
+         <a href='/auth/register'>create account</a>
          <p>------------</p>
          <p>Forgot your password?</p>
          <a href='/resetPassword'>reset password</a>

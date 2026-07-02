@@ -12,7 +12,7 @@ function NavigationBar() {
    const [open, setOpen] = useState<boolean>(false);
    const navRef = useRef<HTMLDivElement>(null);
    const pathname = usePathname();
-   const { authUserId } = useAuth();
+   const { authId } = useAuth();
    
    function toggleOpen() {
       setOpen(!open);
@@ -69,12 +69,12 @@ function NavigationBar() {
          <section aria-labelledby="findRecipesHeading">
             <h3 id="findRecipesHeading">Find Recipes</h3>
             <NavItem href="/searchRecipes/public">Public Recipes</NavItem>
-            { authUserId && (
+            { authId && (
                <NavItem href="/searchRecipes/friends">Friends Recipes</NavItem>
             )}
          </section>
 
-         { authUserId && (
+         { authId && (
             <>
                <section aria-labelledby="yourRecipesHeading">
                   <h3 id="yourRecipesHeading">Your Recipes</h3>
@@ -93,12 +93,12 @@ function NavigationBar() {
 
          <section aria-labelledby="accountHeading">
             <h3 id="accountHeading">Account</h3>
-            { authUserId ? (
+            { authId ? (
                <NavItem href="/profile">Profile</NavItem>
             ):(
                <>
-                  <NavItem href="/login">Login</NavItem>
-                  <NavItem href="/register">Create Account</NavItem>
+                  <NavItem href="/auth/login">Login</NavItem>
+                  <NavItem href="/auth/register">Create Account</NavItem>
                </>
             )}
          </section>
@@ -109,7 +109,7 @@ function NavigationBar() {
             <NavItem href="/aboutMe">About Me</NavItem>
          </section>
 
-         <ButtonNavigationBar isOpen={open} action={toggleOpen} />
+         <ButtonNavigationBar isOpen={open} onClick={toggleOpen} />
       </nav>
    )
 }
