@@ -1,10 +1,10 @@
 export interface IngredientType {
-   id: string;
+   food_id: string;
    description: string;
    label?: string;
    commonName?: string;
    portion?: {
-      id: string;
+      measure_id: string;
       description: string;
       amount: string | null;
    }

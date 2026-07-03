@@ -1,5 +1,6 @@
-import SearchRecipePage from "@/features/recipes/components/SearchRecipePage";
+import { useRouter } from "next/router";
 
 export default function SearchRecipe() {
-   return <SearchRecipePage />;
+   const router = useRouter()
+   router.replace('/recipe/search/public')
 }

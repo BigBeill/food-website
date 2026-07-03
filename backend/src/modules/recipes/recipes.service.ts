@@ -4,7 +4,6 @@ import type AuthIdParams from "../../common/parameters/authId.parameters";
 import { removeMongooseNoise } from "../../common/utils/db.mapper";
 import type { ImagesService } from "../images/images.service";
 import type { IngredientsService } from "../ingredients/ingredients.service";
-import type { UsersService } from "../users/users.service";
 import type { RecipesRepository } from "./recipes.repository";
 import type { NutritionType, RecipeType } from "./recipes.types";
 import type PaginationParams from "../../common/parameters/pagination.parameters";
@@ -155,7 +154,8 @@ export class RecipesService {
          recipe.ingredientList.forEach((ingredient, index) => {
             const oldIngredient = oldMongooseRecord.ingredientList[index]!;
             if (
-               ingredient.food_id !== oldIngredient.food_id 
+               !ingredient.portion
+               || ingredient.food_id !== oldIngredient.food_id 
                || ingredient.portion.measure_id !== oldIngredient.portion.measure_id
                || ingredient.portion.amount !== oldIngredient.portion.amount
             ) { recalculateNutrition = true; }

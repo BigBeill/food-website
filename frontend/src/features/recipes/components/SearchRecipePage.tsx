@@ -5,11 +5,10 @@ import useNotebook from '@/shared/hooks/useNotebook';
 import { RecipeType} from '@/features/recipes/domain/recipes.types';
 import RecipePreview from '@/features/recipes/components/RecipePreview';
 import FilterSearchPage from '@/features/recipes/components/FilterSearchPage';
-import { usePathname, useSearchParams } from 'next/navigation';
-import { useRouter } from 'next/router';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { IngredientType } from '@/features/ingredients/domain/ingredient.types';
-import { recipeService } from '../services/recipes.api';
 import { ingredientService } from '@/features/ingredients/services/ingredient.service';
+import { recipeService } from '../services/recipe.service';
 
 interface SearchRecipePageProps {
    category?: "public" | "friends" | "personal"
@@ -33,7 +32,7 @@ export default function SearchRecipePage({category}: SearchRecipePageProps) {
 
    // send parameters to the url
    function handleSubmit(title: string, ingredientList: IngredientType[]) {
-      const newIngredientIdList: string[] = ingredientList.map((ingredient) => { return ingredient.id; });
+      const newIngredientIdList: string[] = ingredientList.map((ingredient) => { return ingredient.food_id; });
 
       const params = new URLSearchParams();
       if(title) { params.append('title', title); }
@@ -78,14 +77,13 @@ export default function SearchRecipePage({category}: SearchRecipePageProps) {
 
       recipeService.search({title: titleParam, ingredientIdList: ingredientIdListParam.join(','), category, limit, skip, includeCount: true, includeNutrition: true})
       .then((response) => {
-         const expectedResponse = response as {count: number, list: RecipeType[]}
-         const maxGroupNumber = Math.ceil((expectedResponse.count + 1) / 2)
-         if (groupNumberParam > maxGroupNumber) { 
-            updateGroupNumber(maxGroupNumber);
+         const totalGroups = Math.ceil((response.count + 1) / 2)
+         if (groupNumberParam > totalGroups) {
+            updateGroupNumber(totalGroups);
          }
          else {
-            setRecipeList(expectedResponse.list);
-            setRecipeCount(expectedResponse.count);
+            setRecipeList(response.list);
+            setRecipeCount(response.count);
          }
       })
       .catch((error) => {

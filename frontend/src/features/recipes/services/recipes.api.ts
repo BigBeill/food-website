@@ -46,7 +46,7 @@ export const recipeApi = {
 
    // under normal conditions this function will return RecipeType[], if count: true is passed in the params {count: number, list: RecipeType[]} will be returned
    search: (params: searchParams) => 
-      sendServerRequest<RecipeType[] | {count: number, list: RecipeType[]}>({
+      sendServerRequest<PaginatedListType<RecipeType>>({
          url:`/recipes/search`,
          method: 'get',
          body: params,

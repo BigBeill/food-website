@@ -3,15 +3,14 @@ import { useRef } from "react";
 import GrowingText from "@/shared/components/GrowingText";
 import Loading from "@/shared/components/stateComponents/Loading";
 import NotFound from "@/shared/components/stateComponents/NotFound";
-import { useRecipe } from "../services/recipe.service";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
+import { recipeService } from "../services/recipe.service";
+import useServiceState from "@/shared/lib/serviceState";
 
-type RecipeInput = RecipeType | Promise<RecipeType> | string;
+export default function RecipePage ({ recipeId }: { recipeId: string }) {
+   const recipeState = useServiceState(() => recipeService.get(recipeId), [ recipeId ]);
 
-export default function RecipePage ({ recipe }: { recipe: RecipeInput }) {
-   const state = useRecipe(recipe ?? '');
-
-   switch (state.status) {
+   switch (recipeState.status) {
       case 'loading':
          return <Loading />
       case 'not-found':
@@ -19,11 +18,11 @@ export default function RecipePage ({ recipe }: { recipe: RecipeInput }) {
       case 'error':
          return <NotFound />
       case 'ready':
-         return <RecipeView recipe={state.recipe}/>
+         return <RecipeView recipe={recipeState.data}/>
    }
 }
 
-function RecipeView({ recipe }: { recipe: RecipeType }) {
+export function RecipeView({ recipe }: { recipe: RecipeType }) {
    console.log("rendering recipe")
    const titleRef = useRef<HTMLDivElement | null>(null);
 

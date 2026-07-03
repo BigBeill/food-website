@@ -1,9 +1,9 @@
 import { useRef } from "react";
 import { RecipeType } from "../domain/recipes.types";
 import GrowingText from "@/shared/components/GrowingText";
-import RecipePage from "./RecipePage";
+import { RecipeView } from "./RecipePage";
 import { useRouter } from "next/router";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import useAuth from "@/features/auth/hooks/useAuth";
 import { unpackImage } from "@/features/images/services/image.services";
 import { usePopup } from "../../../shared/hooks/usePopup";
 
@@ -13,8 +13,8 @@ interface RecipePreviewProps {
 
 export default function RecipePreview({ recipe }: RecipePreviewProps) {
    const router = useRouter();
-   const { userId } = useAuth();
-   const popup = usePopup(<RecipePage recipe={recipe}/>);
+   const { authId } = useAuth();
+   const popup = usePopup(<RecipeView recipe={recipe}/>);
 
    const titleRef = useRef<HTMLDivElement>(null);
 
@@ -24,14 +24,14 @@ export default function RecipePreview({ recipe }: RecipePreviewProps) {
          <div className="titleContainer" ref={titleRef}>
             <GrowingText text={recipe.title} parentDiv={titleRef}/>
          </div>
-         <img {...unpackImage({ category: "recipe", image: recipe.image })} />
+         <img {...unpackImage(recipe.image)} />
          <p className="description">{recipe.description}</p>
          <div className="ingredients">
             <p>Ingredients:</p>
             <ul>
-               {recipe.ingredients.map((ingredient, index) => (
+               {recipe.ingredientList.map((ingredient, index) => (
                   <li key={index}>
-                     {ingredient.label ? ingredient.label : ingredient.portion?.amount + " " + ingredient.portion?.measureDescription + " of [" + ingredient.foodDescription + "]"}
+                     {ingredient.label ? ingredient.label : ingredient.portion?.amount + " " + ingredient.portion?.description + " of [" + ingredient.description + "]"}
                   </li>
                ))}
             </ul>
@@ -54,7 +54,7 @@ export default function RecipePreview({ recipe }: RecipePreviewProps) {
 
          <div className="bottomButtons splitSpace">
             <button onClick={() => popup.show()}> View Recipe </button>
-            { recipe.owner == userId ? 
+            { recipe.owner == authId ? 
                <button onClick={() => {router.push(`/editRecipe/${recipe._id}`)}}>Edit Recipe</button>
                : null
             }

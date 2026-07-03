@@ -1,5 +1,5 @@
-import sendServerRequest from "@/shared/lib/api";
-import { IngredientGroupType, IngredientConversionType, IngredientType } from "../../ingredients/domain/ingredient.types";
+import { ingredientApi } from "./ingredient.api";
+import { IngredientType } from "../domain/ingredient.types";
 
 interface searchParams {
    description?: string;
@@ -8,25 +8,10 @@ interface searchParams {
 }
 
 export const ingredientService = {
-   conversionOptionList: (ingredientId: string) =>
-      sendServerRequest<IngredientConversionType[]>({
-         url: `/ingredient/conversionOptionList/${ingredientId}`,
-         method: 'get',
-      }),
-   get: (ingredientId: string) =>
-      sendServerRequest<IngredientType>({
-         url: `/ingredient/get/${ingredientId}`,
-         method: 'get',
-      }),
-   groupList: () =>
-      sendServerRequest<IngredientGroupType[]>({
-         url: `/ingredient/groupList`,
-         method: 'get',
-      }),
-   search: (params: searchParams) => 
-      sendServerRequest<IngredientType[]>({
-         url: '/ingredient/search',
-         method: 'get',
-         body: params,
-      }),
+   get: (ingredientId: string): Promise<IngredientType> => {
+      return ingredientApi.get(ingredientId);
+   },
+   search: (params: searchParams): Promise<IngredientType[]> => {
+      return ingredientApi.search(params);
+   }
 }

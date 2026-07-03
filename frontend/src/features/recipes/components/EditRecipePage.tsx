@@ -10,7 +10,7 @@ import { RecipeType } from '../domain/recipes.types';
 import { recipeService } from '../services/recipes.api';
 import checkRecipeRequirements from '../domain/recipeRequirements';
 import useTaggedList from '@/shared/hooks/useTaggedList';
-import { ingredientService } from '@/features/ingredients/services/ingredient.service';
+import { ingredientService } from '@/features/ingredients/services/ingredient.api';
 import { IngredientConversionType, IngredientType } from '../../ingredients/domain/ingredient.types';
 import ImageUploader from '@/features/images/components/ImageUploader';
 import { PackagedImageType } from '@/features/images/domain/image.types';

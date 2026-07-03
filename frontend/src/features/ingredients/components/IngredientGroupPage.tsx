@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { IngredientGroupType } from "../domain/ingredient.types";
-import { ingredientService } from "../services/ingredient.service";
+import { ingredientService } from "../services/ingredient.api";
 import { useRouter } from "next/router";
 
 export default function IngredientGroupPage() {

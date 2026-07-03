@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
-import paginationBarStyles from './paginationBar.module.scss';
+import styles from './paginationBar.module.scss';
 
 
 interface PaginationBarProps {
@@ -18,7 +18,7 @@ export default function PaginationBar({ currentGroup, totalGroups, requestNewGro
    }
 
    return (
-      <div className={paginationBarStyles.paginationBar}>
+      <div className={styles.paginationBar}>
          <button onClick={() => handlePageChange(currentGroup - 1)} > <FontAwesomeIcon icon={faArrowLeft} /> </button>
          { currentGroup == 4 ? (
             <>

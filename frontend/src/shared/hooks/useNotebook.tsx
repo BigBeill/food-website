@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
-
-import '../styles/componentSpecific/notebook.scss';
 import PaginationBar from '@/shared/components/PaginationBar';
 
-import notebookStyles from './notebook.module.scss';
+import styles from './notebook.module.scss';
 
 // LOOK AT README.MD FILE IN THE ROOT FOLDER FOR INSTRUCTIONS ON HOW TO USE THIS COMPONENT
 
@@ -109,7 +107,7 @@ export default function useNotebook (requestOutOfBoundsIndex?: (requestedIndex: 
       handlePageChange(currentIndex + 2);
    }
 
-   const paginationBar = <PaginationBar currentPage={Math.ceil((currentIndex + 1) / 2)} totalPages={Math.ceil(componentCount / 2)} requestNewPage={handleGroupingChange} />;
+   const paginationBar = <PaginationBar currentGroup={Math.ceil((currentIndex + 1) / 2)} totalGroups={Math.ceil(componentCount / 2)} requestNewGroup={handleGroupingChange} />;
    const notebook = <Notebook firstPage={firstPage} secondPage={secondPage} paginationBar={paginationBar} />;
 
    return { content: notebook, replaceComponentList, appendComponentList, currentIndex };
@@ -146,7 +144,7 @@ function Notebook({firstPage, secondPage, paginationBar}: NotebookProps) {
    }, []);
 
    return(
-      <div className={notebookStyles.notebookContainer}>
+      <div className={styles.notebookContainer}>
          <div className={`notebook ${displayRight ? 'displayRight' : ''}`}>
             <div className={`notebookPage ${(displayRight && narrowScreen) ? 'shielded' : ''}`} onClick={() => setDisplayRight(false)}>
                {firstPage || null}

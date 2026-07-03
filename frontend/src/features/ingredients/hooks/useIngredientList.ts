@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IngredientType } from '../domain/recipes.types';
+import { IngredientType } from '../../recipes/domain/recipes.types';
 
 export function useIngredientList(initial: IngredientType[] = []) {
    const [ingredientList, setIngredientList] = useState<IngredientType[]>(initial);

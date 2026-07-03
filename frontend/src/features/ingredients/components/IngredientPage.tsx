@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import { IngredientType } from "../domain/ingredient.types";
-import { ingredientService } from "../services/ingredient.service";
+import { ingredientService } from "../services/ingredient.api";
 
 interface IngredientPageProps {
    ingredientId: string;

@@ -2,8 +2,8 @@
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleCheck, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
-import { useIngredientSearch } from '../hooks/useIngredientSearch';
-import { useIngredientList } from '../hooks/useIngredientList';
+import { useIngredientSearch } from '../../ingredients/hooks/useIngredientSearch';
+import { useIngredientList } from '../../ingredients/hooks/useIngredientList';
 import { IngredientType } from '@/features/ingredients/domain/ingredient.types';
 import { useState } from 'react';
 

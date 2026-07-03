@@ -55,7 +55,7 @@ export default function LoginPage() {
    return (
       <div className={styles.loginForm} id="loginForm">
          <h1>Login</h1>
-         <div className={styles.inputWrapper}>
+         <div className={styles.textInputWrapper}>
             <input
                type="text"
                name="username"
@@ -68,28 +68,28 @@ export default function LoginPage() {
             <label htmlFor="username">Username</label>
          </div>
 
-         <input
-            type="password"
-            name="password"
-            id="password"
-            placeholder=' '
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            onKeyDown={(event) => { if (event.key === 'Enter') { attemptLogin() } }}
-         />
-         <label htmlFor="password">Password</label>
+         <div className={styles.textInputWrapper}>
+            <input
+               type="password"
+               name="password"
+               id="password"
+               placeholder=' '
+               value={password}
+               onChange={(event) => setPassword(event.target.value)}
+               onKeyDown={(event) => { if (event.key === 'Enter') { attemptLogin() } }}
+            />
+            <label htmlFor="password">Password</label>
+         </div>
 
-         <div className="splitSpace">
-            <div className="checkboxInput">
-               <input type="checkbox"
-               name="remember me"
-               id="remember"
-               value="1" 
-               checked={rememberMe}
-               onChange={(event) => setRememberMe(event.target.checked)}
-               />
-               <label htmlFor="remember">Remember Me</label>
-            </div>
+         <div className={styles.checkboxInputWrapper}>
+            <input type="checkbox"
+            name="remember me"
+            id="remember"
+            value="1" 
+            checked={rememberMe}
+            onChange={(event) => setRememberMe(event.target.checked)}
+            />
+            <label htmlFor="remember">Remember Me</label>
          </div>
 
          <ButtonOval

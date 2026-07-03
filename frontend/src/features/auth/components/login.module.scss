@@ -33,17 +33,26 @@
 		padding: 0rem;
 		color: #60a5fa;
 	}
-
-	.checkboxInput input{
-		accent-color: $color-secondary;
-	}
 }
 
 .loginBackground {
 	background-image: url('/loginBackground.jpg');
 }
 
-.textInput {
+.checkboxInputWrapper {
+	margin: 0.6rem 0rem;
+
+	&:hover *{
+		cursor: pointer;
+		user-select: none;
+	}
+
+	input {
+		accent-color: $color-secondary;
+	}
+}
+
+.textInputWrapper {
 	position: relative;
 	margin: 1.2rem 0rem;
 

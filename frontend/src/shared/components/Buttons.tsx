@@ -1,4 +1,4 @@
-import styles from './Buttons.module.scss';
+import styles from './buttons.module.scss';
 
 interface ButtonPairedParams {
    firstText: string

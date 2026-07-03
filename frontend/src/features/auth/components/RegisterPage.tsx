@@ -67,7 +67,7 @@ export default function RegisterPage() {
       <div className={styles.loginForm} id="registerForm">
          <h1>Create Account</h1>
 
-         <div className={styles.textInput}>
+         <div className={styles.textInputWrapper}>
             <input
                type="text"
                name="username"
@@ -81,7 +81,7 @@ export default function RegisterPage() {
             <label htmlFor="username">Username</label>
          </div>
 
-         <div className={styles.textInput}>
+         <div className={styles.textInputWrapper}>
             <input
                type="text"
                name="email"
@@ -95,7 +95,7 @@ export default function RegisterPage() {
             <label htmlFor="email">Email</label>
          </div>
 
-         <div className={styles.textInput}>
+         <div className={styles.textInputWrapper}>
             <input
                type="password"
                name="passwordOne"
@@ -108,7 +108,7 @@ export default function RegisterPage() {
             <label htmlFor="passwordOne">Password</label>
          </div>
 
-         <div className={styles.textInput}>
+         <div className={styles.textInputWrapper}>
             <input
                type="password"
                name="passwordTwo"

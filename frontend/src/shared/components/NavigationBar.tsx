@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import useAuth from '@/features/auth/hooks/useAuth';
 import Image from 'next/image';
-import styles from './NavigationBar.module.scss';
+import styles from './navigationBar.module.scss';
 import { ButtonNavigationBar } from './Buttons';
 
 function NavigationBar() {
@@ -68,9 +68,9 @@ function NavigationBar() {
 
          <section aria-labelledby="findRecipesHeading">
             <h3 id="findRecipesHeading">Find Recipes</h3>
-            <NavItem href="/searchRecipes/public">Public Recipes</NavItem>
+            <NavItem href="/recipe/search/public">Public Recipes</NavItem>
             { authId && (
-               <NavItem href="/searchRecipes/friends">Friends Recipes</NavItem>
+               <NavItem href="/recipe/search/friends">Friends Recipes</NavItem>
             )}
          </section>
 
@@ -78,7 +78,7 @@ function NavigationBar() {
             <>
                <section aria-labelledby="yourRecipesHeading">
                   <h3 id="yourRecipesHeading">Your Recipes</h3>
-                  <NavItem href="/searchRecipes/personal">My Recipes</NavItem>
+                  <NavItem href="/search/recipe/personal">My Recipes</NavItem>
                   <NavItem href="/index">Saved Recipes</NavItem>
                   <NavItem href="/editRecipe">Create Recipe</NavItem>
                </section>
