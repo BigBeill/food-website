@@ -1,11 +1,11 @@
 // external imports
 import { useRef, useState, useEffect } from 'react';
 import useAuth from '@/features/auth/hooks/useAuth';
-import { authService } from '../services/auth.service';
 import checkPasswordRequirements from '../domain/passwordRequirements';
 import styles from './login.module.scss';
 import { useRouter } from 'next/navigation';
 import { ButtonOval } from '@/shared/components/Buttons';
+import { authService } from '../services/auth.service';
 
 export default function RegisterPage() {
    const errorRef = useRef(null);

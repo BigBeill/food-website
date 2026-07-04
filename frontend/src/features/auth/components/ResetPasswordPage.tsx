@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { authService } from "../services/auth.service";
+import { authService } from "../services/auth.api";
 import { useRouter } from "next/router";
 import { useAuth } from "../hooks/useAuth";
 

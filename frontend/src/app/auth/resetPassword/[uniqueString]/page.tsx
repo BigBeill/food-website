@@ -1,3 +1,5 @@
+"use client"
+
 import ResetPasswordPage from "@/features/auth/components/RequestPasswordResetPage";
 
 export default async function ResetPassword({ params }: { params: Promise<{ uniqueString: string }>; }) {

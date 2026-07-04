@@ -1,9 +1,9 @@
 import { useRef, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation';
 import useAuth from '../hooks/useAuth';
-import { authService } from '../services/auth.service';
 import styles from './login.module.scss';
 import { ButtonOval } from '@/shared/components/Buttons';
+import { authService } from '../services/auth.service';
 
 export default function LoginPage() {
    const errorRef = useRef(null);
@@ -104,7 +104,7 @@ export default function LoginPage() {
          <a href='/auth/register'>create account</a>
          <p>------------</p>
          <p>Forgot your password?</p>
-         <a href='/resetPassword'>reset password</a>
+         <a href='/auth/resetPassword'>reset password</a>
 
       </div>
    )

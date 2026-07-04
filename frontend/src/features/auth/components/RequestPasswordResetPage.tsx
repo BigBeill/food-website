@@ -1,41 +1,30 @@
 import { useRouter } from 'next/router';
-import { useState, useRef } from 'react';
-import checkPasswordRequirements from '../domain/passwordRequirements';
+import { useState, useRef, useEffect } from 'react';
+import useAuth from '../hooks/useAuth';
 import { authService } from '../services/auth.service';
-import { useAuth } from '../hooks/useAuth';
+import { useServiceMutation } from '@/shared/lib/serviceMutation';
+import { ButtonOval } from '@/shared/components/Buttons';
 
-interface ResetPasswordPageProps {
-   uniqueString: string;
+interface FormDataType {
+   passwordOne: string,
+   passwordTwo: string,
+   token: string,
 }
-export default function ResetPasswordPage({ uniqueString }: ResetPasswordPageProps) {
+
+export default function ResetPasswordPage({ token }: {token: string}) {
 
    const router = useRouter();
-   const { userId } = useAuth();
-   if (userId) { router.replace('/'); }
+   const { authId } = useAuth();
+   if (authId) { router.replace('/'); }
    
    const errorRef = useRef(null);
 
-   const [passwordOne, setPasswordOne] = useState<string>("");
-   const [passwordTwo, setPasswordTwo] = useState<string>("");
-   const [errorMessage, setErrorMessage] = useState<string>("");
+   const [formData, setFormData] = useState<FormDataType>({ passwordOne: "", passwordTwo: "", token})
+   const resetPasswordMutator = useServiceMutation<FormDataType, void>((input) => authService.resetPassword(input))
 
-   function changePassword() {
-      if (!passwordOne || !passwordTwo) { return; }
-      if (passwordOne !== passwordTwo) {
-         setErrorMessage("passwords don't match");
-         return;
-      }
-
-      const missingPasswordRequirements: string | null = checkPasswordRequirements(passwordOne);
-      if (missingPasswordRequirements) {
-         setErrorMessage(missingPasswordRequirements);
-         return;
-      }
-
-      authService.resetPassword({uniqueString, password: passwordOne})
-
-      router.replace('/login');
-   }
+   useEffect(() => {
+      if (resetPasswordMutator.state.status === "ready") { router.replace('/auth/login'); }
+   }, [resetPasswordMutator.state]);
 
    return (
       <div className='loginForm' id='resetPasswordForm'>
@@ -46,8 +35,8 @@ export default function ResetPasswordPage({ uniqueString }: ResetPasswordPagePro
                name="newPassword"
                id="newPasswordOne"
                placeholder=' '
-               onChange={(event) => { setPasswordOne(event.target.value) } }
-               onKeyDown={(event) => { if (event.key === 'Enter') { changePassword() } }}
+               onChange={(event) => { setFormData({ ...formData, passwordOne: event.target.value }) } }
+               onKeyDown={(event) => { if (event.key === 'Enter') { resetPasswordMutator.send } }}
             />
             <label htmlFor="newPasswordOne">Enter New Password</label>
          </div>
@@ -57,13 +46,14 @@ export default function ResetPasswordPage({ uniqueString }: ResetPasswordPagePro
                name="newPasswordConfirm"
                id="newPasswordTwo"
                placeholder=' '
-               onChange={(event) => { setPasswordTwo(event.target.value) } }
-               onKeyDown={(event) => { if (event.key === 'Enter') { changePassword() } }}
+               onChange={(event) => { setFormData({ ...formData, passwordTwo: event.target.value }) } }
+               onKeyDown={(event) => { if (event.key === 'Enter') { resetPasswordMutator.send(formData) } }}
             />
             <label htmlFor="newPasswordTwo">Re-Enter New Password</label>
          </div>
-         <button onClick={changePassword}> Change Password </button>
-         <p ref={errorRef} className={errorMessage ? "error" : "hidden"} aria-live="assertive">{errorMessage}</p>
+         <ButtonOval onClick={ () => { resetPasswordMutator.send(formData) } }>Change Password</ButtonOval>
+         {/* show error message if one exists */}
+         { resetPasswordMutator.state.status === "error" ? <p ref={errorRef} className='error' aria-live='assertive'>{resetPasswordMutator.state.error as string}</p> : null}
          <p>Need a new link?</p>
          <a href='/resetPassword'>Reset Password</a>
       </div>

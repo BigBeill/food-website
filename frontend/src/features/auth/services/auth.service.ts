@@ -1,5 +1,6 @@
-// features/auth/services/authService.ts
-import sendServerRequest from "@/shared/lib/api";
+import { authApi } from "./auth.api";
+import { checkValidPassword } from "./auth.utils";
+
 
 interface LoginParams {
   username: string;
@@ -18,42 +19,28 @@ interface RequestPasswordResetParams {
 }
 
 interface ResetPasswordParams {
+  passwordOne: string;
+  passwordTwo: string;
   token: string;
-  password: string;
 }
 
 export const authService = {
-   login: (params: LoginParams) =>
-      sendServerRequest({
-         url: "/auth/login",
-         method: "POST",
-         body: params,
-      }),
-
-   logout: () => 
-      sendServerRequest({
-         url: '/auth/logout',
-         method: 'POST',
-      }),
-
-   register: (params: RegisterParams) =>
-      sendServerRequest({
-         url: "/auth/register",
-         method: "POST",
-         body: params,
-      }),
-
-   requestPasswordReset: (params: RequestPasswordResetParams) =>
-      sendServerRequest({
-         url: "/auth/requestPasswordReset",
-         method: "POST",
-         body: params,
-      }),
-
-   resetPassword: (params: ResetPasswordParams) =>
-      sendServerRequest({
-         url: "/auth/resetPassword",
-         method: "POST",
-         body: params,
-      }),
-};
+   login: (params: LoginParams): Promise<void> => {
+      return authApi.login(params);
+   },
+   logout: (): Promise<void> => {
+      return authApi.logout();
+   },
+   register: (params: RegisterParams) => {
+      return authApi.register(params);
+   },
+   requestPasswordReset: (params: RequestPasswordResetParams) => {
+      return authApi.requestPasswordReset(params);
+   },
+   resetPassword: (params: ResetPasswordParams) => {
+      const { passwordOne, passwordTwo, token } = params;
+      checkValidPassword(passwordOne); // errors will handle any issue
+      if (passwordOne !== passwordTwo) { throw new Error("Passwords do not match!"); }
+      return authApi.resetPassword({password: passwordOne, token});
+   }
+}
