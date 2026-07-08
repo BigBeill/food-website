@@ -25,7 +25,7 @@
    border-color: $color-primary;
    color: $color-background;
 
-   &:hover {
+   &:hover, &.loadingState {
       transform: scale(1.05);
       border-radius: 0.3rem;
    }
@@ -34,7 +34,7 @@
 .buttonSecondary {
    @extend %universalButtonStyling;
 
-   &:hover {
+   &:hover, &.loadingState {
       color: $color-background;
       background: $color-secondary;
    }

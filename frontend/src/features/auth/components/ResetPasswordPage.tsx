@@ -64,6 +64,7 @@ export default function ResetPasswordPage({ token }: {token: string}) {
             id="submitButton"
                         style={{ margin: '0rem', width: '100%', padding: '0.6rem 2rem' }}
             onClick={ () => { resetPasswordMutator.send(formData) } }
+            loadingState={ resetPasswordMutator.state.status === 'loading' }
          > Change Password </ButtonOval>
 
          { resetPasswordMutator.state.status === "error" ? 

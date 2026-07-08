@@ -1,4 +1,5 @@
 import styles from './buttons.module.scss';
+import Spinner from './icons/spinner';
 
 interface ButtonPairedParams {
    firstText: string
@@ -11,6 +12,10 @@ interface NavigationBarButtonParams {
    isOpen: boolean,
    onClick: () => void
 }
+
+type ButtonOvalProps = React.ComponentPropsWithoutRef<'button'> & {
+   loadingState?: boolean;
+};
 
 export function ButtonPaired ({ firstText, firstOnClick, secondText, secondOnClick }: ButtonPairedParams) {
    return (
@@ -34,10 +39,10 @@ export function ButtonNavigationBar ({ isOpen, onClick }: NavigationBarButtonPar
    );
 }
 
-export function ButtonOval({ className, children, ...rest }: React.ComponentPropsWithoutRef<'button'>) {
+export function ButtonOval({ className, children, loadingState, ...rest }: ButtonOvalProps) {
    return (
-      <button className={[styles.buttonOval, className].filter(Boolean).join(' ')} {...rest}>
-         {children}
+      <button className={[styles.buttonOval, loadingState && styles.loadingState, className].filter(Boolean).join(' ')} {...rest}>
+         { loadingState ? <Spinner /> : children }
       </button>
    );
 }

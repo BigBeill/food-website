@@ -79,6 +79,7 @@ export default function LoginPage() {
             id="submitButton"
             style={{ margin: '0rem', width: '100%', padding: '0.6rem 2rem' }}
             onClick={ () => loginMutator.send(formData) }
+            loadingState={ loginMutator.state.status === 'loading' }
          > Login </ButtonOval>
 
          { loginMutator.state.status === "error" ? 

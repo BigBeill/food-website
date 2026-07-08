@@ -1,14 +1,13 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleNotch } from '@fortawesome/free-solid-svg-icons';
 import AnimationSpin from '@/shared/animations/spin.animation';
+import Spinner from '../icons/spinner';
 
 export default function Loading() {
     return(
         <div className="standardPage" role="status" aria-live="polite">
             <div> 
-                <AnimationSpin>
-                    <FontAwesomeIcon icon={faCircleNotch} />
-                </AnimationSpin> 
+                <Spinner />
                 <p>Loading...</p>
             </div>
             <p>

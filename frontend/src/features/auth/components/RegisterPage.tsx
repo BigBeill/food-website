@@ -97,6 +97,7 @@ export default function RegisterPage() {
             id="submitButton"
             style={{ margin: '0rem', width: '100%', padding: '0.6rem 2rem' }}
             onClick={ () => registerMutator.send(formData) }
+            loadingState={ registerMutator.state.status === 'loading' }
          > Create Account </ButtonOval>
 
          { registerMutator.state.status === "error" ? 
