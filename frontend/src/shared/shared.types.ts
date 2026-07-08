@@ -5,7 +5,7 @@ type ServiceState<T> =
    | { status: 'loading' }
    | { status: 'ready'; data: T }
    | { status: 'not-found' }
-   | { status: 'error'; error: unknown };
+   | { status: 'error'; error: Error };
 
 type PaginatedListType<T> = {
    list: T[];

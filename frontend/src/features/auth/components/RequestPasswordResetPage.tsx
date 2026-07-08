@@ -1,10 +1,10 @@
-import { useRouter } from 'next/router';
 import { useState, useRef, useEffect } from 'react';
 import useAuth from '../hooks/useAuth';
 import { authService } from '../services/auth.service';
 import { useServiceMutation } from '@/shared/lib/serviceMutation';
 import { ButtonOval } from '@/shared/components/Buttons';
 import styles from './login.module.scss';
+import { useRouter } from 'next/navigation';
 
 interface FormDataType {
    email: string
@@ -35,7 +35,7 @@ export default function RequestPasswordResetPage() {
    return (
       <div className={ styles.loginForm } id='resetPasswordForm'>
          <h1>Change Your Password</h1>
-         <div className='textInput'>
+         <div className={ styles.textInputWrapper }>
             <input 
                type="email"
                name="newEmail"
@@ -56,8 +56,14 @@ export default function RequestPasswordResetPage() {
          
          { requestPasswordResetMutator.state.status === "error" ? 
             <p ref={errorRef} className='error' aria-live='assertive'>
-               { requestPasswordResetMutator.state.error as string }
+               { requestPasswordResetMutator.state.error.message }
             </p> 
+         : null}
+
+         { requestPasswordResetMutator.state.status === "ready" ?
+            <p className='update' aria-live='assertive'>
+               A password reset request has been sent to your email
+            </p>
          : null}
 
          <p>Need a new link?</p>

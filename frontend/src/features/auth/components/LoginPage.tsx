@@ -83,7 +83,7 @@ export default function LoginPage() {
 
          { loginMutator.state.status === "error" ? 
             <p ref={errorRef} className='error' aria-live='assertive'>
-               { loginMutator.state.error as string }
+               { loginMutator.state.error.message }
             </p> 
          : null}
          

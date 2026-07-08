@@ -9,7 +9,13 @@ export function useServiceMutation<TInput, TOutput>(mutationFunction: (input: TI
          const data = await mutationFunction(input);
          setState({ status: 'ready', data });
       } catch (error) {
-         setState({ status: 'error', error });
+         if (error instanceof Error) {
+            setState({ status: 'error', error });
+         } 
+         else {
+            console.error('useServiceMutation caught a non-Error value:', error);
+            setState({ status: 'error', error: new Error(String(error)) });
+         }
       }
    }
 

@@ -68,7 +68,7 @@ export default function ResetPasswordPage({ token }: {token: string}) {
 
          { resetPasswordMutator.state.status === "error" ? 
             <p ref={errorRef} className='error' aria-live='assertive'>
-               { resetPasswordMutator.state.error as string }
+               { resetPasswordMutator.state.error.message }
             </p> 
          : null}
 

@@ -101,7 +101,7 @@ export default function RegisterPage() {
 
          { registerMutator.state.status === "error" ? 
             <p ref={errorRef} className='error' aria-live='assertive'>
-               { registerMutator.state.error as string }
+               { registerMutator.state.error.message }
             </p> 
          : null}
 
