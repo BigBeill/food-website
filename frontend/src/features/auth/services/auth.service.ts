@@ -11,7 +11,8 @@ interface LoginParams {
 interface RegisterParams {
   username: string;
   email: string;
-  password: string;
+  passwordOne: string;
+  passwordTwo: string;
 }
 
 interface RequestPasswordResetParams {
@@ -32,7 +33,10 @@ export const authService = {
       return authApi.logout();
    },
    register: (params: RegisterParams) => {
-      return authApi.register(params);
+      const { username, email, passwordOne, passwordTwo } = params
+      checkValidPassword(passwordOne);
+      if (passwordOne != passwordTwo) { throw new Error("Passwords do not match!"); }
+      return authApi.register({ username, email, password: passwordOne });
    },
    requestPasswordReset: (params: RequestPasswordResetParams) => {
       return authApi.requestPasswordReset(params);

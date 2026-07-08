@@ -1,51 +1,79 @@
-import { useState } from "react";
-import { authService } from "../services/auth.api";
-import { useRouter } from "next/router";
-import { useAuth } from "../hooks/useAuth";
+import { useState, useRef, useEffect } from 'react';
+import useAuth from '../hooks/useAuth';
+import { authService } from '../services/auth.service';
+import { useServiceMutation } from '@/shared/lib/serviceMutation';
+import { ButtonOval } from '@/shared/components/Buttons';
+import { useRouter } from 'next/navigation';
+import styles from './login.module.scss';
 
-export default function RequestPasswordResetPage() {
+interface FormDataType {
+   passwordOne: string,
+   passwordTwo: string,
+   token: string,
+}
 
+export default function ResetPasswordPage({ token }: {token: string}) {
+
+   const errorRef = useRef(null);
    const router = useRouter();
-   const { userId } = useAuth();
-   if (userId) { router.replace('/'); }
+   const { authId } = useAuth();
+   
+   useEffect(() => {
+      if (authId) { router.replace('/'); }
+   },[authId])
 
-   const [email, setEmail] = useState<string>("");
-   const [requestSent, setRequestSent] = useState<boolean>(false);
+   const [formData, setFormData] = useState<FormDataType>({ passwordOne: "", passwordTwo: "", token})
+   const resetPasswordMutator = useServiceMutation<FormDataType, void>((input) => authService.resetPassword(input))
 
-   function sendResetRequest() {
-      if (!email) { return; }
-      
-      try {
-         authService.requestPasswordReset({ email });
-         setRequestSent(true);
-      }
-      catch (error) {
-         console.error(error);
-      }
-      
-   }
+   useEffect(() => {
+      document.body.classList.add(styles.loginBackground);
+      return () => { document.body.classList.remove(styles.loginBackground); }
+   }, []);
+   
+   useEffect(() => {
+      if (resetPasswordMutator.state.status === "ready") { router.replace('/auth/login'); }
+   }, [resetPasswordMutator.state]);
 
    return (
-      <div className='loginForm' id='resetPasswordForm'>
-         <h1>Request a Password Reset Link</h1>
-         { requestSent ? 
-            <p>A reset link has been sent to your email, if your email exists in our system you will receive it shortly.</p> 
-         : <>
-            <div className='textInput'>
-               <input 
-                  type="text"
-                  name="email"
-                  id="email"
-                  placeholder=' '
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  onKeyDown={(event) => { if (event.key === 'Enter') { sendResetRequest() } }}
-               />
-               <label htmlFor="email">Enter Your Email</label>
-            </div>
+      <div className={ styles.loginForm } id='resetPasswordForm'>
+         <h1>Change Your Password</h1>
+         <div className={ styles.textInputWrapper }>
+            <input 
+               type="password"
+               name="newPassword"
+               id="newPasswordOne"
+               placeholder=' '
+               onChange={(event) => { setFormData({ ...formData, passwordOne: event.target.value }) } }
+               onKeyDown={(event) => { if (event.key === 'Enter') { resetPasswordMutator.send } }}
+            />
+            <label htmlFor="newPasswordOne">Enter New Password</label>
+         </div>
+         <div className={ styles.textInputWrapper }>
+            <input 
+               type="password"
+               name="newPasswordConfirm"
+               id="newPasswordTwo"
+               placeholder=' '
+               onChange={(event) => { setFormData({ ...formData, passwordTwo: event.target.value }) } }
+               onKeyDown={(event) => { if (event.key === 'Enter') { resetPasswordMutator.send(formData) } }}
+            />
+            <label htmlFor="newPasswordTwo">Re-Enter New Password</label>
+         </div>
+         <ButtonOval 
+            name="submit"
+            id="submitButton"
+                        style={{ margin: '0rem', width: '100%', padding: '0.6rem 2rem' }}
+            onClick={ () => { resetPasswordMutator.send(formData) } }
+         > Change Password </ButtonOval>
 
-            <button onClick={sendResetRequest}> Request Reset Link </button>
-         </> }
+         { resetPasswordMutator.state.status === "error" ? 
+            <p ref={errorRef} className='error' aria-live='assertive'>
+               { resetPasswordMutator.state.error as string }
+            </p> 
+         : null}
+
+         <p>Need a new link?</p>
+         <a href='/resetPassword'>Reset Password</a>
       </div>
    )
 }

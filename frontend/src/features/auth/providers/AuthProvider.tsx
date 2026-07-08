@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useState, useEffect, useCallback } from 'react';
-import { authService } from '../services/auth.api';
+import { authService } from '../services/auth.service';
 
 type AuthContextType = {
   authId: string | null;

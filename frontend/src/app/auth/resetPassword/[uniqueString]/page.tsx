@@ -1,8 +1,8 @@
 "use client"
 
-import ResetPasswordPage from "@/features/auth/components/RequestPasswordResetPage";
+import ResetPasswordPage from "@/features/auth/components/ResetPasswordPage";
 
-export default async function ResetPassword({ params }: { params: Promise<{ uniqueString: string }>; }) {
-  const { uniqueString } = await params;
-  return <ResetPasswordPage uniqueString={uniqueString} />;
+export default async function ResetPassword({ params }: { params: Promise<{ token: string }>; }) {
+  const { token } = await params;
+  return <ResetPasswordPage token={ token } />;
 }

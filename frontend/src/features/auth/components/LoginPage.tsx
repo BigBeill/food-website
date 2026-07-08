@@ -4,53 +4,34 @@ import useAuth from '../hooks/useAuth';
 import styles from './login.module.scss';
 import { ButtonOval } from '@/shared/components/Buttons';
 import { authService } from '../services/auth.service';
+import { useServiceMutation } from '@/shared/lib/serviceMutation';
+
+interface FormDataType {
+   username: string,
+   password: string,
+   rememberMe: boolean,
+}
 
 export default function LoginPage() {
    const errorRef = useRef(null);
    const router = useRouter();
    const { authId } = useAuth();
 
-   // Tracks that a login attempt has been made and a response is being waited on
-   const [activeLoginAttempt, setActiveLoginAttempt] = useState<boolean>(false);
+   const [formData, setFormData] = useState<FormDataType>({ username: "", password: "", rememberMe: false });
+   const loginMutator = useServiceMutation<FormDataType, void>((input) => authService.login(input));
 
-   const [username, setUsername] = useState<string>("");
-   const [password, setPassword] = useState<string>("");
-   const [rememberMe, setRememberMe] = useState<boolean>(false);
-   const [errorMessage, setErrorMessage] = useState<string>("");
-
-   // monitor userId and redirect the page if it contains a value
    useEffect(() => {
-      if (authId) { 
-         router.replace('/');
-         return;
-      }
+      if (authId) { router.replace('/'); }
+   },[authId])
+
+   useEffect(() => {
       document.body.classList.add(styles.loginBackground);
       return () => { document.body.classList.remove(styles.loginBackground); }
-   }, [authId]);
+   }, []);
 
-   // clean up any error message once the input has changed
    useEffect(() => {
-      setErrorMessage("");
-   }, [username, password]);
-
-   async function attemptLogin() {
-      // don't run this function while a login attempt has already been made
-      if (activeLoginAttempt) { return; }
-
-      if (!username) return setErrorMessage("no username provided");
-      if (!password) return setErrorMessage("no password provided");
-
-      setActiveLoginAttempt(true);
-
-      try { 
-         await authService.login({username, password, rememberMe}); 
-         router.replace("/");
-      }
-      catch(error) {
-         console.error(error); // CHANGE THIS TO USE setErrorMessage
-      }
-      setActiveLoginAttempt(false);
-   }
+      if (loginMutator.state.status === "ready") { router.replace('/'); }
+   }, [loginMutator.state]);
 
    return (
       <div className={styles.loginForm} id="loginForm">
@@ -61,9 +42,9 @@ export default function LoginPage() {
                name="username"
                id="username"
                placeholder=' '
-               value={username}
-               onChange={(event) => setUsername(event.target.value)}
-               onKeyDown={(event) => { if (event.key === 'Enter') { attemptLogin() } }}
+               value={ formData.username }
+               onChange={ (event) => setFormData((data) => ({ ...data, username: event.target.value })) }
+               onKeyDown={ (event) => { if (event.key === 'Enter') { loginMutator.send(formData) } } }
             />
             <label htmlFor="username">Username</label>
          </div>
@@ -74,9 +55,9 @@ export default function LoginPage() {
                name="password"
                id="password"
                placeholder=' '
-               value={password}
-               onChange={(event) => setPassword(event.target.value)}
-               onKeyDown={(event) => { if (event.key === 'Enter') { attemptLogin() } }}
+               value={ formData.password }
+               onChange={ (event) => setFormData((data) => ({ ...data, password: event.target.value })) }
+               onKeyDown={ (event) => { if (event.key === 'Enter') { loginMutator.send(formData) } } }
             />
             <label htmlFor="password">Password</label>
          </div>
@@ -86,8 +67,8 @@ export default function LoginPage() {
             name="remember me"
             id="remember"
             value="1" 
-            checked={rememberMe}
-            onChange={(event) => setRememberMe(event.target.checked)}
+            checked={ formData.rememberMe }
+            onChange={(event) => setFormData((data) => ({ ...data, rememberMe: event.target.checked })) }
             />
             <label htmlFor="remember">Remember Me</label>
          </div>
@@ -97,9 +78,15 @@ export default function LoginPage() {
             type="submit"
             id="submitButton"
             style={{ margin: '0rem', width: '100%', padding: '0.6rem 2rem' }}
-            onClick={attemptLogin}
+            onClick={ () => loginMutator.send(formData) }
          > Login </ButtonOval>
-         <p ref={errorRef} className={errorMessage ? "error" : "hidden"} area-live="assertive" role="alert">{errorMessage}</p>
+
+         { loginMutator.state.status === "error" ? 
+            <p ref={errorRef} className='error' aria-live='assertive'>
+               { loginMutator.state.error as string }
+            </p> 
+         : null}
+         
          <p>Don&apos;t have an account?</p>
          <a href='/auth/register'>create account</a>
          <p>------------</p>

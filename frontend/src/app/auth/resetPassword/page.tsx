@@ -1,7 +1,7 @@
 "use client"
 
-import RequestPasswordResetPage from "@/features/auth/components/ResetPasswordPage";
+import RequestPasswordResetPage from "@/features/auth/components/RequestPasswordResetPage";
 
 export default function RequestDefaultPassword() {
-   return <RequestPasswordResetPage />;
+   return < RequestPasswordResetPage />;
 }
