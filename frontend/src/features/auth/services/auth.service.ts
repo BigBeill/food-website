@@ -39,7 +39,8 @@ export const authService = {
       return authApi.register({ username, email, password: passwordOne });
    },
    requestPasswordReset: (params: RequestPasswordResetParams) => {
-      return authApi.requestPasswordReset(params);
+      const { email } = params
+      return authApi.requestPasswordReset({ email });
    },
    resetPassword: (params: ResetPasswordParams) => {
       const { passwordOne, passwordTwo, token } = params;

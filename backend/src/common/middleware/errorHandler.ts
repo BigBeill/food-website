@@ -16,4 +16,5 @@ export const errorHandler = new Elysia({ name: 'error-handler' })
       console.error('Unhandled error:', error);
       set.status = 500;
       return { error: { code: 'INTERNAL_ERROR', message: 'Something went wrong' } };
-   });
+   })
+      .as('global');
