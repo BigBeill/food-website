@@ -37,7 +37,7 @@ async function request<T>(config: SendServerRequestProps): Promise<T> {
    }
    const response = await fetch(url, options);
 
-   if (!response.ok) throw { status: response.status, ...(await response.json().catch(() => ({}))) };
+   if (!response.ok) { throw { status: response.status, ...(await response.json().catch(() => ({}))) }; }
 
    const jsonResponse = await response.json();
    console.log(jsonResponse);
@@ -45,7 +45,7 @@ async function request<T>(config: SendServerRequestProps): Promise<T> {
 }
 
 export default async function sendServerRequest<T>(config: SendServerRequestProps): Promise<T> {
-   console.log(config);
+   console.log("Request to server has been made, config:", config);
    try {
       return await request(config);
    } catch (error: any) {
@@ -55,7 +55,7 @@ export default async function sendServerRequest<T>(config: SendServerRequestProp
          await request({ method: 'POST', url: 'authentication/refresh' });
          return await request(config);
       }
-
-      throw error;
+      console.error("error response from server received:", error);
+      throw new Error(error.error.message);
    }
 }

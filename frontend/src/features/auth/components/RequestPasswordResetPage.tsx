@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import useAuth from '../hooks/useAuth';
 import { authService } from '../services/auth.service';
 import { useServiceMutation } from '@/shared/lib/serviceMutation';
@@ -24,13 +24,14 @@ export default function RequestPasswordResetPage() {
    },[authId])
 
    useEffect(() => {
+      // set background
       document.body.classList.add(styles.loginBackground);
       return () => { document.body.classList.remove(styles.loginBackground); }
    }, []);
 
    useEffect(() => {
-      if (requestPasswordResetMutator.state.status === "ready") { router.replace('/auth/login'); }
-   }, [requestPasswordResetMutator.state]);
+      requestPasswordResetMutator.resetToIdle();
+   }, [formData])
 
    return (
       <div className={ styles.loginForm } id='resetPasswordForm'>
@@ -41,6 +42,7 @@ export default function RequestPasswordResetPage() {
                name="newEmail"
                id="newEmail"
                placeholder=' '
+               value={ formData.email }
                onChange={(event) => { setFormData({ ...formData, email: event.target.value }) } }
                onKeyDown={(event) => { if (event.key === 'Enter') { requestPasswordResetMutator.send } }}
             />
@@ -63,12 +65,9 @@ export default function RequestPasswordResetPage() {
 
          { requestPasswordResetMutator.state.status === "ready" ?
             <p className='update' aria-live='assertive'>
-               A password reset request has been sent to your email
+               A password reset link has been sent to your email
             </p>
          : null}
-
-         <p>Need a new link?</p>
-         <a href='/resetPassword'>Reset Password</a>
       </div>
    )
 }

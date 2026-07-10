@@ -11,3 +11,11 @@ export function checkValidPassword(password: string): void {
 
    if (/\s/.test(password)) { throw new Error("Password must not contain whitespace"); }
 }
+
+const ELYSIA_EMAIL_REGEX = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i;
+
+export function checkValidEmail(email: string): void {
+   if (!ELYSIA_EMAIL_REGEX.test(email)) {
+      throw new Error(`Invalid email address`);
+   }
+}

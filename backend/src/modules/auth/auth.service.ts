@@ -92,8 +92,8 @@ export class AuthService {
    async requestPasswordReset(email: string): Promise<void> {
       const normalizedEmail = email.toLowerCase().trim();
       const user = await this.repository.getExactUserList({ email: normalizedEmail });
-      if (!user[0]) { throw new UnauthorizedError(); }
-      const userId = user[0]._id.toString()
+      if (!user[0]) { throw new NotFoundError(`user containing { email: ${email} }`); }
+      const userId = user[0]._id.toString();
       await this.repository.deletePasswordResetTokens(userId);
 
       const resetToken = randomBytes(32).toString('hex');

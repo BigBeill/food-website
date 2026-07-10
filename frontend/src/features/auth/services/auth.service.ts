@@ -1,5 +1,5 @@
 import { authApi } from "./auth.api";
-import { checkValidPassword } from "./auth.utils";
+import { checkValidEmail, checkValidPassword } from "./auth.utils";
 
 
 interface LoginParams {
@@ -39,7 +39,8 @@ export const authService = {
       return authApi.register({ username, email, password: passwordOne });
    },
    requestPasswordReset: (params: RequestPasswordResetParams) => {
-      const { email } = params
+      const { email } = params;
+      checkValidEmail(email);
       return authApi.requestPasswordReset({ email });
    },
    resetPassword: (params: ResetPasswordParams) => {
