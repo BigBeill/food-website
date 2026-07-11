@@ -23,7 +23,7 @@ export default function RecipePage ({ recipeId }: { recipeId: string }) {
 }
 
 export function RecipeView({ recipe }: { recipe: RecipeType }) {
-   console.log("rendering recipe")
+   
    const titleRef = useRef<HTMLDivElement | null>(null);
 
    return (

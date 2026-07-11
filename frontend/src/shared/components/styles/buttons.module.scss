@@ -1,4 +1,4 @@
-@use '../styles/variables' as *;
+@use '../../styles/variables' as *;
 
 %universalButtonStyling {
    display: inline-block;
@@ -124,4 +124,40 @@
 .buttonOval {
    @extend .buttonSecondary;
    border-radius: 99rem;
+}
+
+
+.buttonDevisable{
+   display: flex;
+
+   &.additionalMargin {
+      width: calc(100% - 9rem);
+      margin: 0rem 4.5rem 1.2rem 4.5rem;
+   }
+
+   button{
+      flex: 1;
+      margin: 0rem;
+
+      &.showButton{
+         margin-left: 0.3rem;
+      }
+
+      &.hideButton{
+         flex: 0;
+         opacity: 0;
+         pointer-events: none;
+         padding: 0rem;
+         border: none;
+      }
+   }
+}
+
+.buttonMobileNav {
+   padding: 0.5rem;
+
+   /* md:hidden — applies at the md breakpoint and up */
+   @media (min-width: 60rem) {
+      display: none;
+   }
 }

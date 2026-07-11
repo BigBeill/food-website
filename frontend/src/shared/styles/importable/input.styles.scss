@@ -1,6 +1,6 @@
-@use '../shared/styles/variables' as *;
+@use '../variables' as *;
 
-.textInput {
+.text {
    width: calc(100% - 1.2rem);
    margin: 0rem 0.6rem 1.8rem 0.6rem;
 
@@ -126,32 +126,6 @@
    }
 }
 
-.devisableButton{
-   display: flex;
-
-   &.additionalMargin {
-      width: calc(100% - 9rem);
-      margin: 0rem 4.5rem 1.2rem 4.5rem;
-   }
-
-   button{
-      flex: 1;
-      margin: 0rem;
-
-      &.showButton{
-         margin-left: 0.3rem;
-      }
-
-      &.hideButton{
-         flex: 0;
-         opacity: 0;
-         pointer-events: none;
-         padding: 0rem;
-         border: none;
-      }
-   }
-}
-
 .svgButtonContainer{
    margin-top: auto;
 
@@ -164,7 +138,7 @@
    }
 }
 
-.textInputParent {
+.textContainer {
    width: 100%;
    height: 100%;
    box-sizing: border-box;
@@ -207,7 +181,7 @@
    }
 }
 
-.radioButtonInput {
+.radioButton {
    display: flex;
    flex-direction: column;
    gap: 0.3rem;
@@ -235,7 +209,7 @@
    }
 }
 
-.imageInput {
+.image {
    position: relative;
    display: block;
    width: 100%;

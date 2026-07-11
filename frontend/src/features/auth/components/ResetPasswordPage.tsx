@@ -2,9 +2,10 @@ import { useState, useRef, useEffect } from 'react';
 import useAuth from '../hooks/useAuth';
 import { authService } from '../services/auth.service';
 import { useServiceMutation } from '@/shared/lib/serviceMutation';
-import { ButtonOval } from '@/shared/components/Buttons';
+import { ButtonOval } from '@/shared/components/Button.components';
 import { useRouter } from 'next/navigation';
 import styles from './login.module.scss';
+import { ValidationErrorComponent } from '@/shared/components/stateComponents/ValidationError';
 
 interface FormDataType {
    passwordOne: string,
@@ -14,7 +15,6 @@ interface FormDataType {
 
 export default function ResetPasswordPage({ token }: {token: string}) {
 
-   const errorRef = useRef(null);
    const router = useRouter();
    const { authId } = useAuth();
    
@@ -33,6 +33,10 @@ export default function ResetPasswordPage({ token }: {token: string}) {
    useEffect(() => {
       if (resetPasswordMutator.state.status === "ready") { router.replace('/auth/login'); }
    }, [resetPasswordMutator.state]);
+
+   useEffect(() => {
+      resetPasswordMutator.resetToIdle();
+   }, [formData])
 
    return (
       <div className={ styles.loginForm } id='resetPasswordForm'>
@@ -67,11 +71,7 @@ export default function ResetPasswordPage({ token }: {token: string}) {
             loadingState={ resetPasswordMutator.state.status === 'loading' }
          > Change Password </ButtonOval>
 
-         { resetPasswordMutator.state.status === "error" ? 
-            <p ref={errorRef} className='error' aria-live='assertive'>
-               { resetPasswordMutator.state.error.message }
-            </p> 
-         : null}
+         <ValidationErrorComponent serviceState={ resetPasswordMutator.state } />
 
          <p>Need a new link?</p>
          <a href='/resetPassword'>Reset Password</a>

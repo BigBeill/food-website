@@ -27,16 +27,19 @@ interface ResetPasswordParams {
 
 export const authService = {
    login: (params: LoginParams): Promise<void> => {
-      return authApi.login(params);
+      const { username, password, rememberMe } = params;
+      checkValidPassword(password);
+      return authApi.login({ name: username, password, rememberMe });
    },
    logout: (): Promise<void> => {
       return authApi.logout();
    },
    register: (params: RegisterParams) => {
       const { username, email, passwordOne, passwordTwo } = params
+      checkValidEmail(email);
       checkValidPassword(passwordOne);
       if (passwordOne != passwordTwo) { throw new Error("Passwords do not match!"); }
-      return authApi.register({ username, email, password: passwordOne });
+      return authApi.register({ name: username, email, password: passwordOne });
    },
    requestPasswordReset: (params: RequestPasswordResetParams) => {
       const { email } = params;

@@ -3,9 +3,10 @@ import { useRef, useState, useEffect } from 'react';
 import useAuth from '@/features/auth/hooks/useAuth';
 import styles from './login.module.scss';
 import { useRouter } from 'next/navigation';
-import { ButtonOval } from '@/shared/components/Buttons';
+import { ButtonOval } from '@/shared/components/Button.components';
 import { authService } from '../services/auth.service';
 import { useServiceMutation } from '@/shared/lib/serviceMutation';
+import { ValidationErrorComponent } from '@/shared/components/stateComponents/ValidationError';
 
 interface FormDataType {
    username: string,
@@ -16,7 +17,6 @@ interface FormDataType {
 
 export default function RegisterPage() {
 
-   const errorRef = useRef(null);
    const router = useRouter();
    const { authId } = useAuth();
 
@@ -35,6 +35,10 @@ export default function RegisterPage() {
    useEffect(() => {
       if (registerMutator.state.status === "ready") { router.replace('/'); }
    }, [registerMutator.state]);
+
+   useEffect(() => {
+      registerMutator.resetToIdle();
+   }, [formData])
 
    return (
       <div className={styles.loginForm} id="registerForm">
@@ -100,11 +104,7 @@ export default function RegisterPage() {
             loadingState={ registerMutator.state.status === 'loading' }
          > Create Account </ButtonOval>
 
-         { registerMutator.state.status === "error" ? 
-            <p ref={errorRef} className='error' aria-live='assertive'>
-               { registerMutator.state.error.message }
-            </p> 
-         : null}
+         <ValidationErrorComponent serviceState={ registerMutator.state } />
 
          <p>Already have an account?</p>
          <a href='/auth/login'>Login</a>

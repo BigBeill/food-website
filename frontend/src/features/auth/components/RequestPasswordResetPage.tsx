@@ -2,9 +2,10 @@ import { useRef, useEffect, useState } from 'react';
 import useAuth from '../hooks/useAuth';
 import { authService } from '../services/auth.service';
 import { useServiceMutation } from '@/shared/lib/serviceMutation';
-import { ButtonOval } from '@/shared/components/Buttons';
+import { ButtonOval } from '@/shared/components/Button.components';
 import styles from './login.module.scss';
 import { useRouter } from 'next/navigation';
+import { ValidationErrorComponent } from '@/shared/components/stateComponents/ValidationError';
 
 interface FormDataType {
    email: string
@@ -12,7 +13,6 @@ interface FormDataType {
 
 export default function RequestPasswordResetPage() {
 
-   const errorRef = useRef(null);
    const router = useRouter();
    const { authId } = useAuth();
 
@@ -57,11 +57,7 @@ export default function RequestPasswordResetPage() {
             loadingState={ requestPasswordResetMutator.state.status === 'loading' }
          >Change Password</ButtonOval>
          
-         { requestPasswordResetMutator.state.status === "error" ? 
-            <p ref={errorRef} className='error' aria-live='assertive'>
-               { requestPasswordResetMutator.state.error.message }
-            </p> 
-         : null}
+         <ValidationErrorComponent serviceState={ requestPasswordResetMutator.state } />
 
          { requestPasswordResetMutator.state.status === "ready" ?
             <p className='update' aria-live='assertive'>

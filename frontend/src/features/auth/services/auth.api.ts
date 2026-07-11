@@ -2,13 +2,13 @@
 import sendServerRequest from "@/shared/lib/api";
 
 interface LoginParams {
-  username: string;
+  name: string;
   password: string;
   rememberMe: boolean;
 }
 
 interface RegisterParams {
-  username: string;
+  name: string;
   email: string;
   password: string;
 }

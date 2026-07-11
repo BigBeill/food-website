@@ -21,8 +21,8 @@
 }
 
 body {
-   margin:0;
-   padding:0;
+   margin:0rem;
+   padding: 4.5rem 0rem 0rem 0rem; // add margin to make room for nav bar
    background-image: url('/woodBackground.jpg');
    background-size: cover;
    background-position: center;
@@ -41,16 +41,9 @@ main{
    position: relative;
    margin: 0rem;
    padding: 0rem;
-   margin-left: 14.1rem; // add margin to make room for nav bar
-   width: calc(100% - 14.1rem);
-   min-height: 100vh;
+   width: 100vw;
+   min-height: calc(100vh - 4.5rem);
    overflow-x: hidden;
-
-   // remove left margin making room for nav bar if nav bar is going to be tucked away
-   @media (max-width: 93rem) {
-      margin-left: .3rem;
-      width: calc(100% - .3rem);
-   }
 }
 
 
@@ -286,20 +279,6 @@ immediate children can be given the class 'priorityChild' to give them {flex: 1;
    }
 }
 
-/*
-Error class
-used to add error message blocks directly into the component
-typical usage includes pairing this class with the 'hidden' class, to hide the error message when there is no error
-*/
-.error {
-   margin: 0rem 2.4rem;
-   padding: .3rem !important;
-   padding-left: .9rem !important;
-   border: .1rem solid #991b1b;
-   border-radius: .3rem;
-   background-color: rgb(153, 27, 27, .5);
-}
-
 .update {
    margin: 0rem 2.4rem;
    padding: .3rem !important;
@@ -309,12 +288,12 @@ typical usage includes pairing this class with the 'hidden' class, to hide the e
    background-color: rgb(22, 101, 52, .5);
 }
 
-/*
-Extra bottom class
-adds extra bottom margin to an element
-*/
-.extraBottom {
-   margin-bottom: 3rem;
+.hidden {
+   display: none !important;
+}
+
+.shielded * {
+   pointer-events: none !important;
 }
 
 /*

@@ -84,7 +84,6 @@ export const authController = new Elysia({ prefix: '/auth' })
    )
    .post('/requestPasswordReset',
       async ({ set, body }) => {
-         console.log("controller reached");
          const { email } = body;
          try { await service.requestPasswordReset(email); }
          // catch not found errors and return as if it was a success (prevents an enumeration attack)

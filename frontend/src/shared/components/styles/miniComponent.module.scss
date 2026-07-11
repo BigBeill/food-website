@@ -1,7 +1,5 @@
-@use '../styles/addons.scss' as *;
 
 .miniComponent {
-   @extend .shielded;
    position: relative;
    margin: auto;
    width: fit-content;
@@ -23,6 +21,10 @@
       width: 100%;
       height: 3em;
       background: linear-gradient(to bottom, rgba(245, 248, 250, 0) 0%, var(--background-color) 100%);
+      pointer-events: none;
+   }
+
+   > * {
       pointer-events: none;
    }
 }
