@@ -71,9 +71,7 @@ export class AuthService {
       catch { throw new UnauthorizedError('invalid refresh token'); }
 
       const refreshTokenList = await this.repository.getRefreshTokenList(payload.authId);
-      if (refreshTokenList.length == 0) { 
-         throw new UnauthorizedError('invalid refresh token'); 
-      }
+      if (refreshTokenList.length == 0) { throw new UnauthorizedError(); }
 
       let matchingToken: boolean = false;
       for (const token of refreshTokenList) {

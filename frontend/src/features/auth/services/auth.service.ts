@@ -1,3 +1,4 @@
+import { ValidationError } from "@/shared/components/stateComponents/ValidationError";
 import { authApi } from "./auth.api";
 import { checkValidEmail, checkValidPassword } from "./auth.utils";
 
@@ -26,6 +27,9 @@ interface ResetPasswordParams {
 }
 
 export const authService = {
+   checkAuthStatus: (): Promise<string> => {
+      return authApi.checkStatus();
+   },
    login: (params: LoginParams): Promise<void> => {
       const { username, password, rememberMe } = params;
       checkValidPassword(password);
@@ -38,7 +42,7 @@ export const authService = {
       const { username, email, passwordOne, passwordTwo } = params
       checkValidEmail(email);
       checkValidPassword(passwordOne);
-      if (passwordOne != passwordTwo) { throw new Error("Passwords do not match!"); }
+      if (passwordOne != passwordTwo) { throw new ValidationError([{ field: 'passwords', issueList: ['do not match'] }]); }
       return authApi.register({ name: username, email, password: passwordOne });
    },
    requestPasswordReset: (params: RequestPasswordResetParams) => {

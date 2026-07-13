@@ -23,6 +23,12 @@ interface ResetPasswordParams {
 }
 
 export const authApi = {
+   checkStatus: (): Promise<string> => 
+      sendServerRequest({
+         url: '/auth/status',
+         method: 'GET'
+      }),
+
    login: (params: LoginParams): Promise<void> =>
       sendServerRequest({
          url: "/auth/login",

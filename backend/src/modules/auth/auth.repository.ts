@@ -57,7 +57,7 @@ export class AuthRepository {
    }
 
    async getRefreshTokenList(userId: string): Promise<RefreshTokenRecord[]> {
-      return RefreshTokenModel.find({ user: userId }).lean<RefreshTokenRecord[]>();
+      return RefreshTokenModel.find({ userId }).lean<RefreshTokenRecord[]>();
    }
 
    async saveRefreshToken(userId: string, hash: string): Promise<void> {

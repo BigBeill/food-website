@@ -37,25 +37,27 @@ async function request<T>(config: SendServerRequestProps): Promise<T> {
    }
    const response = await fetch(url, options);
 
+   if (response.status === 204) { return undefined as T };
+
    if (!response.ok) { throw { status: response.status, ...(await response.json().catch(() => ({}))) }; }
 
    const jsonResponse = await response.json();
-   console.log(jsonResponse);
+   console.log("Response from server received:", jsonResponse);
    return jsonResponse.data;
 }
 
 export default async function sendServerRequest<T>(config: SendServerRequestProps): Promise<T> {
    console.log("Request to server has been made, config:", config);
    try {
-      return await request(config);
+      return await request<T>(config);
    } catch (error: any) {
       const skipRefresh = config.url === '/auth/login' || config.url === '/auth/register';
       if (error.status === 401 && !skipRefresh) {
          console.warn('accessToken rejected, requesting new accessToken');
-         await request({ method: 'POST', url: 'authentication/refresh' });
-         return await request(config);
+         await request<T>({ method: 'POST', url: '/auth/refresh' });
+         return await request<T>(config);
       }
       console.error("error response from server received:", error);
-      throw new Error(error.error.message);
+      throw new Error(error?.error?.message ?? error?.message ?? 'Request failed');
    }
 }

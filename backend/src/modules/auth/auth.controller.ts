@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { AuthRepository } from './auth.repository';
 import { RegisterValidator } from './validators/register.validator';
 import { LoginValidator } from './validators/login.validator';
-import { authorizeMiddleware } from './auth.middleware';
+import { authenticateMiddleware, authorizeMiddleware } from './auth.middleware';
 import { requestPasswordResetValidator } from './validators/requestPasswordReset.validator';
 import { NotFoundError } from '../../common/errors/app-error';
 import { resetPasswordValidator } from './validators/resetPassword.validator';
@@ -45,8 +45,8 @@ export const authController = new Elysia({ prefix: '/auth' })
             value: result.tokens.accessToken,
             maxAge: 60 * 15 // 15 minutes in seconds
          });
-         set.status = 200;
-         return { 
+         set.status = 204;
+         return {
             message: "refresh successful"
          };
       },
@@ -110,6 +110,7 @@ export const authController = new Elysia({ prefix: '/auth' })
       }
    )
 
+   .use(authenticateMiddleware)
    //* Routes past this point require a valid accessToken to use
    .use(authorizeMiddleware)
    .post( '/changePassword',
@@ -122,6 +123,15 @@ export const authController = new Elysia({ prefix: '/auth' })
       },
       {
          body: changePasswordValidator,
+      }
+   )
+   .get( '/status', 
+      ({ authId }) => {
+         console.log("authId provided to status", authId);
+         return {
+            message: 'authId collected',
+            data: authId,
+         }
       }
    )
    .post( '/logout',

@@ -7,14 +7,6 @@ import useAuth from '@/features/auth/hooks/useAuth';
 import styles from './styles/header.module.scss';
 import { ButtonMobileNav } from './Button.components';
 
-const navigation = [
-   { name: 'Home', href: '/' },
-   { name: 'Portfolio', href: '/portfolio' },
-   { name: 'Services', href: '/services' },
-   { name: 'About', href: '/about' },
-   { name: 'Contact', href: '/contact' },
-];
-
 interface NavigationNodeType {
    name: string,
    href: string,
@@ -28,6 +20,7 @@ export default function Header() {
    useEffect(() => {
       setNavigation([
          [
+            { name: 'Home', href: '/' },
             { name: 'Find Recipes', href: '/recipes/search' },
             ...(authId ? [{ name: 'My Recipes', href: '/recipes/mine' }] : []),
             { name: 'Ingredients', href: '/ingredients' },

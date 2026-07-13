@@ -7,20 +7,17 @@ import type { JwtPayloadType } from './auth.types';
 
 export const authenticateMiddleware = new Elysia({ name: 'authenticate' }).derive(
    { as: 'scoped' },
-   ({ headers }): { authId?: string} => {
-      const header = headers.authorization;
-      if (!header?.startsWith('Bearer')) {
-         return { authId: undefined }
-      }
-
-      const token = header.slice('Bearer '.length);
+   ({ cookie: { accessToken } }): { authId?: string } => {
+      const token = accessToken?.value as string;
+      if (!token) { return { authId: undefined } }
+      
       try {
          const payload = jwt.verify(token, env.JWT_ACCESS_SECRET) as JwtPayloadType;
+         console.log('token data:', payload);
          return { authId: payload.authId };
       } catch {
          return { authId: undefined }
       }
-
    }
 )
 
@@ -29,6 +26,7 @@ export const authorizeMiddleware = new Elysia({ name: 'authorize' })
 .derive(
    { as: 'scoped' },
    ({ authId }): { authId: string } => {
+      console.log("authId reaching authorizeMiddleware: ", authId)
       if (!authId) { throw new UnauthorizedError('Invalid or expired token'); }
       return { authId }
    },
