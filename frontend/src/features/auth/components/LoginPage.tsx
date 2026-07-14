@@ -1,11 +1,11 @@
-import { useRef, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation';
 import useAuth from '../hooks/useAuth';
 import styles from './login.module.scss';
 import { ButtonOval } from '@/shared/components/Button.components';
 import { authService } from '../services/auth.service';
 import { useServiceMutation } from '@/shared/lib/serviceMutation';
-import { ValidationError, ValidationErrorComponent } from '@/shared/components/stateComponents/ValidationError';
+import { ValidationErrorInsert } from '@/shared/components/stateComponents/ValidationErrorInsert';
 
 interface FormDataType {
    username: string,
@@ -19,7 +19,7 @@ export default function LoginPage() {
    const { authId } = useAuth();
 
    const [formData, setFormData] = useState<FormDataType>({ username: "", password: "", rememberMe: false });
-   const loginMutator = useServiceMutation<FormDataType, void>((input) => authService.login(input));
+   const loginMutator = useServiceMutation((input: FormDataType) => authService.login(input));
 
    useEffect(() => {
       if (authId) { router.replace('/'); }
@@ -87,7 +87,7 @@ export default function LoginPage() {
             loadingState={ loginMutator.state.status === 'loading' }
          > Login </ButtonOval>
 
-         <ValidationErrorComponent serviceState={ loginMutator.state } />
+         <ValidationErrorInsert serviceState={ loginMutator.state } />
          
          <p>Don&apos;t have an account?</p>
          <a href='/auth/register'>create account</a>

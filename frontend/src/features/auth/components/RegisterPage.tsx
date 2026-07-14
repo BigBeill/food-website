@@ -1,12 +1,12 @@
 // external imports
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import useAuth from '@/features/auth/hooks/useAuth';
 import styles from './login.module.scss';
 import { useRouter } from 'next/navigation';
 import { ButtonOval } from '@/shared/components/Button.components';
 import { authService } from '../services/auth.service';
 import { useServiceMutation } from '@/shared/lib/serviceMutation';
-import { ValidationErrorComponent } from '@/shared/components/stateComponents/ValidationError';
+import { ValidationErrorInsert } from '@/shared/components/stateComponents/ValidationErrorInsert';
 
 interface FormDataType {
    username: string,
@@ -104,7 +104,7 @@ export default function RegisterPage() {
             loadingState={ registerMutator.state.status === 'loading' }
          > Create Account </ButtonOval>
 
-         <ValidationErrorComponent serviceState={ registerMutator.state } />
+         <ValidationErrorInsert serviceState={ registerMutator.state } />
 
          <p>Already have an account?</p>
          <a href='/auth/login'>Login</a>

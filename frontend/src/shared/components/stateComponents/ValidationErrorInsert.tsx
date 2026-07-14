@@ -16,7 +16,7 @@ export class ValidationError extends Error {
 }
 
 // takes a serviceStateType and inserts an error dive it he state reaches an error state
-export function ValidationErrorComponent({ serviceState }: { serviceState: ServiceState<unknown> }) {
+export function ValidationErrorInsert({ serviceState }: { serviceState: ServiceState<unknown> }) {
    
    // display nothing if service is not in an error state
    if (serviceState.status !== 'error') { return null; }

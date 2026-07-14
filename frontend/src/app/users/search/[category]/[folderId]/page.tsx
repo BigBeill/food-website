@@ -1,3 +1,5 @@
+"use client"
+
 import SearchUserPage from "@/features/users/components/SearchUserPage";
 
 export default async function SearchRecipe({ params }: {params: Promise<{category: 'friends' | 'incomingRequests' | 'outgoingRequests' | 'none', folderId: string}>}) {

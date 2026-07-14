@@ -1,4 +1,4 @@
-import { ValidationError } from "@/shared/components/stateComponents/ValidationError";
+import { ValidationError } from "@/shared/components/stateComponents/ValidationErrorInsert";
 
 export function checkValidUsername(username: string): void {
    let issueList: string[] = []

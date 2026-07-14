@@ -10,23 +10,23 @@ interface searchParams {
 export const ingredientApi = {
    conversionOptionList: (ingredientId: string) =>
       sendServerRequest<IngredientConversionType[]>({
-         url: `/ingredient/conversionOptionList/${ingredientId}`,
+         url: `/ingredients/conversionOptionList/${ingredientId}`,
          method: 'get',
       }),
    get: (ingredientId: string) =>
       sendServerRequest<IngredientType>({
-         url: `/ingredient/get/${ingredientId}`,
-         method: 'get',
-      }),
-   groupList: () =>
-      sendServerRequest<IngredientGroupType[]>({
-         url: `/ingredient/groupList`,
+         url: `/ingredients/get/${ingredientId}`,
          method: 'get',
       }),
    search: (params: searchParams) => 
       sendServerRequest<IngredientType[]>({
-         url: '/ingredient/search',
+         url: '/ingredients/search',
          method: 'get',
          body: params,
+      }),
+   searchGroup: () =>
+      sendServerRequest<IngredientGroupType[]>({
+         url: `/ingredients/searchGroup`,
+         method: 'get',
       }),
 }

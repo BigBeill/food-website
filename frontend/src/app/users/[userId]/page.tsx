@@ -1,3 +1,5 @@
+"use client"
+
 import ProfilePage from "@/features/users/components/ProfilePage";
 
 export default async function Profile({ params }: { params: Promise<{userId: string}> }) {

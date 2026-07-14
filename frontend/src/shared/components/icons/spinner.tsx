@@ -6,6 +6,6 @@ export default function Spinner() {
    return (
       <AnimationSpin>
          <FontAwesomeIcon icon={faCircleNotch} />
-      </AnimationSpin> 
+      </AnimationSpin>
    )
 }

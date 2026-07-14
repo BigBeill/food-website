@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import useAuth from '@/features/auth/hooks/useAuth';
@@ -16,13 +16,11 @@ export default function Header() {
 
    const { authId } = useAuth();
 
-   const [navigation, setNavigation] = useState<NavigationNodeType[][]>([[]]); // Just keep the navigation bar blank for now
-   useEffect(() => {
-      setNavigation([
-         [
+   const navigation = useMemo<NavigationNodeType[][]>(() => [
+      [
             { name: 'Home', href: '/' },
             { name: 'Find Recipes', href: '/recipes/search' },
-            ...(authId ? [{ name: 'My Recipes', href: '/recipes/mine' }] : []),
+            ...(authId ? [{ name: 'My Recipes', href: '/recipes/personal' }] : []),
             { name: 'Ingredients', href: '/ingredients' },
             { name: 'About Project', href: '/about' },
          ],
@@ -34,8 +32,7 @@ export default function Header() {
                { name: 'Register', href: '/auth/register' },
             ]),
          ]
-      ]);
-   }, [authId]);
+   ], [authId]);
 
    const [navOpen, setNavOpen] = useState(false);
    const pathname = usePathname();

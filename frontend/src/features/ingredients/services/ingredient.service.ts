@@ -1,5 +1,5 @@
 import { ingredientApi } from "./ingredient.api";
-import { IngredientType } from "../domain/ingredient.types";
+import { IngredientGroupType, IngredientType } from "../domain/ingredient.types";
 
 interface searchParams {
    description?: string;
@@ -13,5 +13,8 @@ export const ingredientService = {
    },
    search: (params: searchParams): Promise<IngredientType[]> => {
       return ingredientApi.search(params);
-   }
+   },
+   searchGroup: (): Promise<IngredientGroupType[]> => {
+      return ingredientApi.searchGroup();
+   },
 }

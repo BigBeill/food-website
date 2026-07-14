@@ -1,3 +1,5 @@
+"use client"
+
 import RecipePage from "@/features/recipes/components/RecipePage";
 
 export default async function Recipe({ params }: { params: Promise<{recipeId: string}> }) {

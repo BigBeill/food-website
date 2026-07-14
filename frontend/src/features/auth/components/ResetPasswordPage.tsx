@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import useAuth from '../hooks/useAuth';
 import { authService } from '../services/auth.service';
 import { useServiceMutation } from '@/shared/lib/serviceMutation';
 import { ButtonOval } from '@/shared/components/Button.components';
 import { useRouter } from 'next/navigation';
 import styles from './login.module.scss';
-import { ValidationErrorComponent } from '@/shared/components/stateComponents/ValidationError';
+import { ValidationErrorInsert } from '@/shared/components/stateComponents/ValidationErrorInsert';
 
 interface FormDataType {
    passwordOne: string,
@@ -71,7 +71,7 @@ export default function ResetPasswordPage({ token }: {token: string}) {
             loadingState={ resetPasswordMutator.state.status === 'loading' }
          > Change Password </ButtonOval>
 
-         <ValidationErrorComponent serviceState={ resetPasswordMutator.state } />
+         <ValidationErrorInsert serviceState={ resetPasswordMutator.state } />
 
          <p>Need a new link?</p>
          <a href='/resetPassword'>Reset Password</a>

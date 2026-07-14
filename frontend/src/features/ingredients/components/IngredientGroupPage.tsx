@@ -1,23 +1,24 @@
-import { useEffect, useState } from "react";
 import { IngredientGroupType } from "../domain/ingredient.types";
-import { ingredientService } from "../services/ingredient.api";
-import { useRouter } from "next/router";
+import { ingredientService } from "../services/ingredient.service";
+import { useRouter } from "next/navigation";
+import useServiceState from "@/shared/lib/serviceState";
+import Loading from "@/shared/components/stateComponents/LoadingPage";
+import NotFound from "@/shared/components/stateComponents/NotFoundPage";
+import ErrorPage from "@/shared/components/stateComponents/ErrorPage";
 
 export default function IngredientGroupPage() {
 
    const router = useRouter();
-   const [groupList, setGroupList] = useState<IngredientGroupType[]>([]);
 
-   useEffect(() => {
-      ingredientService.groupList()
-      .then((response) => { setGroupList(response) })
-      .catch((error) => console.error(error));
-   },[]);
+   const groupListState = useServiceState<IngredientGroupType[]>(() => ingredientService.searchGroup(), [])
 
+   if (groupListState.status === 'loading') { return <Loading /> }
+   if (groupListState.status === 'error') { return <ErrorPage /> }
+   if (groupListState.status !== 'ready') { console.log(groupListState.status); return <NotFound /> }
    return (
       <div className="displayButtons">
-         {groupList.map((ingredientGroup, index) => (
-            <button 
+         { groupListState.data.map((ingredientGroup, index) => (
+            <button
                key={index} 
                onClick={() => router.push(`/ingredient/${ingredientGroup.id}`)}
             >
