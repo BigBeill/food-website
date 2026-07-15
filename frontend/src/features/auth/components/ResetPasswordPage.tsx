@@ -5,7 +5,7 @@ import { useServiceMutation } from '@/shared/lib/serviceMutation';
 import { ButtonOval } from '@/shared/components/Button.components';
 import { useRouter } from 'next/navigation';
 import styles from './login.module.scss';
-import { ValidationErrorInsert } from '@/shared/components/stateComponents/ValidationErrorInsert';
+import { ValidationErrorInsert } from '@/shared/components/stateComponents/InsertStateComponents';
 
 interface FormDataType {
    passwordOne: string,

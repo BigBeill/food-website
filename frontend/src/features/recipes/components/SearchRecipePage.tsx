@@ -9,29 +9,48 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { IngredientType } from '@/features/ingredients/domain/ingredient.types';
 import { ingredientService } from '@/features/ingredients/services/ingredient.service';
 import { recipeService } from '../services/recipe.service';
+import useServiceState from '@/shared/lib/serviceState';
+import { ErrorInsert, LoadingInsert } from '@/shared/components/stateComponents/InsertStateComponents';
 
 interface SearchRecipePageProps {
    category?: "public" | "friends" | "personal"
 }
+
+interface ServiceDataType {
+   title?: string;
+   ingredientIdList: string[];
+   category?: "public" | "friends" | "personal";
+   limit?: number;
+   skip?: number;
+   includeNutrition?: boolean;
+}
+
 export default function SearchRecipePage({category}: SearchRecipePageProps) {
+
+   const groupSize = 2
 
    // get url parameters
    const router = useRouter();
    const pathname = usePathname();
    const searchParams = useSearchParams();
 
-   // collect params saved in the url
-   const groupNumberParam: number = Number(searchParams.get('groupNumber')) || 1;
-   const titleParam: string = searchParams.get('title') || '';
-   const ingredientIdListParam: string[] = searchParams.get('ingredientIdList')?.split(',') ?? [];
+   const groupNumber: number = Number(searchParams.get('groupNumber')) || 1;
 
-   const [ingredientList, setIngredientList] = useState<IngredientType[]>([]);
+   const serviceData: ServiceDataType = {
+      title: searchParams.get('title') || '',
+      ingredientIdList: searchParams.get('ingredientIdList')?.split(',') ?? [],
+      skip: ((groupSize * (groupNumber - 1)) - 1),
+      limit: groupSize,
+      includeNutrition: true,
+   }
 
-   const [recipeList, setRecipeList] = useState<RecipeType[]>([]);
-   const [recipeCount, setRecipeCount] = useState<number>(0);
+   const recipeListState = useServiceState(() => recipeService.search(serviceData), []);
+   const ingredientListState = useServiceState(() => {
+      return Promise.all(serviceData.ingredientIdList.map((ingredientId) => { return ingredientService.get(ingredientId); }))
+   }, [serviceData.ingredientIdList])
 
    // send parameters to the url
-   function handleSubmit(title: string, ingredientList: IngredientType[]) {
+   function handleFilterFormSubmit(title: string, ingredientList: IngredientType[]) {
       const newIngredientIdList: string[] = ingredientList.map((ingredient) => { return ingredient.food_id; });
 
       const params = new URLSearchParams();
@@ -41,82 +60,44 @@ export default function SearchRecipePage({category}: SearchRecipePageProps) {
       router.push(`${pathname}?${params.toString()}`);
    }
 
-   function updateGroupNumber(newGroupNumber: number) {
+   function setGroupNumber(groupNumber: number) {
       const params = new URLSearchParams(searchParams.toString())
-      params.set('groupNumber', String(newGroupNumber));
+      params.set('groupNumber', String(groupNumber));
       router.push(`${pathname}?${params.toString()}`);
    }
 
-   async function requestNewPage(newPageNumber: number): Promise<void> {
-      updateGroupNumber(Math.ceil((newPageNumber + 1) / 2));
-   }
-
-   const noteBook = useNotebook(requestNewPage);
-
-   useEffect(() => {
-      Promise.all(
-         ingredientIdListParam.map((ingredientId) => {
-            return ingredientService.get(ingredientId);
-         })
-      )
-      .then((ingredientList: IngredientType[]) => {
-         setIngredientList(ingredientList);
-      })
-      .catch((error) => console.error(error));
-   }, [ingredientIdListParam]);
-
-   // Fetch recipes from the server
-   useEffect(() => {
-      // Let ingredient list update before collecting more data from the server
-      if (ingredientIdListParam.length != ingredientList.length) { return; } // TODO: Fix possible glitch where if the user removes one ingredient and adds another at the same time, ingredientIdList would be the same length causing this if check to fail and the useEffect to fire off twice
-
-      let limit = 2;
-      if (groupNumberParam == 1) { limit = 1; }
-
-      const skip = ((groupNumberParam - 1) * 2) - 1;
-
-      recipeService.search({title: titleParam, ingredientIdList: ingredientIdListParam.join(','), category, limit, skip, includeCount: true, includeNutrition: true})
-      .then((response) => {
-         const totalGroups = Math.ceil((response.count + 1) / 2)
-         if (groupNumberParam > totalGroups) {
-            updateGroupNumber(totalGroups);
-         }
-         else {
-            setRecipeList(response.list);
-            setRecipeCount(response.count);
-         }
-      })
-      .catch((error) => {
-         console.error(error);
-      });
-   }, [groupNumberParam, titleParam, ingredientList]);
+   const noteBook = useNotebook(setGroupNumber);
 
    // converts the contents of recipeList to a PageObject array and saving it to pageList
    useEffect(() => {
       let newPageList: React.ReactNode[] = [];
-      if (groupNumberParam == 1) {
+      let pageCount: number = 1;
+
+      if (groupNumber == 1) {
          newPageList = [
             <FilterSearchPage 
-               initialTitle={titleParam}
-               initialIngredientList={ingredientList}
-               handleSubmit={handleSubmit}
+               initialTitle={serviceData.title}
+               initialIngredientListState={ingredientListState}
+               handleSubmit={handleFilterFormSubmit}
             />
          ];
       }
 
-      recipeList.forEach((recipe) => {
-         newPageList.push(
-            <RecipePreview
-               recipe={recipe}
-            />
-         );
-      });
+      if (recipeListState.status === 'loading') { newPageList.push(<LoadingInsert />); }
+      if (recipeListState.status !== 'ready') { newPageList.push(<ErrorInsert />); }
+      else {
+         recipeListState.data.list.forEach((recipe) => {
+            newPageList.push(<RecipePreview recipe={recipe} />);
+            pageCount = recipeListState.data.count
+         });
+      }
+
 
       noteBook.replaceComponentList(newPageList, {
-         newComponentCount: recipeCount,
-         firstItemIndex: ((groupNumberParam - 1) * 2)
+         newComponentCount: pageCount,
+         firstItemIndex: ((pageCount - 1) * 2)
       });
-   }, [recipeList]);
+   }, [recipeListState.status, ingredientListState.status]);
 
    return noteBook.content
 }

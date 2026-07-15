@@ -6,17 +6,25 @@ import { useIngredientSearch } from '../../ingredients/hooks/useIngredientSearch
 import { useIngredientList } from '../../ingredients/hooks/useIngredientList';
 import { IngredientType } from '@/features/ingredients/domain/ingredient.types';
 import { useState } from 'react';
+import { ErrorInsert, LoadingInsert } from '@/shared/components/stateComponents/InsertStateComponents';
 
 interface FilterSearchPageProps {
    initialTitle?: string;
    initialIngredientList?: IngredientType[];
+   initialIngredientListState?: ServiceState<IngredientType[]>
    handleSubmit: (title: string, ingredientList: IngredientType[]) => void;
 }
 
-export default function FilterSearchPage({ initialTitle, initialIngredientList, handleSubmit }: FilterSearchPageProps) {
+export default function FilterSearchPage({ initialTitle, initialIngredientList, initialIngredientListState, handleSubmit }: FilterSearchPageProps) {
+
+   if (initialIngredientListState) {
+      if (initialIngredientListState.status === 'loading') { return <LoadingInsert /> }
+      if (initialIngredientListState.status !== 'ready') { return <ErrorInsert />}
+   }
+
    const [recipeTitle, setRecipeTitle] = useState<string>(initialTitle || '');
    const { newIngredient, ingredientsAvailable, handleInputChange, selectIngredient, reset } = useIngredientSearch();
-   const { ingredientList, addIngredient, removeIngredient } = useIngredientList(initialIngredientList);
+   const { ingredientList, addIngredient, removeIngredient } = useIngredientList(initialIngredientList || initialIngredientListState?.data);
 
    function handleAddIngredient() {
       addIngredient(newIngredient);
@@ -36,13 +44,13 @@ export default function FilterSearchPage({ initialTitle, initialIngredientList, 
             <div className='activeSearchBar bottom'> {/* ingredient search bar */}
                <input 
                   type='text' 
-                  value={newIngredient.foodDescription} 
+                  value={newIngredient.description} 
                   onChange={(event) => handleInputChange(event.target.value)} 
                   placeholder='Ingredient Name'
                />
                <ul className={`${ingredientsAvailable.length == 0 ? 'hidden' : ''}`}>
                   {ingredientsAvailable.map((ingredient, index) => (
-                     <li key={index} onClick={() => selectIngredient(ingredient)}> {ingredient.commonName ? ingredient.commonName : ingredient.foodDescription} </li>
+                     <li key={index} onClick={() => selectIngredient(ingredient)}> {ingredient.commonName ? ingredient.commonName : ingredient.description} </li>
                   ))}
                </ul>
             </div>

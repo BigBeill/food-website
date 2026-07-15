@@ -1,18 +1,29 @@
-import styles from '../styles/error.module.scss'
+import ValidationError from '@/shared/errorClasses/validationError';
+import styles from '../styles/insertStateComponents.module.scss';
+import Spinner from '../icons/spinner';
 
-interface ValidationErrorType {
-   field: string
-   issueList: string[]
+export function ErrorInsert () {
+   return (
+      <p className={ styles.error } aria-live='assertive'>
+         Issue loading content, please try again.
+      </p>
+   )
 }
 
-export class ValidationError extends Error {
-   readonly errorList: ValidationErrorType[];
+export function InfoInsert ({ message }: { message: string }) {
+   return (
+      <p className={ styles.update } aria-live='assertive'>
+         { message }
+      </p>
+   )
+}
 
-   constructor (validationErrorList: ValidationErrorType[]) {
-      super('Form Validation Failed')
-      this.name = 'Validation Error';
-      this.errorList = validationErrorList
-   }
+export function LoadingInsert () {
+   return (
+      <p className={ styles.warning } aria-live='assertive'> 
+         <Spinner /> Your content is loading.
+      </p>
+   )
 }
 
 // takes a serviceStateType and inserts an error dive it he state reaches an error state

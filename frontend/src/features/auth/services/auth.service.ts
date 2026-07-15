@@ -1,4 +1,4 @@
-import { ValidationError } from "@/shared/components/stateComponents/ValidationErrorInsert";
+import ValidationError from "@/shared/errorClasses/validationError";
 import { authApi } from "./auth.api";
 import { checkValidEmail, checkValidPassword } from "./auth.utils";
 

@@ -6,7 +6,7 @@ import styles from './notebook.module.scss';
 // LOOK AT README.MD FILE IN THE ROOT FOLDER FOR INSTRUCTIONS ON HOW TO USE THIS COMPONENT
 
 // Notebook will call this function if it needs access to a page that it does not currently have access to. requestedIndex will be set to the index of the page it is trying to display to the user.
-export default function useNotebook (requestOutOfBoundsIndex?: (requestedIndex: number) => Promise<void>) {
+export default function useNotebook (requestOutOfBoundsGroup?: (groupNumber: number) => void) {
 
    const [componentList, setComponentList] = useState<React.ReactNode[]>([]);
    const [componentCount, setComponentCount] = useState<number>(0);
@@ -57,8 +57,8 @@ export default function useNotebook (requestOutOfBoundsIndex?: (requestedIndex: 
 
    useEffect(() => {
       // request page from requestOutOfBoundsIndex not already provided in pageList
-      if ((currentIndex < firstItemIndex || currentIndex > (componentList.length + firstItemIndex)) && requestOutOfBoundsIndex) {
-         requestOutOfBoundsIndex(currentIndex);
+      if ((currentIndex < firstItemIndex || currentIndex > (componentList.length + firstItemIndex)) && requestOutOfBoundsGroup) {
+         requestOutOfBoundsGroup(currentIndex);
       }
    }, [currentIndex]);
 

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ButtonOval } from '@/shared/components/Button.components';
 import { authService } from '../services/auth.service';
 import { useServiceMutation } from '@/shared/lib/serviceMutation';
-import { ValidationErrorInsert } from '@/shared/components/stateComponents/ValidationErrorInsert';
+import { ValidationErrorInsert } from '@/shared/components/stateComponents/InsertStateComponents';
 
 interface FormDataType {
    username: string,
