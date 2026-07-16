@@ -1,8 +1,7 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import useNotebook from '@/shared/hooks/useNotebook';
-import { RecipeType} from '@/features/recipes/domain/recipes.types';
 import RecipePreview from '@/features/recipes/components/RecipePreview';
 import FilterSearchPage from '@/features/recipes/components/FilterSearchPage';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -35,10 +34,15 @@ export default function SearchRecipePage({category}: SearchRecipePageProps) {
    const searchParams = useSearchParams();
 
    const groupNumber: number = Number(searchParams.get('groupNumber')) || 1;
+   const ingredientIdListParam = searchParams.get('ingredientIdList');
+
+   const ingredientIdList = useMemo(() => { 
+      return ingredientIdListParam ? ingredientIdListParam.split(',') : [] 
+   }, [ingredientIdListParam] );
 
    const serviceData: ServiceDataType = {
       title: searchParams.get('title') || '',
-      ingredientIdList: searchParams.get('ingredientIdList')?.split(',') ?? [],
+      ingredientIdList,
       skip: ((groupSize * (groupNumber - 1)) - 1),
       limit: groupSize,
       includeNutrition: true,
@@ -47,7 +51,7 @@ export default function SearchRecipePage({category}: SearchRecipePageProps) {
    const recipeListState = useServiceState(() => recipeService.search(serviceData), []);
    const ingredientListState = useServiceState(() => {
       return Promise.all(serviceData.ingredientIdList.map((ingredientId) => { return ingredientService.get(ingredientId); }))
-   }, [serviceData.ingredientIdList])
+   }, [ingredientIdList])
 
    // send parameters to the url
    function handleFilterFormSubmit(title: string, ingredientList: IngredientType[]) {
@@ -70,8 +74,9 @@ export default function SearchRecipePage({category}: SearchRecipePageProps) {
 
    // converts the contents of recipeList to a PageObject array and saving it to pageList
    useEffect(() => {
+      console.log("useEffect called");
       let newPageList: React.ReactNode[] = [];
-      let pageCount: number = 1;
+      let componentCount: number = 1;
 
       if (groupNumber == 1) {
          newPageList = [
@@ -88,14 +93,14 @@ export default function SearchRecipePage({category}: SearchRecipePageProps) {
       else {
          recipeListState.data.list.forEach((recipe) => {
             newPageList.push(<RecipePreview recipe={recipe} />);
-            pageCount = recipeListState.data.count
+            componentCount = recipeListState.data.count
          });
       }
 
 
       noteBook.replaceComponentList(newPageList, {
-         newComponentCount: pageCount,
-         firstItemIndex: ((pageCount - 1) * 2)
+         newComponentCount: componentCount,
+         newFirstComponentIndex: ((componentCount - 1) * 2)
       });
    }, [recipeListState.status, ingredientListState.status]);
 

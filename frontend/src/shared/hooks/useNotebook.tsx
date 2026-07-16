@@ -10,23 +10,24 @@ export default function useNotebook (requestOutOfBoundsGroup?: (groupNumber: num
 
    const [componentList, setComponentList] = useState<React.ReactNode[]>([]);
    const [componentCount, setComponentCount] = useState<number>(0);
-   const [firstItemIndex, setFirstItemIndex] = useState<number>(0);
+   const [firstComponentIndex, setFirstComponentIndex] = useState<number>(0);
    const [currentIndex, setCurrentIndex] = useState<number>(0);
 
    // Notebook assumes that the page at index 0 is a menu page and thus will not assign it a page number. If the first page must be assigned a page number, set initialPageIndex to 1
    function replaceComponentList(componentList: React.ReactNode[], 
       {
          newComponentCount = componentList.length, 
-         firstItemIndex = 0, 
-         showIndex = firstItemIndex
+         newFirstComponentIndex = 0, 
+         showIndex = newFirstComponentIndex
       }: { 
          newComponentCount?: number; 
-         showIndex?: number; 
-         firstItemIndex?: number 
-      } = {}) {
+         newFirstComponentIndex?: number; 
+         showIndex?: number 
+      } = {}
+   ) {
       setComponentList(componentList);
       setComponentCount(newComponentCount);
-      setFirstItemIndex(firstItemIndex);
+      setFirstComponentIndex(newFirstComponentIndex);
       setCurrentIndex(showIndex);
    }
 
@@ -51,13 +52,13 @@ export default function useNotebook (requestOutOfBoundsGroup?: (groupNumber: num
          if (updatedListCount < componentCount) { setComponentCount(updatedListCount); }
       }
 
-      if (firstItemIndex) { setFirstItemIndex(firstItemIndex); }
+      if (firstItemIndex) { setFirstComponentIndex(firstItemIndex); }
       if (showIndex) { setCurrentIndex(showIndex); }
    }
 
    useEffect(() => {
       // request page from requestOutOfBoundsIndex not already provided in pageList
-      if ((currentIndex < firstItemIndex || currentIndex > (componentList.length + firstItemIndex)) && requestOutOfBoundsGroup) {
+      if ((currentIndex < firstComponentIndex || currentIndex > (componentList.length + firstComponentIndex)) && requestOutOfBoundsGroup) {
          requestOutOfBoundsGroup(currentIndex);
       }
    }, [currentIndex]);
@@ -77,8 +78,8 @@ export default function useNotebook (requestOutOfBoundsGroup?: (groupNumber: num
    }, [currentIndex, componentCount]);
 
    // real index in pageList of the pages being displayed
-   const firstPage = componentList[currentIndex - firstItemIndex];
-   const secondPage = componentList[(currentIndex - firstItemIndex) + 1];
+   const firstPage = componentList[currentIndex - firstComponentIndex];
+   const secondPage = componentList[(currentIndex - firstComponentIndex) + 1];
 
    // pages are grouped into pairs, so changing the grouping by 1 changes the page index by 2 
    function handleGroupingChange(newGrouping: number) {
@@ -145,12 +146,12 @@ function Notebook({firstPage, secondPage, paginationBar}: NotebookProps) {
 
    return(
       <div className={styles.notebookContainer}>
-         <div className={`notebook ${displayRight ? 'displayRight' : ''}`}>
-            <div className={`notebookPage ${(displayRight && narrowScreen) ? 'shielded' : ''}`} onClick={() => setDisplayRight(false)}>
+         <div className={`${styles.notebook} ${displayRight ? styles.displayRight : ''}`}>
+            <div className={`${styles.page} ${(displayRight && narrowScreen) ? 'shielded' : ''}`} onClick={() => setDisplayRight(false)}>
                {firstPage || null}
             </div>
-            <img className="notebookSpine" src="/notebookSpine.png" alt="notebookSpine" />
-            <div className={`notebookPage ${(!displayRight && narrowScreen) ? 'shielded' : ''}`} onClick={() => setDisplayRight(true)}>
+            <img className={ styles.spine } src="/notebookSpine.png" alt="notebookSpine" />
+            <div className={`${ styles.page } ${(!displayRight && narrowScreen) ? 'shielded' : ''}`} onClick={() => setDisplayRight(true)}>
                {secondPage || null}
             </div>
          </div>

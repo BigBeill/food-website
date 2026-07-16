@@ -42,8 +42,8 @@ main{
    margin: 0rem;
    padding: 0rem;
    width: 100vw;
-   min-height: calc(100vh - 4.5rem);
-   overflow-x: hidden;
+   height: calc(100vh - 4.5rem);
+   overflow-x: scroll;
 }
 
 

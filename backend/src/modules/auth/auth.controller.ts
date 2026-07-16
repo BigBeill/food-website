@@ -127,7 +127,6 @@ export const authController = new Elysia({ prefix: '/auth' })
    )
    .get( '/status', 
       ({ authId }) => {
-         console.log("authId provided to status", authId);
          return {
             message: 'authId collected',
             data: authId,

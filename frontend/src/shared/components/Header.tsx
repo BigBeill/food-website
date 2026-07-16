@@ -19,8 +19,8 @@ export default function Header() {
    const navigation = useMemo<NavigationNodeType[][]>(() => [
       [
             { name: 'Home', href: '/' },
-            { name: 'Find Recipes', href: '/recipes/search' },
-            ...(authId ? [{ name: 'My Recipes', href: '/recipes/personal' }] : []),
+            { name: 'Find Recipes', href: '/recipes/search/public' },
+            ...(authId ? [{ name: 'My Recipes', href: '/recipes/search/personal' }] : []),
             { name: 'Ingredients', href: '/ingredients' },
             { name: 'About Project', href: '/about' },
          ],

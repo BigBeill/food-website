@@ -13,7 +13,6 @@ export const authenticateMiddleware = new Elysia({ name: 'authenticate' }).deriv
       
       try {
          const payload = jwt.verify(token, env.JWT_ACCESS_SECRET) as JwtPayloadType;
-         console.log('token data:', payload);
          return { authId: payload.authId };
       } catch {
          return { authId: undefined }
@@ -26,7 +25,6 @@ export const authorizeMiddleware = new Elysia({ name: 'authorize' })
 .derive(
    { as: 'scoped' },
    ({ authId }): { authId: string } => {
-      console.log("authId reaching authorizeMiddleware: ", authId)
       if (!authId) { throw new UnauthorizedError('Invalid or expired token'); }
       return { authId }
    },
