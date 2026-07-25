@@ -2,7 +2,7 @@ import { IngredientConversionType, IngredientType } from "@/features/ingredients
 import { ingredientService } from "@/features/ingredients/services/ingredient.service";
 import { ButtonOval } from "@/shared/components/Button.components";
 import { InputSearch } from "@/shared/components/Input.components";
-import { useIntractableList } from "@/shared/hooks/useInteractableList";
+import { useIntractableList } from "@/shared/hooks/useIntractableList";
 import useServiceState from "@/shared/lib/serviceState";
 import { ChildFormContent } from "@/shared/shared.types";
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";

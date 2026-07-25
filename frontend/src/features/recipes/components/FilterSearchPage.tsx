@@ -5,11 +5,11 @@ import { faCircleCheck, faCircleXmark } from '@fortawesome/free-solid-svg-icons'
 import { useIngredientSearch } from '../../ingredients/hooks/useIngredientSearch';
 import { IngredientType } from '@/features/ingredients/domain/ingredient.types';
 import { useEffect, useState } from 'react';
-import { ErrorInsert, LoadingInsert } from '@/shared/components/stateComponents/InsertStateComponents';
-import { useIntractableList } from '@/shared/hooks/useInteractableList';
+import { useIntractableList } from '@/shared/hooks/useIntractableList';
 import { ServiceStateType } from '@/shared/shared.types';
 import { InputText } from '@/shared/components/Input.components';
 import { ButtonOval } from '@/shared/components/Button.components';
+import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
 
 interface FilterSearchPageProps {
    initialTitle?: string;
@@ -73,12 +73,12 @@ export default function FilterSearchPage({ initialTitle, initialIngredientList, 
          </div>
 
          {
-            initialIngredientListState?.status === 'loading' ? <LoadingInsert />
-            : initialIngredientListState?. status === 'error' ? <ErrorInsert />
+            initialIngredientListState?.status === 'loading' ? <InsertError />
+            : initialIngredientListState?. status === 'error' ? <InsertError />
             : ingredientList.reactComponent
          }
 
-         <ButtonOval onClick={ () => handleSubmit(recipeTitle, ingredientList.content) }>search</ButtonOval>
+         <ButtonOval onClick={ () => handleSubmit(recipeTitle, ingredientList.content()) }>search</ButtonOval>
       </section>
    )
 }

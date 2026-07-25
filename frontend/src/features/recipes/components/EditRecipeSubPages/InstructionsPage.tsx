@@ -1,6 +1,6 @@
 import { ButtonOval } from "@/shared/components/Button.components";
 import { InputText } from "@/shared/components/Input.components";
-import { useIntractableList } from "@/shared/hooks/useInteractableList";
+import { useIntractableList } from "@/shared/hooks/useIntractableList";
 import { ChildFormContent } from "@/shared/shared.types";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
