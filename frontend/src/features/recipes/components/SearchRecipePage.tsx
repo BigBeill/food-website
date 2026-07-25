@@ -7,9 +7,9 @@ import FilterSearchPage from '@/features/recipes/components/FilterSearchPage';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { IngredientType } from '@/features/ingredients/domain/ingredient.types';
 import { ingredientService } from '@/features/ingredients/services/ingredient.service';
-import { recipeService } from '../services/recipe.service';
+import { recipeService } from '../services/recipes.service';
 import useServiceState from '@/shared/lib/serviceState';
-import { ErrorInsert, LoadingInsert } from '@/shared/components/stateComponents/InsertStateComponents';
+import { InsertError, InsertLoading } from '@/shared/components/stateComponents/InsertStateComponents';
 
 interface SearchRecipePageProps {
    category?: "public" | "friends" | "personal"
@@ -17,7 +17,7 @@ interface SearchRecipePageProps {
 
 interface ServiceDataType {
    title?: string;
-   ingredientIdList: string[];
+   ingredientIdList: number[];
    category?: "public" | "friends" | "personal";
    limit?: number;
    skip?: number;
@@ -37,7 +37,7 @@ export default function SearchRecipePage({category}: SearchRecipePageProps) {
    const ingredientIdListParam = searchParams.get('ingredientIdList');
 
    const ingredientIdList = useMemo(() => { 
-      return ingredientIdListParam ? ingredientIdListParam.split(',') : [] 
+      return ingredientIdListParam ? ingredientIdListParam.split(',').map(Number) : [] 
    }, [ingredientIdListParam] );
 
    const serviceData: ServiceDataType = {
@@ -55,7 +55,7 @@ export default function SearchRecipePage({category}: SearchRecipePageProps) {
 
    // send parameters to the url
    function handleFilterFormSubmit(title: string, ingredientList: IngredientType[]) {
-      const newIngredientIdList: string[] = ingredientList.map((ingredient) => { return ingredient.food_id; });
+      const newIngredientIdList: number[] = ingredientList.map((ingredient) => { return ingredient.food_id; });
 
       const params = new URLSearchParams();
       if(title) { params.append('title', title); }
@@ -74,7 +74,6 @@ export default function SearchRecipePage({category}: SearchRecipePageProps) {
 
    // converts the contents of recipeList to a PageObject array and saving it to pageList
    useEffect(() => {
-      console.log("useEffect called");
       let newPageList: React.ReactNode[] = [];
       let componentCount: number = 1;
 
@@ -88,8 +87,8 @@ export default function SearchRecipePage({category}: SearchRecipePageProps) {
          ];
       }
 
-      if (recipeListState.status === 'loading') { newPageList.push(<LoadingInsert />); }
-      if (recipeListState.status !== 'ready') { newPageList.push(<ErrorInsert />); }
+      if (recipeListState.status === 'loading') { newPageList.push(<InsertLoading />); }
+      if (recipeListState.status !== 'ready') { newPageList.push(<InsertError />); }
       else {
          recipeListState.data.list.forEach((recipe) => {
             newPageList.push(<RecipePreview recipe={recipe} />);

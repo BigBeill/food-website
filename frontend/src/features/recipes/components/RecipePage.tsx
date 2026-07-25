@@ -4,7 +4,7 @@ import GrowingText from "@/shared/components/GrowingText";
 import Loading from "@/shared/components/stateComponents/LoadingPage";
 import NotFound from "@/shared/components/stateComponents/NotFoundPage";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
-import { recipeService } from "../services/recipe.service";
+import { recipeService } from "../services/recipes.service";
 import useServiceState from "@/shared/lib/serviceState";
 
 export default function RecipePage ({ recipeId }: { recipeId: string }) {

@@ -47,7 +47,6 @@ async function request<T>(config: SendServerRequestProps): Promise<T> {
 }
 
 export default async function sendServerRequest<T>(config: SendServerRequestProps): Promise<T> {
-   console.log("Request to server has been made, config:", config);
    try {
       return await request<T>(config);
    } catch (error: any) {

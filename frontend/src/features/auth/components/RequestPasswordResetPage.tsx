@@ -5,7 +5,7 @@ import { useServiceMutation } from '@/shared/lib/serviceMutation';
 import { ButtonOval } from '@/shared/components/Button.components';
 import styles from './login.module.scss';
 import { useRouter } from 'next/navigation';
-import { ValidationErrorInsert } from '@/shared/components/stateComponents/InsertStateComponents';
+import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
 
 interface FormDataType {
    email: string
@@ -57,7 +57,9 @@ export default function RequestPasswordResetPage() {
             loadingState={ requestPasswordResetMutator.state.status === 'loading' }
          >Change Password</ButtonOval>
          
-         <ValidationErrorInsert serviceState={ requestPasswordResetMutator.state } />
+         { requestPasswordResetMutator.state.status == 'error' &&
+            <InsertError error={ requestPasswordResetMutator.state.error } />
+         }
 
          { requestPasswordResetMutator.state.status === "ready" ?
             <p className='update' aria-live='assertive'>

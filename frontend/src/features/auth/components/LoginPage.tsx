@@ -5,7 +5,7 @@ import styles from './login.module.scss';
 import { ButtonOval } from '@/shared/components/Button.components';
 import { authService } from '../services/auth.service';
 import { useServiceMutation } from '@/shared/lib/serviceMutation';
-import { ValidationErrorInsert } from '@/shared/components/stateComponents/InsertStateComponents';
+import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
 
 interface FormDataType {
    username: string,
@@ -87,7 +87,9 @@ export default function LoginPage() {
             loadingState={ loginMutator.state.status === 'loading' }
          > Login </ButtonOval>
 
-         <ValidationErrorInsert serviceState={ loginMutator.state } />
+         { loginMutator.state.status == 'error' &&
+            <InsertError error={ loginMutator.state.error } />
+         }
          
          <p>Don&apos;t have an account?</p>
          <a href='/auth/register'>create account</a>

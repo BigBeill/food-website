@@ -1,14 +1,18 @@
 import { PackagedImageType } from '@/features/images/domain/image.types';
 import { IngredientType } from '../../ingredients/domain/ingredient.types';
 
-export interface RecipeType {
-   _id: string;
-   owner?: string;
+export interface RecipeDraft {
+   ownerId: string;
    title: string;
    description: string;
-   image?: PackagedImageType;
    ingredientList: IngredientType[];
    instructionList: string[];
+   visibility: 'public' | 'private' | 'personal';
+}
+
+export interface RecipeType extends RecipeDraft {
+   _id: string;
+   image?: PackagedImageType;
    nutrition?: {
       calories: number;
       fat: number;
@@ -20,5 +24,4 @@ export interface RecipeType {
       sugar: number;
       protein: number;
    }
-   visibility: 'public' | 'private' | 'personal';
 }

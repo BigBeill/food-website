@@ -5,7 +5,7 @@ import { useServiceMutation } from '@/shared/lib/serviceMutation';
 import { ButtonOval } from '@/shared/components/Button.components';
 import { useRouter } from 'next/navigation';
 import styles from './login.module.scss';
-import { ValidationErrorInsert } from '@/shared/components/stateComponents/InsertStateComponents';
+import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
 
 interface FormDataType {
    passwordOne: string,
@@ -71,7 +71,9 @@ export default function ResetPasswordPage({ token }: {token: string}) {
             loadingState={ resetPasswordMutator.state.status === 'loading' }
          > Change Password </ButtonOval>
 
-         <ValidationErrorInsert serviceState={ resetPasswordMutator.state } />
+         { resetPasswordMutator.state.status == 'error' &&
+            <InsertError error={ resetPasswordMutator.state.error } />
+         }
 
          <p>Need a new link?</p>
          <a href='/resetPassword'>Reset Password</a>

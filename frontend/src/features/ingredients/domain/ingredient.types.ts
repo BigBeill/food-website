@@ -1,12 +1,12 @@
 export interface IngredientType {
-   food_id: string;
+   food_id: number;
    description: string;
    label?: string;
    commonName?: string;
    portion?: {
-      measure_id: string;
+      measure_id: number;
       description: string;
-      amount: string | null;
+      amount: number;
    }
    nutrition?: {
       calories: number;
@@ -22,9 +22,10 @@ export interface IngredientType {
 }
 
 export interface IngredientConversionType {
-   id: string,
+   food_id: number,
+   measure_id: number,
    description: string,
-   conversionFactorValue: number
+   value: number
 }
 
 export interface IngredientGroupType {

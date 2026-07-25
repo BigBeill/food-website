@@ -3,54 +3,67 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleCheck, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { useIngredientSearch } from '../../ingredients/hooks/useIngredientSearch';
-import { useIngredientList } from '../../ingredients/hooks/useIngredientList';
 import { IngredientType } from '@/features/ingredients/domain/ingredient.types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ErrorInsert, LoadingInsert } from '@/shared/components/stateComponents/InsertStateComponents';
+import { useIntractableList } from '@/shared/hooks/useInteractableList';
+import { ServiceStateType } from '@/shared/shared.types';
+import { InputText } from '@/shared/components/Input.components';
+import { ButtonOval } from '@/shared/components/Button.components';
 
 interface FilterSearchPageProps {
    initialTitle?: string;
    initialIngredientList?: IngredientType[];
-   initialIngredientListState?: ServiceState<IngredientType[]>
+   initialIngredientListState?: ServiceStateType<IngredientType[]>
    handleSubmit: (title: string, ingredientList: IngredientType[]) => void;
 }
 
 export default function FilterSearchPage({ initialTitle, initialIngredientList, initialIngredientListState, handleSubmit }: FilterSearchPageProps) {
 
-   if (initialIngredientListState) {
-      if (initialIngredientListState.status === 'loading') { return <LoadingInsert /> }
-      if (initialIngredientListState.status !== 'ready') { return <ErrorInsert />}
-   }
+   const listItemOptionsComponent = (item: IngredientType, index: number) => (
+      <FontAwesomeIcon icon={faCircleXmark} onClick={ () => ingredientList.removeIndex(index) } />
+   )
+
+   const listItemContentComponent = (item: IngredientType, index: number) => (
+      <p>{item.label || item.description}</p>
+   )
 
    const [recipeTitle, setRecipeTitle] = useState<string>(initialTitle || '');
-   const { newIngredient, ingredientsAvailable, handleInputChange, selectIngredient, reset } = useIngredientSearch();
-   const { ingredientList, addIngredient, removeIngredient } = useIngredientList(initialIngredientList || initialIngredientListState?.data);
+   const ingredientSearch = useIngredientSearch();
+   const ingredientList = useIntractableList<IngredientType>({
+      initial: initialIngredientList,
+      renderItemOptions: listItemOptionsComponent,
+      renderItemContent: listItemContentComponent,
+   });
 
    function handleAddIngredient() {
-      addIngredient(newIngredient);
-      reset();
+      ingredientList.addItem(ingredientSearch.ingredient);
+      ingredientSearch.reset();
    }
 
+   useEffect(() => {
+      if (initialIngredientListState?.status === 'ready') {
+         ingredientList.replaceList(initialIngredientListState.data);
+      }
+   }, [initialIngredientListState?.status])
+
    return (
-      <div className='consumeSpace'>
+      <section className='consumeSpace'>
          <h1>Public Recipes</h1>
 
-         <div className='textInput additionalMargin'>
-            <label>Name</label>
-            <input type='text' value={recipeTitle} onChange={(event) => setRecipeTitle(event.target.value)} placeholder='recipe name' />
-         </div>
+         <InputText label='Name' value={ recipeTitle } placeholder='recipe name' onChange={ (value) => setRecipeTitle(value) } />
 
          <div className='textInput sideButton additionalMargin'>
             <div className='activeSearchBar bottom'> {/* ingredient search bar */}
                <input 
                   type='text' 
-                  value={newIngredient.description} 
-                  onChange={(event) => handleInputChange(event.target.value)} 
+                  value={ingredientSearch.ingredient.description} 
+                  onChange={(event) => ingredientSearch.handleInputChange(event.target.value)} 
                   placeholder='Ingredient Name'
                />
-               <ul className={`${ingredientsAvailable.length == 0 ? 'hidden' : ''}`}>
-                  {ingredientsAvailable.map((ingredient, index) => (
-                     <li key={index} onClick={() => selectIngredient(ingredient)}> {ingredient.commonName ? ingredient.commonName : ingredient.description} </li>
+               <ul className={`${ingredientSearch.optionList.length == 0 ? 'hidden' : ''}`}>
+                  {ingredientSearch.optionList.map((ingredient, index) => (
+                     <li key={index} onClick={() => ingredientSearch.selectIngredient(ingredient)}> {ingredient.commonName ? ingredient.commonName : ingredient.description} </li>
                   ))}
                </ul>
             </div>
@@ -59,18 +72,13 @@ export default function FilterSearchPage({ initialTitle, initialIngredientList, 
             </div>
          </div>
 
-         <ul className='displayList'>
-            {ingredientList.map((ingredient, index) => (
-               <li key={index} className='listItem'>
-                  <div className='options'>
-                     <FontAwesomeIcon icon={faCircleXmark} style={{color: "#575757",}} onClick={() => removeIngredient(index)} />
-                  </div>
-                  <p>[{ingredient.foodDescription}]</p>
-               </li>
-            ))}
-         </ul>
+         {
+            initialIngredientListState?.status === 'loading' ? <LoadingInsert />
+            : initialIngredientListState?. status === 'error' ? <ErrorInsert />
+            : ingredientList.reactComponent
+         }
 
-         <button className='additionalMargin' onClick={() => handleSubmit(recipeTitle, ingredientList)}> search </button>
-      </div>
+         <ButtonOval onClick={ () => handleSubmit(recipeTitle, ingredientList.content) }>search</ButtonOval>
+      </section>
    )
 }

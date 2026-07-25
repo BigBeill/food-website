@@ -1,5 +1,13 @@
 import styles from './styles/buttons.module.scss';
 import Spinner from './icons/spinner';
+import { useState } from 'react';
+
+
+export function ButtonInline ({ children, ...rest }: React.ComponentPropsWithoutRef<'button'>) {
+   return (
+      <button className={ styles.buttonInline } { ...rest }>{ children }</button>
+   );
+}
 
 interface ButtonPairedParams {
    firstText: string
@@ -8,30 +16,18 @@ interface ButtonPairedParams {
    secondOnClick: () => void
 }
 
-interface MobileNavButtonParams {
-   navOpen: boolean,
-   onClick: () => void
-}
-
-type ButtonOvalProps = React.ComponentPropsWithoutRef<'button'> & {
-   loadingState?: boolean;
-};
-
 export function ButtonPaired ({ firstText, firstOnClick, secondText, secondOnClick }: ButtonPairedParams) {
    return (
       <div className="splitSpace">
-         <button className={styles.buttonPrimary} onClick={firstOnClick}>{firstText}</button>
-         <button className={styles.buttonSecondary} onClick={secondOnClick}>{secondText}</button>
+         <button className={ styles.buttonPrimary } onClick={ firstOnClick }>{ firstText }</button>
+         <button className={ styles.buttonSecondary } onClick={ secondOnClick }>{ secondText }</button>
       </div>
    )
 }
 
-export function ButtonOval({ className, children, loadingState, ...rest }: ButtonOvalProps) {
-   return (
-      <button className={[styles.buttonOval, loadingState && styles.loadingState, className].filter(Boolean).join(' ')} {...rest}>
-         { loadingState ? <Spinner /> : children }
-      </button>
-   );
+interface MobileNavButtonParams {
+   navOpen: boolean,
+   onClick: () => void
 }
 
 export function ButtonMobileNav({ navOpen, onClick }: MobileNavButtonParams ) {
@@ -54,4 +50,42 @@ export function ButtonMobileNav({ navOpen, onClick }: MobileNavButtonParams ) {
          </svg>
       </button>
    )
+}
+
+type ButtonOvalProps = React.ComponentPropsWithoutRef<'button'> & {
+   loadingState?: boolean;
+};
+
+export function ButtonOval({ children, loadingState, ...rest }: ButtonOvalProps) {
+   return (
+      <button className={[styles.buttonOval, loadingState && styles.loadingState].filter(Boolean).join(' ')} { ...rest }>
+         { loadingState ? <Spinner /> : children }
+      </button>
+   );
+}
+
+
+
+interface ButtonShieldedProps {
+   message: string,
+   onClick: () => void,
+   loadingState?: boolean
+}
+
+export function ButtonShielded({ message, onClick, loadingState }: ButtonShieldedProps) {
+   const [shielded, setShielded] = useState<boolean>(false);
+
+   function attemptOnClick() {
+      if (!shielded) { setShielded(true); }
+      else { onClick() }
+   }
+
+   return (
+      <div className={ styles.ButtonShielded } >
+         <ButtonOval loadingState={ loadingState } onClick={ attemptOnClick }>{ shielded ? message : `confirm ${ message }` }</ButtonOval>
+         { !shielded && 
+            <ButtonOval onClick={() => setShielded(false)}>Cancel</ButtonOval>
+         }
+      </div>
+   );
 }

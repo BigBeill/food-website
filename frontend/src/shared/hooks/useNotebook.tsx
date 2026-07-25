@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import PaginationBar from '@/shared/components/PaginationBar';
 
-import styles from './notebook.module.scss';
+import styles from './styles/notebook.module.scss';
 
 // LOOK AT README.MD FILE IN THE ROOT FOLDER FOR INSTRUCTIONS ON HOW TO USE THIS COMPONENT
 

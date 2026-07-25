@@ -3,12 +3,15 @@ import { IngredientGroupType, IngredientType } from "../domain/ingredient.types"
 
 interface searchParams {
    description?: string;
-   groupId?: string;
+   groupId?: number;
    limit?: number;
 }
 
 export const ingredientService = {
-   get: (ingredientId: string): Promise<IngredientType> => {
+   conversionOptionList: (ingredientId: number) => {
+      return ingredientApi.conversionOptionList(ingredientId);
+   },
+   get: (ingredientId: number): Promise<IngredientType> => {
       return ingredientApi.get(ingredientId);
    },
    search: (params: searchParams): Promise<IngredientType[]> => {

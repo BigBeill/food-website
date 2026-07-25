@@ -1,9 +1,6 @@
 import sendServerRequest from "@/shared/lib/api";
 import { RecipeType } from "../domain/recipes.types";
-
-interface createParams {
-   recipe: FormData;
-}
+import { PaginatedListType } from "@/shared/shared.types";
 
 interface getParams {
    includeNutrients?: boolean;
@@ -19,19 +16,15 @@ interface searchParams {
    includeNutrition?: boolean;
 }
 
-interface updateParams {
-   recipe: FormData;
-}
-
 export const recipeApi = {
-   create: (params: createParams) =>
+   create: (recipe: FormData): Promise<void> =>
       sendServerRequest({
          url: '/recipes/create',
          method: 'post',
-         body: params
+         body: { recipe: recipe }
       }),
    
-   delete: (recipeId: string) => 
+   delete: (recipeId: string): Promise<void> => 
       sendServerRequest({
          url: `/recipes/delete/${recipeId}`,
          method: 'delete'
@@ -52,10 +45,10 @@ export const recipeApi = {
          body: params,
       }),
 
-   update: (recipeId: string, params: updateParams) =>
+   update: (recipeId: string, recipe: FormData): Promise<void> =>
       sendServerRequest({
          url:`/recipes/update/${recipeId}`,
          method: 'put',
-         body: params,
+         body: { recipe: recipe },
       })
 }

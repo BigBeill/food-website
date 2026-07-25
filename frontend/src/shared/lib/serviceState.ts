@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import { ServiceStateType } from "../shared.types";
 
-export default function useServiceState<T>(fetcher: () => Promise<T>, refetchOn: unknown[]): ServiceState<T> {
-   const [state, setState] = useState<ServiceState<T>>({ status: 'loading' });
+export default function useServiceState<T>(fetcher: () => Promise<T>, refetchOn: unknown[]): ServiceStateType<T> {
+   const [state, setState] = useState<ServiceStateType<T>>({ status: 'loading' });
    const requestIdRef = useRef(0);
 
    useEffect(() => {

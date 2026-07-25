@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ButtonOval } from '@/shared/components/Button.components';
 import { authService } from '../services/auth.service';
 import { useServiceMutation } from '@/shared/lib/serviceMutation';
-import { ValidationErrorInsert } from '@/shared/components/stateComponents/InsertStateComponents';
+import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
 
 interface FormDataType {
    username: string,
@@ -104,7 +104,9 @@ export default function RegisterPage() {
             loadingState={ registerMutator.state.status === 'loading' }
          > Create Account </ButtonOval>
 
-         <ValidationErrorInsert serviceState={ registerMutator.state } />
+         { registerMutator.state.status == 'error' &&
+            <InsertError error={ registerMutator.state.error } />
+         }
 
          <p>Already have an account?</p>
          <a href='/auth/login'>Login</a>

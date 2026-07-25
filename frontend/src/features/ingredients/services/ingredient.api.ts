@@ -3,17 +3,17 @@ import { IngredientGroupType, IngredientConversionType, IngredientType } from ".
 
 interface searchParams {
    description?: string;
-   groupId?: string;
+   groupId?: number;
    limit?: number;
 }
 
 export const ingredientApi = {
-   conversionOptionList: (ingredientId: string) =>
+   conversionOptionList: (ingredientId: number) =>
       sendServerRequest<IngredientConversionType[]>({
          url: `/ingredients/conversionOptionList/${ingredientId}`,
          method: 'get',
       }),
-   get: (ingredientId: string) =>
+   get: (ingredientId: number) =>
       sendServerRequest<IngredientType>({
          url: `/ingredients/get/${ingredientId}`,
          method: 'get',

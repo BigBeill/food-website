@@ -4,7 +4,7 @@ import { ingredientService } from "../services/ingredient.service";
 import useServiceState from "@/shared/lib/serviceState";
 
 export function useIngredientSearch() {
-   const [newIngredient, setNewIngredient] = useState<IngredientType>({ food_id: '', description: '' });
+   const [ingredient, setIngredient] = useState<IngredientType>({ food_id: '', description: '' });
    const [searchTerm, setSearchTerm] = useState('');
 
    const ingredientSearchState = useServiceState(() => {
@@ -12,28 +12,27 @@ export function useIngredientSearch() {
       else { return Promise.resolve([]); }
    }, [searchTerm])
 
-   const ingredientsAvailable = ingredientSearchState.status === 'ready' ? ingredientSearchState.data : [];
+   const optionList = ingredientSearchState.status === 'ready' ? ingredientSearchState.data : [];
 
    function handleInputChange(partialName: string) {
-      setNewIngredient({ food_id: '', description: partialName });
+      setIngredient({ food_id: '', description: partialName });
       setSearchTerm(partialName);
    }
 
-
    function selectIngredient(ingredient: IngredientType) {
       setSearchTerm('');
-      setNewIngredient(ingredient);
+      setIngredient(ingredient);
    }
 
    function reset() {
-      setNewIngredient({ food_id: '', description: '' });
+      setIngredient({ food_id: '', description: '' });
    }
 
    return { 
-      newIngredient, 
-      ingredientsAvailable, 
+      ingredient, 
+      optionList, 
       handleInputChange, 
-      selectIngredient, 
+      selectIngredient,
       reset 
    };
 }

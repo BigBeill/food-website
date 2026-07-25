@@ -14,7 +14,7 @@ export default function IngredientGroupPage() {
 
    if (groupListState.status === 'loading') { return <Loading /> }
    if (groupListState.status === 'error') { return <ErrorPage /> }
-   if (groupListState.status !== 'ready') { console.log(groupListState.status); return <NotFound /> }
+   if (groupListState.status !== 'ready') { return <NotFound /> }
    return (
       <div className="displayButtons">
          { groupListState.data.map((ingredientGroup, index) => (

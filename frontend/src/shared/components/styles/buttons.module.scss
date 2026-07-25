@@ -19,7 +19,19 @@
    }
 }
 
-.buttonPrimary{
+.buttonInline {
+   margin-top: auto;
+
+   svg { 
+      height: 1.5rem;
+   }
+
+   :hover {
+      cursor: pointer;
+   }
+}
+
+.buttonPrimary {
    @extend %universalButtonStyling;
    background: $color-primary;
    border-color: $color-primary;
