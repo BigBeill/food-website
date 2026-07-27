@@ -1,110 +1,97 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import GrowingText from '@/shared/components/GrowingText';
-import { UserType } from '../domain/user.types';
+import { RelationshipType, UserType } from '../domain/user.types';
 import ImageUploader from '@/features/images/components/ImageUploader';
 import { useRouter } from 'next/navigation';
 import useAuth from '@/features/auth/hooks/useAuth';
-import { userService } from '../services/user.service';
 import { unpackImage } from '@/features/images/services/image.services';
+import useServiceState from '@/shared/lib/serviceState';
+import { userService } from '../services/user.service';
+import { useServiceMutation } from '@/shared/lib/serviceMutation';
+import LoadingPage from '@/shared/components/stateComponents/LoadingPage';
+import ErrorPage from '@/shared/components/stateComponents/ErrorPage';
+import styles from './profilePage.module.scss';
+import { ButtonOval, ButtonShielded } from '@/shared/components/Button.components';
 
 interface ProfilePageProps {
    userId?: string;
 }
-export default function ProfilePage({userId}: ProfilePageProps) {
+export default function ProfilePage({ userId }: ProfilePageProps) {
+
    const titleParent = useRef(null);
    const router = useRouter();
-   const { authUserId, logout } = useAuth();
+   const { authId, logout } = useAuth();
 
-   const [user, setUser] = useState<UserType>({_id: '', name: '', email: '', bio: '', relationship: undefined });
+   const userState = useServiceState((): Promise<UserType> => {
+      if (userId) { return userService.get(userId, { includeRelationship: true }); }
+      else if(authId) { return userService.get(authId, { includeRelationship: true }); }
+      else {
+         router.replace('/login');
+         throw new Error ("This page is not accessible without being logged in");
+      }
+   }, [userId]);
+
+   if (userState.status === 'loading') { return <LoadingPage />; }
+   if (userState.status !== 'ready') { return <ErrorPage />; }
+   const user: UserType = userState.data;
+
+   const [modifiedUser, setModifiedUser] = useState<UserType | null>(null);
    const [imageBuffer, setImageBuffer] = useState<File | null>(null);
 
-   const [editMode, setEditMode] = useState<boolean>(false);
-   const [buttonSafety, setButtonSafety] = useState<boolean>(true);
+   const userMutator = useServiceMutation((newUser: UserType): Promise<UserType> => { return userService.update(newUser); })
 
-   useEffect(() => {
-      if (!userId && !authUserId) { 
-         router.replace('/login');
-         return; 
-      }
+   async function saveChanges() {
+      if (!modifiedUser) { return; }
 
-      setEditMode(false);
-      setImageBuffer(null);
-
-      userService.get((userId || authUserId)!, { includeRelationship: true })
-      .then((response) => {
-         setUser(response);
-      })
-      .catch((error) => console.error(error));
-
-   }, [userId, authUserId, router]);
-
-   function exitEditMode(saveChanges: boolean) {
-      if (saveChanges) {
-         const formData = new FormData();
-         formData.append("username", user.name);
-         formData.append("email", user.email ?? "");
-         formData.append("bio", user.bio ?? "");
-         if (imageBuffer instanceof File) {
-            formData.append("image", imageBuffer);
-         }
-         userService.update({ user: formData })
-         .catch((error) => console.error(error));
-      }
-      else {
-         router.refresh();
-      }
-      setEditMode(false);
+      const mutatedUser = await userMutator.send(modifiedUser);
+      userState.overrideOutput({ ...mutatedUser, relationship: user.relationship });
+      setModifiedUser(null);
    }
 
-   function sendFriendRequest () {
-      if (!authUserId) { return; }
-      userService.sendFriendRequest(user._id)
-      .then((response) => setUser((previous) => ({...previous, relationship: response})))
-      .catch((error) => console.error(error));
-   }
+   // mutator for setting the relationship.type field of another user
+   const relationshipMutator = useServiceMutation((newRelationship: 'none' | 'requestReceived' | 'friend'): Promise<RelationshipType> => {
+      const relationship: RelationshipType = user.relationship!;
+      if (newRelationship === 'none') { 
+         if (relationship.type === 'friend') { return userService.removeFriend(relationship._id); }
+         else if (relationship.type === 'requestReceived', relationship.type === 'requestSent') { return userService.processFriendRequest(relationship._id, { accept: false}); }
+      }
+      if (newRelationship === 'requestReceived' && relationship.type === 'none') { return userService.sendFriendRequest(relationship.owner); }
+      if (newRelationship === 'friend' && relationship.type === 'requestSent') { return userService.processFriendRequest(relationship._id, { accept: true }); }
 
-   function processFriendRequest(accept: boolean) {
-      if (!user.relationship) { return; }
-      userService.processFriendRequest(user.relationship._id, { accept })
-      .then((response) => setUser((previous) => ({...previous, relationship: response})))
-      .catch((error) => console.error(error))
-   }
+      // If the request does not match any of the above conditions and trigger a return then send an error
+      console.error('Unable to set the targets relationship with this user to: ' + newRelationship + ' their current relationship with this user is: ' + relationship.type);
+      throw new Error('relationship cannot be set to ' + newRelationship);
+   });
 
-   function removeFriend() {
-      if (!user.relationship) { return; }
-      userService.removeFriend(user.relationship._id)
-      .then((response) => setUser((previous) => ({...previous, relationship: response})))
-      .catch((error) => console.error(error));
+   async function updateRelationship(newRelationship: 'none' | 'requestReceived' | 'friend') {
+      const mutatedRelationship = await relationshipMutator.send(newRelationship);
+      userState.overrideOutput({ ...user, relationship: mutatedRelationship });
    }
 
    // handle logout function
    function handleLogout() {
       logout()
-      .then(() => router.push('/login'));
+         .then(() => router.push('/login'));
    }
 
    return (
-      <div className='userObjectView fullViewPage'>
-         <div ref={titleParent} className='centredVertically'>
-            <GrowingText text={user.name} parentDiv={titleParent} />
+      <div className={ styles.userProfile }>
+         <div ref={ titleParent } className='centredVertically'>
+            <GrowingText text={ user.name } parentDiv={ titleParent } />
          </div>
          <div>
-            { editMode ? (
+            { !modifiedUser ? (
+               <img className='consumeSpace' { ...unpackImage(user.image) }/>
+            ) : (
                <ImageUploader
-                  imageBuffer={imageBuffer}
-                  setImageBuffer={setImageBuffer}
-                  oldImage={user.image}
-                  category={'user'}
+                  imageBuffer={ imageBuffer }
+                  setImageBuffer={ setImageBuffer }
+                  oldImage={ user.image }
+                  category={ 'user' }
                />
-            )
-            : (
-               <img
-                  className='consumeSpace'
-                  {...unpackImage({ category: 'user', image: user.image})}
-               />
-            )}
+            ) }
          </div>
 
          <div> {/* styleDiv, should not contain anything */} </div>
@@ -113,56 +100,51 @@ export default function ProfilePage({userId}: ProfilePageProps) {
             <p>_id: {user._id}</p>
             <p>username: {user.name}</p>
          </div>
+
          <div className='textInputParent bottomPadding'>
-            { editMode ? (
-               <>
-                  <label htmlFor="bio">Personal Bio</label>
-                  <textarea id="bio" value={user.bio} onChange={ (event) => { setUser({ ...user, bio: event.target.value }); } } />
-               </> 
-            ) : (
+            { !modifiedUser ? (
                <>
                   <h4>Personal Bio</h4>
-                  { user.bio ? <p>{user.bio}</p> : <p>No bio available</p> }
+                  { user.bio ? <p>{ user.bio }</p> : <p>No bio available</p> }
                </>
-            )}
+            ) : (
+               <>
+                  <label htmlFor="bio">Personal Bio</label>
+                  <textarea id="bio" value={modifiedUser.bio} onChange={ (event) => { setModifiedUser((previous) => ({ ...previous!, bio: event.target.value })); } } />
+               </>
+            ) }
          </div>
 
          <div> {/* styleDiv, should not contain anything */} </div>
 
          {/* display the appropriate set of two buttons */}
          <div className="splitSpace smallerGap">
-            { !user || !user.relationship ? null : editMode ? (
+            { !modifiedUser ? (
                <>
-                  <button onClick={ () => { exitEditMode(true); } }>Save Changes</button>
-                  <button onClick={ () => { exitEditMode(false); } }>Delete Changes</button>
+                  <ButtonShielded message='Save Changes' loadingState={ userMutator.status === 'loading' } onClick={ saveChanges } />
+                  <ButtonShielded message='Delete Changes' onClick={ () => { setModifiedUser(null); } }/>
                </>
-            ) : user.relationship.type == "none" ? (
+            ) : user.relationship!.type == "none" ? (
                <>
-                  <div></div>
-                  <button onClick={ () => { sendFriendRequest(); } }>Send friend request</button>
+                  <ButtonOval loadingState={ relationshipMutator.status === 'loading' } onClick={ () => { updateRelationship('requestReceived'); } }>Send friend request</ButtonOval>
                </>
-            ) : user.relationship.type == "friend" ? (
+            ) : user.relationship!.type == "friend" ? (
                <>
-                  <div></div>
-                  <div className='devisableButton'>
-                     <button onClick={() => { removeFriend(); }}>Remove friend</button>
-                     <button className={buttonSafety ? 'hideButton' : 'showButton'} onClick={() => { setButtonSafety(true); }} >Cancel</button>
-                  </div>
+                  <ButtonShielded message='Remove Friend' loadingState={ relationshipMutator.status === 'loading' } onClick={ () => { updateRelationship('none') } } />
                </>
-            ) : user.relationship.type == "requestReceived" ? (
+            ) : user.relationship!.type == "requestReceived" ? (
                <>
-                  <div></div>
-                  <button onClick={ () => { processFriendRequest(false); } }>Cancel friend request</button>
+                  <ButtonOval loadingState={ relationshipMutator.status === 'loading' } onClick={ () => { updateRelationship('none') } }>Cancel friend request</ButtonOval>
                </>
-            ) : user.relationship.type == "requestSent" ? (
+            ) : user.relationship!.type == "requestSent" ? (
                <>
-                  <button onClick={ () => { processFriendRequest(true); } }>Accept friend request</button>
-                  <button onClick={ () => { processFriendRequest(false); } }>Reject friend request</button>
+                  <ButtonOval loadingState={ relationshipMutator.status === 'loading' } onClick={ () => { updateRelationship('friend'); } }>Accept friend request</ButtonOval>
+                  <ButtonOval loadingState={ relationshipMutator.status === 'loading' } onClick={ () => { updateRelationship('none'); } }>Reject friend request</ButtonOval>
                </>
-            ) : user.relationship.type == "self" ? (
+            ) : user.relationship!.type == "self" ? (
                <>
-                  <button onClick={ () => { setEditMode(true); } }> edit account </button>
-                  <button onClick={ () => { handleLogout(); } }> logout </button>
+                  <ButtonOval onClick={ () => { setModifiedUser(user); } }> edit account </ButtonOval>
+                  <ButtonOval onClick={ () => { handleLogout(); } }> logout </ButtonOval>
                </>
             ) : null }
          </div>

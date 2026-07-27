@@ -5,11 +5,11 @@ import { faCircleCheck, faCircleXmark } from '@fortawesome/free-solid-svg-icons'
 import { useIngredientSearch } from '../../ingredients/hooks/useIngredientSearch';
 import { IngredientType } from '@/features/ingredients/domain/ingredient.types';
 import { useEffect, useState } from 'react';
-import { useIntractableList } from '@/shared/hooks/useIntractableList';
 import { ServiceStateType } from '@/shared/shared.types';
 import { InputText } from '@/shared/components/Input.components';
 import { ButtonOval } from '@/shared/components/Button.components';
 import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
+import { useIntractableList } from '@/shared/hooks/useIntractableList';
 
 interface FilterSearchPageProps {
    initialTitle?: string;

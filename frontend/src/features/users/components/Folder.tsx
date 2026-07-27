@@ -6,7 +6,7 @@ import UserPin from "./UserPin"
 
 import { UserType, FolderType } from "../domain/user.types";
 import { useRouter } from "next/router";
-import { userService } from "../services/user.service";
+import { userService } from "../services/user.api";
 
 interface FolderProps {
    folder: FolderType

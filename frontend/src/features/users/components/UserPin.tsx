@@ -4,7 +4,7 @@ import { faBan, faCheck, faUser, faUserPlus, faX } from '@fortawesome/free-solid
 import GrowingText from '@/shared/components/GrowingText';
 import { UserType } from '../domain/user.types';
 import { useRouter } from 'next/router';
-import { userService } from '../services/user.service';
+import { userService } from '../services/user.api';
 import useAuth from '@/features/auth/hooks/useAuth';
 import { unpackImage } from '@/features/images/services/image.services';
 

@@ -1,0 +1,69 @@
+.userObjectView {
+
+   width: fit-content;
+   box-sizing: border-box;
+   background-color: var(--background-color);
+   display: grid;
+   border-radius: 0.15em;
+   box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+   height: 100%;
+   padding: 0.6em;
+   grid-template-columns: 16.8em 6em;
+   grid-template-rows: 6em 0.6em 4.2em;
+   grid-template-areas: "username profile" "designArea designArea" "contactInformation actionIcons";
+
+   p{
+      margin: 0;
+   }
+
+   img{
+      width: 100%;
+      height: 100%;
+   }
+
+   .contactInformation{
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: .15em;
+   }
+
+   .icons{
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.6em;
+
+      svg{
+         margin: auto 0;
+         height: 50%;
+   
+         &:hover{
+            cursor: pointer;
+         }
+      }
+   }
+
+   > div:nth-child(1):hover{
+      cursor: pointer;
+   }
+   > div:nth-child(2):hover{
+      cursor: pointer;
+   }
+
+   > div:nth-child(3){
+      margin-left: -0.6em;
+      width: calc(100% + 1.2em);
+      height: 100%;
+      grid-area: designArea;
+      background-color: var(--primary-color);
+      clip-path: polygon(0em 0.3em, 17.1em 0.3em, 17.4em 0em, 24em 0em, 24em 0.6em, 0em 0.6em);
+   }
+
+   > div:nth-child(4){
+      margin-top: 0.6em;
+   }
+
+   > div:nth-child(5){
+      margin-top: 0.6em;
+   }
+}

@@ -1,7 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ServiceStateType } from "../shared.types";
 
-export default function useServiceState<T>(fetcher: () => Promise<T>, refetchOn: unknown[]): ServiceStateType<T> {
+type UseServiceStateReturnType<T> = ServiceStateType<T> & {
+   overrideOutput: (output: T) => void
+}
+
+export default function useServiceState<T>(fetcher: () => Promise<T>, refetchOn: unknown[]): UseServiceStateReturnType<T> {
    const [state, setState] = useState<ServiceStateType<T>>({ status: 'loading' });
    const requestIdRef = useRef(0);
 
@@ -20,5 +24,13 @@ export default function useServiceState<T>(fetcher: () => Promise<T>, refetchOn:
          });
    }, refetchOn);
 
-   return state;
+   const overrideOutput = useCallback((output: T) => {
+      requestIdRef.current++;
+      setState({ status: 'ready', data: output })
+   },[]);
+
+   return { 
+      ...state,
+      overrideOutput 
+   };
 }

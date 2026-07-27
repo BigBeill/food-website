@@ -5,7 +5,7 @@ import Folder from "./Folder.js";
 import PaginationBar from "@/shared/components/PaginationBar.js";
 import { UserType, FolderType } from "../domain/user.types.js";
 import { usePathname, useSearchParams } from "next/navigation.js";
-import { userService } from "../services/user.service.js";
+import { userService } from "../services/user.api.js";
 import { useRouter } from "next/router.js";
 
 interface SearchUserPageProps {

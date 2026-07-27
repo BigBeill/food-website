@@ -26,7 +26,7 @@ export default function Header() {
          ],
          [
             ...(authId
-            ? [{ name: 'Profile', href: `/users/${authId}` }]
+            ? [{ name: 'Profile', href: `/users` }]
             : [
                { name: 'Login', href: '/auth/login' },
                { name: 'Register', href: '/auth/register' },

@@ -1,21 +1,23 @@
-import sendServerRequest from "@/shared/lib/api"
-import { FolderType, RelationshipType, UserType } from "../domain/user.types"
+import { PaginatedListType } from "@/shared/shared.types";
+import { FolderType, RelationshipType, UserType } from "../domain/user.types";
+import { userApi } from "./user.api"
+import { createUserFormData } from "./user.utils";
 
-interface getParams {
+interface GetParams {
    includeRelationship: boolean
 }
 
-interface folderListParams {
+interface SearchFolderParams {
    skip?: number;
    limit?: number
    includeCount?: boolean
 }
 
-interface processFriendRequestParams {
+interface ProcessFriendRequestParams {
    accept: boolean;
 }
 
-interface searchParams{
+interface SearchParams {
    _id?: string
    name?: string
    category?: 'friends' | 'incomingRequests' | 'outgoingRequests' | 'none';
@@ -24,61 +26,34 @@ interface searchParams{
    includeCount?: boolean;
 }
 
-interface updateParams {
+interface UpdateParams {
    user: FormData;
 }
 
 export const userService = {
-   defineRelationship: (userId: string) =>
-      sendServerRequest<RelationshipType>({
-         url: `/user/defineRelationship/${userId}`,
-         method: 'get'
-      }),
-
-   folderList: (params: folderListParams) =>
-      sendServerRequest<FolderType[] | {count: number, list: FolderType[]}>({
-         url: '/user/folderList',
-         method: 'get',
-         body: params
-      }),
-
-   get: (userId: string, params?: getParams) =>
-      sendServerRequest<UserType>({
-         url: `/user/get/${userId}`,
-         method: 'get',
-         body: params,
-      }),
-
-   processFriendRequest: (relationshipId: string, params: processFriendRequestParams) =>
-      sendServerRequest<RelationshipType>({
-         url:`/user/processFriendRequest/${relationshipId}`,
-         method: 'post',
-         body: params,
-      }),
-
-   removeFriend: (relationshipId: string) => 
-      sendServerRequest<RelationshipType>({
-         url: `/user/removeFriend/${relationshipId}`,
-         method: 'post',
-      }),
-
-   search: (params: searchParams) =>
-      sendServerRequest<UserType[] | {count: number, list: UserType[]}>({
-         url: `/user/search`,
-         method: 'get',
-         body: params
-      }),
-
-   sendFriendRequest: (userId: string) =>
-      sendServerRequest<RelationshipType>({
-         url: `/user/sendFriendRequest/${userId}`,
-         method: 'push',
-      }),
-
-   update: (params: updateParams) =>
-      sendServerRequest({
-         url: `/user/update`,
-         method: 'put',
-         body: params,
-      }),
+   defineRelationship: (userId: string): Promise<RelationshipType> => {
+      return userApi.defineRelationship(userId);
+   },
+   get: (userId: string, params?: GetParams) => {
+      return userApi.get(userId, params);
+   },
+   processFriendRequest: (relationshipId: string, params: ProcessFriendRequestParams) => {
+      return userApi.processFriendRequest(relationshipId, params);
+   },
+   removeFriend: (relationshipId: string) => {
+      return userApi.removeFriend(relationshipId);
+   },
+   search: (params: SearchParams): Promise<PaginatedListType<UserType[]>> => {
+      return userApi.search(params);
+   },
+   searchFolder: (params: SearchFolderParams): Promise<PaginatedListType<FolderType[]>> => {
+      return userApi.searchFolder(params); 
+   },
+   sendFriendRequest: (userId: string) => {
+      return userApi.sendFriendRequest(userId);
+   },
+   update: (user: UserType, image?: File): Promise<UserType> => {
+      const userFormData = createUserFormData(user, image);
+      return userApi.update(userFormData);
+   },
 }

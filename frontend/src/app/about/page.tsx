@@ -2,6 +2,6 @@
 
 import AboutMePage from "@/features/about/components/AboutMePage";
 
-export function aboutMe () {
+export default function aboutMe () {
    return <AboutMePage />;
 }
