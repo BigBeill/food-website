@@ -1,6 +1,6 @@
-import ValidationError from "@/shared/errorClasses/validationError";
 import { authApi } from "./auth.api";
 import { checkValidEmail, checkValidPassword } from "./auth.utils";
+import { ErrorValidation } from "@/shared/lib/errorClasses";
 
 
 interface LoginParams {
@@ -42,7 +42,7 @@ export const authService = {
       const { username, email, passwordOne, passwordTwo } = params
       checkValidEmail(email);
       checkValidPassword(passwordOne);
-      if (passwordOne != passwordTwo) { throw new ValidationError([{ field: 'passwords', issueList: ['do not match'] }]); }
+      if (passwordOne != passwordTwo) { throw new ErrorValidation([{ field: 'passwords', issueList: ['do not match'] }]); }
       return authApi.register({ name: username, email, password: passwordOne });
    },
    requestPasswordReset: (params: RequestPasswordResetParams) => {

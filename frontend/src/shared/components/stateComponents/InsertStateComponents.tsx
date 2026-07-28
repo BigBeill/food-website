@@ -1,11 +1,11 @@
-import ValidationError from '@/shared/errorClasses/validationError';
 import styles from '../styles/insertStateComponents.module.scss';
 import Spinner from '../icons/spinner';
+import { ErrorValidation } from '@/shared/lib/errorClasses';
 
 export function InsertError({ error }: { error?: Error }) {
    return (
       <div className={ styles.error } aria-live='assertive'>
-         { error instanceof ValidationError ?
+         { error instanceof ErrorValidation ?
             error.errorList.map((error) => (
                <div key={error.field}>
                   <p>Invalid {error.field}:</p>

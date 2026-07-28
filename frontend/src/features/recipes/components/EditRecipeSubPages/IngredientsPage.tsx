@@ -3,7 +3,7 @@ import { ingredientService } from "@/features/ingredients/services/ingredient.se
 import { ButtonOval } from "@/shared/components/Button.components";
 import { InputSearch } from "@/shared/components/Input.components";
 import { useIntractableList } from "@/shared/hooks/useIntractableList";
-import useServiceState from "@/shared/lib/serviceState";
+import useServiceState from "@/shared/hooks/useServiceState";
 import { ChildFormContent } from "@/shared/shared.types";
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

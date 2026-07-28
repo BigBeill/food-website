@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import useAuth from '../hooks/useAuth';
 import { authService } from '../services/auth.service';
-import { useServiceMutation } from '@/shared/lib/serviceMutation';
+import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import { ButtonOval } from '@/shared/components/Button.components';
 import { useRouter } from 'next/navigation';
 import styles from './login.module.scss';

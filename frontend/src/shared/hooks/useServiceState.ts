@@ -14,12 +14,13 @@ export default function useServiceState<T>(fetcher: () => Promise<T>, refetchOn:
       setState({ status: 'loading' });
 
       fetcher()
-         .then(data => {
+         .then((data) => {
             if (requestIdRef.current !== requestId) { return; }
-            setState(data ? { status: 'ready', data } : { status: 'not-found' });
+            setState({ status: 'ready', data });
          })
          .catch(error => {
             if (requestIdRef.current !== requestId) { return; }
+            if (error)
             setState({ status: 'error', error });
          });
    }, refetchOn);

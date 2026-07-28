@@ -5,7 +5,7 @@ import Loading from "@/shared/components/stateComponents/LoadingPage";
 import NotFound from "@/shared/components/stateComponents/NotFoundPage";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
 import { recipeService } from "../services/recipes.service";
-import useServiceState from "@/shared/lib/serviceState";
+import useServiceState from "@/shared/hooks/useServiceState";
 
 export default function RecipePage ({ recipeId }: { recipeId: string }) {
    const recipeState = useServiceState(() => recipeService.get(recipeId), [ recipeId ]);

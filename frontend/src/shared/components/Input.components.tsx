@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styles from './styles/inputs.module.scss';
 import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 import { ButtonInline } from './Button.components';
-import useServiceState from '../lib/serviceState';
+import useServiceState from '../hooks/useServiceState';
 import { useState } from 'react';
 
 

@@ -1,4 +1,4 @@
-import ValidationError from "@/shared/errorClasses/validationError";
+import { ErrorValidation } from "@/shared/lib/errorClasses";
 
 export function checkValidUsername(username: string): void {
    let issueList: string[] = []
@@ -7,7 +7,7 @@ export function checkValidUsername(username: string): void {
    if (username.length > 256) { issueList.push("Must be less than 128 characters long"); }
 
    if (issueList. length != 0) {
-      throw new ValidationError([{ field: 'password', issueList }]);
+      throw new ErrorValidation([{ field: 'password', issueList }]);
    }
 }
 
@@ -15,7 +15,7 @@ const ELYSIA_EMAIL_REGEX = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?
 
 export function checkValidEmail(email: string): void {
    if (!ELYSIA_EMAIL_REGEX.test(email)) {
-      throw new ValidationError([{ field: 'email', issueList: ['invalid'] }]);
+      throw new ErrorValidation([{ field: 'email', issueList: ['invalid'] }]);
    }
 }
 
@@ -34,6 +34,6 @@ export function checkValidPassword(password: string): void {
    if (/\s/.test(password)) { issueList.push("Must not contain whitespace"); }
 
    if (issueList. length != 0) {
-      throw new ValidationError([{ field: 'password', issueList }]);
+      throw new ErrorValidation([{ field: 'password', issueList }]);
    }
 }

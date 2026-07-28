@@ -1,3 +1,5 @@
+import { ErrorNotFound, ErrorUnauthorized } from "./errorClasses";
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface SendServerRequestProps {
@@ -39,7 +41,16 @@ async function request<T>(config: SendServerRequestProps): Promise<T> {
 
    if (response.status === 204) { return undefined as T };
 
-   if (!response.ok) { throw { status: response.status, ...(await response.json().catch(() => ({}))) }; }
+
+   if (!response.ok) { 
+      if (response.status === 401) { throw new ErrorUnauthorized(); }
+      else if (response.status === 404) { throw new ErrorNotFound(); }
+      else { 
+         const responseContent = await response.json().catch(() => ({}))
+         console.error("error response from server received:", responseContent );
+         throw new Error(responseContent?.error?.message ?? responseContent?.message ?? 'Request failed');
+      }
+   }
 
    const jsonResponse = await response.json();
    console.log("Response from server received:", jsonResponse);
@@ -51,12 +62,11 @@ export default async function sendServerRequest<T>(config: SendServerRequestProp
       return await request<T>(config);
    } catch (error: any) {
       const skipRefresh = config.url === '/auth/login' || config.url === '/auth/register';
-      if (error.status === 401 && !skipRefresh) {
+      if (error instanceof ErrorUnauthorized || skipRefresh) {
          console.warn('accessToken rejected, requesting new accessToken');
          await request<T>({ method: 'POST', url: '/auth/refresh' });
          return await request<T>(config);
       }
-      console.error("error response from server received:", error);
-      throw new Error(error?.error?.message ?? error?.message ?? 'Request failed');
+      throw error
    }
-}
+} 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { IngredientType } from "../domain/ingredient.types";
 import { ingredientService } from "../services/ingredient.service";
-import useServiceState from "@/shared/lib/serviceState";
+import useServiceState from "@/shared/hooks/useServiceState";
 
 export function useIngredientSearch() {
    const [ingredient, setIngredient] = useState<IngredientType>({ food_id: '', description: '' });

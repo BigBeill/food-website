@@ -1,5 +1,5 @@
-import ValidationError from "@/shared/errorClasses/validationError";
 import { RecipeDraft, RecipeType } from "../domain/recipes.types";
+import { ErrorValidation } from "@/shared/lib/errorClasses";
 
 export function checkValidRecipe(recipe: RecipeDraft | RecipeType) {
    const issueList: string[] = [];
@@ -28,7 +28,7 @@ export function checkValidRecipe(recipe: RecipeDraft | RecipeType) {
       if (instruction.length > 16384) { issueList.push('all instructions must be less than 16,384 characters') }
    });
 
-   if (issueList. length != 0) { throw new ValidationError([{ field: 'recipe', issueList }]); }
+   if (issueList. length != 0) { throw new ErrorValidation([{ field: 'recipe', issueList }]); }
    else { return null; }
 }
 

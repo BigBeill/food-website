@@ -10,10 +10,10 @@ import EditRecipeIngredientsPage from './EditRecipeSubPages/IngredientsPage';
 import EditRecipeInstructionsPage from './EditRecipeSubPages/InstructionsPage';
 import EditRecipeFinalizeChangesPage from './EditRecipeSubPages/FinalizeChangesPage';
 import LoadingPage from '@/shared/components/stateComponents/LoadingPage';
-import useServiceState from '@/shared/lib/serviceState';
+import useServiceState from '@/shared/hooks/useServiceState';
 import { IngredientType } from '@/features/ingredients/domain/ingredient.types';
 import { ChildFormContent } from '@/shared/shared.types';
-import { useServiceMutation } from '@/shared/lib/serviceMutation';
+import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import ErrorPage from '@/shared/components/stateComponents/ErrorPage';
 
 // if no recipeId has been assigned this page will assume you are creating a brand new recipe

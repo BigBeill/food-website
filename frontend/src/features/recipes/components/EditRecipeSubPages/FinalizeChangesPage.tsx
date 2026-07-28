@@ -1,6 +1,6 @@
 import { ButtonShielded } from "@/shared/components/Button.components";
 import { InsertError } from "@/shared/components/stateComponents/InsertStateComponents";
-import { ServiceMutationType } from "@/shared/lib/serviceMutation";
+import { ServiceMutationType } from "@/shared/hooks/useServiceMutation";
 
 interface EditRecipeFinalizeChangesPageProps {
    saveRecipeMutator: ServiceMutationType<undefined, void>;

@@ -8,7 +8,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { IngredientType } from '@/features/ingredients/domain/ingredient.types';
 import { ingredientService } from '@/features/ingredients/services/ingredient.service';
 import { recipeService } from '../services/recipes.service';
-import useServiceState from '@/shared/lib/serviceState';
+import useServiceState from '@/shared/hooks/useServiceState';
 import { InsertError, InsertLoading } from '@/shared/components/stateComponents/InsertStateComponents';
 
 interface SearchRecipePageProps {

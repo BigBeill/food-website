@@ -4,7 +4,7 @@ import useAuth from '../hooks/useAuth';
 import styles from './login.module.scss';
 import { ButtonOval } from '@/shared/components/Button.components';
 import { authService } from '../services/auth.service';
-import { useServiceMutation } from '@/shared/lib/serviceMutation';
+import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
 
 interface FormDataType {

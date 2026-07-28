@@ -1,7 +1,7 @@
 import { IngredientGroupType } from "../domain/ingredient.types";
 import { ingredientService } from "../services/ingredient.service";
 import { useRouter } from "next/navigation";
-import useServiceState from "@/shared/lib/serviceState";
+import useServiceState from "@/shared/hooks/useServiceState";
 import Loading from "@/shared/components/stateComponents/LoadingPage";
 import NotFound from "@/shared/components/stateComponents/NotFoundPage";
 import ErrorPage from "@/shared/components/stateComponents/ErrorPage";
