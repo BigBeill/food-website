@@ -54,14 +54,14 @@ export default function RequestPasswordResetPage() {
             id="submitButton"
             style={{ margin: '0rem', width: '100%', padding: '0.6rem 2rem' }}
             onClick={ () => { requestPasswordResetMutator.send(formData) } }
-            loadingState={ requestPasswordResetMutator.state.status === 'loading' }
+            loadingState={ requestPasswordResetMutator.status === 'loading' }
          >Change Password</ButtonOval>
          
-         { requestPasswordResetMutator.state.status == 'error' &&
-            <InsertError error={ requestPasswordResetMutator.state.error } />
+         { requestPasswordResetMutator.status == 'error' &&
+            <InsertError error={ requestPasswordResetMutator.error } />
          }
 
-         { requestPasswordResetMutator.state.status === "ready" ?
+         { requestPasswordResetMutator.status === "ready" ?
             <p className='update' aria-live='assertive'>
                A password reset link has been sent to your email
             </p>

@@ -13,6 +13,11 @@ export const errorHandler = new Elysia({ name: 'error-handler' })
          return { error: { code: 'VALIDATION_ERROR', message: error.message } };
       }
 
+      if (code === 'NOT_FOUND') {
+         set.status = 404;
+         return { error: { code: 'NOT_FOUND', message: 'Resource not found' } };
+      }
+
       console.error('Unhandled error:', error);
       set.status = 500;
       return { error: { code: 'INTERNAL_ERROR', message: 'Something went wrong' } };

@@ -1,7 +1,13 @@
 "use client"
 
+import RequireAuth from "@/features/auth/components/RequireAuth";
 import ProfilePage from "@/features/users/components/ProfilePage";
 
 export default function Profile() {
-   return <ProfilePage />
+   
+   return (
+      <RequireAuth>
+         <ProfilePage />
+      </RequireAuth>
+   );
 }

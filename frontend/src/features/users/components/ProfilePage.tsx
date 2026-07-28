@@ -14,15 +14,15 @@ import LoadingPage from '@/shared/components/stateComponents/LoadingPage';
 import ErrorPage from '@/shared/components/stateComponents/ErrorPage';
 import styles from './profilePage.module.scss';
 import { ButtonOval, ButtonShielded } from '@/shared/components/Button.components';
+import NotFoundPage from '@/shared/components/stateComponents/NotFoundPage';
 
 interface ProfilePageProps {
    userId?: string;
 }
 export default function ProfilePage({ userId }: ProfilePageProps) {
 
-   const titleParent = useRef(null);
    const router = useRouter();
-   const { authId, logout } = useAuth();
+   const { authId } = useAuth();
 
    const userState = useServiceState((): Promise<UserType> => {
       if (userId) { return userService.get(userId, { includeRelationship: true }); }
@@ -33,9 +33,23 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
       }
    }, [userId]);
 
-   if (userState.status === 'loading') { return <LoadingPage />; }
-   if (userState.status !== 'ready') { return <ErrorPage />; }
-   const user: UserType = userState.data;
+   switch (userState.status) {
+      case 'loading':
+         return <LoadingPage />
+      case 'not-found':
+         return <NotFoundPage />
+      case 'error':
+         return <ErrorPage />
+      case 'ready':
+         return <ProfileView user={ userState.data } updateUser={ userState.overrideOutput } />
+   }
+}
+
+function ProfileView({ user, updateUser }: { user: UserType, updateUser: (input: UserType) => void }) {
+
+   const titleParent = useRef(null);
+   const router = useRouter();
+   const { logout } = useAuth();
 
    const [modifiedUser, setModifiedUser] = useState<UserType | null>(null);
    const [imageBuffer, setImageBuffer] = useState<File | null>(null);
@@ -46,7 +60,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
       if (!modifiedUser) { return; }
 
       const mutatedUser = await userMutator.send(modifiedUser);
-      userState.overrideOutput({ ...mutatedUser, relationship: user.relationship });
+      updateUser({ ...mutatedUser, relationship: user.relationship });
       setModifiedUser(null);
    }
 
@@ -67,7 +81,7 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
 
    async function updateRelationship(newRelationship: 'none' | 'requestReceived' | 'friend') {
       const mutatedRelationship = await relationshipMutator.send(newRelationship);
-      userState.overrideOutput({ ...user, relationship: mutatedRelationship });
+      updateUser({ ...user, relationship: mutatedRelationship });
    }
 
    // handle logout function

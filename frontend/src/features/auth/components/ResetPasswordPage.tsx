@@ -31,8 +31,8 @@ export default function ResetPasswordPage({ token }: {token: string}) {
    }, []);
    
    useEffect(() => {
-      if (resetPasswordMutator.state.status === "ready") { router.replace('/auth/login'); }
-   }, [resetPasswordMutator.state]);
+      if (resetPasswordMutator.status === "ready") { router.replace('/auth/login'); }
+   }, [resetPasswordMutator.status]);
 
    useEffect(() => {
       resetPasswordMutator.resetToIdle();
@@ -68,11 +68,11 @@ export default function ResetPasswordPage({ token }: {token: string}) {
             id="submitButton"
                         style={{ margin: '0rem', width: '100%', padding: '0.6rem 2rem' }}
             onClick={ () => { resetPasswordMutator.send(formData) } }
-            loadingState={ resetPasswordMutator.state.status === 'loading' }
+            loadingState={ resetPasswordMutator.status === 'loading' }
          > Change Password </ButtonOval>
 
-         { resetPasswordMutator.state.status == 'error' &&
-            <InsertError error={ resetPasswordMutator.state.error } />
+         { resetPasswordMutator.status == 'error' &&
+            <InsertError error={ resetPasswordMutator.error } />
          }
 
          <p>Need a new link?</p>

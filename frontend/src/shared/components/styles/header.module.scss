@@ -132,7 +132,7 @@
          height: 0.12rem;
          background-color: #1a2258;
          border-radius: 100rem;
-         transition: left 0.3s ease-in-out, width 0.3s ease;
+         transition: left 0.3s ease-out, width 0.3s ease-out;
          pointer-events: none;
       }
 

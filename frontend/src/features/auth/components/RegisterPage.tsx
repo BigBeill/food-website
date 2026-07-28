@@ -33,8 +33,8 @@ export default function RegisterPage() {
    }, []);
 
    useEffect(() => {
-      if (registerMutator.state.status === "ready") { router.replace('/'); }
-   }, [registerMutator.state]);
+      if (registerMutator.status === "ready") { router.replace('/'); }
+   }, [registerMutator.status]);
 
    useEffect(() => {
       registerMutator.resetToIdle();
@@ -101,11 +101,11 @@ export default function RegisterPage() {
             id="submitButton"
             style={{ margin: '0rem', width: '100%', padding: '0.6rem 2rem' }}
             onClick={ () => registerMutator.send(formData) }
-            loadingState={ registerMutator.state.status === 'loading' }
+            loadingState={ registerMutator.status === 'loading' }
          > Create Account </ButtonOval>
 
-         { registerMutator.state.status == 'error' &&
-            <InsertError error={ registerMutator.state.error } />
+         { registerMutator.status == 'error' &&
+            <InsertError error={ registerMutator.error } />
          }
 
          <p>Already have an account?</p>
