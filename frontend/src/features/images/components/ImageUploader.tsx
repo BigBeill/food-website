@@ -1,5 +1,6 @@
-import { useRef, useState, useEffect } from "react"
+import styles from './input.module.scss';
 
+import { useRef, useState, useEffect } from "react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import { PackagedImageType } from "../domain/image.types";
@@ -83,7 +84,7 @@ export default function ImageUploader({ imageBuffer, setImageBuffer, oldImage, c
 
    return (
       <div 
-         className="imageInput"
+         className={styles.inputWrapper}
          onClick={uploadFile}
          onDragOver={handleDragOver}
          onDragLeave={handleDragLeave}
