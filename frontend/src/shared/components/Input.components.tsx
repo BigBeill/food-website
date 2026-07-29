@@ -3,7 +3,8 @@ import styles from './styles/inputs.module.scss';
 import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 import { ButtonInline } from './Button.components';
 import useServiceState from '../hooks/useServiceState';
-import { useState } from 'react';
+import { Ref, useImperativeHandle, useState } from 'react';
+import { DataHandle } from '../shared.types';
 
 
 
@@ -12,18 +13,53 @@ import { useState } from 'react';
 
 interface InputTextParams {
    label: string;
-   value: string;
    placeholder: string;
-   onChange: (value: string) => void;
+   dataRef: Ref<DataHandle<string>>
+   initial?: string;
 }
 
-export function InputText({ label, value, placeholder, onChange }: InputTextParams) {
+export function InputText({ label, placeholder, dataRef, initial }: InputTextParams) {
+   const [value, setValue] = useState(initial || '');
+
+   useImperativeHandle(dataRef, () => ({
+      getData: () => value,
+      setData: setValue,
+   }),[value]);
+
    return (
       <div className={ styles.inputTextWrapper }>
          <label>{ label }</label>
-         <input type='text' value={ value } onChange={ (event) => onChange(event.target.value) } placeholder={ placeholder } />
+         <input type='text' value={ value } onChange={ (event) => setValue(event.target.value) } placeholder={ placeholder } />
       </div>
    )
+}
+
+
+
+
+
+
+interface InputTextAreaParams {
+   label: string;
+   placeholder: string;
+   dataRef: Ref<DataHandle<string>>
+   initial?: string;
+}
+
+export function InputTextArea({ label, placeholder, dataRef, initial }: InputTextAreaParams) {
+   const [value, setValue] = useState<string>(initial || '');
+
+   useImperativeHandle(dataRef, () => ({
+      getData: () => value,
+      setData: setValue,
+   }), [value]);
+
+   return (
+      <div className={ styles.inputTextAreaWrapper }>
+         <label>{ label }</label>
+         <textarea value={ value } placeholder={ placeholder } onChange={ (event) => { setValue(event.target.value) } } />
+      </div>
+   );
 }
 
 

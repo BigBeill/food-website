@@ -1,6 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import useAuth from '@/features/auth/hooks/useAuth';
-import { useRouter } from 'next/router';
 import useNotebook from '@/shared/hooks/useNotebook';
 import { RecipeDraft, RecipeType } from '../domain/recipes.types';
 import { recipeService } from '../services/recipes.service';
@@ -12,20 +11,18 @@ import EditRecipeFinalizeChangesPage from './EditRecipeSubPages/FinalizeChangesP
 import LoadingPage from '@/shared/components/stateComponents/LoadingPage';
 import useServiceState from '@/shared/hooks/useServiceState';
 import { IngredientType } from '@/features/ingredients/domain/ingredient.types';
-import { ChildFormContent } from '@/shared/shared.types';
 import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import ErrorPage from '@/shared/components/stateComponents/ErrorPage';
+import { DataHandle } from '@/shared/shared.types';
+import NotFoundPage from '@/shared/components/stateComponents/NotFoundPage';
+import { useRouter } from 'next/navigation';
 
 // if no recipeId has been assigned this page will assume you are creating a brand new recipe
 export default function EditRecipePage({ recipeId }: { recipeId?: string }) {
+	const { authId } = useAuth();
 
-	const router = useRouter();
-	const { authId, loading: authLoading } = useAuth();
-	const notebook = useNotebook();
-
-	const defaultRecipe: RecipeType = {
-		_id: 'unsavedRecipe', 
-		ownerId: authId!, //? this page will be redirected if the user is not signed in
+	const defaultRecipe: RecipeDraft = {
+		ownerId: authId!,
 		title: '', 
 		description: '', 
 		ingredientList: [], 
@@ -33,43 +30,45 @@ export default function EditRecipePage({ recipeId }: { recipeId?: string }) {
 		visibility: 'public',
 	}
 
-	// make sure user is signed in before letting them edit recipes
-	if (authLoading) { return <LoadingPage /> }
-	if (!authId) router.replace('/login');
-
-	// page references
-	const generalInfoPageRef = useRef<ChildFormContent<{ title: string, description: string }>>(null);
-	const additionalInfoPageRef = useRef<ChildFormContent<{ imageBuffer?: File, visibility: 'public' | 'private' | 'personal' }>>(null);
-	const ingredientPageRef = useRef<ChildFormContent<IngredientType[]>>(null);
-	const instructionPageRef = useRef<ChildFormContent<string[]>>(null);
-
 	// fetch recipe from the server on recipeId change
-	const recipeServiceState = useServiceState(() => { 
+	const recipeState = useServiceState(() => { 
 		if (recipeId) { return recipeService.get(recipeId); }
 		else { return Promise.resolve(defaultRecipe); }
 	}, [recipeId]);
-	
-	// update the child forms
-	useEffect(() => { 
-		if (recipeServiceState.status === 'ready') { 
-			const fetchedRecipe = recipeServiceState.data;
-			generalInfoPageRef.current?.setContent!({ title: fetchedRecipe.title, description: fetchedRecipe.description });
-			additionalInfoPageRef.current?.setContent!({ visibility: fetchedRecipe.visibility });
-			ingredientPageRef.current?.setContent!(fetchedRecipe.ingredientList);
-			instructionPageRef.current?.setContent!(fetchedRecipe.instructionList);
-		} 
-	}, [recipeServiceState.status]);
+
+	switch (recipeState.status) {
+		case 'loading':
+			return <LoadingPage />
+		case 'not-found':
+			return <NotFoundPage />
+		case 'error':
+			return <ErrorPage />
+		case 'ready':
+			return <EditRecipeView recipe={ recipeState.data } />
+	}
+}
+
+function EditRecipeView({ recipe }: { recipe: RecipeType | RecipeDraft }) {
+
+	const router = useRouter();
+	const notebook = useNotebook();
+	const { authId } = useAuth();
+
+	// page references
+	const generalInfoPageRef = useRef<DataHandle<{ title: string, description: string }>>(null);
+	const additionalInfoPageRef = useRef<DataHandle<{ imageBuffer?: File, visibility: 'public' | 'private' | 'personal' }>>(null);
+	const ingredientPageRef = useRef<DataHandle<IngredientType[]>>(null);
+	const instructionPageRef = useRef<DataHandle<string[]>>(null);
 
 	const saveRecipeMutator = useServiceMutation((): Promise<void> => {
 		const input = collectRecipeData();
-		if (!recipeId) { return recipeService.create(input as RecipeDraft, additionalInfoPageRef.current!.getContent().imageBuffer); }
-		else { return recipeService.update(input as RecipeType, additionalInfoPageRef.current!.getContent().imageBuffer); }
+		if ('_id' in input) { return recipeService.update(input as RecipeType, additionalInfoPageRef.current!.getData().imageBuffer); }
+		else { return recipeService.create(input, additionalInfoPageRef.current!.getData().imageBuffer); }
 	});
 
 	const deleteRecipeMutator = useServiceMutation(async () => {
-		if(!recipeId) { return; }
-		else { 
-			const deleteResult = await recipeService.delete(recipeId); 
+		if ( '_id' in recipe ) {
+			const deleteResult = await recipeService.delete(recipe._id); 
 			router.push("/");
 			return deleteResult;
 		}
@@ -77,24 +76,21 @@ export default function EditRecipePage({ recipeId }: { recipeId?: string }) {
 
 	function collectRecipeData(): RecipeDraft | RecipeType {
 		return {
-			...(recipeId && { _id: recipeId }),
+			...("_id" in recipe && { _id: recipe._id }),
 			ownerId: authId!,
-			...generalInfoPageRef.current!.getContent(),
-			visibility: additionalInfoPageRef.current!.getContent().visibility,
-			ingredientList: ingredientPageRef.current!.getContent(),
-			instructionList: instructionPageRef.current!.getContent(),
+			...generalInfoPageRef.current!.getData(),
+			visibility: additionalInfoPageRef.current!.getData().visibility,
+			ingredientList: ingredientPageRef.current!.getData(),
+			instructionList: instructionPageRef.current!.getData(),
 		}	
 	}
 
-	if (recipeServiceState.status == 'loading') { return <LoadingPage /> }
-	if (recipeServiceState.status != 'ready') { return <ErrorPage /> }
-
 	// create pageList, a list of all function (plus associated variables) that are apart of the edit recipe page.
 	const pageList = [
-		<EditRecipeGeneralInfoPage newRecipe={ !recipeId } ref={ generalInfoPageRef } />,
-		<EditRecipeAdditionalInfoPage oldImage={ recipeServiceState.data.image || undefined } ref={ additionalInfoPageRef } />,
-		<EditRecipeIngredientsPage ref={ ingredientPageRef } />,
-		<EditRecipeInstructionsPage ref={ instructionPageRef } />,
+		<EditRecipeGeneralInfoPage newRecipe={ !('_id' in recipe) } ref={ generalInfoPageRef } initial={ { title: recipe.title, description: recipe.description } } />,
+		<EditRecipeAdditionalInfoPage oldImage={ ('_id' in recipe) ? recipe.image : undefined } ref={ additionalInfoPageRef } initial={ { visibility: recipe.visibility } } />,
+		<EditRecipeIngredientsPage ref={ ingredientPageRef } initial={ recipe.ingredientList } />,
+		<EditRecipeInstructionsPage ref={ instructionPageRef } initial={ recipe.instructionList } />,
 		<EditRecipeFinalizeChangesPage saveRecipeMutator={ saveRecipeMutator } deleteRecipeMutator={ deleteRecipeMutator } />
 	]
 

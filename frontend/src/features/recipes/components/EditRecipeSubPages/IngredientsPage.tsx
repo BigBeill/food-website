@@ -4,7 +4,7 @@ import { ButtonOval } from "@/shared/components/Button.components";
 import { InputSearch } from "@/shared/components/Input.components";
 import { useIntractableList } from "@/shared/hooks/useIntractableList";
 import useServiceState from "@/shared/hooks/useServiceState";
-import { ChildFormContent } from "@/shared/shared.types";
+import { DataHandle } from "@/shared/shared.types";
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Ref, useImperativeHandle, useState } from "react";
@@ -14,10 +14,16 @@ type NewIngredientType = Omit<IngredientType, 'portion'> & {
   portion: NonNullable<IngredientType['portion']>;
 };
 
+interface EditRecipeIngredientsPageProps {
+   ref: Ref<DataHandle<IngredientType[]>>
+   initial?: IngredientType[];
+}
 
-export default function EditRecipeIngredientsPage ({ ref }: { ref: Ref<ChildFormContent<IngredientType[]>> }) {
+
+export default function EditRecipeIngredientsPage ({ ref, initial}: EditRecipeIngredientsPageProps) {
 
    const ingredientList = useIntractableList({ 
+      initial,
       renderItemContent: (item: IngredientType) => {
          if (item.commonName) { return (<p>{ item.commonName }</p>) }
          else if (item.portion) { return (<p>{ item.portion.amount } { item.portion.description } of [{ item.description }]</p>)  }
@@ -37,8 +43,8 @@ export default function EditRecipeIngredientsPage ({ ref }: { ref: Ref<ChildForm
 
    // function that lets the parent component read and write to ingredientList
    useImperativeHandle(ref, () => ({
-      getContent: ingredientList.content,
-      setContent: ingredientList.replaceList,
+      getData: ingredientList.content,
+      setData: ingredientList.replaceList,
    }), [ingredientList])
 
    const [newIngredient, setNewIngredient] = useState<NewIngredientType>({ food_id: 0, description: '', label: '', commonName: '', portion: { measure_id: 0, description: '', amount: 0 } });

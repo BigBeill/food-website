@@ -1,15 +1,23 @@
 import { ButtonOval } from "@/shared/components/Button.components";
 import { InputText } from "@/shared/components/Input.components";
 import { useIntractableList } from "@/shared/hooks/useIntractableList";
-import { ChildFormContent } from "@/shared/shared.types";
+import { DataHandle } from "@/shared/shared.types";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Ref, useImperativeHandle, useState } from "react";
+import { Ref, useImperativeHandle, useRef, useState } from "react";
 
-export default function EditRecipeInstructionsPage ({ ref }: { ref: Ref<ChildFormContent<string[]>> }) {
+interface EditRecipeInstructionsPage {
+   ref: Ref<DataHandle<string[]>>;
+   initial?: string[];
+}
+
+export default function EditRecipeInstructionsPage ({ ref, initial }: EditRecipeInstructionsPage) {
+
+   const newInstructionRef = useRef<DataHandle<string>>(null);
 
    const [newInstruction, setNewInstruction] = useState('');
    const instructionList = useIntractableList({
+      initial,
       renderItemContent: (item: string) => (
          <p>{item}</p>
       ),
@@ -30,8 +38,8 @@ export default function EditRecipeInstructionsPage ({ ref }: { ref: Ref<ChildFor
 
    // function that lets the parent component read and write to instructionList
    useImperativeHandle(ref, () => ({
-      getContent: instructionList.content,
-      setContent: instructionList.replaceList,
+      getData: instructionList.content,
+      setData: instructionList.replaceList,
    }), [instructionList])
 
    function addInstruction() {
@@ -47,9 +55,9 @@ export default function EditRecipeInstructionsPage ({ ref }: { ref: Ref<ChildFor
 
          <InputText
             label="New Instruction"
-            value={ newInstruction }
             placeholder="add a new instruction"
-            onChange={ (value) => setNewInstruction(value) }
+            dataRef={ newInstructionRef }
+            initial={ newInstruction }
          />
          <ButtonOval onClick={() => { addInstruction(); }}>Add Instruction</ButtonOval>
       </div>

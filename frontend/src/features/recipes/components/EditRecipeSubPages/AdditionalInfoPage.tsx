@@ -1,21 +1,22 @@
 import ImageUploader from "@/features/images/components/ImageUploader";
 import { PackagedImageType } from "@/features/images/domain/image.types";
-import { ChildFormContent } from "@/shared/shared.types";
+import { DataHandle} from "@/shared/shared.types";
 import { Ref, useImperativeHandle, useState } from "react";
 
 interface EditRecipeAdditionalInfoPageProps {
    oldImage?: PackagedImageType;
-   ref: Ref<ChildFormContent<{ imageBuffer?: File, visibility: 'public' | 'private' | 'personal' }>>;
+   ref: Ref<DataHandle<{ imageBuffer?: File, visibility: 'public' | 'private' | 'personal' }>>;
+   initial?: { imageBuffer?: File, visibility: 'public' | 'private' | 'personal' }
 }
 
-export default function EditRecipeAdditionalInfoPage ({ oldImage, ref }: EditRecipeAdditionalInfoPageProps) {
+export default function EditRecipeAdditionalInfoPage ({ oldImage, ref, initial }: EditRecipeAdditionalInfoPageProps) {
 
-   const [imageBuffer, setImageBuffer] = useState<File | null>(null);
-   const [visibility, setVisibility] = useState<'public' | 'private' | 'personal'>('public');
+   const [imageBuffer, setImageBuffer] = useState<File | null>(initial?.imageBuffer || null);
+   const [visibility, setVisibility] = useState<'public' | 'private' | 'personal'>(initial?.visibility || 'public');
 
    useImperativeHandle(ref, () => ({
-      getContent: () => { return { ...(imageBuffer && { imageBuffer }), visibility } },
-      setContent: ({ imageBuffer, visibility }) => { 
+      getData: () => { return { ...(imageBuffer && { imageBuffer }), visibility } },
+      setData: ({ imageBuffer, visibility }) => { 
          if (imageBuffer) { setImageBuffer(imageBuffer); }
          setVisibility(visibility);
       }

@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { ServiceStateType } from "../shared.types";
 
-type ServiceMutationReturnType<TInput, TOutput> = ServiceStateType<TOutput> & {
+export type ServiceMutationReturnType<TInput, TOutput> = ServiceStateType<TOutput> & {
    send: (input: TInput) => Promise<TOutput>;
    resetToIdle: () => void;
 }

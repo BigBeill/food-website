@@ -1,18 +1,19 @@
-import { ChildFormContent } from "@/shared/shared.types";
+import { DataHandle } from "@/shared/shared.types";
 import { Ref, useImperativeHandle, useState } from "react";
 
 interface EditRecipeGeneralInfoPageProps {
 	newRecipe: boolean;
-	ref: Ref<ChildFormContent<{ title: string, description: string }>>;
+	ref: Ref<DataHandle<{ title: string, description: string }>>;
+	initial?: { title: string, description: string};
 }
 
-export default function EditRecipeGeneralInfoPage ({ newRecipe, ref }: EditRecipeGeneralInfoPageProps) {
-	const [title, setTitle] = useState<string>('');
-	const [description, setDescription] = useState<string>('')
+export default function EditRecipeGeneralInfoPage ({ newRecipe, ref, initial }: EditRecipeGeneralInfoPageProps) {
+	const [title, setTitle] = useState<string>(initial?.title || '');
+	const [description, setDescription] = useState<string>(initial?.description || '')
 
 	useImperativeHandle(ref, () => ({
-		getContent: () => { return { title, description } },
-		setContent: ({ title, description }) => {
+		getData: () => { return { title, description } },
+		setData: ({ title, description }) => {
 			setTitle(title);
 			setDescription(description);
 		}
