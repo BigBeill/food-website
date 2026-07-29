@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ServiceStateType } from "../shared.types";
+import { ErrorNotFound } from "../lib/errorClasses";
 
 type UseServiceStateReturnType<T> = ServiceStateType<T> & {
    overrideOutput: (output: T) => void
@@ -20,8 +21,8 @@ export default function useServiceState<T>(fetcher: () => Promise<T>, refetchOn:
          })
          .catch(error => {
             if (requestIdRef.current !== requestId) { return; }
-            if (error)
-            setState({ status: 'error', error });
+            if (error instanceof ErrorNotFound) { setState({ status:'not-found' }); }
+            else { setState({ status: 'error', error }); }
          });
    }, refetchOn);
 

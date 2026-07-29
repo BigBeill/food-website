@@ -3,6 +3,7 @@ import { useRef, useState, useEffect } from "react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import { PackagedImageType } from "../domain/image.types";
+import { unpackImage } from "../services/image.services";
 
 
 /*
@@ -105,12 +106,7 @@ export default function ImageUploader({ imageBuffer, setImageBuffer, oldImage, c
          ) : ( 
             <img 
                className="consumeSpace" 
-               src={oldImageUrl ? oldImageUrl : fallbackImageUrl} 
-               alt="user profile" 
-               onError={(error: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                  error.currentTarget.onerror = null; // Prevents looping
-                  error.currentTarget.src = fallbackImageUrl; 
-               }}
+               { ...unpackImage(oldImage) }
             />
          ) }
          <FontAwesomeIcon icon={faCamera} className={isDragging ? 'makeVisible' : ''}/>

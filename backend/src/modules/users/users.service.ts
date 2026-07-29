@@ -1,7 +1,6 @@
 import { ConflictError, NotFoundError, UnauthorizedError } from "../../common/errors/app-error";
 import type { FriendRequestRecord } from "../../common/mongo-db/schemas/friendRequest.schema";
 import type { FriendshipRecord } from "../../common/mongo-db/schemas/friendship.schema";
-import type { UserRecord } from "../../common/mongo-db/schemas/user.schema";
 import type AuthIdParams from "../../common/parameters/authId.parameters";
 import type PaginationParams from "../../common/parameters/pagination.parameters";
 import type { PaginatedListType } from "../../common/types/PaginatedList.type";
@@ -14,28 +13,33 @@ import { UsersRepository } from "./users.repository";
 import type { FriendFolderType, UserType, RelationshipType } from "./users.types";
 import { buildConflictString } from "./users.utils";
 
+interface DefinedRelationshipParams {
+   authId: string;
+   userId: string;
+}
+
 interface GetUserParams extends AuthIdParams{
-   includeRelationship?: boolean,
+   includeRelationship?: boolean;
 }
 
 interface SearchFoldersParams extends PaginationParams {
-   authId: string,
-   parentId?: string,
+   authId: string;
+   parentId?: string;
 }
 
 interface SearchUsersParams extends PaginationParams {
-   authId?: string,
-   _id?: string,
-   name?: string,
-   includeRelationship?: boolean,
+   authId?: string;
+   _id?: string;
+   name?: string;
+   includeRelationship?: boolean;
 }
 
 interface UpdateAccountParams {
-   authId: string,
-   name?: string,
-   email?: string,
-   bio?: string,
-   image?: ImageType,
+   authId: string;
+   name?: string;
+   email?: string;
+   bio?: string;
+   image?: ImageType;
 }
 
 export class UsersService {
@@ -51,7 +55,7 @@ export class UsersService {
       this.imagesService = imagesService;
    }
 
-   async defineRelationship(authId: string, userId: string): Promise<RelationshipType> {
+   async defineRelationship({ authId, userId }: DefinedRelationshipParams): Promise<RelationshipType> {
       const definingRelationship = { ownerId: userId, targetId: authId }
 
       if (definingRelationship.ownerId = definingRelationship.targetId) { 
@@ -119,10 +123,15 @@ export class UsersService {
       });
    }
 
-   async getUser(_id: string, params: GetUserParams): Promise<UserRecord | null> {
-      const { authId, includeRelationship } = params;
-      const user = this.repository.getUser(_id);
-      return user;
+   async getUser(_id: string, {authId, includeRelationship}: GetUserParams): Promise<UserType | null> {
+      const [user, relationship] = await Promise.all([
+         this.repository.getUser(_id),
+         (() => {
+            if (!includeRelationship || !authId) { return undefined; }
+            else { return this.defineRelationship({ authId, userId: _id }); }
+         })(),
+      ]);
+      return { ...removeMongooseNoise<UserType>(user), relationship };
    }
 
    async searchFolders(params: SearchFoldersParams): Promise<PaginatedListType<FriendFolderType>> {
@@ -138,7 +147,7 @@ export class UsersService {
       if (includeRelationship) {
          if (!authId) { throw new UnauthorizedError('Include relationship flag cannot be set to true if user is not signed in'); }
          users.list.map((user) => {
-            const relationship = this.defineRelationship(authId, user._id);
+            const relationship = this.defineRelationship({ authId, userId: user._id });
             return { ...user, relationship };
          });
       }

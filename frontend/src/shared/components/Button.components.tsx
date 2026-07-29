@@ -57,8 +57,9 @@ type ButtonOvalProps = React.ComponentPropsWithoutRef<'button'> & {
 };
 
 export function ButtonOval({ children, loadingState, ...rest }: ButtonOvalProps) {
+   const { className, ...domProps } = rest;
    return (
-      <button className={[styles.buttonOval, loadingState && styles.loadingState].filter(Boolean).join(' ')} { ...rest }>
+      <button className={[styles.buttonOval, loadingState && styles.loadingState, className].filter(Boolean).join(' ') } { ...domProps }>
          { loadingState ? <Spinner /> : children }
       </button>
    );
@@ -73,19 +74,17 @@ interface ButtonShieldedProps {
 }
 
 export function ButtonShielded({ message, onClick, loadingState }: ButtonShieldedProps) {
-   const [shielded, setShielded] = useState<boolean>(false);
+   const [shielded, setShielded] = useState<boolean>(true);
 
    function attemptOnClick() {
-      if (!shielded) { setShielded(true); }
-      else { onClick() }
+      if (shielded) { setShielded(false); }
+      else { onClick(); }
    }
 
    return (
-      <div className={ styles.ButtonShielded } >
+      <div className={ [styles.buttonShielded, shielded && styles.shielded].filter(Boolean).join(' ') } >
          <ButtonOval loadingState={ loadingState } onClick={ attemptOnClick }>{ shielded ? message : `confirm ${ message }` }</ButtonOval>
-         { !shielded && 
-            <ButtonOval onClick={() => setShielded(false)}>Cancel</ButtonOval>
-         }
+         <ButtonOval onClick={ () => setShielded(true) }>Cancel</ButtonOval>
       </div>
    );
 }

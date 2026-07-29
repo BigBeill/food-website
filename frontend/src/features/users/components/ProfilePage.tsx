@@ -25,8 +25,8 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
    const { authId } = useAuth();
 
    const userState = useServiceState((): Promise<UserType> => {
-      if (userId) { return userService.get(userId, { includeRelationship: true }); }
-      else if(authId) { return userService.get(authId, { includeRelationship: true }); }
+      const requestId = userId ?? authId;
+      if (requestId) { return userService.get(requestId, { includeRelationship: true }); }
       else {
          router.replace('/login');
          throw new Error ("This page is not accessible without being logged in");
@@ -69,7 +69,7 @@ function ProfileView({ user, updateUser }: { user: UserType, updateUser: (input:
       const relationship: RelationshipType = user.relationship!;
       if (newRelationship === 'none') { 
          if (relationship.type === 'friend') { return userService.removeFriend(relationship._id); }
-         else if (relationship.type === 'requestReceived', relationship.type === 'requestSent') { return userService.processFriendRequest(relationship._id, { accept: false}); }
+         else if (relationship.type === 'requestReceived' || relationship.type === 'requestSent') { return userService.processFriendRequest(relationship._id, { accept: false}); }
       }
       if (newRelationship === 'requestReceived' && relationship.type === 'none') { return userService.sendFriendRequest(relationship.owner); }
       if (newRelationship === 'friend' && relationship.type === 'requestSent') { return userService.processFriendRequest(relationship._id, { accept: true }); }
@@ -111,8 +111,8 @@ function ProfileView({ user, updateUser }: { user: UserType, updateUser: (input:
          <div> {/* styleDiv, should not contain anything */} </div>
 
          <div>
-            <p>_id: {user._id}</p>
-            <p>username: {user.name}</p>
+            <p>id: { String(user._id) }</p>
+            <p>username: { user.name }</p>
          </div>
 
          <div className='textInputParent bottomPadding'>
@@ -132,33 +132,33 @@ function ProfileView({ user, updateUser }: { user: UserType, updateUser: (input:
          <div> {/* styleDiv, should not contain anything */} </div>
 
          {/* display the appropriate set of two buttons */}
-         <div className="splitSpace smallerGap">
-            { !modifiedUser ? (
+         <div className="splitSpace">
+            { modifiedUser ? (
                <>
-                  <ButtonShielded message='Save Changes' loadingState={ userMutator.status === 'loading' } onClick={ saveChanges } />
-                  <ButtonShielded message='Delete Changes' onClick={ () => { setModifiedUser(null); } }/>
+                  <ButtonShielded key='save' message='Save Changes' loadingState={ userMutator.status === 'loading' } onClick={ saveChanges } />
+                  <ButtonShielded key='delete' message='Delete Changes' onClick={ () => { setModifiedUser(null); } }/>
                </>
-            ) : user.relationship!.type == "none" ? (
+            ) : user.relationship?.type == "none" ? (
                <>
                   <ButtonOval loadingState={ relationshipMutator.status === 'loading' } onClick={ () => { updateRelationship('requestReceived'); } }>Send friend request</ButtonOval>
                </>
-            ) : user.relationship!.type == "friend" ? (
+            ) : user.relationship?.type == "friend" ? (
                <>
                   <ButtonShielded message='Remove Friend' loadingState={ relationshipMutator.status === 'loading' } onClick={ () => { updateRelationship('none') } } />
                </>
-            ) : user.relationship!.type == "requestReceived" ? (
+            ) : user.relationship?.type == "requestReceived" ? (
                <>
                   <ButtonOval loadingState={ relationshipMutator.status === 'loading' } onClick={ () => { updateRelationship('none') } }>Cancel friend request</ButtonOval>
                </>
-            ) : user.relationship!.type == "requestSent" ? (
+            ) : user.relationship?.type == "requestSent" ? (
                <>
                   <ButtonOval loadingState={ relationshipMutator.status === 'loading' } onClick={ () => { updateRelationship('friend'); } }>Accept friend request</ButtonOval>
                   <ButtonOval loadingState={ relationshipMutator.status === 'loading' } onClick={ () => { updateRelationship('none'); } }>Reject friend request</ButtonOval>
                </>
-            ) : user.relationship!.type == "self" ? (
+            ) : user.relationship?.type == "self" ? (
                <>
                   <ButtonOval onClick={ () => { setModifiedUser(user); } }> edit account </ButtonOval>
-                  <ButtonOval onClick={ () => { handleLogout(); } }> logout </ButtonOval>
+                  <ButtonShielded key='logout' message="logout" onClick={ () => { handleLogout(); } }/>
                </>
             ) : null }
          </div>

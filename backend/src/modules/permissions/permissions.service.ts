@@ -10,7 +10,7 @@ export class PermissionsService {
       this.repository = usersRepository;
    }
 
-   async defineRelationship(authId: string, userId: string): Promise<RelationshipType> {
+   async defineRelationship({ authId, userId }: { authId: string, userId: string }): Promise<RelationshipType> {
       const definingRelationship = { ownerId: userId, targetId: authId }
 
       if (definingRelationship.ownerId = definingRelationship.targetId) { 

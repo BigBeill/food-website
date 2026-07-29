@@ -49,7 +49,7 @@ export const usersController = new Elysia({ prefix: '/users' })
    .get( '/defineRelationship/:_id',
       async ({ params, authId }) => {
          const { _id } = params
-         const definedRelationship = await service.defineRelationship(authId, _id);
+         const definedRelationship = await service.defineRelationship({ authId, userId: _id });
          return { 
             message: "relationship defined",
             data: definedRelationship
