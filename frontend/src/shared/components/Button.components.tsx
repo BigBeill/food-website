@@ -1,6 +1,33 @@
 import styles from './styles/buttons.module.scss';
 import Spinner from './icons/spinner';
 import { useState } from 'react';
+import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+
+export interface ButtonIconType {
+   icon: IconDefinition;
+   label: string; // needed for accessibility
+   onClick: () => void;
+}
+
+interface ButtonIconListProps {
+   iconList: ButtonIconType[];
+   loadingState?: boolean;
+}
+
+export function ButtonIconList ({ iconList, loadingState = false }: ButtonIconListProps) {
+   return (
+      <div>
+         { iconList.map(({ icon, label, onClick }) => (
+            <button key={label} onClick={onClick} aria-label={label}>
+               <FontAwesomeIcon icon={icon} />
+            </button>
+         )) }
+      </div>
+   );
+}
+
 
 
 export function ButtonInline ({ children, ...rest }: React.ComponentPropsWithoutRef<'button'>) {
@@ -8,6 +35,8 @@ export function ButtonInline ({ children, ...rest }: React.ComponentPropsWithout
       <button className={ styles.buttonInline } { ...rest }>{ children }</button>
    );
 }
+
+
 
 interface ButtonPairedParams {
    firstText: string
@@ -24,6 +53,8 @@ export function ButtonPaired ({ firstText, firstOnClick, secondText, secondOnCli
       </div>
    )
 }
+
+
 
 interface MobileNavButtonParams {
    navOpen: boolean,
@@ -51,6 +82,8 @@ export function ButtonMobileNav({ navOpen, onClick }: MobileNavButtonParams ) {
       </button>
    )
 }
+
+
 
 type ButtonOvalProps = React.ComponentPropsWithoutRef<'button'> & {
    loadingState?: boolean;

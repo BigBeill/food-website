@@ -54,7 +54,7 @@ export default function RecipePreview({ recipe }: RecipePreviewProps) {
 
          <div className="bottomButtons splitSpace">
             <button onClick={() => popup.show()}> View Recipe </button>
-            { recipe.owner == authId ? 
+            { recipe.ownerId == authId ? 
                <button onClick={() => {router.push(`/editRecipe/${recipe._id}`)}}>Edit Recipe</button>
                : null
             }

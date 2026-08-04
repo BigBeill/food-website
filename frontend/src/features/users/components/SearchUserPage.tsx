@@ -1,7 +1,5 @@
-import {useState, useEffect } from "react";
-
+import {useState } from "react";
 import UserPin from "./UserPin.js";
-import Folder from "./Folder.js";
 import PaginationBar from "@/shared/components/PaginationBar.js";
 import { UserType, FolderType } from "../domain/user.types.js";
 import { usePathname, useSearchParams } from "next/navigation.js";
@@ -9,10 +7,8 @@ import { useRouter } from "next/router.js";
 import { userService } from "../services/user.service.js";
 import useServiceState from "@/shared/hooks/useServiceState.js";
 import { PaginatedListType } from "@/shared/shared.types.js";
-import FilterSearchPage from "@/features/recipes/components/FilterSearchPage.js";
-import LoadingPage from "@/shared/components/stateComponents/LoadingPage.js";
-import NotFoundPage from "@/shared/components/stateComponents/NotFoundPage.js";
-import ErrorPage from "@/shared/components/stateComponents/ErrorPage.js";
+import RequireServiceStateReady from "@/shared/components/RequireServiceStateReady.js";
+import FolderPin from "./FolderPin.js";
 
 type PaginatedCollectionType = Omit<PaginatedListType<unknown>, 'list'> & { folderList: FolderType[], userList: UserType[] }
 
@@ -79,22 +75,12 @@ export default function SearchUserPage({ folderId, category }: SearchUserPagePro
    return (
       <div className="displayPinCollection">
          <FilterUsersPanel handleSubmit={ handleSubmit } />
-         { (() => {
-            switch(paginatedCollection.status) {
-               case 'loading':
-                  return <LoadingPage />
-               case 'not-found':
-                  return <NotFoundPage />
-               case 'error':
-                  return <ErrorPage />
-               case 'ready':
-                  return <SearchUserView paginatedCollection={ paginatedCollection.data } />
-            }
-         })() }
-         { (() => {
-            if (paginatedCollection.status != 'ready') { return null; }
-            else { return <PaginationBar currentGroup={groupNumber} totalGroups={Math.ceil((paginatedCollection.data.count)/groupSize)} requestNewGroup={requestNewGroup} /> }
-         })() }
+         <RequireServiceStateReady serviceState={paginatedCollection} > 
+            { (collection) => (<>
+               <SearchUserView paginatedCollection={ collection } /> 
+               <PaginationBar currentGroup={groupNumber} totalGroups={Math.ceil((collection.count)/groupSize)} requestNewGroup={requestNewGroup} />
+            </>) }
+         </RequireServiceStateReady>
       </div>
    )
 }
@@ -151,12 +137,12 @@ function SearchUserView({ paginatedCollection }: { paginatedCollection: Paginate
    return (
       <>
          { paginatedCollection.folderList.map((folder, index) => (
-            <Folder key={index} folder={ folder } />
+            <FolderPin key={index} folder={ folder } />
          ))}
 
          {/* create a user pin for each user given by the database */}
          { paginatedCollection.userList.map((user, index) => (
-            <UserPin key={index} initialUser={ user } />
+            <UserPin key={index} user={ user } />
          ))}
       </>
    );

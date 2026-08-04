@@ -17,8 +17,9 @@ interface ProcessFriendRequestParams {
 }
 
 interface SearchParams {
-   _id?: string
-   name?: string
+   _id?: string;
+   folderId?: string;
+   name?: string;
    category?: 'friends' | 'incomingRequests' | 'outgoingRequests' | 'none';
    skip?: number;
    limit?: number;

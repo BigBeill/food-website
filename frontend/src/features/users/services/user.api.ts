@@ -17,11 +17,11 @@ interface ProcessFriendRequestParams {
 
 interface SearchParams {
    _id?: string
+   folderId?: string;
    name?: string
    category?: 'friends' | 'incomingRequests' | 'outgoingRequests' | 'none';
    skip?: number;
    limit?: number;
-   includeCount?: boolean;
 }
 
 export const userApi = {

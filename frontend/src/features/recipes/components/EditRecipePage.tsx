@@ -8,14 +8,12 @@ import EditRecipeAdditionalInfoPage from './EditRecipeSubPages/AdditionalInfoPag
 import EditRecipeIngredientsPage from './EditRecipeSubPages/IngredientsPage';
 import EditRecipeInstructionsPage from './EditRecipeSubPages/InstructionsPage';
 import EditRecipeFinalizeChangesPage from './EditRecipeSubPages/FinalizeChangesPage';
-import LoadingPage from '@/shared/components/stateComponents/LoadingPage';
 import useServiceState from '@/shared/hooks/useServiceState';
 import { IngredientType } from '@/features/ingredients/domain/ingredient.types';
 import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
-import ErrorPage from '@/shared/components/stateComponents/ErrorPage';
 import { DataHandle } from '@/shared/shared.types';
-import NotFoundPage from '@/shared/components/stateComponents/NotFoundPage';
 import { useRouter } from 'next/navigation';
+import RequireServiceStateReady from '@/shared/components/RequireServiceStateReady';
 
 // if no recipeId has been assigned this page will assume you are creating a brand new recipe
 export default function EditRecipePage({ recipeId }: { recipeId?: string }) {
@@ -36,16 +34,11 @@ export default function EditRecipePage({ recipeId }: { recipeId?: string }) {
 		else { return Promise.resolve(defaultRecipe); }
 	}, [recipeId]);
 
-	switch (recipeState.status) {
-		case 'loading':
-			return <LoadingPage />
-		case 'not-found':
-			return <NotFoundPage />
-		case 'error':
-			return <ErrorPage />
-		case 'ready':
-			return <EditRecipeView recipe={ recipeState.data } />
-	}
+	return (
+		<RequireServiceStateReady serviceState={ recipeState }>
+			{(recipe) => <EditRecipeView recipe={ recipe } />}
+		</RequireServiceStateReady>
+	);
 }
 
 function EditRecipeView({ recipe }: { recipe: RecipeType | RecipeDraft }) {

@@ -19,5 +19,5 @@ export interface RelationshipType {
 export interface FolderType {
    _id: string;
    title: string;
-   content: UserType[];
+   content?: UserType[];
 }

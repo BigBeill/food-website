@@ -1,5 +1,4 @@
-.userObjectView {
-
+.user {
    width: fit-content;
    box-sizing: border-box;
    background-color: var(--background-color);
@@ -21,7 +20,7 @@
       height: 100%;
    }
 
-   .contactInformation{
+   .publicInformation{
       display: flex;
       flex-direction: column;
       justify-content: center;

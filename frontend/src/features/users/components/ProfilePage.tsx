@@ -10,13 +10,11 @@ import { unpackImage } from '@/features/images/services/image.services';
 import useServiceState from '@/shared/hooks/useServiceState';
 import { userService } from '../services/user.service';
 import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
-import LoadingPage from '@/shared/components/stateComponents/LoadingPage';
-import ErrorPage from '@/shared/components/stateComponents/ErrorPage';
 import styles from './profilePage.module.scss';
 import { ButtonOval, ButtonShielded } from '@/shared/components/Button.components';
-import NotFoundPage from '@/shared/components/stateComponents/NotFoundPage';
 import { InputTextArea } from '@/shared/components/Input.components';
 import { DataHandle } from '@/shared/shared.types';
+import RequireServiceStateReady from '@/shared/components/RequireServiceStateReady';
 
 interface ProfilePageProps {
    userId?: string;
@@ -35,16 +33,11 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
       }
    }, [userId]);
 
-   switch (userState.status) {
-      case 'loading':
-         return <LoadingPage />
-      case 'not-found':
-         return <NotFoundPage />
-      case 'error':
-         return <ErrorPage />
-      case 'ready':
-         return <ProfileView user={ userState.data } updateUser={ userState.overrideOutput } />
-   }
+   return (
+      <RequireServiceStateReady serviceState={ userState }>
+         { (user) => <ProfileView user={ user } updateUser={ userState.overrideOutput } /> }
+      </RequireServiceStateReady>
+   )
 }
 
 function ProfileView({ user, updateUser }: { user: UserType, updateUser: (input: UserType) => void }) {
