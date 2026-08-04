@@ -16,14 +16,8 @@ interface FormDataType {
 export default function LoginPage() {
 
    const router = useRouter();
-   const { authId } = useAuth();
-
-   const [formData, setFormData] = useState<FormDataType>({ username: "", password: "", rememberMe: false });
+   const [loginData, setLoginData] = useState<FormDataType>({ username: "", password: "", rememberMe: false });
    const loginMutator = useServiceMutation((input: FormDataType) => authService.login(input));
-
-   useEffect(() => {
-      if (authId) { router.replace('/'); }
-   },[authId])
 
    useEffect(() => {
       document.body.classList.add(styles.loginBackground);
@@ -36,7 +30,7 @@ export default function LoginPage() {
 
    useEffect(() => {
       loginMutator.resetToIdle();
-   }, [formData])
+   }, [loginData])
 
    return (
       <div className={styles.loginForm} id="loginForm">
@@ -47,9 +41,9 @@ export default function LoginPage() {
                name="username"
                id="username"
                placeholder=' '
-               value={ formData.username }
-               onChange={ (event) => setFormData((data) => ({ ...data, username: event.target.value })) }
-               onKeyDown={ (event) => { if (event.key === 'Enter') { loginMutator.send(formData) } } }
+               value={ loginData.username }
+               onChange={ (event) => setLoginData((data) => ({ ...data, username: event.target.value })) }
+               onKeyDown={ (event) => { if (event.key === 'Enter') { loginMutator.send(loginData) } } }
             />
             <label htmlFor="username">Username</label>
          </div>
@@ -60,9 +54,9 @@ export default function LoginPage() {
                name="password"
                id="password"
                placeholder=' '
-               value={ formData.password }
-               onChange={ (event) => setFormData((data) => ({ ...data, password: event.target.value })) }
-               onKeyDown={ (event) => { if (event.key === 'Enter') { loginMutator.send(formData) } } }
+               value={ loginData.password }
+               onChange={ (event) => setLoginData((data) => ({ ...data, password: event.target.value })) }
+               onKeyDown={ (event) => { if (event.key === 'Enter') { loginMutator.send(loginData) } } }
             />
             <label htmlFor="password">Password</label>
          </div>
@@ -72,8 +66,8 @@ export default function LoginPage() {
             name="remember me"
             id="remember"
             value="1" 
-            checked={ formData.rememberMe }
-            onChange={(event) => setFormData((data) => ({ ...data, rememberMe: event.target.checked })) }
+            checked={ loginData.rememberMe }
+            onChange={(event) => setLoginData((data) => ({ ...data, rememberMe: event.target.checked })) }
             />
             <label htmlFor="remember">Remember Me</label>
          </div>
@@ -83,7 +77,7 @@ export default function LoginPage() {
             type="submit"
             id="submitButton"
             style={{ margin: '0rem', width: '100%', padding: '0.6rem 2rem' }}
-            onClick={ () => loginMutator.send(formData) }
+            onClick={ () => loginMutator.send(loginData) }
             loadingState={ loginMutator.status === 'loading' }
          > Login </ButtonOval>
 

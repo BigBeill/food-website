@@ -2,24 +2,27 @@ import { IngredientGroupType } from "../domain/ingredient.types";
 import { ingredientService } from "../services/ingredient.service";
 import { useRouter } from "next/navigation";
 import useServiceState from "@/shared/hooks/useServiceState";
-import Loading from "@/shared/components/stateComponents/LoadingPage";
-import NotFound from "@/shared/components/stateComponents/NotFoundPage";
-import ErrorPage from "@/shared/components/stateComponents/ErrorPage";
+import RequireServiceStateReady from "@/shared/components/RequireServiceStateReady";
+
 
 export default function IngredientGroupPage() {
-
-   const router = useRouter();
-
    const groupListState = useServiceState<IngredientGroupType[]>(() => ingredientService.searchGroup(), [])
 
-   if (groupListState.status === 'loading') { return <Loading /> }
-   if (groupListState.status === 'error') { return <ErrorPage /> }
-   if (groupListState.status !== 'ready') { return <NotFound /> }
+   return (
+      <RequireServiceStateReady serviceState={ groupListState } >
+         { (groupList) => <IngredientGroupView groupList={ groupList } /> }
+      </RequireServiceStateReady>
+   );
+}
+
+function IngredientGroupView({ groupList }: { groupList: IngredientGroupType[] }) {
+   const router = useRouter();
+
    return (
       <div className="displayButtons">
-         { groupListState.data.map((ingredientGroup, index) => (
+         { groupList.map((ingredientGroup, index) => (
             <button
-               key={index} 
+               key={index}
                onClick={() => router.push(`/ingredient/${ingredientGroup.id}`)}
             >
                {ingredientGroup.name}

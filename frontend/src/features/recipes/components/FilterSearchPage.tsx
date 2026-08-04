@@ -1,11 +1,9 @@
-'use client';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleCheck, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { useIngredientSearch } from '../../ingredients/hooks/useIngredientSearch';
 import { IngredientType } from '@/features/ingredients/domain/ingredient.types';
-import { useEffect, useState } from 'react';
-import { ServiceStateType } from '@/shared/shared.types';
+import { useEffect, useRef, useState } from 'react';
+import { DataHandle, ServiceStateType } from '@/shared/shared.types';
 import { InputText } from '@/shared/components/Input.components';
 import { ButtonOval } from '@/shared/components/Button.components';
 import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
@@ -20,6 +18,9 @@ interface FilterSearchPageProps {
 
 export default function FilterSearchPage({ initialTitle, initialIngredientList, initialIngredientListState, handleSubmit }: FilterSearchPageProps) {
 
+   const inputTextRef = useRef<DataHandle<string>>(null);
+   const ingredientSearch = useIngredientSearch();
+
    const listItemOptionsComponent = (item: IngredientType, index: number) => (
       <FontAwesomeIcon icon={faCircleXmark} onClick={ () => ingredientList.removeIndex(index) } />
    )
@@ -28,8 +29,6 @@ export default function FilterSearchPage({ initialTitle, initialIngredientList, 
       <p>{item.label || item.description}</p>
    )
 
-   const [recipeTitle, setRecipeTitle] = useState<string>(initialTitle || '');
-   const ingredientSearch = useIngredientSearch();
    const ingredientList = useIntractableList<IngredientType>({
       initial: initialIngredientList,
       renderItemOptions: listItemOptionsComponent,
@@ -51,7 +50,7 @@ export default function FilterSearchPage({ initialTitle, initialIngredientList, 
       <section className='consumeSpace'>
          <h1>Public Recipes</h1>
 
-         <InputText label='Name' value={ recipeTitle } placeholder='recipe name' onChange={ (value) => setRecipeTitle(value) } />
+         <InputText label='Name' dataRef={ inputTextRef } placeholder='recipe name' />
 
          <div className='textInput sideButton additionalMargin'>
             <div className='activeSearchBar bottom'> {/* ingredient search bar */}
@@ -78,7 +77,7 @@ export default function FilterSearchPage({ initialTitle, initialIngredientList, 
             : ingredientList.reactComponent
          }
 
-         <ButtonOval onClick={ () => handleSubmit(recipeTitle, ingredientList.content()) }>search</ButtonOval>
+         <ButtonOval onClick={ () => handleSubmit(inputTextRef.current!.getData(), ingredientList.content()) }>search</ButtonOval>
       </section>
    )
 }

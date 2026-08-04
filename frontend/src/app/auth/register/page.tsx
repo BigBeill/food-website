@@ -1,7 +1,12 @@
 "use client"
 
 import RegisterPage from "@/features/auth/components/RegisterPage";
+import RequireNoAuth from "@/features/auth/components/RequireNoAuth";
 
 export default function register() {
-   return <RegisterPage />
+   return (
+      <RequireNoAuth>
+         <RegisterPage />
+      </RequireNoAuth>
+   )
 }

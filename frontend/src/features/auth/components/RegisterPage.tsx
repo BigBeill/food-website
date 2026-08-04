@@ -8,7 +8,7 @@ import { authService } from '../services/auth.service';
 import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
 
-interface FormDataType {
+interface registerDataType {
    username: string,
    email: string,
    passwordOne: string,
@@ -18,14 +18,9 @@ interface FormDataType {
 export default function RegisterPage() {
 
    const router = useRouter();
-   const { authId } = useAuth();
 
-   const [formData, setFormData] = useState<FormDataType>({ username: "", email: "", passwordOne: "", passwordTwo: "" });
-   const registerMutator = useServiceMutation<FormDataType, void>((input) => authService.register(input));
-   
-   useEffect(() => {
-      if (authId) { router.replace('/'); }
-   },[authId])
+   const [registerData, setRegisterData] = useState<registerDataType>({ username: "", email: "", passwordOne: "", passwordTwo: "" });
+   const registerMutator = useServiceMutation<registerDataType, void>((input) => authService.register(input));
 
    useEffect(() => {
       document.body.classList.add(styles.loginBackground);
@@ -38,7 +33,7 @@ export default function RegisterPage() {
 
    useEffect(() => {
       registerMutator.resetToIdle();
-   }, [formData])
+   }, [registerData])
 
    return (
       <div className={styles.loginForm} id="registerForm">
@@ -50,9 +45,9 @@ export default function RegisterPage() {
                name="username"
                id="username"
                placeholder=' '
-               value={ formData.username }
-               onChange={ (event) => setFormData((data) => ({...data, username: event.target.value })) }
-               onKeyDown={ (event) => { if (event.key === 'Enter') { registerMutator.send(formData) } } }
+               value={ registerData.username }
+               onChange={ (event) => setRegisterData((data) => ({...data, username: event.target.value })) }
+               onKeyDown={ (event) => { if (event.key === 'Enter') { registerMutator.send(registerData) } } }
             />
             <label htmlFor="username">Username</label>
          </div>
@@ -63,9 +58,9 @@ export default function RegisterPage() {
                name="email"
                id="email"
                placeholder=' '
-               value={ formData.email }
-               onChange={ (event) => setFormData((data) => ({ ...data, email: event.target.value })) }
-               onKeyDown={ (event) => { if (event.key === 'Enter') { registerMutator.send(formData) } } }
+               value={ registerData.email }
+               onChange={ (event) => setRegisterData((data) => ({ ...data, email: event.target.value })) }
+               onKeyDown={ (event) => { if (event.key === 'Enter') { registerMutator.send(registerData) } } }
             />
             <label htmlFor="email">Email</label>
          </div>
@@ -76,9 +71,9 @@ export default function RegisterPage() {
                name="passwordOne"
                id="passwordOne"
                placeholder=' '
-               value={ formData.passwordOne }
-               onChange={ (event) => setFormData((data) => ({ ...data, passwordOne: event.target.value })) }
-               onKeyDown={ (event) => { if (event.key === 'Enter') { registerMutator.send(formData) } } }
+               value={ registerData.passwordOne }
+               onChange={ (event) => setRegisterData((data) => ({ ...data, passwordOne: event.target.value })) }
+               onKeyDown={ (event) => { if (event.key === 'Enter') { registerMutator.send(registerData) } } }
             />
             <label htmlFor="passwordOne">Password</label>
          </div>
@@ -89,9 +84,9 @@ export default function RegisterPage() {
                name="passwordTwo"
                id="passwordTwo"
                placeholder=' '
-               value={ formData.passwordTwo }
-               onChange={ (event) => setFormData((data) => ({ ...data, passwordTwo: event.target.value })) }
-               onKeyDown={ (event) => { if (event.key === 'Enter') { registerMutator.send(formData) } } }
+               value={ registerData.passwordTwo }
+               onChange={ (event) => setRegisterData((data) => ({ ...data, passwordTwo: event.target.value })) }
+               onKeyDown={ (event) => { if (event.key === 'Enter') { registerMutator.send(registerData) } } }
             />
             <label htmlFor="passwordTwo">Confirm Password</label>
          </div>
@@ -100,7 +95,7 @@ export default function RegisterPage() {
             name="submit"
             id="submitButton"
             style={{ margin: '0rem', width: '100%', padding: '0.6rem 2rem' }}
-            onClick={ () => registerMutator.send(formData) }
+            onClick={ () => registerMutator.send(registerData) }
             loadingState={ registerMutator.status === 'loading' }
          > Create Account </ButtonOval>
 

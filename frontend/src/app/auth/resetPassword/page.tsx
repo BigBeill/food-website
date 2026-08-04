@@ -1,7 +1,12 @@
 "use client"
 
 import RequestPasswordResetPage from "@/features/auth/components/RequestPasswordResetPage";
+import RequireNoAuth from "@/features/auth/components/RequireNoAuth";
 
 export default function RequestDefaultPassword() {
-   return < RequestPasswordResetPage />;
+   return (
+      <RequireNoAuth>
+         <RequestPasswordResetPage />
+      </RequireNoAuth>
+   );
 }

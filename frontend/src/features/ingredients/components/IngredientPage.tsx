@@ -2,24 +2,17 @@ import { useState } from "react";
 import { IngredientType } from "../domain/ingredient.types";
 import useServiceState from "@/shared/hooks/useServiceState";
 import { ingredientService } from "../services/ingredient.service";
-import LoadingPage from "@/shared/components/stateComponents/LoadingPage";
-import NotFoundPage from "@/shared/components/stateComponents/NotFoundPage";
-import ErrorPage from "@/shared/components/stateComponents/ErrorPage";
+import RequireServiceStateReady from "@/shared/components/RequireServiceStateReady";
 
 
 export default function IngredientPage({ ingredientId }: { ingredientId: number }) {
-   const ingredient = useServiceState(() => { return ingredientService.get(ingredientId) }, [ingredientId]);
+   const ingredientState = useServiceState(() => { return ingredientService.get(ingredientId) }, [ingredientId]);
 
-   switch (ingredient.status) {
-      case 'loading':
-         return <LoadingPage />
-      case 'not-found':
-         return <NotFoundPage />
-      case 'error':
-         return <ErrorPage />
-      case 'ready':
-         return <IngredientView ingredient={ ingredient.data } />
-   }
+   return (
+      <RequireServiceStateReady serviceState={ ingredientState } >
+         { (ingredient) => <IngredientView ingredient={ingredient} /> }
+      </RequireServiceStateReady>
+   );
 }
 
 function IngredientView({ ingredient }: { ingredient: IngredientType }) {

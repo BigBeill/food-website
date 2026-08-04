@@ -1,25 +1,19 @@
 import { RecipeType } from "../domain/recipes.types";
 import { useRef } from "react";
 import GrowingText from "@/shared/components/GrowingText";
-import Loading from "@/shared/components/stateComponents/LoadingPage";
-import NotFound from "@/shared/components/stateComponents/NotFoundPage";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
 import { recipeService } from "../services/recipes.service";
 import useServiceState from "@/shared/hooks/useServiceState";
+import RequireServiceStateReady from "@/shared/components/RequireServiceStateReady";
 
 export default function RecipePage ({ recipeId }: { recipeId: string }) {
    const recipeState = useServiceState(() => recipeService.get(recipeId), [ recipeId ]);
 
-   switch (recipeState.status) {
-      case 'loading':
-         return <Loading />
-      case 'not-found':
-         return <NotFound />
-      case 'error':
-         return <NotFound />
-      case 'ready':
-         return <RecipeView recipe={recipeState.data}/>
-   }
+   return (
+      <RequireServiceStateReady serviceState={ recipeState } >
+         { (recipe) => <RecipeView recipe={recipe} /> }
+      </RequireServiceStateReady>
+   );
 }
 
 export function RecipeView({ recipe }: { recipe: RecipeType }) {
