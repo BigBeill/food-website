@@ -1,10 +1,41 @@
 @use '../../styles/variables' as *;
 
-.inputTextWrapper {
+%universalInputStyling {
    display: flex;
+   flex-direction: column;
    gap: 0.6rem;
-   width: calc(100% - 9rem);
-   margin: 0rem 4.5rem;
+   margin: 1.5rem 0.06rem;
+   width: calc(100% - 0.12rem);
+
+   h4, label {
+      margin: 0rem;
+      padding: 0rem 0.3rem;
+      font-weight: bold;
+   }
+
+   p {
+      padding: 0rem;
+   }
+
+   input, textarea {
+      padding: 0.6rem;
+      border: 1px solid gray;
+      border-radius: 0.6rem;
+      background-color: #FFFFFF;
+      box-shadow: inset 0 2px 4px rgb(0 0 0 / 0.05);
+   }
+
+   input, textarea, p {
+      width: 100%;
+      font-size: 1rem;
+      margin: 0rem;
+   }
+}
+
+.inputTextWrapper {
+   @extend %universalInputStyling;
+
+   gap: 0.6rem;
 
    label {
       display: inline-block;
@@ -68,25 +99,16 @@
 }
 
 .inputTextAreaWrapper {
-   display: flex;
-   gap: 0.6rem;
-   width: calc(100% - 9rem);
-   margin: 0rem 4.5rem;
+   @extend %universalInputStyling;
+
+   textarea, p {
+      height: 12rem;
+   }
 
    textarea {
-      font-size: 1rem;
-      border-left: 1px solid $color-text;
-      border-right: 1px solid $color-text;
-      margin-top: .3rem;
-      padding-top: .3rem;
-      resize: none;
-      box-sizing: border-box;
-      margin-bottom: 0.6rem;
-      width: 100%;
-      padding: 0.03rem 0.48rem;
-      background-color: transparent;
-      border: none;
       color: $color-text;
+      box-sizing: border-box;
+      resize: none;
 
       &:focus{
          outline: none;

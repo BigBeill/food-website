@@ -5,98 +5,64 @@ import Folder from "./Folder.js";
 import PaginationBar from "@/shared/components/PaginationBar.js";
 import { UserType, FolderType } from "../domain/user.types.js";
 import { usePathname, useSearchParams } from "next/navigation.js";
-import { userService } from "../services/user.api.js";
 import { useRouter } from "next/router.js";
+import { userService } from "../services/user.service.js";
+import useServiceState from "@/shared/hooks/useServiceState.js";
+import { PaginatedListType } from "@/shared/shared.types.js";
+import FilterSearchPage from "@/features/recipes/components/FilterSearchPage.js";
+import LoadingPage from "@/shared/components/stateComponents/LoadingPage.js";
+import NotFoundPage from "@/shared/components/stateComponents/NotFoundPage.js";
+import ErrorPage from "@/shared/components/stateComponents/ErrorPage.js";
+
+type PaginatedCollectionType = Omit<PaginatedListType<unknown>, 'list'> & { folderList: FolderType[], userList: UserType[] }
+
+interface SearchFields {
+   userId?: string;
+   name?: string;
+}
 
 interface SearchUserPageProps {
    folderId?: string
    category?: 'friends' | 'incomingRequests' | 'outgoingRequests' | 'none',
 }
 
-export default function SearchUserPage({folderId, category}: SearchUserPageProps)  {
-
+export default function SearchUserPage({ folderId, category }: SearchUserPageProps) {
+   
    const router = useRouter();
    const pathname = usePathname();
    const searchParams = useSearchParams();
-
-   const initialUserId = searchParams.get('userId');
-   const initialName = searchParams.get('name');
-
-   const [userId, setUserId] = useState<string>(initialUserId || '');
-   const [name, setName] = useState<string>(initialName || '');
-
-   // save the page size and current page number
+   
    const groupSize: number = 15;
    const groupNumber: number = Number(searchParams.get("groupNumber")) || 1;
+   const userId = searchParams.get('userId');
+   const username = searchParams.get('name');
 
-   // state variables for variables collected from the server
-   const [folderList, setFolderList] = useState<FolderType[]>([]);
-   const [userList, setUserList] = useState<UserType[]>([]);
-   const [itemCount, setItemCount] = useState<number>(0);
-
-   async function searchUsers() {
-      // reset object variables
-      setFolderList([]);
-      setUserList([]);
-      setItemCount(0);
-
-      // logic for collecting folders from the database if needed
-      let folderList: FolderType[] = [];
-      let folderCount = 0;
-      if (category == 'friends') {
-         let folderCount = !folderId ? 1 : 0; // if your in the root of your friends search, make room for the "Friend Request" folder
-
-         if (!folderId) {
-            let folderLimit = groupSize;
-
-            // if your in the root of your friends search, make room for the "Friend Request" folder
-            folderCount = 1;
-            if (groupNumber == 1) { 
-               // add the friend request folder if applicable
-               folderList = [{ _id: 'requests', title: 'Friend Requests', content: [] }];
-               folderLimit--;
-            }
-
-            const returnedFolderList: {count: number, list: FolderType[]} = await userService.folderList({
-               limit: folderLimit,
-               skip: ((groupNumber - 1) * groupSize),
-               includeCount: true,
-            }) as {count: number, list: FolderType[]};
-
-            folderList = [...folderList, ...returnedFolderList.list];
-            folderCount = folderCount + returnedFolderList.count;
-         }
+   const paginatedCollection = useServiceState<PaginatedCollectionType>(async () => {
+      let folders: PaginatedListType<FolderType> = { list: [], count: 0, groupNumber,  groupSize };
+      if (!folderId) {
+         folders = await userService.searchFolder({ 
+            skip: ((groupNumber - 1) * groupSize),
+            limit: (groupSize),
+         });
       }
+      const skipUsers = ((groupNumber - 1) * groupSize) - folders.count;
+      const collectUserAmount = Math.max(0, Math.min(groupSize, skipUsers + groupSize));
+      let users: PaginatedListType<UserType> = { list: [], count: 0, groupNumber,  groupSize };
+      users = await userService.search({
+         ...(userId && { _id: userId }),
+         ...(username && { name: username }),
+         category: category,
+         ...((skipUsers > 0) && { skip: skipUsers }),
+         limit: collectUserAmount,
+      });
+      return { count: (folders.count + users.count), groupNumber, groupSize, folderList: folders.list, userList: users.list }
+   }, [folderId, category, groupNumber, userId, username]);
 
-      let availableSpaces = groupSize - (folderCount - ((groupNumber - 1) * groupSize));
-      if (availableSpaces > groupSize) { availableSpaces = groupSize; }
-      let skipUsers = (groupSize * (groupNumber - 1)) - folderCount;
-      if (skipUsers < 0) { skipUsers = 0; }
-
-      const returnedUserList: {count:number, list:UserType[]} = await userService.search({
-         _id: userId,
-         name,
-         category,
-         limit: availableSpaces,
-         skip: skipUsers,
-         includeCount: true,
-      }) as {count:number, list:UserType[]};
-
-      setUserList(returnedUserList.list);
-      setItemCount(returnedUserList.count + folderCount);
-
-   }
-
-   useEffect(() => {
-      searchUsers();
-   },[folderId, category, initialUserId, initialName, groupNumber]);
-
-   // handler for when the search button is clicked
-   function handleSubmit() {
+   function handleSubmit(fields: SearchFields) {
       const params= new URLSearchParams();
 
-      if (userId) { params.set("userId", userId); }
-      if (name) { params.set("name", name); }
+      if (fields.userId) { params.set("userId", fields.userId); }
+      if (fields.name) { params.set("name", fields.name); }
 
       router.push(`${pathname}?${params.toString()}`);
 
@@ -104,57 +70,94 @@ export default function SearchUserPage({folderId, category}: SearchUserPageProps
       document.getElementById("root")?.scrollTo({ top: 0, behavior: "auto" });
    }
 
-   // handler for when new page is requested by the pagination bar
-   function requestNewGroup(newGroupNumber: number) {
+   function requestNewGroup(newGroup: number) {
       const params = new URLSearchParams(searchParams.toString())
-      params.set('groupNumber', String(newGroupNumber));
+      params.set('groupNumber', String(newGroup));
       router.push(`${pathname}?${params.toString()}`);
    }
 
    return (
-      <div>
-         <div className="displayPinCollection">
-
-            <div className="filterPanel">
-               <h2>Filter Users - Public</h2>
-               <div className="textInput">
-                  <label htmlFor="searchId">user ID</label>
-                  <input 
-                  id="searchId" 
-                  type="text"
-                  placeholder="Search by ID (exact match)"
-                  value={userId || ''}
-                  onChange={(event) => setUserId(event.target.value)}
-                  onKeyDown={ (event) => { if(event.key == "Enter") handleSubmit(); } }
-                  />
-               </div>
-               <div className="textInput">
-                  <label htmlFor="searchUsername">Username</label>
-                  <input 
-                  id="searchUsername" 
-                  type="text"
-                  placeholder="Search by username"
-                  value={name || ''}
-                  onChange={(event) => setName(event.target.value)}
-                  onKeyDown={ (event) => { if(event.key == "Enter") handleSubmit(); } }
-                  />
-               </div>
-               <button onClick={() => handleSubmit()}>
-                  Search
-               </button>
-            </div>
-
-            { folderList.map((folder, index) => (
-               <Folder key={index} folder={folder} />
-            ))}
-
-            {/* create a user pin for each user given by the database */}
-            { userList.map((userData, index) => (
-               <UserPin key={index} initialUser={userData} />
-            ))}
-         </div>
-
-         <PaginationBar currentGroup={groupNumber} totalGroups={Math.ceil((itemCount)/groupSize)} requestNewGroup={requestNewGroup} />
+      <div className="displayPinCollection">
+         <FilterUsersPanel handleSubmit={ handleSubmit } />
+         { (() => {
+            switch(paginatedCollection.status) {
+               case 'loading':
+                  return <LoadingPage />
+               case 'not-found':
+                  return <NotFoundPage />
+               case 'error':
+                  return <ErrorPage />
+               case 'ready':
+                  return <SearchUserView paginatedCollection={ paginatedCollection.data } />
+            }
+         })() }
+         { (() => {
+            if (paginatedCollection.status != 'ready') { return null; }
+            else { return <PaginationBar currentGroup={groupNumber} totalGroups={Math.ceil((paginatedCollection.data.count)/groupSize)} requestNewGroup={requestNewGroup} /> }
+         })() }
       </div>
+   )
+}
+
+
+
+function FilterUsersPanel({ handleSubmit }: { handleSubmit: (fields: SearchFields) => void }) {
+   const [ userId, setUserId ] = useState('');
+   const [ name, setName ] = useState('');
+
+   function submitSearch() {
+      handleSubmit({ 
+         ...(userId && { userId }),
+         ...(name && { name }), 
+      });
+   }
+
+   return (
+      <div className="filterPanel">
+         <h2>Filter Users - Public</h2>
+         <div className="textInput">
+            <label htmlFor="searchId">user ID</label>
+            <input 
+            id="searchId" 
+            type="text"
+            placeholder="Search by ID (exact match)"
+            value={userId || ''}
+            onChange={(event) => setUserId(event.target.value)}
+            onKeyDown={ (event) => { if(event.key == "Enter") { submitSearch(); } } }
+            />
+         </div>
+         <div className="textInput">
+            <label htmlFor="searchUsername">Username</label>
+            <input 
+            id="searchUsername" 
+            type="text"
+            placeholder="Search by username"
+            value={name || ''}
+            onChange={(event) => setName(event.target.value)}
+            onKeyDown={ (event) => { if(event.key == "Enter") submitSearch(); } }
+            />
+         </div>
+         <button onClick={() => submitSearch()}>
+            Search
+         </button>
+      </div>
+   );
+}
+
+
+
+function SearchUserView({ paginatedCollection }: { paginatedCollection: PaginatedCollectionType })  {
+
+   return (
+      <>
+         { paginatedCollection.folderList.map((folder, index) => (
+            <Folder key={index} folder={ folder } />
+         ))}
+
+         {/* create a user pin for each user given by the database */}
+         { paginatedCollection.userList.map((user, index) => (
+            <UserPin key={index} initialUser={ user } />
+         ))}
+      </>
    );
 }

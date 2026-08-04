@@ -9,7 +9,6 @@ interface GetParams {
 interface SearchFolderParams {
    skip?: number;
    limit?: number
-   includeCount?: boolean
 }
 
 interface ProcessFriendRequestParams {
@@ -53,14 +52,14 @@ export const userApi = {
       }),
 
    search: (params: SearchParams) =>
-      sendServerRequest<PaginatedListType<UserType[]>>({
+      sendServerRequest<PaginatedListType<UserType>>({
          url: `/users/search`,
          method: 'get',
          body: params
       }),
 
    searchFolder: (params: SearchFolderParams) =>
-      sendServerRequest<PaginatedListType<FolderType[]>>({
+      sendServerRequest<PaginatedListType<FolderType>>({
          url: '/users/folderList',
          method: 'get',
          body: params

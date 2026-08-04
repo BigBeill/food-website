@@ -16,9 +16,11 @@ interface InputTextParams {
    placeholder: string;
    dataRef: Ref<DataHandle<string>>
    initial?: string;
+   readOnly?: boolean;
+   substitute?: string
 }
 
-export function InputText({ label, placeholder, dataRef, initial }: InputTextParams) {
+export function InputText({ label, placeholder, dataRef, initial, readOnly, substitute }: InputTextParams) {
    const [value, setValue] = useState(initial || '');
 
    useImperativeHandle(dataRef, () => ({
@@ -28,8 +30,13 @@ export function InputText({ label, placeholder, dataRef, initial }: InputTextPar
 
    return (
       <div className={ styles.inputTextWrapper }>
-         <label>{ label }</label>
-         <input type='text' value={ value } onChange={ (event) => setValue(event.target.value) } placeholder={ placeholder } />
+         { readOnly ? (<>
+            <h4>{ label }</h4>
+            <p>{ value || substitute }</p>
+         </>) : (<>
+            <label>{ label }</label>
+            <input type='text' value={ value } onChange={ (event) => setValue(event.target.value) } placeholder={ placeholder } />
+         </>) }
       </div>
    )
 }
@@ -44,20 +51,27 @@ interface InputTextAreaParams {
    placeholder: string;
    dataRef: Ref<DataHandle<string>>
    initial?: string;
+   readOnly?: boolean;
+   substitute?: string;
 }
 
-export function InputTextArea({ label, placeholder, dataRef, initial }: InputTextAreaParams) {
+export function InputTextArea({ label, placeholder, dataRef, initial, readOnly, substitute }: InputTextAreaParams) {
    const [value, setValue] = useState<string>(initial || '');
 
    useImperativeHandle(dataRef, () => ({
       getData: () => value,
-      setData: setValue,
+      setData: setValue
    }), [value]);
 
    return (
       <div className={ styles.inputTextAreaWrapper }>
-         <label>{ label }</label>
-         <textarea value={ value } placeholder={ placeholder } onChange={ (event) => { setValue(event.target.value) } } />
+         { readOnly ? (<>
+            <h4>{ label }</h4>
+            <p>{ value || substitute }</p>
+         </>) : (<>
+            <label>{ label }</label>
+            <textarea value={ value } placeholder={ placeholder } onChange={ (event) => { setValue(event.target.value) } } />
+         </>) }
       </div>
    );
 }

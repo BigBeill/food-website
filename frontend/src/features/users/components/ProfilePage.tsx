@@ -15,6 +15,8 @@ import ErrorPage from '@/shared/components/stateComponents/ErrorPage';
 import styles from './profilePage.module.scss';
 import { ButtonOval, ButtonShielded } from '@/shared/components/Button.components';
 import NotFoundPage from '@/shared/components/stateComponents/NotFoundPage';
+import { InputTextArea } from '@/shared/components/Input.components';
+import { DataHandle } from '@/shared/shared.types';
 
 interface ProfilePageProps {
    userId?: string;
@@ -50,6 +52,9 @@ function ProfileView({ user, updateUser }: { user: UserType, updateUser: (input:
    const titleParent = useRef(null);
    const router = useRouter();
    const { logout } = useAuth();
+
+   const nameRef = useRef<DataHandle<string>>(null);
+   const bioRef = useRef<DataHandle<string>>(null);
 
    const [modifiedUser, setModifiedUser] = useState<UserType | null>(null);
    const [imageBuffer, setImageBuffer] = useState<File | null>(null);
@@ -115,19 +120,14 @@ function ProfileView({ user, updateUser }: { user: UserType, updateUser: (input:
             <p>username: { user.name }</p>
          </div>
 
-         <div className='textInputParent bottomPadding'>
-            { !modifiedUser ? (
-               <>
-                  <h4>Personal Bio</h4>
-                  { user.bio ? <p>{ user.bio }</p> : <p>No bio available</p> }
-               </>
-            ) : (
-               <>
-                  <label htmlFor="bio">Personal Bio</label>
-                  <textarea id="bio" value={modifiedUser.bio} onChange={ (event) => { setModifiedUser((previous) => ({ ...previous!, bio: event.target.value })); } } />
-               </>
-            ) }
-         </div>
+         <InputTextArea 
+            label='Personal Bio' 
+            placeholder='Talk about yourself' 
+            dataRef={ bioRef } 
+            initial={ user.bio }
+            readOnly={ !modifiedUser }
+            substitute='Bio not yet created'
+         />
 
          <div> {/* styleDiv, should not contain anything */} </div>
 

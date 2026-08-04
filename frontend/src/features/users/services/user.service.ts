@@ -10,7 +10,6 @@ interface GetParams {
 interface SearchFolderParams {
    skip?: number;
    limit?: number
-   includeCount?: boolean
 }
 
 interface ProcessFriendRequestParams {
@@ -23,11 +22,6 @@ interface SearchParams {
    category?: 'friends' | 'incomingRequests' | 'outgoingRequests' | 'none';
    skip?: number;
    limit?: number;
-   includeCount?: boolean;
-}
-
-interface UpdateParams {
-   user: FormData;
 }
 
 export const userService = {
@@ -43,10 +37,10 @@ export const userService = {
    removeFriend: (relationshipId: string) => {
       return userApi.removeFriend(relationshipId);
    },
-   search: (params: SearchParams): Promise<PaginatedListType<UserType[]>> => {
+   search: (params: SearchParams): Promise<PaginatedListType<UserType>> => {
       return userApi.search(params);
    },
-   searchFolder: (params: SearchFolderParams): Promise<PaginatedListType<FolderType[]>> => {
+   searchFolder: (params: SearchFolderParams): Promise<PaginatedListType<FolderType>> => {
       return userApi.searchFolder(params); 
    },
    sendFriendRequest: (userId: string) => {
