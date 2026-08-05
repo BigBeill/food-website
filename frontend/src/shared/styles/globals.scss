@@ -326,42 +326,13 @@ h3 {
    font-size: 24px;
 }
 
+
 /* remove arrows from number input */
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
    -webkit-appearance: none;
    margin: 0;
-}
-/* Firefox */
-input[type=number] {
-   appearance: textfield;
-   -moz-appearance: textfield;
-}
-
-::-webkit-scrollbar {
-   width: .45rem;
-}
-
-/* Customize the thumb */
-::-webkit-scrollbar-thumb {
-   background-color: var(--background-color); /* color of the scrollbar thumb */
-   border-radius: 0.3rem; /* rounded corners */
-}
-
-/* Hover state of the thumb */
-::-webkit-scrollbar-thumb:hover {
-   background-color: lightgray;
-}
-
-/* Handle when scrollbar is in a drag state */
-::-webkit-scrollbar-thumb:active {
-   background-color: lightgray;
-}
-
-/* Customize the track */
-::-webkit-scrollbar-track {
-   background: var(--primary-color); /* color of the scrollbar track */
 }
 
 .growingText{
