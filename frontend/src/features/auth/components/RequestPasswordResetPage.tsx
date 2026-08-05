@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import useAuth from '../hooks/useAuth';
 import { authService } from '../services/auth.service';
 import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import { ButtonOval } from '@/shared/components/Button.components';
@@ -14,14 +13,9 @@ interface FormDataType {
 export default function RequestPasswordResetPage() {
 
    const router = useRouter();
-   const { authId } = useAuth();
 
    const [formData, setFormData] = useState<FormDataType>({ email: "" });
    const requestPasswordResetMutator = useServiceMutation<FormDataType, void>((input) => authService.requestPasswordReset(input));
-   
-   useEffect(() => {
-      if (authId) { router.replace('/'); }
-   },[authId])
 
    useEffect(() => {
       // set background

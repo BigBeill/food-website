@@ -2,14 +2,15 @@ import jwt from 'jsonwebtoken';
 import { ConflictError, NotFoundError, UnauthorizedError } from "../../common/errors/app-error";
 import { hashPassword, verifyPassword } from "../../common/utils/password";
 import { AuthRepository } from "./auth.repository";
-import type { AuthResultType, JwtPayloadType } from "./auth.types";
+import type { AuthResultType, JwtPayloadType, SavedTokenType } from "./auth.types";
 import { env } from '../../config/env';
-import { sendPasswordResetEmail } from './auth.emailServices';
+import { sendPasswordResetEmail } from '../../services/email/email.service';
 import type AuthIdParams from '../../common/parameters/authId.parameters';
 import { buildConflictString } from '../users/users.utils';
 import { randomBytes } from 'node:crypto';
 import type { DeleteResult } from 'mongoose';
 import type { UserRecord } from '../../common/mongo-db/schemas/user.schema';
+import { removeMongooseNoise } from '../../common/utils/db.mapper';
 
 export class AuthService {
    private readonly repository: AuthRepository;
@@ -60,8 +61,9 @@ export class AuthService {
       return this.buildAuthResult(user);
    }
 
-   async removeRefreshToken(userId: string): Promise<DeleteResult> {
-      return await this.repository.deleteRefreshTokensByUserId(userId);
+   async removeRefreshToken(token: string): Promise<DeleteResult> {
+      const tokenHash = new Bun.CryptoHasher("sha256").update(token).digest("hex");
+      return await this.repository.deleteRefreshTokenByHash(tokenHash);
    }
 
    async refreshTokens(refreshToken: string): Promise<AuthResultType> {
@@ -70,16 +72,10 @@ export class AuthService {
       try { payload = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as JwtPayloadType; }
       catch { throw new UnauthorizedError('invalid refresh token'); }
 
-      const refreshTokenList = await this.repository.getRefreshTokenList(payload.authId);
-      if (refreshTokenList.length == 0) { throw new UnauthorizedError(); }
+      const hashedToken = new Bun.CryptoHasher("sha256").update(refreshToken).digest("hex");
+      const serverHash = removeMongooseNoise<SavedTokenType>(await this.repository.getRefreshToken(hashedToken));
 
-      let matchingToken: boolean = false;
-      for (const token of refreshTokenList) {
-         const checkMatch = await verifyPassword(refreshToken, token.hash);
-         if (checkMatch) { matchingToken = true; }
-      }
-
-      if (!matchingToken) { throw new UnauthorizedError('invalid refresh token'); }
+      if (!serverHash || serverHash.userId !== payload.authId) { throw new UnauthorizedError('invalid refresh token'); }
 
       const userList = await this.repository.getExactUserList({ _id: payload.authId });
       if (!userList[0]) { throw new UnauthorizedError('invalid refresh token'); }
@@ -150,7 +146,7 @@ export class AuthService {
          { expiresIn: env.JWT_REFRESH_EXPIRES_IN },
       );
 
-      const refreshTokenHash = await hashPassword(refreshToken);
+      const refreshTokenHash = new Bun.CryptoHasher("sha256").update(refreshToken).digest("hex");
       await this.repository.saveRefreshToken(user._id.toString(), refreshTokenHash);
 
       return {

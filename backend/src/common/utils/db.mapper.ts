@@ -5,7 +5,9 @@ type PlainObject = Record<string, unknown>;
 type SerializedBuffer = { type: 'Buffer'; data: number[] };
 
 function isPlainObject(value: unknown): value is PlainObject {
-   return typeof value === 'object' && value !== null && !Array.isArray(value);
+   if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+   const prototype = Object.getPrototypeOf(value);
+   return prototype === Object.prototype || prototype === null;
 }
 
 function isObjectId(value: unknown): value is Types.ObjectId {
@@ -15,9 +17,12 @@ function isObjectId(value: unknown): value is Types.ObjectId {
    return tag === 'ObjectId' || tag === 'ObjectID'; // casing changed across bson versions
 }
 
-// The shape an ObjectId/Buffer degrades to after JSON: { type: 'Buffer', data: number[] }
 function isSerializedBuffer(value: unknown): value is SerializedBuffer {
    return isPlainObject(value) && value.type === 'Buffer' && Array.isArray(value.data);
+}
+
+function isHydratedDocument(value: unknown): value is { toObject: () => PlainObject } {
+   return typeof (value as { toObject?: unknown } | null)?.toObject === 'function';
 }
 
 function toHexString(value: unknown): string {
@@ -32,12 +37,9 @@ function removeFromList(list: unknown[]): unknown[] {
 
 function removeFromObject(obj: PlainObject): PlainObject {
    const { __v, createdAt, updatedAt, ...rest } = obj as Partial<Record<MongooseNoise, unknown>> & PlainObject;
-   if ('__v' in obj || 'createdAt' in obj || 'updatedAt' in obj) {
-      console.warn(`[removeMongooseNoise] Stripped metadata field(s) from outgoing data. If this was intentional, wrap the value in a 'clientSafeMetadata' field instead.`);
-   }
    return Object.fromEntries(
       Object.entries(rest).map(([key, value]) => {
-         if (key != 'clientSafeMetadata') { return [key, removeMongooseNoise(value)]; }
+         if (key !== 'clientSafeMetadata') { return [key, removeMongooseNoise(value)]; }
          else { return [key, value]; }
       })
    );
@@ -47,7 +49,10 @@ export function removeMongooseNoise<T>(value: unknown): T {
    if (Buffer.isBuffer(value) || isObjectId(value) || isSerializedBuffer(value)) {
       return toHexString(value) as T;
    }
+   if (value instanceof Date) { return value.toISOString() as T; }
+   if (value instanceof Map) { return removeMongooseNoise(Object.fromEntries(value)) as T; }
    if (Array.isArray(value)) { return removeFromList(value) as T; }
+   if (isHydratedDocument(value)) { return removeFromObject(value.toObject()) as T; }
    if (isPlainObject(value)) { return removeFromObject(value) as T; }
    return value as T;
 }

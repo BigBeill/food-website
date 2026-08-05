@@ -21,8 +21,8 @@ export class AuthRepository {
       return record;
    }
 
-   async deletePasswordResetTokens(userId: string): Promise<void> {
-      await PasswordResetTokenModel.deleteMany({ userId });
+   async deletePasswordResetTokens(userId: string): Promise<DeleteResult> {
+      return await PasswordResetTokenModel.deleteMany({ userId });
    }
 
    async deleteRefreshTokenByHash(hash: string): Promise<DeleteResult> {
@@ -56,8 +56,8 @@ export class AuthRepository {
       return UserModel.findOne({ ...(_id && { _id }), ...(name && { name }) }).select('+passwordHash').lean<UserWithPassword>();
    }
 
-   async getRefreshTokenList(userId: string): Promise<RefreshTokenRecord[]> {
-      return RefreshTokenModel.find({ userId }).lean<RefreshTokenRecord[]>();
+   async getRefreshToken(tokenHash: string): Promise<RefreshTokenRecord | null> {
+      return RefreshTokenModel.findOne({ hash: tokenHash }).lean<RefreshTokenRecord>();
    }
 
    async saveRefreshToken(userId: string, hash: string): Promise<void> {

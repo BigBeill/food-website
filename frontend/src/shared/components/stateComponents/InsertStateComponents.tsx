@@ -18,8 +18,7 @@ export function InsertError({ error }: { error?: Error }) {
             ))
          :
             <>
-               { console.error(error) }
-               <p>Issue loading content, please try again.</p>
+               <p>{ error?.message || "Issue loading content, please try again." }</p>
             </>
          }
       </div>

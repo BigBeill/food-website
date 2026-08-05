@@ -1,42 +1,52 @@
 'use client';
 
-import { createContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useEffect, useCallback } from 'react';
 import { authService } from '../services/auth.service';
+import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
+import { ErrorUnauthorized } from '@/shared/lib/errorClasses';
+import { ServiceStateType } from '@/shared/shared.types';
 
 type AuthContextType = {
-	authId: string | null;
-	loading: boolean;
+	authId: string | null
+	status: ServiceStateType<string | null>['status'];
+	refetchStatus: () => void;
 	logout: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType>({
 	authId: null,
-	loading: true,
+	status: 'idle',
+	refetchStatus: () => {},
 	logout: async () => {},
 });
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
-	const [authId, setAuthId] = useState<string | null>(null);
-	const [loading, setLoading] = useState(true);
+
+	const authMutator = useServiceMutation(() => { 
+		return authService.checkAuthStatus()
+			.catch((error) => {
+				if (error instanceof ErrorUnauthorized) { return null; }
+				else { throw error; }
+			});
+	});
 
 	useEffect(() => {
-
-		authService.checkAuthStatus()
-			.then((response) => { setAuthId(response); })
-			.finally(() => { setLoading(false); });
-
+		authMutator.send(undefined);
 	}, []);
 
 	const logout = useCallback(async () => {
-		
-		authService.logout()
-			.then(() => setAuthId(null))
+		await authService.logout()
+			.then(() => authMutator.overrideOutput(null))
 			.catch((error) => console.error(error));
-
-	}, []);
+	}, [authMutator.overrideOutput]);
 
 	return (
-		<AuthContext.Provider value={{ authId, loading, logout }}>
+		<AuthContext.Provider value={ { 
+			authId: (authMutator.status === 'ready') ? authMutator.data : null, 
+			status: authMutator.status, 
+			refetchStatus: () => { authMutator.send(undefined); },
+			logout 
+		} }>
 			{children}
 		</AuthContext.Provider>
 	);

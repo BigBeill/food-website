@@ -6,8 +6,8 @@ export class ErrorNotFound extends Error {
 }
 
 export class ErrorUnauthorized extends Error {
-   constructor () {
-      super('Unauthorized access');
+   constructor (message: string = 'Unauthorized access') {
+      super(message);
       this.name = 'Unauthorized Error';
    }
 }

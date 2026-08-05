@@ -10,6 +10,7 @@ import { imagesController } from './modules/images/images.controller';
 import { recipesController } from './modules/recipes/recipes.controller';
 
 export const app = new Elysia()
+   .use(errorHandler)
    .mapResponse({ as: 'global' }, ({ responseValue }) => {
       if (responseValue && typeof responseValue === 'object' && 'data' in responseValue) {
          return new Response(
@@ -20,7 +21,6 @@ export const app = new Elysia()
    })
    .use(corsConfig)
    .use(logger)
-   .use(errorHandler)
    .get('/health', () => ({ status: 'ok' }))
    .group('/api/v1', (api) =>
       api

@@ -15,3 +15,8 @@ export interface JwtPayloadType {
    issued?: number;
    expires?: number;
 }
+
+export interface SavedTokenType {
+   userId: string;
+   hash: string
+}

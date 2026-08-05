@@ -1,6 +1,5 @@
 // external imports
 import { useState, useEffect } from 'react';
-import useAuth from '@/features/auth/hooks/useAuth';
 import styles from './login.module.scss';
 import { useRouter } from 'next/navigation';
 import { ButtonOval } from '@/shared/components/Button.components';

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import useAuth from '../hooks/useAuth';
 import { authService } from '../services/auth.service';
 import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import { ButtonOval } from '@/shared/components/Button.components';
@@ -16,11 +15,6 @@ interface FormDataType {
 export default function ResetPasswordPage({ token }: {token: string}) {
 
    const router = useRouter();
-   const { authId } = useAuth();
-   
-   useEffect(() => {
-      if (authId) { router.replace('/'); }
-   },[authId])
 
    const [formData, setFormData] = useState<FormDataType>({ passwordOne: "", passwordTwo: "", token})
    const resetPasswordMutator = useServiceMutation<FormDataType, void>((input) => authService.resetPassword(input))

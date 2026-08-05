@@ -2,7 +2,7 @@ import { Resend } from "resend";
 import { readFileSync } from "fs";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const template = readFileSync("src/email/templates/resetPassword.html", "utf-8");
+const template = readFileSync("src/services/email/templates/resetPassword.html", "utf-8");
 
 export async function sendPasswordResetEmail(toEmail: string, resetToken: string): Promise<void> {
    const html = template.replace("{{resetString}}", resetToken);
