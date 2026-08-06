@@ -5,6 +5,7 @@ import { ButtonOval } from '@/shared/components/Button.components';
 import { authService } from '../services/auth.service';
 import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
+import useAuth from '../hooks/useAuth';
 
 interface FormDataType {
    username: string,
@@ -15,6 +16,7 @@ interface FormDataType {
 export default function LoginPage() {
 
    const router = useRouter();
+   const { refetchStatus: refetchAuth } = useAuth();
    const [loginData, setLoginData] = useState<FormDataType>({ username: "", password: "", rememberMe: false });
    const loginMutator = useServiceMutation((input: FormDataType) => authService.login(input));
 
@@ -24,7 +26,10 @@ export default function LoginPage() {
    }, []);
 
    useEffect(() => {
-      if (loginMutator.status === "ready") { router.replace('/'); }
+      if (loginMutator.status === "ready") { 
+         refetchAuth();
+         router.replace('/'); 
+      }
    }, [loginMutator.status]);
 
    useEffect(() => {

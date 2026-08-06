@@ -1,10 +1,11 @@
-'use client';
+"use client"
 
 import { createContext, useEffect, useCallback } from 'react';
 import { authService } from '../services/auth.service';
 import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import { ErrorUnauthorized } from '@/shared/lib/errorClasses';
 import { ServiceStateType } from '@/shared/shared.types';
+import { useRouter } from 'next/navigation';
 
 type AuthContextType = {
 	authId: string | null
@@ -22,6 +23,8 @@ export const AuthContext = createContext<AuthContextType>({
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
 
+	const router = useRouter();
+
 	const authMutator = useServiceMutation(() => { 
 		return authService.checkAuthStatus()
 			.catch((error) => {
@@ -36,7 +39,10 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
 	const logout = useCallback(async () => {
 		await authService.logout()
-			.then(() => authMutator.overrideOutput(null))
+			.then(() => { 
+				authMutator.overrideOutput(null);
+				router.push("/");
+			})
 			.catch((error) => console.error(error));
 	}, [authMutator.overrideOutput]);
 

@@ -6,6 +6,7 @@ import { ButtonOval } from '@/shared/components/Button.components';
 import { authService } from '../services/auth.service';
 import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
+import useAuth from '../hooks/useAuth';
 
 interface registerDataType {
    username: string,
@@ -17,6 +18,7 @@ interface registerDataType {
 export default function RegisterPage() {
 
    const router = useRouter();
+   const { refetchStatus: refetchAuth } = useAuth();
 
    const [registerData, setRegisterData] = useState<registerDataType>({ username: "", email: "", passwordOne: "", passwordTwo: "" });
    const registerMutator = useServiceMutation<registerDataType, void>((input) => authService.register(input));
@@ -27,7 +29,10 @@ export default function RegisterPage() {
    }, []);
 
    useEffect(() => {
-      if (registerMutator.status === "ready") { router.replace('/'); }
+      if (registerMutator.status === "ready") { 
+         refetchAuth();
+         router.replace('/');
+      }
    }, [registerMutator.status]);
 
    useEffect(() => {
