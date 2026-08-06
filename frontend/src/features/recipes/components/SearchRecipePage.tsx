@@ -1,5 +1,3 @@
-'use client'
-
 import React, { useEffect, useMemo } from 'react';
 import useNotebook from '@/shared/hooks/useNotebook';
 import RecipePreview from '@/features/recipes/components/RecipePreview';

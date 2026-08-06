@@ -1,4 +1,6 @@
 import { useEffect, useRef } from 'react';
+import styles from './styles/growingText.module.scss'
+
 /* 
 THIS FUNCTION IS NOT EFFICIENT RIGHT NOW
    I didn't realize offsetHeight/offsetWidth was a thing at the time of creating this and some code utilizes it and some doesn't.
@@ -61,8 +63,8 @@ function GrowingText({ text, parentDiv }: GrowingTextProps) {
    }, [text, parentDiv]);
 
    return (
-      <h2 className="growingText" ref={textRef}>
-         {text}
+      <h2 className={ styles.growingText } ref={ textRef }>
+         { text }
       </h2>
    );
 }

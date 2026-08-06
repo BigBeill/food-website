@@ -35,8 +35,8 @@ export function InsertInfo ({ message }: { message: string }) {
 
 export function InsertLoading () {
    return (
-      <p className={ styles.warning } aria-live='assertive'> 
-         <Spinner /> Your content is loading.
-      </p>
+      <div className={ styles.warning } aria-live='assertive'> 
+         <Spinner /> <p>Your content is loading.</p>
+      </div>
    )
 }
