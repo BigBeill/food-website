@@ -75,7 +75,8 @@ export default async function sendServerRequest<T>(config: SendServerRequestProp
       if (error instanceof ErrorUnauthorized && !skipRefresh) {
          // request a new access token
          console.warn('accessToken rejected, requesting new accessToken');
-         await request<T>({ method: 'POST', url: '/auth/refresh' });
+         try { await request<T>({ method: 'POST', url: '/auth/refresh' }); }
+         catch { throw error; }
          return await request<T>(config);
       }
       else {
