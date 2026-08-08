@@ -2,52 +2,69 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 import styles from './styles/paginationBar.module.scss';
+import { useEffect } from 'react';
 
 
 interface PaginationBarProps {
-   currentGroup: number;
-   totalGroups: number;
-   requestNewGroup: (page: number) => void;
+   groupNumber: number;
+   groupCount: number;
+   setGroupNumber: (index: number) => void;
 }
 
-export default function PaginationBar({ currentGroup, totalGroups, requestNewGroup }: PaginationBarProps) {
+export default function PaginationBar({ groupNumber, groupCount, setGroupNumber }: PaginationBarProps) {
 
-   function handlePageChange(newPage: number) {
-      if (newPage < 1 || newPage > totalGroups) { return; }
-      requestNewGroup(newPage);
+   // guard to try and limit out of bounds requests leaving this component
+   function handleGroupChange(newGroupNumber: number) {
+      if (newGroupNumber < 1) { setGroupNumber(1); }
+      else if (newGroupNumber > groupCount) { setGroupNumber(groupCount); }
+      else { setGroupNumber(newGroupNumber); }
    }
+
+   // creates event listener for key presses
+   useEffect(() => {
+      // changes page if arrow key or a/d is pressed
+      function handleKeyDown(event: KeyboardEvent) {
+         const focusedElement = (event.target as HTMLElement)?.tagName;
+         if (focusedElement === 'INPUT' || focusedElement === 'TEXTAREA') { return; }
+         if (event.key == 'a' || event.key == 'ArrowLeft') { handleGroupChange(groupNumber - 1); }
+         if (event.key == 'd' || event.key == 'ArrowRight') { handleGroupChange(groupNumber + 1); }
+      }
+
+      window.addEventListener('keydown', handleKeyDown);
+      return () => { window.removeEventListener('keydown', handleKeyDown); }
+   }, [groupNumber, setGroupNumber]);
 
    return (
       <div className={styles.paginationBar}>
-         <button onClick={() => handlePageChange(currentGroup - 1)} > <FontAwesomeIcon icon={faArrowLeft} /> </button>
-         { currentGroup == 4 ? (
+         <button onClick={() => handleGroupChange(groupNumber - 1)} > <FontAwesomeIcon icon={faArrowLeft} /> </button>
+         { groupNumber == 4 ? (
             <>
-               <button onClick={() => handlePageChange(1)}> 1 </button>
+               <button onClick={() => handleGroupChange(1)}> 1 </button>
             </>
-         ): currentGroup > 4 ? (
+         ): groupNumber > 4 ? (
             <>
-               <button onClick={() => handlePageChange(1)}> 1 </button>
-               <button onClick={() => handlePageChange(2)}> 2 </button>
+               <button onClick={() => handleGroupChange(1)}> 1 </button>
+               <button onClick={() => handleGroupChange(2)}> 2 </button>
             </>
          ) : null }
-         { currentGroup > 5 ? (<p>...</p>) : null}
-         { currentGroup > 2 ? (<button onClick={() => handlePageChange(currentGroup - 2)}> {currentGroup - 2} </button>) : null }
-         { currentGroup > 1 ? (<button onClick={() => handlePageChange(currentGroup - 1)}> {currentGroup - 1} </button>) : null }
-         <p className="primaryBlock">{currentGroup}</p>
-         { currentGroup < totalGroups ?  (<button onClick={() => handlePageChange(currentGroup + 1)}> {currentGroup + 1} </button>) : null}
-         { currentGroup < totalGroups - 1 ? (<button onClick={() => handlePageChange(currentGroup + 2)}> {currentGroup + 2} </button>) : null }
-         { currentGroup < totalGroups - 4 ? (<p>...</p>) : null}
-         { currentGroup == (totalGroups - 3)? (
+         { groupNumber > 5 ? (<p>...</p>) : null}
+         { groupNumber > 2 ? (<button onClick={() => handleGroupChange(groupNumber - 2)}> {groupNumber - 2} </button>) : null }
+         { groupNumber > 1 ? (<button onClick={() => handleGroupChange(groupNumber - 1)}> {groupNumber - 1} </button>) : null }
+         <p className="primaryBlock">{groupNumber}</p>
+         { groupNumber < groupCount ?  (<button onClick={() => handleGroupChange(groupNumber + 1)}> {groupNumber + 1} </button>) : null}
+         { groupNumber < groupCount - 1 ? (<button onClick={() => handleGroupChange(groupNumber + 2)}> {groupNumber + 2} </button>) : null }
+         { groupNumber < groupCount - 4 ? (<p>...</p>) : null}
+         { groupNumber == (groupCount - 3)? (
             <>
-               <button onClick={() => handlePageChange(totalGroups)}> {totalGroups} </button>
+               <button onClick={() => handleGroupChange(groupCount)}> {groupCount} </button>
             </>
-         ) : currentGroup < (totalGroups - 3)? (
+         ) : groupNumber < (groupCount - 3)? (
             <>
-              <button  onClick={() => handlePageChange(totalGroups - 1)}> {totalGroups - 1} </button>
-              <button onClick={() => handlePageChange(totalGroups)}> {totalGroups} </button> 
+              <button  onClick={() => handleGroupChange(groupCount - 1)}> {groupCount - 1} </button>
+              <button onClick={() => handleGroupChange(groupCount)}> {groupCount} </button> 
             </>
          ) : null}
-         <button onClick={() => handlePageChange(currentGroup + 1)} > <FontAwesomeIcon icon={faArrowRight} /> </button>
+         <button onClick={() => handleGroupChange(groupNumber + 1)} > <FontAwesomeIcon icon={faArrowRight} /> </button>
       </div>
    )
 }

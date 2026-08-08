@@ -1,5 +1,4 @@
 import { RecipeType } from "../domain/recipes.types";
-import { useRef } from "react";
 import GrowingText from "@/shared/components/GrowingText";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
 import { recipeService } from "../services/recipes.service";
@@ -17,15 +16,10 @@ export default function RecipePage ({ recipeId }: { recipeId: string }) {
 }
 
 export function RecipeView({ recipe }: { recipe: RecipeType }) {
-   
-   const titleRef = useRef<HTMLDivElement | null>(null);
 
    return (
       <div className="recipeObjectView fullPage">
-      
-         <div className="titleContainer" ref={titleRef} >
-            <GrowingText text={recipe.title} parentDiv={titleRef} />
-         </div>
+         <GrowingText text={recipe.title}/>
 
          <ImageDisplay packagedImage={recipe.image} />
 

@@ -73,9 +73,7 @@ function UserPinView({ user, relationship }: { user: UserType, relationship: Rel
 
    return (
       <div className={ styles.user }>
-         <div ref={titleRef} onClick={ () => { viewProfile() } }>
-            <GrowingText text={user.name} parentDiv={titleRef} />
-         </div>
+         <GrowingText text={ user.name } onClick={ () => { viewProfile} } />
          <div onClick={ () => { viewProfile() } }>
             <img className='consumeSpace' { ...unpackImage(user.image) } />
          </div>

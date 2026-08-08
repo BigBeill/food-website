@@ -1,125 +1,66 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import PaginationBar from '@/shared/components/PaginationBar';
-
 import styles from './styles/notebook.module.scss';
+import { PaginatedListType } from '../shared.types';
+import { ErrorNotFound } from '../lib/errorClasses';
+import { useServiceMutation } from './useServiceMutation';
 
-// LOOK AT README.MD FILE IN THE ROOT FOLDER FOR INSTRUCTIONS ON HOW TO USE THIS COMPONENT
+interface useNotebookParams {
+   requestOutOfBoundsIndex?: (groupNumber: number) => Promise<PaginatedListType<React.ReactNode>>;
+}
 
-// Notebook will call this function if it needs access to a page that it does not currently have access to. requestedIndex will be set to the index of the page it is trying to display to the user.
-export default function useNotebook (requestOutOfBoundsGroup?: (groupNumber: number) => void) {
+export default function useNotebook (initialPaginatedPages: PaginatedListType<React.ReactNode>, { requestOutOfBoundsIndex }: useNotebookParams) {
 
-   const [componentList, setComponentList] = useState<React.ReactNode[]>([]);
-   const [componentCount, setComponentCount] = useState<number>(0);
-   const [firstComponentIndex, setFirstComponentIndex] = useState<number>(0);
-   const [currentIndex, setCurrentIndex] = useState<number>(0);
+   const getOutOfBoundsIndex = useServiceMutation((index: number) => {
+      if (!requestOutOfBoundsIndex) { throw new ErrorNotFound(); }
+      return requestOutOfBoundsIndex(index);
+   });
 
-   // Notebook assumes that the page at index 0 is a menu page and thus will not assign it a page number. If the first page must be assigned a page number, set initialPageIndex to 1
-   function replaceComponentList(componentList: React.ReactNode[], 
-      {
-         newComponentCount = componentList.length, 
-         newFirstComponentIndex = 0, 
-         showIndex = newFirstComponentIndex
-      }: { 
-         newComponentCount?: number; 
-         newFirstComponentIndex?: number; 
-         showIndex?: number 
-      } = {}
-   ) {
-      setComponentList(componentList);
-      setComponentCount(newComponentCount);
-      setFirstComponentIndex(newFirstComponentIndex);
-      setCurrentIndex(showIndex);
+   const [paginatedPages, setPaginatedPages] = useState<PaginatedListType<React.ReactNode>>(initialPaginatedPages);
+   const [currentIndex, setCurrentIndexDirect] = useState<number>(paginatedPages.firstItemIndex || 0);
+
+   async function setCurrentIndex(newIndex: number) {
+      if (newIndex < (paginatedPages.firstItemIndex || 0) || newIndex > paginatedPages.list.length + (paginatedPages.firstItemIndex || 0)) {
+         try { 
+            const newList = await getOutOfBoundsIndex.send(newIndex);
+            setPaginatedPages(newList);
+            setCurrentIndex(newIndex);
+         }
+         catch (error) { console.warn("notebook is attempting to access content that may not exist"); }
+      }
+      else { setCurrentIndexDirect(newIndex); }
    }
 
-   function appendComponentList(newComponents: React.ReactNode[], 
-      {
-         newComponentCount, 
-         firstItemIndex, 
-         showIndex, 
-         addToBeginning = false
-      }: { 
-         newComponentCount?: number, 
-         firstItemIndex?: number, 
-         showIndex?: number, 
-         addToBeginning?: boolean
-      } = {}) {
-      if (addToBeginning) { setComponentList([...newComponents, ...componentList]); }
-      else { setComponentList([...componentList, ...newComponents]); }
-
-      if (newComponentCount) { setComponentCount(newComponentCount); }
-      else {
-         const updatedListCount = componentList.length + newComponents.length;
-         if (updatedListCount < componentCount) { setComponentCount(updatedListCount); }
-      }
-
-      if (firstItemIndex) { setFirstComponentIndex(firstItemIndex); }
-      if (showIndex) { setCurrentIndex(showIndex); }
+   function overridePaginatedPages(newList: PaginatedListType<React.ReactNode>, { currentIndex = newList.firstItemIndex || 0 }: { currentIndex: number }) {
+      setPaginatedPages(newList);
+      setCurrentIndex(currentIndex);
    }
-
-   useEffect(() => {
-      // request page from requestOutOfBoundsIndex not already provided in pageList
-      if ((currentIndex < firstComponentIndex || currentIndex > (componentList.length + firstComponentIndex)) && requestOutOfBoundsGroup) {
-         requestOutOfBoundsGroup(currentIndex);
-      }
-   }, [currentIndex]);
-
-   // creates event listener for key presses
-   useEffect(() => {
-      // changes page if arrow key or a/d is pressed
-      function handleKeyDown(event: KeyboardEvent) {
-         const focusedElement = (event.target as HTMLElement)?.tagName;
-         if (focusedElement === 'INPUT' || focusedElement === 'TEXTAREA') { return; }
-         if (event.key == 'a' || event.key == 'ArrowLeft') { previousPage(); }
-         if (event.key == 'd' || event.key == 'ArrowRight') { nextPage(); }
-      }
-
-      window.addEventListener('keydown', handleKeyDown)
-      return () => { window.removeEventListener('keydown', handleKeyDown) }
-   }, [currentIndex, componentCount]);
 
    // real index in pageList of the pages being displayed
-   const firstPage = componentList[currentIndex - firstComponentIndex];
-   const secondPage = componentList[(currentIndex - firstComponentIndex) + 1];
+   const firstPage = paginatedPages.list[currentIndex - (paginatedPages.firstItemIndex || 0)];
+   const secondPage = paginatedPages.list[currentIndex - (paginatedPages.firstItemIndex || 0) + 1];
 
-   // pages are grouped into pairs, so changing the grouping by 1 changes the page index by 2 
-   function handleGroupingChange(newGrouping: number) {
-      handlePageChange((newGrouping - 1) * 2);
+   function setGroup(newGroup: number) {
+      setCurrentIndex((newGroup - 1) * 2);
    }
 
-   function handlePageChange(newPageIndex: number) {
-      // check if the pageIndex being requested is out of bounds
-      if (newPageIndex > componentCount) { 
-         handlePageChange(componentCount);
-         return;
-      }
-      if (newPageIndex < 0) { 
-         handlePageChange(0);
-         return;
-      }
+   const paginationBar = <PaginationBar groupNumber={ Math.ceil((currentIndex + 1) / 2) } groupCount={ Math.ceil(paginatedPages.count / 2) } setGroupNumber={ setGroup } />;
+   const htmlView = <NotebookView firstPage={ firstPage } secondPage={ secondPage } paginationBar={ paginationBar } />;
 
-      setCurrentIndex(0);
-   }
-
-   function previousPage() {
-      handlePageChange(currentIndex - 2);
-   }
-
-   function nextPage(){
-      handlePageChange(currentIndex + 2);
-   }
-
-   const paginationBar = <PaginationBar currentGroup={Math.ceil((currentIndex + 1) / 2)} totalGroups={Math.ceil(componentCount / 2)} requestNewGroup={handleGroupingChange} />;
-   const notebook = <Notebook firstPage={firstPage} secondPage={secondPage} paginationBar={paginationBar} />;
-
-   return { content: notebook, replaceComponentList, appendComponentList, currentIndex };
+   return { 
+      htmlView: htmlView,
+      overridePaginatedPages,
+   };
 }
+
+
 
 interface NotebookProps {
    firstPage?: React.ReactNode;
    secondPage?: React.ReactNode;
    paginationBar: React.ReactNode;
 }
-function Notebook({firstPage, secondPage, paginationBar}: NotebookProps) {
+function NotebookView({firstPage, secondPage, paginationBar}: NotebookProps) {
 
    // use States that keep track of whether the screen is too narrow to display both pages at once, and if so which page to display
    const [narrowScreen, setNarrowScreen] = useState<boolean>(false);

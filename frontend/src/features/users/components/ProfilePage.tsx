@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useRef } from 'react'
 import GrowingText from '@/shared/components/GrowingText';
 import { RelationshipType, UserType } from '../domain/user.types';
@@ -42,11 +40,9 @@ export default function ProfilePage({ userId }: ProfilePageProps) {
 
 function ProfileView({ user, updateUser }: { user: UserType, updateUser: (input: UserType) => void }) {
 
-   const titleParent = useRef(null);
    const router = useRouter();
    const { logout } = useAuth();
 
-   const nameRef = useRef<DataHandle<string>>(null);
    const bioRef = useRef<DataHandle<string>>(null);
 
    const [modifiedUser, setModifiedUser] = useState<UserType | null>(null);
@@ -90,9 +86,7 @@ function ProfileView({ user, updateUser }: { user: UserType, updateUser: (input:
 
    return (
       <div className={ styles.userProfile }>
-         <div ref={ titleParent } className='centredVertically'>
-            <GrowingText text={ user.name } parentDiv={ titleParent } />
-         </div>
+         <GrowingText text={ user.name }/>
          <div>
             { !modifiedUser ? (
                <img className='consumeSpace' { ...unpackImage(user.image) }/>

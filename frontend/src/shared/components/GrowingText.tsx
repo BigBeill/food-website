@@ -1,46 +1,20 @@
 import { useEffect, useRef } from 'react';
 import styles from './styles/growingText.module.scss'
 
-/* 
-THIS FUNCTION IS NOT EFFICIENT RIGHT NOW
-   I didn't realize offsetHeight/offsetWidth was a thing at the time of creating this and some code utilizes it and some doesn't.
-   right now im of the mindset that if it works don't touch it while i work on other stuff,
-   but i do intend to fix this in the near future.
-*/
-
-/*
-returns html&css for provided text with maximum possible size before overflowing parentDiv
-
-how to use:
-
-import React, { useRef } from 'react';
-
-function MyComponent() {
-   const parentDiv = useRef(null);
-
-   return (
-      <div ref={parentDiv}>
-      <GrowingText text="Hello, World!" parentDiv={parentDiv} />
-      </div>
-   )
-}
-
-*/
-
-interface GrowingTextProps {
+type GrowingTextProps = React.ComponentPropsWithoutRef<'div'> & {
    text: string;
-   parentDiv: React.RefObject<HTMLDivElement | null>;
 }
 
-function GrowingText({ text, parentDiv }: GrowingTextProps) {
+function GrowingText({ text, ...divProps }: GrowingTextProps) {
 
+   const wrapperRef = useRef<HTMLDivElement>(null);
    const textRef = useRef<HTMLHeadingElement>(null);
 
    function adjustFontSize() {
-      if (textRef.current && parentDiv.current) {
+      if (textRef.current && wrapperRef.current) {
          let fontSize = 1.2;
          textRef.current.style.fontSize = `${fontSize}rem`;
-         while (textRef.current.scrollHeight < parentDiv.current.scrollHeight) {
+         while (textRef.current.scrollHeight < wrapperRef.current.scrollHeight) {
             fontSize += 0.1;
             if (fontSize > 64) { 
                console.warn("Growing Text component hit its maximum font size of 64rem, text may be overflowing parent div");
@@ -60,12 +34,14 @@ function GrowingText({ text, parentDiv }: GrowingTextProps) {
       adjustFontSize();
       window.addEventListener('resize', adjustFontSize);
       return () => window.removeEventListener('resize', adjustFontSize);
-   }, [text, parentDiv]);
+   }, [text, wrapperRef]);
 
    return (
-      <h2 className={ styles.growingText } ref={ textRef }>
-         { text }
-      </h2>
+      <div { ...divProps } className={ styles.textWrapper } ref={ wrapperRef }>
+         <h2 className={ styles.text } ref={ textRef }>
+            { text }
+         </h2>
+      </div>
    );
 }
 

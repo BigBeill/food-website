@@ -12,8 +12,7 @@ export type ServiceStateType<T> =
    | { status: 'error'; error: Error };
 
 export type PaginatedListType<T> = {
-   list: T[];
-   count: number;
-   groupNumber: number;
-   groupSize: number;
+   list: T[]; // the list of content itself
+   count: number; // the number of items applicable to the category (whether or not they exist inside the current list)
+   firstItemIndex?: number; // the index of the first item in the list (assumed to be 0)
 };

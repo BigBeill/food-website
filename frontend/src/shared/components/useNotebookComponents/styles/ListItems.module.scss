@@ -1,0 +1,19 @@
+@use '../../../styles/variables' as *;
+
+.list {
+   display: flex;
+}
+
+.item {
+   flex: 1;
+   background-color: $color-background;
+   border-bottom: 2px solid var($color-text);
+
+   .decretiveLine {
+      background-color: $color-primary;
+   }
+
+   &:last-child {
+      border-bottom: none;
+   }
+}

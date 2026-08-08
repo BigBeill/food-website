@@ -4,6 +4,5 @@ export type StandardApiResponse<T> = { data: T } | { error: { code: string; mess
 export type PaginatedListType<T> = {
   list: T[];
   count: number;
-  groupNumber: number;
-  groupSize: number;
+  firstItemIndex?: number;
 };

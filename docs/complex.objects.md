@@ -72,8 +72,7 @@ interface NutritionType {
 type PaginatedListType<T> = {
    list: T[];
    count: number;
-   groupNumber: number;
-   groupSize: number;
+   firstItemIndex?: number;
 };
 ```
 ### Recipe

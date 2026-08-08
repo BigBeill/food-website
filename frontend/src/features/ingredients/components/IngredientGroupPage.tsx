@@ -3,6 +3,7 @@ import { ingredientService } from "../services/ingredient.service";
 import { useRouter } from "next/navigation";
 import useServiceState from "@/shared/hooks/useServiceState";
 import RequireServiceStateReady from "@/shared/components/RequireServiceStateReady";
+import useNotebook from "@/shared/hooks/useNotebook";
 
 
 export default function IngredientGroupPage() {
@@ -17,6 +18,7 @@ export default function IngredientGroupPage() {
 
 function IngredientGroupView({ groupList }: { groupList: IngredientGroupType[] }) {
    const router = useRouter();
+   const notebook = useNotebook();
 
    return (
       <div className="displayButtons">

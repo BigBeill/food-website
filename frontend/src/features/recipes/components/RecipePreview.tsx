@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { RecipeType } from "../domain/recipes.types";
 import GrowingText from "@/shared/components/GrowingText";
 import { RecipeView } from "./RecipePage";
@@ -16,14 +15,10 @@ export default function RecipePreview({ recipe }: RecipePreviewProps) {
    const { authId } = useAuth();
    const popup = usePopup(<RecipeView recipe={recipe}/>);
 
-   const titleRef = useRef<HTMLDivElement>(null);
-
    return (
       <>
       <div className="recipeObjectView previewPage">
-         <div className="titleContainer" ref={titleRef}>
-            <GrowingText text={recipe.title} parentDiv={titleRef}/>
-         </div>
+         <GrowingText text={recipe.title}/>
          <img {...unpackImage(recipe.image)} />
          <p className="description">{recipe.description}</p>
          <div className="ingredients">
