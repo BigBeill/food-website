@@ -4,15 +4,16 @@ import GrowingText from "../GrowingText";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
 
 
-interface ListItemsNotebookPageParams {
+
+interface NotebookPageListItemsProps {
    itemList: {
       title: string;
-      image: PackagedImageType;
+      image?: PackagedImageType;
       onClick: () => void;
    }[];
 }
 
-export default function ListItemsNotebookPage({ itemList }: ListItemsNotebookPageParams) {
+export default function NotebookPageListItems({ itemList }: NotebookPageListItemsProps) {
 
    return (
       <div className={ styles.page }>

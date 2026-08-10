@@ -29,6 +29,6 @@ export interface IngredientConversionType {
 }
 
 export interface IngredientGroupType {
-   id: string;
+   _id: string;
    name: string;
 }

@@ -1,6 +1,5 @@
 import { useRef } from 'react';
 import useAuth from '@/features/auth/hooks/useAuth';
-import useNotebook from '@/shared/hooks/useNotebook';
 import { RecipeDraft, RecipeType } from '../domain/recipes.types';
 import { recipeService } from '../services/recipes.service';
 import EditRecipeGeneralInfoPage from './EditRecipeSubPages/GeneralInfoPage';
@@ -14,6 +13,7 @@ import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import { DataHandle } from '@/shared/shared.types';
 import { useRouter } from 'next/navigation';
 import RequireServiceStateReady from '@/shared/components/RequireServiceStateReady';
+import Notebook from '@/shared/components/Notebook';
 
 // if no recipeId has been assigned this page will assume you are creating a brand new recipe
 export default function EditRecipePage({ recipeId }: { recipeId?: string }) {
@@ -44,7 +44,6 @@ export default function EditRecipePage({ recipeId }: { recipeId?: string }) {
 function EditRecipeView({ recipe }: { recipe: RecipeType | RecipeDraft }) {
 
 	const router = useRouter();
-	const notebook = useNotebook();
 	const { authId } = useAuth();
 
 	// page references
@@ -78,17 +77,14 @@ function EditRecipeView({ recipe }: { recipe: RecipeType | RecipeDraft }) {
 		}	
 	}
 
-	// create pageList, a list of all function (plus associated variables) that are apart of the edit recipe page.
-	const pageList = [
-		<EditRecipeGeneralInfoPage newRecipe={ !('_id' in recipe) } ref={ generalInfoPageRef } initial={ { title: recipe.title, description: recipe.description } } />,
-		<EditRecipeAdditionalInfoPage oldImage={ ('_id' in recipe) ? recipe.image : undefined } ref={ additionalInfoPageRef } initial={ { visibility: recipe.visibility } } />,
-		<EditRecipeIngredientsPage ref={ ingredientPageRef } initial={ recipe.ingredientList } />,
-		<EditRecipeInstructionsPage ref={ instructionPageRef } initial={ recipe.instructionList } />,
-		<EditRecipeFinalizeChangesPage saveRecipeMutator={ saveRecipeMutator } deleteRecipeMutator={ deleteRecipeMutator } />
-	]
-
-	notebook.replaceComponentList(pageList)
-
 	// call notebook and give it pageList
-	return notebook.content;
+	return (
+		<Notebook childrenCount={ 5 }>
+			<EditRecipeGeneralInfoPage newRecipe={ !('_id' in recipe) } ref={ generalInfoPageRef } initial={ { title: recipe.title, description: recipe.description } } />,
+			<EditRecipeAdditionalInfoPage oldImage={ ('_id' in recipe) ? recipe.image : undefined } ref={ additionalInfoPageRef } initial={ { visibility: recipe.visibility } } />,
+			<EditRecipeIngredientsPage ref={ ingredientPageRef } initial={ recipe.ingredientList } />,
+			<EditRecipeInstructionsPage ref={ instructionPageRef } initial={ recipe.instructionList } />,
+			<EditRecipeFinalizeChangesPage saveRecipeMutator={ saveRecipeMutator } deleteRecipeMutator={ deleteRecipeMutator } />
+		</Notebook>
+	)
 }

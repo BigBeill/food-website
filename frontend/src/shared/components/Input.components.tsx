@@ -10,18 +10,21 @@ import { DataHandle } from '../shared.types';
 
 
 
-
-interface InputTextParams {
+/*
+   In the event that you only want to let text be editable under specific conditions (edit mode enabled) you can supply readOnlyOptions,
+   otherwise the component will always be in edit mode
+*/
+type InputTextParams = React.ComponentPropsWithoutRef<'input'> & {
    label: string;
-   placeholder: string;
-   dataRef: Ref<DataHandle<string>>
-   initial?: string;
-   readOnly?: boolean;
-   substitute?: string
+   dataRef?: Ref<DataHandle<string>>
+   readOnlyOptions?: {
+      condition: boolean;
+      placeholder: string;
+   }
 }
 
-export function InputText({ label, placeholder, dataRef, initial, readOnly, substitute }: InputTextParams) {
-   const [value, setValue] = useState(initial || '');
+export function InputText({ label, dataRef, readOnlyOptions, ...rest }: InputTextParams) {
+   const [value, setValue] = useState(String(rest.value) || '');
 
    useImperativeHandle(dataRef, () => ({
       getData: () => value,
@@ -30,12 +33,12 @@ export function InputText({ label, placeholder, dataRef, initial, readOnly, subs
 
    return (
       <div className={ styles.inputTextWrapper }>
-         { readOnly ? (<>
+         { (readOnlyOptions?.condition === true) ? (<>
             <h4>{ label }</h4>
-            <p>{ value || substitute }</p>
+            <p>{ value || readOnlyOptions.placeholder }</p>
          </>) : (<>
             <label>{ label }</label>
-            <input type='text' value={ value } onChange={ (event) => setValue(event.target.value) } placeholder={ placeholder } />
+            <input type='text' value={ value } onChange={ (event) => setValue(event.target.value) } { ...rest } />
          </>) }
       </div>
    )

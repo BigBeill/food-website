@@ -49,7 +49,7 @@ interface IngredientConversionType {
 ### Ingredient Group
 ```js
 interface IngredientGroupType {
-   id: string;
+   _id: string;
    name: string;
 }
 ```

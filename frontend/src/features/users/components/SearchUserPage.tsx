@@ -34,7 +34,7 @@ export default function SearchUserPage({ folderId, category }: SearchUserPagePro
    const username = searchParams.get('name');
 
    const paginatedCollection = useServiceState<PaginatedCollectionType>(async () => {
-      let folders: PaginatedListType<FolderType> = { list: [], count: 0, groupNumber,  groupSize };
+      let folders: PaginatedListType<FolderType> = { list: [], count: 0 };
       if (!folderId) {
          folders = await userService.searchFolder({ 
             skip: ((groupNumber - 1) * groupSize),
@@ -43,7 +43,7 @@ export default function SearchUserPage({ folderId, category }: SearchUserPagePro
       }
       const skipUsers = ((groupNumber - 1) * groupSize) - folders.count;
       const collectUserAmount = Math.max(0, Math.min(groupSize, skipUsers + groupSize));
-      let users: PaginatedListType<UserType> = { list: [], count: 0, groupNumber,  groupSize };
+      let users: PaginatedListType<UserType> = { list: [], count: 0 };
       users = await userService.search({
          ...(userId && { _id: userId }),
          ...(username && { name: username }),
@@ -75,10 +75,10 @@ export default function SearchUserPage({ folderId, category }: SearchUserPagePro
    return (
       <div className="displayPinCollection">
          <FilterUsersPanel handleSubmit={ handleSubmit } />
-         <RequireServiceStateReady serviceState={paginatedCollection} > 
+         <RequireServiceStateReady serviceState={ paginatedCollection } > 
             { (collection) => (<>
                <SearchUserView paginatedCollection={ collection } /> 
-               <PaginationBar currentGroup={groupNumber} totalGroups={Math.ceil((collection.count)/groupSize)} requestNewGroup={requestNewGroup} />
+               <PaginationBar groupNumber={ groupNumber } groupCount={ Math.ceil((collection.count)/groupSize) } setGroupNumber={ requestNewGroup } />
             </>) }
          </RequireServiceStateReady>
       </div>
@@ -108,7 +108,7 @@ function FilterUsersPanel({ handleSubmit }: { handleSubmit: (fields: SearchField
             type="text"
             placeholder="Search by ID (exact match)"
             value={userId || ''}
-            onChange={(event) => setUserId(event.target.value)}
+            onChange={ (event) => setUserId(event.target.value) }
             onKeyDown={ (event) => { if(event.key == "Enter") { submitSearch(); } } }
             />
          </div>
@@ -118,12 +118,12 @@ function FilterUsersPanel({ handleSubmit }: { handleSubmit: (fields: SearchField
             id="searchUsername" 
             type="text"
             placeholder="Search by username"
-            value={name || ''}
-            onChange={(event) => setName(event.target.value)}
+            value={ name || '' }
+            onChange={ (event) => setName(event.target.value) }
             onKeyDown={ (event) => { if(event.key == "Enter") submitSearch(); } }
             />
          </div>
-         <button onClick={() => submitSearch()}>
+         <button onClick={ () => submitSearch() }>
             Search
          </button>
       </div>
@@ -137,12 +137,12 @@ function SearchUserView({ paginatedCollection }: { paginatedCollection: Paginate
    return (
       <>
          { paginatedCollection.folderList.map((folder, index) => (
-            <FolderPin key={index} folder={ folder } />
+            <FolderPin key={ index } folder={ folder } />
          ))}
 
          {/* create a user pin for each user given by the database */}
          { paginatedCollection.userList.map((user, index) => (
-            <UserPin key={index} user={ user } />
+            <UserPin key={ index } user={ user } />
          ))}
       </>
    );

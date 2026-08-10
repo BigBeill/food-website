@@ -5,10 +5,9 @@ import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
-export interface ButtonIconType {
+export type ButtonIconType = React.ComponentPropsWithoutRef<'button'> & {
    icon: IconDefinition;
    label: string; // needed for accessibility
-   onClick: () => void;
 }
 
 interface ButtonIconListProps {
@@ -18,10 +17,10 @@ interface ButtonIconListProps {
 
 export function ButtonIconList ({ iconList, loadingState = false }: ButtonIconListProps) {
    return (
-      <div>
-         { iconList.map(({ icon, label, onClick }) => (
-            <button key={label} onClick={onClick} aria-label={label}>
-               <FontAwesomeIcon icon={icon} />
+      <div className={loadingState ? 'hidden' : undefined}>
+         { iconList.map(({ icon, label, ...rest }) => (
+            <button key={ label } aria-label={ label } { ...rest } >
+               <FontAwesomeIcon icon={ icon } />
             </button>
          )) }
       </div>

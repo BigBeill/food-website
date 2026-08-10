@@ -1,5 +1,6 @@
 import { ingredientApi } from "./ingredient.api";
 import { IngredientGroupType, IngredientType } from "../domain/ingredient.types";
+import { PaginatedListType } from "@/shared/shared.types";
 
 interface searchParams {
    description?: string;
@@ -14,10 +15,10 @@ export const ingredientService = {
    get: (ingredientId: number): Promise<IngredientType> => {
       return ingredientApi.get(ingredientId);
    },
-   search: (params: searchParams): Promise<IngredientType[]> => {
+   search: (params: searchParams): Promise<PaginatedListType<IngredientType>> => {
       return ingredientApi.search(params);
    },
-   searchGroup: (): Promise<IngredientGroupType[]> => {
+   searchGroup: (): Promise<PaginatedListType<IngredientGroupType>> => {
       return ingredientApi.searchGroup();
    },
 }

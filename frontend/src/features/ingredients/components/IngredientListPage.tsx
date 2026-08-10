@@ -4,8 +4,15 @@ import useServiceState from "@/shared/hooks/useServiceState";
 import { ingredientService } from "../services/ingredient.service";
 import RequireServiceStateReady from "@/shared/components/RequireServiceStateReady";
 import { usePathname } from "next/navigation";
+import { PaginatedListType } from "@/shared/shared.types";
+import NotebookPageListItems from "@/shared/components/useNotebookComponents/ListItems";
+import Notebook from "@/shared/components/Notebook";
+
+const groupSize = 5;
 
 export default function IngredientListPage({ ingredientGroupId }: { ingredientGroupId: number }) {
+
+   const router = useRouter();
 
    const ingredientListState = useServiceState(() => {
       return ingredientService.search({ groupId: ingredientGroupId });
@@ -13,20 +20,20 @@ export default function IngredientListPage({ ingredientGroupId }: { ingredientGr
 
    return (
       <RequireServiceStateReady serviceState={ ingredientListState } >
-         { (ingredientList) => <IngredientGroupView ingredientList={ ingredientList } /> }
+         { (ingredients) => {
+            const pageComponentList: React.ReactElement[] = [];
+            for (let groupStartIndex = 0; groupStartIndex < ingredients.list.length; groupStartIndex += groupSize) {
+               const ingredientGroupList = ingredients.list.slice(groupStartIndex, groupStartIndex + groupSize);
+               const itemList = ingredientGroupList.map((ingredient) => { return { title: ingredient.description, onClick: () => { router.push(`/ingredients/${ingredientGroupId}/${ ingredient.food_id }`); } } });
+               pageComponentList.push(<NotebookPageListItems key={ groupStartIndex } itemList={ itemList } />);
+            }
+
+            return ( 
+               <Notebook childrenCount={ ingredients.count / groupSize } >
+                  { ...pageComponentList }
+               </Notebook>
+            )
+         } }
       </RequireServiceStateReady>
    )
-}
-
-function IngredientGroupView({ ingredientList }: { ingredientList: IngredientType[] }) {
-   const router = useRouter();
-   const pathname = usePathname();
-
-   return (
-      <div className="displayButtons">
-         { ingredientList.map((ingredient, index) => (
-            <button key={index} onClick={ () => router.push(`${pathname}/${ingredient.food_id}`) }>{ ingredient.description }</button>
-         )) }
-      </div>
-   );
 }

@@ -1,6 +1,6 @@
 export interface DataHandle<T> {
    getData: () => T;
-   setData?: (newList: T) => void;
+   setData: (newList: T) => void;
 };
 
 // all service functions should return this to force idle handling and preventing slow reactions waiting for API responses

@@ -1,6 +1,6 @@
 import { ButtonOval } from "@/shared/components/Button.components";
 import { InputText } from "@/shared/components/Input.components";
-import { useIntractableList } from "@/shared/hooks/useIntractableList";
+import { useInteractableList } from "@/shared/hooks/useInteractableList";
 import { DataHandle } from "@/shared/shared.types";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -15,8 +15,7 @@ export default function EditRecipeInstructionsPage ({ ref, initial }: EditRecipe
 
    const newInstructionRef = useRef<DataHandle<string>>(null);
 
-   const [newInstruction, setNewInstruction] = useState('');
-   const instructionList = useIntractableList({
+   const instructionList = useInteractableList({
       initial,
       renderItemContent: (item: string) => (
          <p>{item}</p>
@@ -38,26 +37,26 @@ export default function EditRecipeInstructionsPage ({ ref, initial }: EditRecipe
 
    // function that lets the parent component read and write to instructionList
    useImperativeHandle(ref, () => ({
-      getData: instructionList.content,
+      getData: () => instructionList.content,
       setData: instructionList.replaceList,
    }), [instructionList])
 
    function addInstruction() {
+      const newInstruction = newInstructionRef.current!.getData();
       if(newInstruction.length < 3) { return; }
       instructionList.addItem(newInstruction);
-      setNewInstruction('');
+      newInstructionRef.current!.setData('');
    }
 
    return (
       <div className='consumeSpace'>
          <h2>Recipe Instructions</h2>
-         { instructionList.reactComponent }
+         { instructionList.htmlView }
 
          <InputText
             label="New Instruction"
             placeholder="add a new instruction"
             dataRef={ newInstructionRef }
-            initial={ newInstruction }
          />
          <ButtonOval onClick={() => { addInstruction(); }}>Add Instruction</ButtonOval>
       </div>

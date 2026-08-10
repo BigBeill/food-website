@@ -1,8 +1,9 @@
+import IngredientSearch from "@/features/ingredients/components/IngredientSearch";
 import { IngredientConversionType, IngredientType } from "@/features/ingredients/domain/ingredient.types";
 import { ingredientService } from "@/features/ingredients/services/ingredient.service";
 import { ButtonOval } from "@/shared/components/Button.components";
 import { InputSearch } from "@/shared/components/Input.components";
-import { useIntractableList } from "@/shared/hooks/useIntractableList";
+import { useInteractableList } from "@/shared/hooks/useInteractableList";
 import useServiceState from "@/shared/hooks/useServiceState";
 import { DataHandle } from "@/shared/shared.types";
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
@@ -22,7 +23,7 @@ interface EditRecipeIngredientsPageProps {
 
 export default function EditRecipeIngredientsPage ({ ref, initial}: EditRecipeIngredientsPageProps) {
 
-   const ingredientList = useIntractableList({ 
+   const ingredientList = useInteractableList({ 
       initial,
       renderItemContent: (item: IngredientType) => {
          if (item.commonName) { return (<p>{ item.commonName }</p>) }
@@ -43,7 +44,7 @@ export default function EditRecipeIngredientsPage ({ ref, initial}: EditRecipeIn
 
    // function that lets the parent component read and write to ingredientList
    useImperativeHandle(ref, () => ({
-      getData: ingredientList.content,
+      getData: () => ingredientList.content,
       setData: ingredientList.replaceList,
    }), [ingredientList])
 
@@ -63,7 +64,7 @@ export default function EditRecipeIngredientsPage ({ ref, initial}: EditRecipeIn
       <div className='consumeSpace'>
          <h2>Recipe Ingredients</h2>
          
-         { ingredientList.reactComponent }
+         { ingredientList.htmlView }
 
          <div>
             <input type='text' placeholder='Ingredient Label (optional)' value={newIngredient.label} onChange={(event) => setNewIngredient({...newIngredient, label: event.target.value})}/>
@@ -84,14 +85,7 @@ export default function EditRecipeIngredientsPage ({ ref, initial}: EditRecipeIn
             </select>
          </div>
 
-         <InputSearch 
-            label="Ingredient"
-            placeholder="Add New Ingredient"
-            buttonAction={ (item: IngredientType) => { ingredientList.addItem(item); } }
-            fetcher={ (value: string) => { return ingredientService.search({ description: value }) } }
-            renderListItem={ (item: IngredientType) => ( <p>{item.description}</p> ) }
-            onItemSelect={ (item: IngredientType) => { setNewIngredient({ ...item, portion: { measure_id: 0, description: '', amount: 0 } }) } }
-         />
+         <IngredientSearch onSubmit={ (ingredient: IngredientType) => ingredientList.addItem(ingredient) }/>
 
          <ButtonOval onClick={ () => addIngredient } >
             Add Ingredient

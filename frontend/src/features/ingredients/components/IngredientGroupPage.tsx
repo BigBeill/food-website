@@ -3,33 +3,34 @@ import { ingredientService } from "../services/ingredient.service";
 import { useRouter } from "next/navigation";
 import useServiceState from "@/shared/hooks/useServiceState";
 import RequireServiceStateReady from "@/shared/components/RequireServiceStateReady";
-import useNotebook from "@/shared/hooks/useNotebook";
+import { PaginatedListType } from "@/shared/shared.types";
+import NotebookPageListItems from "@/shared/components/useNotebookComponents/ListItems";
+import Notebook from "@/shared/components/Notebook";
 
+const groupSize = 5;
 
 export default function IngredientGroupPage() {
-   const groupListState = useServiceState<IngredientGroupType[]>(() => ingredientService.searchGroup(), [])
+
+   const router = useRouter();
+
+   const groupListState = useServiceState<PaginatedListType<IngredientGroupType>>(() => ingredientService.searchGroup(), [])
 
    return (
       <RequireServiceStateReady serviceState={ groupListState } >
-         { (groupList) => <IngredientGroupView groupList={ groupList } /> }
+         { (ingredientGroups) => {
+            const pageComponentList: React.ReactElement[] = [];
+            for (let groupStartIndex = 0; groupStartIndex < ingredientGroups.list.length; groupStartIndex += groupSize) {
+               const ingredientGroupList = ingredientGroups.list.slice(groupStartIndex, groupStartIndex + groupSize);
+               const itemList = ingredientGroupList.map((ingredientGroup) => { return { title: ingredientGroup.name, onClick: () => { router.push(`/ingredients/${ ingredientGroup._id }`); } } });
+               pageComponentList.push(<NotebookPageListItems key={ groupStartIndex } itemList={ itemList } />);
+            }
+
+            return ( 
+               <Notebook childrenCount={ ingredientGroups.count / groupSize } >
+                  { ...pageComponentList }
+               </Notebook>
+            )
+         } }
       </RequireServiceStateReady>
-   );
-}
-
-function IngredientGroupView({ groupList }: { groupList: IngredientGroupType[] }) {
-   const router = useRouter();
-   const notebook = useNotebook();
-
-   return (
-      <div className="displayButtons">
-         { groupList.map((ingredientGroup, index) => (
-            <button
-               key={index}
-               onClick={() => router.push(`/ingredient/${ingredientGroup.id}`)}
-            >
-               {ingredientGroup.name}
-            </button>
-         ))}
-      </div>
    );
 }
