@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import useAuth from '@/features/auth/hooks/useAuth';
 import styles from './styles/header.module.scss';
-import { ButtonMobileNav } from './Button.components';
+import { ButtonNarrowNav } from './Button.components';
 
 interface NavigationNodeType {
    name: string,
@@ -99,7 +99,7 @@ export default function Header() {
             />
          </nav>
 
-         <ButtonMobileNav navOpen={ navOpen } onClick={ () => setNavOpen(!navOpen) } />
+         <ButtonNarrowNav navOpen={ navOpen } onClick={ () => setNavOpen(!navOpen) } />
 
       </header>
    );

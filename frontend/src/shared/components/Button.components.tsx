@@ -37,6 +37,34 @@ export function ButtonInline ({ children, ...rest }: React.ComponentPropsWithout
 
 
 
+interface ButtonNarrowNavParams {
+   navOpen: boolean,
+   onClick: () => void
+}
+
+export function ButtonNarrowNav({ navOpen, onClick }: ButtonNarrowNavParams ) {
+
+   return (
+      <button type="button" className={ styles.buttonNarrowNav } onClick={ onClick } >
+         <span>Open navigation</span>
+         <svg
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="2"
+            stroke="currentColor"
+         >
+            {navOpen ? (
+               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            ) : (
+               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            )}
+         </svg>
+      </button>
+   )
+}
+
+
+
 interface ButtonPairedParams {
    firstText: string
    firstOnClick: () => void
@@ -50,35 +78,6 @@ export function ButtonPaired ({ firstText, firstOnClick, secondText, secondOnCli
          <button className={ styles.buttonPrimary } onClick={ firstOnClick }>{ firstText }</button>
          <button className={ styles.buttonSecondary } onClick={ secondOnClick }>{ secondText }</button>
       </div>
-   )
-}
-
-
-
-interface MobileNavButtonParams {
-   navOpen: boolean,
-   onClick: () => void
-}
-
-export function ButtonMobileNav({ navOpen, onClick }: MobileNavButtonParams ) {
-
-   return (
-      <button type="button" className={ styles.buttonMobileNav } onClick={ onClick } >
-         <span className="sr-only">Open nav</span>
-         <svg
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="2"
-            stroke="currentColor"
-         >
-            {navOpen ? (
-               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            ) : (
-               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-            )}
-         </svg>
-      </button>
    )
 }
 
