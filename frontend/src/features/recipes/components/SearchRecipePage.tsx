@@ -5,7 +5,7 @@ import { recipeService } from '../services/recipes.service';
 import useServiceState from '@/shared/hooks/useServiceState';
 import Notebook from '@/shared/components/Notebook';
 import RequireServiceStateReady from '@/shared/components/RequireServiceStateReady';
-import NotebookPageListItems from '@/shared/components/useNotebookComponents/ListItems';
+import NotebookPageListItems from '@/shared/components/notebookPageComponents/ListItems';
 import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { ButtonIconList, ButtonOval } from '@/shared/components/Button.components';
 import { useInteractableList } from '@/shared/hooks/useInteractableList';

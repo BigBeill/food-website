@@ -1,5 +1,6 @@
 import type { IngredientRecord } from "../../common/mongo-db/schemas/recipe.schema";
 import type PaginationParams from "../../common/parameters/pagination.parameters";
+import type { PaginatedListType } from "../../common/types/PaginatedList.type";
 import type { NutritionType } from "../recipes/recipes.types";
 import type { IngredientsRepository } from "./ingredients.repository";
 import type { IngredientConversionType, IngredientGroupType, IngredientType } from "./ingredients.types";
@@ -79,7 +80,7 @@ export class IngredientsService {
       return conversionList;
    }
 
-   async searchGroup (params: SearchGroupParams): Promise<IngredientGroupType[]> {
+   async searchGroup (params: SearchGroupParams): Promise<PaginatedListType<IngredientGroupType>> {
       const { description, skip, limit } = params;
       const groupList = await this.repository.getGroupList({ description, skip, limit });
       return groupList;

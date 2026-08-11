@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import useServiceState from "@/shared/hooks/useServiceState";
 import RequireServiceStateReady from "@/shared/components/RequireServiceStateReady";
 import { PaginatedListType } from "@/shared/shared.types";
-import NotebookPageListItems from "@/shared/components/useNotebookComponents/ListItems";
+import NotebookPageListItems from "@/shared/components/notebookPageComponents/ListItems";
 import Notebook from "@/shared/components/Notebook";
 
 const groupSize = 5;

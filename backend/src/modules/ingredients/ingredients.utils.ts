@@ -10,37 +10,50 @@ interface BuildPostgresQueryParams {
    }[],
    skip?: number,
    limit?: number,
-   order?: string,
+   order?: { column: string, direction: 'DESC' | 'ASC' },
+   includeCount?: boolean
 }
 
-export async function postgresQueryBuilder<T extends QueryResultRow>(baseQuery: string, functionParams: BuildPostgresQueryParams = {}): Promise<QueryResult<T>>{
-   const { where = [], skip, limit, order } = functionParams;
+export async function postgresQueryBuilder<T extends QueryResultRow>(baseQuery: string, functionParams: BuildPostgresQueryParams = {}): Promise<{ content: T[], count?: number }>{
+   const { where = [], skip, limit, order, includeCount } = functionParams;
 
-   const params = [];
-   const conditions = [];
+   const params: string[] = [];
+   const conditions: string[] = [];
 
    for (const { column, operation, value } of where) {
       params.push(value);
+      // TODO: ADD A CHECK FOR {column} AND {operations} TO PREVENT SQL INJECTION
       conditions.push(`${column} ${operation} $${params.length}`);
    }
 
    const whereClause = conditions.length ? ` WHERE ${conditions.join(' AND ')}` : '';
-   let query = `${baseQuery} ${whereClause}`;
+   let query = `WITH filter AS (${baseQuery} ${whereClause}), contentConstraints AS (SELECT * FROM filter`;
 
-   if (limit) { 
-      params.push(limit)
-      query += ` LIMIT $${params.length}`
-   }
-   if (skip) { 
-      params.push(skip)
-      query += ` OFFSET $${params.length}`
-   }
    if (order) {
-      params.push(order)
-      query += ` ORDER BY $${params.length}`
+      // TODO: ADD A CHECK FOR {order.column} TO PREVENT SQL INJECTION
+      query += ` ORDER BY ${order.column} ${order.direction === 'DESC' ? 'DESC' : 'ASC'}`;
    }
 
-   return postgresConnection.query<T>(query, params);
+   if (limit != null) { 
+      params.push(String(limit));
+      query += ` LIMIT $${params.length}`;
+   }
+   if (skip != null) { 
+      params.push(String(skip));
+      query += ` OFFSET $${params.length}`;
+   }
+
+   query += `) SELECT json_build_object( 'content', COALESCE((SELECT json_agg(contentConstraints) FROM contentConstraints), '[]'::json)`;
+   
+   if(includeCount) {
+      query += `, 'count', (SELECT COUNT(*) FROM filter)`;
+   }
+
+   query += ') AS result;';
+
+   const { rows } = await postgresConnection.query<{ result: { content: T[], count: number }}>(query, params);
+
+   return rows[0]!.result;
 }
 
 export function breakupMeasureDescription(measureDescription: string ): { number: number, string: string} {
@@ -71,16 +84,17 @@ export function breakupMeasureDescription(measureDescription: string ): { number
 }
 
 type StoredIngredient = Pick<IngredientType, 'food_id' | 'label'> & {
-   portion: Pick<IngredientType['portion'], 'measure_id' | 'amount'>;
+   portion: Pick<NonNullable<IngredientType['portion']>, 'measure_id' | 'amount'>;
 };
 
 export function toStoredIngredient(ingredient: IngredientType): StoredIngredient {
+   if (!ingredient.portion) { throw new Error("ingredient is missing portions field and cannot be converted into storedIngredientType."); }
    return {
       food_id: ingredient.food_id,
       label: ingredient.label,
       portion: {
          measure_id: ingredient.portion.measure_id,
          amount: ingredient.portion.amount,
-      },
+      }
    };
 }

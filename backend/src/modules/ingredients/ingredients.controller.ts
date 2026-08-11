@@ -3,6 +3,8 @@ import { ingredientsService } from "../../container";
 import { SearchValidator } from "./validators/search.validator";
 import { PostgresIdValidator } from "../../common/validators/postgresId.validator";
 import { SearchConversionValidator } from "./validators/searchConversion.validator";
+import type { PaginatedListType } from "../../common/types/PaginatedList.type";
+import type { IngredientGroupType } from "./ingredients.types";
 
 const service = ingredientsService;
 
@@ -48,7 +50,7 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
    )
    .get( '/searchGroup', 
       async () => {
-         const groupList = await service.searchGroup({});
+         const groupList: PaginatedListType<IngredientGroupType> = await service.searchGroup({});
          return { 
             message: "food group list found",
             data: groupList 

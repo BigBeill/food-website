@@ -7,7 +7,7 @@
 .item {
    flex: 1;
    background-color: $color-background;
-   border-bottom: 2px solid var($color-text);
+   border-bottom: 2px solid $color-text;
 
    .decretiveLine {
       background-color: $color-primary;

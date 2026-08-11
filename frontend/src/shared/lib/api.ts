@@ -51,7 +51,7 @@ async function request<T>(config: SendServerRequestProps): Promise<T> {
    //check if the request failed for any reason and set errors
    if (!response.ok) {
       const responseContent = await response.json().catch(() => ({}));
-      console.error(`API request {${config.url}} ran into an error:`, responseContent );
+      console.warn(`API request {${config.url}} ran into an error:`, responseContent );
       
       if (response.status === 401) { throw new ErrorUnauthorized(responseContent.error.message); }
       else if (response.status === 404) { throw new ErrorNotFound(); }
