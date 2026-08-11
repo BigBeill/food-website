@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import useAuth from '@/features/auth/hooks/useAuth';
@@ -38,10 +38,11 @@ export default function Header() {
    const pathname = usePathname();
 
    const navRef = useRef<HTMLElement | null>(null);
-   const linkRefList = useRef(new Map<string, HTMLAnchorElement | null>());
-   const [linePosition, setLinePosition] = useState({ left: 0, width: 0 }); // this is relative the location the line would have started at when page loaded
 
-   function redefineLinePosition(href: string) {
+   const linkRefList = useRef(new Map<string, HTMLAnchorElement | null>());
+   const [linePosition, setLinePosition] = useState({ x: 0, scale: 0 });
+
+   const redefineLinePosition = useCallback((href: string) => {
       const nav = navRef.current;
       const activeLink = linkRefList.current.get(href);
       if (!nav || !activeLink) { return; }
@@ -50,20 +51,29 @@ export default function Header() {
       const activeLinkRectangle = activeLink.getBoundingClientRect();
 
       const remInPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
-      const pixelPadding = 0.75 * remInPx; // This is how many pixels are used to pad one side of a link tag
+      const pixelPadding = 0.3 * remInPx; // This is how many pixels are used to pad one side of a link tag
 
       setLinePosition({
-         left: activeLinkRectangle.left - navRectangle.left + pixelPadding,
-         width: activeLinkRectangle.width - (pixelPadding * 2),
-      })
-   }
+         x: activeLinkRectangle.left - navRectangle.left + pixelPadding,
+         scale: activeLinkRectangle.width - (pixelPadding * 2),
+      });
+   }, []);
 
    useEffect(() => {
-      redefineLinePosition(pathname)
-      const handleResize = () => redefineLinePosition(pathname);
+      redefineLinePosition(pathname);
+
+      let frame = 0;
+      const handleResize = () => {
+         cancelAnimationFrame(frame);
+         frame = requestAnimationFrame(() => redefineLinePosition(pathname));
+      }
+
       window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-   },[pathname]);
+      return () => { 
+         window.removeEventListener('resize', handleResize); 
+         cancelAnimationFrame(frame);
+      };
+   },[pathname, redefineLinePosition]);
 
    return (
       <header className={ styles.header }>
@@ -77,14 +87,17 @@ export default function Header() {
 
             { navigation.map((section, index) => (
                <div key={ index }>
-               { section.map((navigationNode, index) => (
+               { section.map((navigationNode) => (
                   <Link
                      key={navigationNode.name}
                      href={navigationNode.href}
-                     ref={(element) => { linkRefList.current.set(navigationNode.href, element); }}
+                     ref={(element) => { 
+                        if(element) { linkRefList.current.set(navigationNode.href, element); } 
+                        else { linkRefList.current.delete(navigationNode.href); }
+                     } }
                      onMouseEnter={() => redefineLinePosition(navigationNode.href)}
                      onClick={() => setNavOpen(false)}
-                     className={(pathname === navigationNode.href) ? "active-link" : ""}
+                     className={ (pathname === navigationNode.href) ? styles['active-link'] : undefined }
                   >
                      {navigationNode.name}
                   </Link>
@@ -93,14 +106,15 @@ export default function Header() {
             )) }
 
             {/* Sliding underline */}
-            <div
+            <span
+               aria-hidden="true"
                className={styles.navUnderline}
-               style={ { left: `${linePosition.left}px`, width: `${linePosition.width}px` } }
+               style={ { transform: `translateX(${linePosition.x}px) scaleX(${linePosition.scale})` } }
             />
          </nav>
 
          <ButtonNarrowNav navOpen={ navOpen } onClick={ () => setNavOpen(!navOpen) } />
-
+            
       </header>
    );
 }
