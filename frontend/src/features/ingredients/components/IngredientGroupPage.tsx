@@ -18,12 +18,15 @@ export default function IngredientGroupPage() {
    return (
       <RequireServiceStateReady serviceState={ groupListState } >
          { (ingredientGroups) => {
+            console.log(ingredientGroups);
             const pageComponentList: React.ReactElement[] = [];
             for (let groupStartIndex = 0; groupStartIndex < ingredientGroups.list.length; groupStartIndex += groupSize) {
                const ingredientGroupList = ingredientGroups.list.slice(groupStartIndex, groupStartIndex + groupSize);
-               const itemList = ingredientGroupList.map((ingredientGroup) => { return { title: ingredientGroup.name, onClick: () => { router.push(`/ingredients/${ ingredientGroup._id }`); } } });
+               const itemList = ingredientGroupList.map((ingredientGroup) => { return { title: ingredientGroup.description, onClick: () => { router.push(`/ingredients/${ ingredientGroup._id }`); } } });
                pageComponentList.push(<NotebookPageListItems key={ groupStartIndex } itemList={ itemList } />);
             }
+
+            console.log(pageComponentList);
 
             return ( 
                <Notebook childrenCount={ ingredientGroups.count / groupSize } >

@@ -14,18 +14,17 @@ interface NotebookPageListItemsProps {
 }
 
 export default function NotebookPageListItems({ itemList }: NotebookPageListItemsProps) {
-
    return (
       <div className={ styles.page }>
-         <div className={ styles.list } >
-            { itemList.map((item) => (
-               <div className={styles.item}>
-                  <GrowingText text={ item.title } />
+         <ul className={ styles.list } >
+            { itemList.map((item, index) => (
+               <li key={ index } className={ styles.item }>
+                  <GrowingText text={ item.title } className={ styles.title } />
                   <div className={ styles.decretiveLine } aria-hidden="true"/>
                   <ImageDisplay packagedImage={ item.image } />
-               </div>
+               </li>
             )) }
-         </div>
+         </ul>
       </div>
    );
 }

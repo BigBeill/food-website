@@ -30,5 +30,5 @@ export interface IngredientConversionType {
 
 export interface IngredientGroupType {
    _id: string;
-   name: string;
+   description: string;
 }
