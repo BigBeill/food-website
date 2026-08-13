@@ -1,8 +1,8 @@
 import { useRouter } from 'next/navigation';
 import useAuth from '@/features/auth/hooks/useAuth';
-import LoadingPage from '@/shared/components/stateComponents/LoadingPage';
+import LoadingPage from '@/shared/components/stateComponents/Loading.states';
 import { useEffect } from 'react';
-import ErrorPage from '@/shared/components/stateComponents/ErrorPage';
+import ErrorPage from '@/shared/components/stateComponents/Error.states';
 
 export default function RequireAuth({ children }: { children: React.ReactNode }) {
    const { authId, status } = useAuth();

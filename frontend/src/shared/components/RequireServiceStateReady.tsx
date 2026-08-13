@@ -1,7 +1,7 @@
 import { ServiceStateType } from "../shared.types";
-import ErrorPage from "./stateComponents/ErrorPage";
-import LoadingPage from "./stateComponents/LoadingPage";
-import NotFoundPage from "./stateComponents/NotFoundPage";
+import ErrorPage from "./stateComponents/Error.states";
+import { StateLoadingPage } from "./stateComponents/Loading.states";
+import { StateNotFoundPage } from "./stateComponents/NotFound.states";
 
 interface RequireServiceStateReadyProps<T> {
    serviceState: ServiceStateType<T>;
@@ -11,9 +11,9 @@ interface RequireServiceStateReadyProps<T> {
 export default function RequireServiceStateReady<T>({ serviceState, children }: RequireServiceStateReadyProps<T>) {
    switch (serviceState.status) {
       case 'loading':
-         return <LoadingPage />
+         return <StateLoadingPage />
       case 'not-found':
-         return <NotFoundPage />
+         return <StateNotFoundPage />
       case 'error':
          return <ErrorPage />
       case 'ready':

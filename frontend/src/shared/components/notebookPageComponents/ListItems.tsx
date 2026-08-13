@@ -18,7 +18,7 @@ export default function NotebookPageListItems({ itemList }: NotebookPageListItem
       <div className={ styles.page }>
          <ul className={ styles.list } >
             { itemList.map((item, index) => (
-               <li key={ index } className={ styles.item }>
+               <li key={ index } className={ styles.item } onClick={ item.onClick }>
                   <GrowingText text={ item.title } className={ styles.title } />
                   <div className={ styles.decretiveLine } aria-hidden="true"/>
                   <ImageDisplay packagedImage={ item.image } />

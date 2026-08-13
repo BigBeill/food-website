@@ -1,14 +1,12 @@
-import useAuth from "@/features/auth/hooks/useAuth";
-import RecipePage from "@/features/recipes/components/RecipePage";
-import { ButtonPaired } from "@/shared/components/Button.components";
-import { useRouter } from "next/navigation";
+import { RecipeView } from "@/features/recipes/components/RecipePage";
 import MiniComponent from "@/shared/components/MiniComponent";
 import AnimationCrooked from "@/shared/animations/crooked.animation";
+import { LinkPair } from "@/shared/components/Link.components";
+import LandingPageLinks from "./LandingPageLinks";
+import LazyLoad from "@/shared/components/LazyLoad";
+import { recipeService } from "@/features/recipes/services/recipes.service";
 
 export default function LandingPage() {
-
-   const { authId } = useAuth();
-   const router = useRouter();
 
    const featuredRecipeId = '6879a6901775cc14af3170ef';
 
@@ -19,25 +17,13 @@ export default function LandingPage() {
             <div className="standardContent" style={{ marginTop: '6rem',}}>
                <h1>Welcome to Big Beill's Kitchen</h1>
                <p style={{ fontSize: '1.2rem' }}> Discover, create, and share amazing recipes with a community of food enthusiasts </p>
-               {!authId ? (
-                  <ButtonPaired 
-                     firstText="Get started" 
-                     firstOnClick={ () => router.push("/auth/register") }
-                     secondText="Sign In"
-                     secondOnClick={ () => router.push("/auth/login") }
-                  />
-               ) : (
-                  <ButtonPaired
-                     firstText="Create Recipe"
-                     firstOnClick={ () => router.push("/editRecipe") }
-                     secondText="My Recipes"
-                     secondOnClick={ () => router.push("/searchRecipes/personal") }
-                  />
-               )}
+               <LandingPageLinks />
             </div>
             <AnimationCrooked>
                <MiniComponent>
-                  <RecipePage recipeId={featuredRecipeId}/>
+                  <LazyLoad serviceCall={ () => recipeService.get(featuredRecipeId) } >
+                     { (response) => <RecipeView recipe={response} /> }
+                  </ LazyLoad>
                </MiniComponent>
             </AnimationCrooked>
          </section>
@@ -75,33 +61,18 @@ export default function LandingPage() {
                   <div aria-hidden="true" className="icon">📖</div>
                   <a  href="/searchRecipes/public">Browse Recipes</a>
                </div>
-               {authId ? (
-                  <>
-                     <div className="buttonContent growOnHover">
-                        <div aria-hidden="true" className="icon">📋</div>
-                        <a href="/searchRecipes/personal">My Recipes</a>
-                     </div>
-                     <div className="buttonContent growOnHover">
-                        <div aria-hidden="true" className="icon">👫</div>
-                        <a href="/searchRecipes/friends">Friend's Recipes</a>
-                     </div>
-                     <div className="buttonContent growOnHover">
-                        <div aria-hidden="true" className="icon">👤</div>
-                        <a href="/profile">My Profile</a>
-                     </div>
-                  </>
-               ) : (
-                  <>
-                     <div className="buttonContent growOnHover">
-                        <div aria-hidden="true" className="icon">🔐</div>
-                        <a href="/login">Login</a>
-                     </div>
-                     <div className="buttonContent growOnHover">
-                        <div aria-hidden="true" className="icon">✨</div>
-                        <a href="/register">Register</a>
-                     </div>
-                  </>
-               )}
+               <div className="buttonContent growOnHover">
+                  <div aria-hidden="true" className="icon">📋</div>
+                  <a href="/searchRecipes/personal">My Recipes</a>
+               </div>
+               <div className="buttonContent growOnHover">
+                  <div aria-hidden="true" className="icon">👫</div>
+                  <a href="/searchRecipes/friends">Friend's Recipes</a>
+               </div>
+               <div className="buttonContent growOnHover">
+                  <div aria-hidden="true" className="icon">👤</div>
+                  <a href="/profile">My Profile</a>
+               </div>
                <div className="buttonContent growOnHover">
                   <div aria-hidden="true" className="icon">ℹ️</div>
                   <a href="/aboutMe">About</a>
@@ -119,12 +90,7 @@ export default function LandingPage() {
                   networking, and cybersecurity skills. This experimental platform allows you to
                   create, share, and discover amazing recipes.
                </p>
-               <ButtonPaired
-                  firstText="View on Github"
-                  firstOnClick={ () => window.location.href="https://github.com/BigBeill/Food-Recipe-Sharing-Platform" }
-                  secondText="Learn More"
-                  secondOnClick={ () => router.push("/about") }
-               />
+               <LinkPair first={ { text: "View on Github", href: 'https://github.com/BigBeill/Food-Recipe-Sharing-Platform' } } second={ { text: 'Learn More', href: '/about' } } />
             </div>
             <div className="warningContent">
                <h3>Security Notice</h3>

@@ -1,3 +1,5 @@
+'use client'
+
 import styles from './styles/buttons.module.scss';
 import Spinner from './icons/spinner';
 import { useState } from 'react';
@@ -60,24 +62,6 @@ export function ButtonNarrowNav({ navOpen, onClick }: ButtonNarrowNavParams ) {
             )}
          </svg>
       </button>
-   )
-}
-
-
-
-interface ButtonPairedParams {
-   firstText: string
-   firstOnClick: () => void
-   secondText: string
-   secondOnClick: () => void
-}
-
-export function ButtonPaired ({ firstText, firstOnClick, secondText, secondOnClick }: ButtonPairedParams) {
-   return (
-      <div className="splitSpace">
-         <button className={ styles.buttonPrimary } onClick={ firstOnClick }>{ firstText }</button>
-         <button className={ styles.buttonSecondary } onClick={ secondOnClick }>{ secondText }</button>
-      </div>
    )
 }
 

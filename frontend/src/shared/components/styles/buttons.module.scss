@@ -62,30 +62,14 @@
    }
 }
 
-.buttonPrimary {
+.buttonOval {
    @extend %universalButtonStyling;
-   background: $color-primary;
-   border-color: $color-primary;
-   color: $color-background;
-
-   &:hover, &.loadingState {
-      transform: scale(1.05);
-      border-radius: 0.3rem;
-   }
-}
-
-.buttonSecondary {
-   @extend %universalButtonStyling;
+   border-radius: 1.5rem;
 
    &:hover, &.loadingState {
       color: $color-background;
       background: $color-secondary;
    }
-}
-
-.buttonOval {
-   @extend .buttonSecondary;
-   border-radius: 1.5rem;
 }
 
 .buttonShielded {

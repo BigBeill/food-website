@@ -1,5 +1,3 @@
-"use client"
-
 import RequestPasswordResetPage from "@/features/auth/components/RequestPasswordResetPage";
 import RequireNoAuth from "@/features/auth/components/RequireNoAuth";
 

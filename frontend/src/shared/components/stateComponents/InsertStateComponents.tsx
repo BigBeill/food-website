@@ -1,5 +1,4 @@
-import styles from '../styles/insertStateComponents.module.scss';
-import Spinner from '../icons/spinner';
+import styles from './states.module.scss';
 import { ErrorValidation } from '@/shared/lib/errorClasses';
 
 export function InsertError({ error }: { error?: Error }) {
@@ -21,22 +20,6 @@ export function InsertError({ error }: { error?: Error }) {
                <p>{ error?.message || "Issue loading content, please try again." }</p>
             </>
          }
-      </div>
-   )
-}
-
-export function InsertInfo ({ message }: { message: string }) {
-   return (
-      <p className={ styles.update } aria-live='assertive'>
-         { message }
-      </p>
-   )
-}
-
-export function InsertLoading () {
-   return (
-      <div className={ styles.warning } aria-live='assertive'> 
-         <Spinner /> <p>Your content is loading.</p>
       </div>
    )
 }

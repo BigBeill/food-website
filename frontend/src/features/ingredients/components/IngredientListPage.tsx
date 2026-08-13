@@ -1,10 +1,7 @@
-import { IngredientType } from "../domain/ingredient.types";
 import { useRouter } from "next/router";
 import useServiceState from "@/shared/hooks/useServiceState";
 import { ingredientService } from "../services/ingredient.service";
 import RequireServiceStateReady from "@/shared/components/RequireServiceStateReady";
-import { usePathname } from "next/navigation";
-import { PaginatedListType } from "@/shared/shared.types";
 import NotebookPageListItems from "@/shared/components/notebookPageComponents/ListItems";
 import Notebook from "@/shared/components/Notebook";
 

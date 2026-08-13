@@ -26,8 +26,6 @@ export default function IngredientGroupPage() {
                pageComponentList.push(<NotebookPageListItems key={ groupStartIndex } itemList={ itemList } />);
             }
 
-            console.log(pageComponentList);
-
             return ( 
                <Notebook childrenCount={ ingredientGroups.count / groupSize } >
                   { ...pageComponentList }

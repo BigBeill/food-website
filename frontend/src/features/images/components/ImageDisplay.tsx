@@ -1,7 +1,7 @@
+"use client"
+
 import { PackagedImageType } from "../domain/image.types";
 import { unpackImage } from "../services/image.services";
-
-
 
 export default function ImageDisplay ({ packagedImage }: { packagedImage: PackagedImageType | undefined }) {
 

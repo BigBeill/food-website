@@ -2,17 +2,11 @@ import { RecipeType } from "../domain/recipes.types";
 import GrowingText from "@/shared/components/GrowingText";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
 import { recipeService } from "../services/recipes.service";
-import useServiceState from "@/shared/hooks/useServiceState";
-import RequireServiceStateReady from "@/shared/components/RequireServiceStateReady";
+import preRenderService from "@/shared/lib/handleServiceResponse";
 
-export default function RecipePage ({ recipeId }: { recipeId: string }) {
-   const recipeState = useServiceState(() => recipeService.get(recipeId), [ recipeId ]);
-
-   return (
-      <RequireServiceStateReady serviceState={ recipeState } >
-         { (recipe) => <RecipeView recipe={recipe} /> }
-      </RequireServiceStateReady>
-   );
+export default async function RecipePage ({ recipeId }: { recipeId: string }) {
+   const recipe = await preRenderService(() => recipeService.get(recipeId));
+   return <RecipeView recipe={ recipe } />
 }
 
 export function RecipeView({ recipe }: { recipe: RecipeType }) {
