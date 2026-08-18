@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+'use client'
+
+import React, { useState, useEffect, ComponentPropsWithoutRef } from 'react';
 import PaginationBar from '@/shared/components/PaginationBar';
 import styles from './styles/notebook.module.scss';
 import { useSearchParams } from 'next/navigation';
@@ -25,7 +27,7 @@ export default function Notebook ({ children, childrenCount, firstChildIndex = 0
    }
 
    function handleSetCurrentIndex(newIndex: number) {
-      setGroupNumber(newIndex / 2);
+      setGroupNumber((newIndex / 2) + 1);
       // only change the current index if the content already exists, otherwise wait for parent to react
       if (newIndex >= firstChildIndex && newIndex < (firstChildIndex + childArray.length)) { setCurrentIndex(newIndex); }
    }
@@ -87,4 +89,18 @@ function NotebookView({firstPage, secondPage, paginationBar}: NotebookProps) {
          {paginationBar}
       </div>
    )
+}
+
+
+
+
+
+
+export function NotebookPage({ children, className, ...rest }: ComponentPropsWithoutRef<'div'>) {
+   
+   return (
+      <div className={ [styles.NotebookPage, className].filter(Boolean).join(' ') } { ...rest } >
+         { children }
+      </div>
+   );
 }

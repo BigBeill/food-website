@@ -1,4 +1,4 @@
-import { NotFoundError, UnauthorizedError } from "../../common/errors/app-error";
+import { NotFoundError, UnauthorizedError } from "../../common/types/error.types";
 import type { RecipeRecord } from "../../common/mongo-db/schemas/recipe.schema";
 import type AuthIdParams from "../../common/parameters/authId.parameters";
 import { removeMongooseNoise } from "../../common/utils/db.mapper";
@@ -8,7 +8,7 @@ import type { RecipesRepository } from "./recipes.repository";
 import type { NutritionType, RecipeType } from "./recipes.types";
 import type PaginationParams from "../../common/parameters/pagination.parameters";
 import type { PermissionsService } from "../permissions/permissions.service";
-import type { PaginatedListType } from "../../common/types/PaginatedList.type";
+import type { PaginatedListType } from "../../common/types/return.types";
 
 interface GetRecipeListParams extends PaginationParams { 
    authId?: string,

@@ -1,3 +1,5 @@
+import "client-only";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ServiceStateType } from "../shared.types";
 import { ErrorNotFound } from "../lib/errorClasses";

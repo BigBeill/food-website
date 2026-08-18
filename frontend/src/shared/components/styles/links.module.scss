@@ -1,5 +1,12 @@
 @use '../../styles/variables' as *;
 
+.linkBackground {
+   height: 100%;
+   width: 100%;
+   color: inherit;
+   text-decoration: inherit;
+}
+
 .linkPair {
    display: flex;
    gap: 0.6rem;

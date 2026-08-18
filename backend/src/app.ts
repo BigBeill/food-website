@@ -8,9 +8,11 @@ import { removeMongooseNoise } from './common/utils/db.mapper';
 import { ingredientsController } from './modules/ingredients/ingredients.controller';
 import { imagesController } from './modules/images/images.controller';
 import { recipesController } from './modules/recipes/recipes.controller';
+import { jwksPlugin } from './modules/auth/jwk.plugin';
 
 export const app = new Elysia()
    .use(errorHandler)
+   .use(jwksPlugin)
    .mapResponse({ as: 'global' }, ({ responseValue }) => {
       if (responseValue && typeof responseValue === 'object' && 'data' in responseValue) {
          return new Response(

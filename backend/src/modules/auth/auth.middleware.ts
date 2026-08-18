@@ -1,27 +1,31 @@
 // src/modules/auth/auth.middleware.ts
 import { Elysia } from 'elysia';
-import jwt from 'jsonwebtoken';
 import { env } from '../../config/env';
-import { UnauthorizedError } from '../../common/errors/app-error';
-import type { JwtPayloadType } from './auth.types';
+import { UnauthorizedError } from '../../common/types/error.types';
+import { jwtVerify } from 'jose';
+import { publicKey } from './keys';
 
 export const authenticateMiddleware = new Elysia({ name: 'authenticate' }).derive(
    { as: 'scoped' },
-   ({ cookie: { accessToken } }): { authId?: string } => {
+   async ({ cookie: { accessToken } }): Promise<{ authId?: string }> => {
       const token = accessToken?.value as string;
       if (!token) { return { authId: undefined } }
       
       try {
-         const payload = jwt.verify(token, env.JWT_ACCESS_SECRET) as JwtPayloadType;
-         return { authId: payload.authId };
-      } catch {
+         const { payload } = await jwtVerify(token, publicKey, { 
+            issuer: env.AUTH_ISSUER,
+            audience: env.AUTH_AUDIENCE,
+            algorithms: ['ES256'],
+         });
+         return { authId: payload.sub };
+      } catch (error) {
          return { authId: undefined }
       }
    }
 )
 
 export const authorizeMiddleware = new Elysia({ name: 'authorize' })
-.use(authenticateMiddleware)
+.use(authenticateMiddleware) //? does this mean authenticateMiddleware is running twice if its used earlier or the same instance is being used again?
 .derive(
    { as: 'scoped' },
    ({ authId }): { authId: string } => {

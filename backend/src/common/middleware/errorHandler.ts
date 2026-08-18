@@ -1,5 +1,5 @@
-import { Elysia } from 'elysia';
-import { AppError } from '../errors/app-error';
+import { Elysia, ValidationError } from 'elysia';
+import { AppError } from '../types/error.types';
 
 export const errorHandler = new Elysia({ name: 'error-handler' })
    .onError(({ error, code, set }) => {
@@ -8,9 +8,10 @@ export const errorHandler = new Elysia({ name: 'error-handler' })
          return { error: { code: error.code, message: error.message } };
       }
 
-      if (code === 'VALIDATION') {
+      else if (error instanceof ValidationError) {
          set.status = 400;
-         return { error: { code: 'VALIDATION_ERROR', message: error.message } };
+         const message = JSON.parse(error.message);
+         return { error: { code: 'VALIDATION_ERROR', message } };
       }
 
       if (code === 'NOT_FOUND') {

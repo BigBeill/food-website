@@ -1,16 +1,14 @@
-import jwt from 'jsonwebtoken';
-import { ConflictError, NotFoundError, UnauthorizedError } from "../../common/errors/app-error";
+import { ConflictError, NotFoundError, UnauthorizedError } from "../../common/types/error.types";
 import { hashPassword, verifyPassword } from "../../common/utils/password";
 import { AuthRepository } from "./auth.repository";
-import type { AuthResultType, JwtPayloadType, SavedTokenType } from "./auth.types";
-import { env } from '../../config/env';
+import type { AuthResultType, SavedTokenType } from "./auth.types";
 import { sendPasswordResetEmail } from '../../services/email/email.service';
 import type AuthIdParams from '../../common/parameters/authId.parameters';
 import { buildConflictString } from '../users/users.utils';
 import { randomBytes } from 'node:crypto';
 import type { DeleteResult } from 'mongoose';
-import type { UserRecord } from '../../common/mongo-db/schemas/user.schema';
 import { removeMongooseNoise } from '../../common/utils/db.mapper';
+import { generateRefreshToken, signAccessToken } from './tokenSigner';
 
 export class AuthService {
    private readonly repository: AuthRepository;
@@ -33,7 +31,8 @@ export class AuthService {
       await this.repository.updatePassword(authId, passwordHash);
    }
 
-   async login(name: string, password: string, rememberMe: boolean = false): Promise<AuthResultType> {
+   async login(loginCredentials: { name: string, password: string, rememberMe?: boolean }): Promise<AuthResultType> {
+      const { name, password, rememberMe } = loginCredentials;
       const userAndPassword = await this.repository.getUserWithPassword({ name });
       if (!userAndPassword) { throw new UnauthorizedError('Invalid Username'); }
 
@@ -43,12 +42,16 @@ export class AuthService {
       // remove the passwordHash before returning to client
       const { passwordHash, ...user } = userAndPassword;
 
-      return this.buildAuthResult(user);
+      const oneDay = 60 * 60 * 24 * 1000 // 1 day in milliseconds
+
+      const refreshExpiresAt = new Date(Date.now() + (rememberMe ? oneDay : oneDay * 30 ));
+      return this.buildAuthResult(user._id.toString(), { refreshExpiresAt });
    }
 
-   async register(name: string, email: string, password: string): Promise<AuthResultType> {
+   async register(newUser: { name: string, email: string, password: string }): Promise<AuthResultType> {
+      const { name, email, password } = newUser;
 
-      const conflictingUserList = await this.repository.getExactUserList({ name, email });
+      const conflictingUserList = await this.repository.searchUserExact({ name, email });
 
       if (conflictingUserList.length > 0) { 
          const conflictingUser = { _id: "0", name, email }
@@ -56,9 +59,10 @@ export class AuthService {
       }
       
       const passwordHash = await hashPassword(password);
-      const user = await this.repository.createUser(name, email, passwordHash);
+      const user = await this.repository.createUser({ name, email, passwordHash });
 
-      return this.buildAuthResult(user);
+      const refreshExpiresAt = new Date(Date.now() + 60 * 60 * 24 * 1000) // 1 day in milliseconds
+      return this.buildAuthResult(user._id.toString(), { refreshExpiresAt: refreshExpiresAt });
    }
 
    async removeRefreshToken(token: string): Promise<DeleteResult> {
@@ -66,29 +70,24 @@ export class AuthService {
       return await this.repository.deleteRefreshTokenByHash(tokenHash);
    }
 
-   async refreshTokens(refreshToken: string): Promise<AuthResultType> {
-
-      let payload: JwtPayloadType;
-      try { payload = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as JwtPayloadType; }
-      catch { throw new UnauthorizedError('invalid refresh token'); }
+   async refresh(refreshToken: string): Promise<AuthResultType> {
 
       const hashedToken = new Bun.CryptoHasher("sha256").update(refreshToken).digest("hex");
-      const serverHash = removeMongooseNoise<SavedTokenType>(await this.repository.getRefreshToken(hashedToken));
+      const databaseRefreshToken = removeMongooseNoise<SavedTokenType>(await this.repository.getRefreshToken(hashedToken));
 
-      if (!serverHash || serverHash.userId !== payload.authId) { throw new UnauthorizedError('invalid refresh token'); }
+      const user = await this.repository.getUserById(databaseRefreshToken.userId);
+      if (!user) { throw new UnauthorizedError('invalid refresh token'); }
 
-      const userList = await this.repository.getExactUserList({ _id: payload.authId });
-      if (!userList[0]) { throw new UnauthorizedError('invalid refresh token'); }
-
-      return this.buildAuthResult(userList[0], { excludeRefreshToken: true });
+      return this.buildAuthResult(user._id.toString(), { refreshExpiresAt: databaseRefreshToken.expiresAt });
    }
 
    async requestPasswordReset(email: string): Promise<void> {
       const normalizedEmail = email.toLowerCase().trim();
-      const user = await this.repository.getExactUserList({ email: normalizedEmail });
+      const user = await this.repository.searchUserExact({ email: normalizedEmail });
       if (!user[0]) { throw new NotFoundError(`user containing { email: ${email} }`); }
       const userId = user[0]._id.toString();
-      await this.repository.deletePasswordResetTokens(userId);
+
+      await this.cleanSavedTokens(userId);
 
       const resetToken = randomBytes(32).toString('hex');
       const tokenHash = new Bun.CryptoHasher("sha256").update(resetToken).digest("hex");
@@ -122,36 +121,31 @@ export class AuthService {
       await this.repository.updatePassword(userId, hashedPassword);
    }
 
-   private async buildAuthResult(user: UserRecord, { excludeRefreshToken = false }: {excludeRefreshToken?: boolean } = {}): Promise<AuthResultType> {
+   private async buildAuthResult(userId: string, { refreshExpiresAt }: { refreshExpiresAt: Date }): Promise<AuthResultType> {
+
+      const accessToken = await signAccessToken(userId);
+
+      const refreshToken = generateRefreshToken();
+      const hash = new Bun.CryptoHasher("sha256").update(refreshToken).digest("hex");
+      await this.repository.createRefreshToken({ userId, hash, expiresAt: refreshExpiresAt });
+
+      return { userId, tokens: { accessToken, refreshToken } }
+   }
+
+   // function that removes all tokens from a database for a specific user. refresh tokens, reset tokens, other I add down the road. Make user sign in and request everything from scratch.
+   private async cleanSavedTokens(userId: string): Promise<void> {
+      const results = await Promise.allSettled([
+         this.repository.deletePasswordResetTokens(userId),
+         this.repository.deleteRefreshTokensByUserId(userId),
+      ]);
+
+      const failures = results.filter((result): result is PromiseRejectedResult => result.status === "rejected");
       
-      const accessToken = jwt.sign(
-         { authId: user._id.toString() },
-         env.JWT_ACCESS_SECRET,
-         { expiresIn: env.JWT_ACCESS_EXPIRES_IN },
-      );
-
-      if (excludeRefreshToken) {
-         return {
-            user,
-            tokens: {
-               accessToken,
-               refreshToken: "",
-            }
+      if (failures.length > 0) {
+         for (const failure of failures) {
+            console.error(`token cleanup failed for userId ${userId}:`, failure.reason);
          }
-      }
-
-      const refreshToken = jwt.sign(
-         { authId: user._id.toString() },
-         env.JWT_REFRESH_SECRET,
-         { expiresIn: env.JWT_REFRESH_EXPIRES_IN },
-      );
-
-      const refreshTokenHash = new Bun.CryptoHasher("sha256").update(refreshToken).digest("hex");
-      await this.repository.saveRefreshToken(user._id.toString(), refreshTokenHash);
-
-      return {
-         user,
-         tokens: { accessToken, refreshToken }
+         throw new Error(`token cleanup failed for userId ${userId}`);
       }
    }
 }

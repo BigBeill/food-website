@@ -1,5 +1,5 @@
 import { ServiceStateType } from "../shared.types";
-import ErrorPage from "./stateComponents/Error.states";
+import StateErrorPage from "./stateComponents/Error.states";
 import { StateLoadingPage } from "./stateComponents/Loading.states";
 import { StateNotFoundPage } from "./stateComponents/NotFound.states";
 
@@ -15,7 +15,7 @@ export default function RequireServiceStateReady<T>({ serviceState, children }: 
       case 'not-found':
          return <StateNotFoundPage />
       case 'error':
-         return <ErrorPage />
+         return <StateErrorPage />
       case 'ready':
          return <>{children(serviceState.data)}</>
    }

@@ -5,14 +5,21 @@ export interface RecipeDraft {
    ownerId: string;
    title: string;
    description: string;
+   image?: File;
    ingredientList: IngredientType[];
    instructionList: string[];
    visibility: 'public' | 'private' | 'personal';
 }
 
-export interface RecipeType extends RecipeDraft {
+export interface RecipeType{
    _id: string;
+   ownerId: string;
+   title: string;
+   description: string;
    image?: PackagedImageType;
+   ingredientList: IngredientType[];
+   instructionList: string[];
+   visibility: 'public' | 'private' | 'personal';
    nutrition?: {
       calories: number;
       fat: number;

@@ -1,7 +1,7 @@
 import { PaginatedListType } from "@/shared/shared.types";
 import { RecipeDraft, RecipeType } from "../domain/recipes.types";
 import { recipeApi } from "./recipes.api";
-import { checkValidRecipe, createRecipeFormData } from "./recipes.utils";
+import { checkValidRecipeDraft, createRecipeFormData } from "./recipes.utils";
 
 interface SearchParams {
    title?: string
@@ -13,9 +13,9 @@ interface SearchParams {
 }
 
 export const recipeService = {
-   create: (recipe: RecipeDraft, image?: File): Promise<void> => {
-      checkValidRecipe(recipe);
-      const recipeFormData = createRecipeFormData(recipe, image);
+   create: (recipe: RecipeDraft): Promise<void> => {
+      checkValidRecipeDraft(recipe);
+      const recipeFormData = createRecipeFormData(recipe);
       return recipeApi.create(recipeFormData);
    },
    delete: (recipeId: string): Promise<void> => {
@@ -35,9 +35,9 @@ export const recipeService = {
          includeNutrition 
       });
    },
-   update: (recipe: RecipeType, image?: File): Promise<void> => {
-      checkValidRecipe(recipe);
-      const recipeFormData = createRecipeFormData(recipe, image);
-      return recipeApi.update(recipe._id, recipeFormData);
+   update: (recipeId: string, recipe: RecipeDraft): Promise<void> => {
+      checkValidRecipeDraft(recipe);
+      const recipeFormData = createRecipeFormData(recipe);
+      return recipeApi.update(recipeId, recipeFormData);
    }
 }

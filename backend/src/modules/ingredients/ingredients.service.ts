@@ -1,6 +1,6 @@
 import type { IngredientRecord } from "../../common/mongo-db/schemas/recipe.schema";
 import type PaginationParams from "../../common/parameters/pagination.parameters";
-import type { PaginatedListType } from "../../common/types/PaginatedList.type";
+import type { PaginatedListType } from "../../common/types/return.types";
 import type { NutritionType } from "../recipes/recipes.types";
 import type { IngredientsRepository } from "./ingredients.repository";
 import type { IngredientConversionType, IngredientGroupType, IngredientType } from "./ingredients.types";

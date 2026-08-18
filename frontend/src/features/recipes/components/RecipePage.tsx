@@ -2,7 +2,7 @@ import { RecipeType } from "../domain/recipes.types";
 import GrowingText from "@/shared/components/GrowingText";
 import ImageDisplay from "@/features/images/components/ImageDisplay";
 import { recipeService } from "../services/recipes.service";
-import preRenderService from "@/shared/lib/handleServiceResponse";
+import preRenderService from "@/shared/lib/preRenderService";
 
 export default async function RecipePage ({ recipeId }: { recipeId: string }) {
    const recipe = await preRenderService(() => recipeService.get(recipeId));

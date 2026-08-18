@@ -1,9 +1,9 @@
-import { ConflictError, NotFoundError, UnauthorizedError } from "../../common/errors/app-error";
+import { ConflictError, NotFoundError, UnauthorizedError } from "../../common/types/error.types";
 import type { FriendRequestRecord } from "../../common/mongo-db/schemas/friendRequest.schema";
 import type { FriendshipRecord } from "../../common/mongo-db/schemas/friendship.schema";
 import type AuthIdParams from "../../common/parameters/authId.parameters";
 import type PaginationParams from "../../common/parameters/pagination.parameters";
-import type { PaginatedListType } from "../../common/types/PaginatedList.type";
+import type { PaginatedListType } from "../../common/types/return.types";
 import { removeMongooseNoise } from "../../common/utils/db.mapper";
 import type { AuthService } from "../auth/auth.service";
 import type { ImagesService } from "../images/images.service";

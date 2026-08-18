@@ -1,7 +1,7 @@
 import { RecipeDraft, RecipeType } from "../domain/recipes.types";
 import { ErrorValidation } from "@/shared/lib/errorClasses";
 
-export function checkValidRecipe(recipe: RecipeDraft | RecipeType) {
+export function checkValidRecipeDraft(recipe: RecipeDraft) {
    const issueList: string[] = [];
 
    if (recipe.title.length < 3) { issueList.push('title must be at least 3 characters long'); }

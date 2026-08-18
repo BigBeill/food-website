@@ -1,12 +1,11 @@
-import type { UserRecord } from "../../common/mongo-db/schemas/user.schema";
 
 export interface AuthTokensType {
    accessToken: string;
-   refreshToken: string;
+   refreshToken?: string;
 }
 
 export interface AuthResultType {
-   user: UserRecord
+   userId: string;
    tokens: AuthTokensType;
 }
 
@@ -18,5 +17,6 @@ export interface JwtPayloadType {
 
 export interface SavedTokenType {
    userId: string;
-   hash: string
+   hash: string;
+   expiresAt: Date;
 }

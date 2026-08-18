@@ -1,5 +1,5 @@
 import { randomUUIDv7 } from "bun";
-import { NotFoundError, UnauthorizedError, ValidationError } from "../../common/errors/app-error";
+import { NotFoundError, UnauthorizedError, ValidationError } from "../../common/types/error.types";
 import { env } from "../../config/env";
 import type { ImageType, TrackedImageType } from "./images.types";
 

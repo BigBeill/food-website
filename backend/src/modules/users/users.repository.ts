@@ -4,7 +4,7 @@ import { FriendshipModel, type FriendshipRecord } from "../../common/mongo-db/sc
 import { UserModel, type UserRecord } from "../../common/mongo-db/schemas/user.schema";
 import type { ImageType } from "../images/images.types";
 import type PaginationParams from "../../common/parameters/pagination.parameters";
-import type { PaginatedListType } from "../../common/types/PaginatedList.type";
+import type { PaginatedListType } from "../../common/types/return.types";
 import { mongooseAggregateToPaginatedList } from "../../common/utils/pagination.utils";
 
 interface GetFolderListParams extends PaginationParams{

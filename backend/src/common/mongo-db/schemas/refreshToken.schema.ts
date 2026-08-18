@@ -4,17 +4,13 @@ const refreshTokenSchema = new Schema(
    {
       userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
       hash: { type: String, required: true, unique: true },
+      expiresAt: { type: Date, required: true },
    },
    { timestamps: true },
 );
 
-// TTL index — Mongo deletes docs ~30 days after createdAt
-refreshTokenSchema.index(
-   { createdAt: 1 },
-   { expireAfterSeconds: 60 * 60 * 24 * 30 }
-);
-
-refreshTokenSchema.index({ user: 1 });
+refreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+refreshTokenSchema.index({ userId: 1 });
 
 type RefreshTokenSchemaType = InferSchemaType<typeof refreshTokenSchema>;
 export type RefreshTokenDocument = HydratedDocument<RefreshTokenSchemaType>;

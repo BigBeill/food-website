@@ -27,4 +27,10 @@ export const env = {
 	UPLOADS_DIRECTORY: required('UPLOADS_DIRECTORY'),
 
 	RESEND_API_KEY: required('RESEND_API_KEY'),
+
+	AUTH_PRIVATE_KEY: required('AUTH_PRIVATE_KEY'),
+	AUTH_PUBLIC_JWK: required('AUTH_PUBLIC_JWK'),
+	AUTH_KEY_ID: required('AUTH_KEY_ID'),
+	AUTH_ISSUER: required('AUTH_ISSUER'),
+	AUTH_AUDIENCE: required('AUTH_AUDIENCE')
 };

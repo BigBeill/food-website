@@ -9,15 +9,26 @@ type GetUserWithPasswordParams =
    | { _id: string, name?: string }
    | { _id?: string, name: string }
 
+interface createRefreshTokenParams { 
+   userId: string;
+   hash: string;
+   expiresAt: Date;
+}
+
 export class AuthRepository {
 
    async createPasswordResetToken(userId: string, tokenHash: string): Promise<void> {
       await PasswordResetTokenModel.create({ userId, tokenHash });
    }
 
-   async createUser (name: string, email: string, passwordHash: string): Promise<UserRecord> {
-      const user = await UserModel.create({ name, email, passwordHash });
-      const { passwordHash: _ , __v, ...record } = user.toObject();
+   async createRefreshToken(params: createRefreshTokenParams): Promise<void> {
+      const { userId, hash, expiresAt } = params;
+      await RefreshTokenModel.create({ userId, hash, expiresAt });
+   }
+
+   async createUser (newUser: { name: string, email: string, passwordHash: string }): Promise<UserRecord> {
+      const user = await UserModel.create(newUser);
+      const { passwordHash, __v, ...record } = user.toObject();
       return record;
    }
 
@@ -33,22 +44,14 @@ export class AuthRepository {
       return await RefreshTokenModel.deleteMany({ userId });
    }
 
-   async getExactUserList({_id, name, email}: { _id?: string, name?: string, email?: string }): Promise<UserRecord[]> {
-      const conditions: any[] = [];
-
-      if (_id) conditions.push({ _id });
-      if (name) conditions.push({ name });
-      if (email) conditions.push({ email });
-
-      if (conditions.length === 0) { return []; }
-
-      const userList = await UserModel.find({ $or: conditions }).lean();
-      return userList;
-   }
-
    async getPasswordResetToken(tokenHash: string): Promise<PasswordResetTokenRecord | null> {
       const passwordResetToken = await PasswordResetTokenModel.findOne({ tokenHash });
       return passwordResetToken;
+   }
+
+   async getUserById(_id: string): Promise<UserRecord | null> {
+      const user = await UserModel.findById(_id);
+      return user;
    }
 
    //! VALUES FROM THIS REPOSITORY CONTAINS CONFIDENTIAL INFORMATION THAT SHOULD NOT BE RETURNED TO THE FRONTEND (returned object contains passwordHash)
@@ -57,11 +60,19 @@ export class AuthRepository {
    }
 
    async getRefreshToken(tokenHash: string): Promise<RefreshTokenRecord | null> {
-      return RefreshTokenModel.findOne({ hash: tokenHash }).lean<RefreshTokenRecord>();
+      return RefreshTokenModel.findOneAndDelete({ hash: tokenHash }).lean<RefreshTokenRecord>();
    }
 
-   async saveRefreshToken(userId: string, hash: string): Promise<void> {
-      await RefreshTokenModel.create({ userId, hash });
+   async searchUserExact({ name, email }: { name?: string, email?: string }): Promise<UserRecord[]> {
+      const conditions: any[] = [];
+
+      if (name) conditions.push({ name });
+      if (email) conditions.push({ email });
+
+      if (conditions.length === 0) { return []; }
+
+      const userList = await UserModel.find({ $or: conditions }).lean();
+      return userList;
    }
 
    async updatePassword(userId: string, passwordHash: string): Promise<void> {

@@ -14,7 +14,7 @@ async function request<T>(config: SendServerRequestProps): Promise<T> {
    const isGet = config.method.toLowerCase() === 'get';
    const isFormData = config.body instanceof FormData;
 
-   let url = `${BASE_URL}/api/v1${config.url}`;
+   let url = `${BASE_URL}${config.url}`;
    // attach the body to the url for get requests
    if (isGet && config.body && !isFormData) {
       const query = new URLSearchParams(

@@ -1,10 +1,13 @@
+"use client"
+
 import styles from './input.module.scss';
 
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState, useEffect, Ref, useImperativeHandle } from "react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
-import { PackagedImageType } from "../domain/image.types";
 import { unpackImage } from "../services/image.services";
+import { DataHandle } from '@/shared/shared.types';
+import { PackagedImageType } from '../domain/image.types';
 
 
 /*
@@ -23,14 +26,20 @@ This component will attempt to display an image source, it chooses what to displ
 It will give the user the option to upload a new image file, which will be sent to setImageBuffer provided by the parent component.
 */
 interface ImageUploaderProps {
-   imageBuffer?: File | null;
-   setImageBuffer: (file: File | null) => void;
-   oldImage?: PackagedImageType
-   category: string
+   imageRef: Ref<DataHandle<File | null>>;
+   initial?: PackagedImageType;
+   category: string;
 }
 
-export default function ImageUploader({ imageBuffer, setImageBuffer, oldImage, category }: ImageUploaderProps) {
+export default function ImageUploader({ imageRef, initial, category }: ImageUploaderProps) {
    const maxFileSize = 5 * 1024 * 1024; // 5 MB
+
+   const [imageBuffer, setImageBuffer] = useState<File | null>(null);
+
+   useImperativeHandle(imageRef, () => ({
+      getData: () => imageBuffer,
+      setData: setImageBuffer,
+   }),[]);
 
    const fileInputRef = useRef<HTMLInputElement | null>(null);
    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -107,7 +116,7 @@ export default function ImageUploader({ imageBuffer, setImageBuffer, oldImage, c
          ) : ( 
             <img 
                className="consumeSpace" 
-               { ...unpackImage(oldImage) }
+               { ...unpackImage(initial) }
             />
          ) }
          <FontAwesomeIcon icon={faCamera} className={isDragging ? 'makeVisible' : ''}/>

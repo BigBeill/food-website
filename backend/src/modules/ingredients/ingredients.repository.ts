@@ -1,6 +1,6 @@
-import { NotFoundError } from "../../common/errors/app-error";
+import { NotFoundError } from "../../common/types/error.types";
 import type paginationParams from "../../common/parameters/pagination.parameters";
-import type { PaginatedListType } from "../../common/types/PaginatedList.type";
+import type { PaginatedListType } from "../../common/types/return.types";
 import postgresConnection from "../../config/postgres.database";
 import type { IngredientConversionType, IngredientGroupType, IngredientType } from "./ingredients.types";
 import { postgresQueryBuilder } from "./ingredients.utils";

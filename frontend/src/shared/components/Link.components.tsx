@@ -11,6 +11,21 @@ function CustomLink ({ children, href, ...rest }: React.ComponentProps<typeof Li
 
 
 
+interface LinkBackgroundParams {
+   children: React.ReactNode;
+   href: string;
+}
+
+export function LinkBackground({ children, href }: LinkBackgroundParams) {
+   return (
+      <CustomLink href={ href } className={ styles.linkBackground }>
+         { children }
+      </CustomLink>
+   )
+}
+
+
+
 interface LinkPairParams {
    first: { text: string, href: string };
    second: { text: string, href: string };

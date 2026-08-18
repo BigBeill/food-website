@@ -1,4 +1,4 @@
-import type { PaginatedListType } from "../types/PaginatedList.type";
+import type { PaginatedListType } from "../types/return.types";
 
 
 type MongooseResponseType<T> = Array<{

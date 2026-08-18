@@ -1,15 +1,18 @@
-import { ReactNode, useRef, useState } from 'react';
+import "client-only";
+
+import { ReactNode, Ref, useImperativeHandle, useRef, useState } from 'react';
 import styles from './styles/interactableList.module.scss'
 import { Reorder } from 'framer-motion';
+import { DataHandle } from "../shared.types";
 
 interface InteractableListActions<T> {
    addItem: (item: T) => void;
    removeIndex: (index: number) => void;
-   replaceList: (newList: T[]) => void;
 }
 
 interface InteractableListOptions<T> {
-   initial?: T[];
+   initial: T[];
+   ref: Ref<DataHandle<T[]>>;
    renderItemContent: (item: T, index: number, actions: InteractableListActions<T>) => ReactNode;
    renderItemOptions: (item: T, index: number, actions: InteractableListActions<T>) => ReactNode;
    renderItemHeader?: (item: T, index: number, actions: InteractableListActions<T>) => ReactNode;
@@ -20,7 +23,7 @@ interface ListItem<T> {
    content: T;
 }
 
-export function useInteractableList<T>({ initial = [], renderItemContent, renderItemOptions, renderItemHeader }: InteractableListOptions<T>) {
+export function useInteractableList<T>({ initial, ref, renderItemContent, renderItemOptions, renderItemHeader }: InteractableListOptions<T>) {
 
    const nextId = useRef(0); // for simplicity, once an ID has been assigned, it will never be reassigned in this list, even if deleted (unless a list reset happens)
    const [list, setList] = useState<ListItem<T>[]>(() => assignIds(initial));
@@ -32,9 +35,13 @@ export function useInteractableList<T>({ initial = [], renderItemContent, render
       }));
    }
 
-   function removeIds(): T[] {
-      return list.map((item) => item.content);
-   }
+   useImperativeHandle(ref, () => ({
+      getData: () => list.map((item) => item.content),
+      setData: (newList) => {
+         nextId.current = 0;
+         setList(assignIds(newList));
+      }
+   }));
 
    function addItem(item: T) { 
       setList((previous) => [...previous, ...assignIds([item])]); 
@@ -44,12 +51,7 @@ export function useInteractableList<T>({ initial = [], renderItemContent, render
       setList(list => list.filter((_, i) => i !== index)); 
    }
 
-   function replaceList(newList: T[]) {
-      nextId.current = 0;
-      setList(assignIds(newList));
-   }
-
-   const actions: InteractableListActions<T> = { addItem, removeIndex, replaceList };
+   const actions: InteractableListActions<T> = { addItem, removeIndex };
 
    const htmlView = (
       <Reorder.Group className={ styles.interactableList } axis='y' values={list} onReorder={setList}>
@@ -72,5 +74,5 @@ export function useInteractableList<T>({ initial = [], renderItemContent, render
       </Reorder.Group>
    );
 
-   return { ...actions, content: removeIds(), htmlView };
+   return { ...actions, htmlView };
 }

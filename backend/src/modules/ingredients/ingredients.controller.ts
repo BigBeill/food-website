@@ -3,7 +3,7 @@ import { ingredientsService } from "../../container";
 import { SearchValidator } from "./validators/search.validator";
 import { PostgresIdValidator } from "../../common/validators/postgresId.validator";
 import { SearchConversionValidator } from "./validators/searchConversion.validator";
-import type { PaginatedListType } from "../../common/types/PaginatedList.type";
+import type { PaginatedListType } from "../../common/types/return.types";
 import type { IngredientGroupType } from "./ingredients.types";
 
 const service = ingredientsService;

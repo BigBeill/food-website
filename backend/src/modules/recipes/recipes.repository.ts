@@ -1,5 +1,5 @@
 import { RecipeModel, type RecipeRecord } from "../../common/mongo-db/schemas/recipe.schema";
-import type { PaginatedListType } from "../../common/types/PaginatedList.type";
+import type { PaginatedListType } from "../../common/types/return.types";
 import { escapeRegex } from "../../common/utils/filter";
 import { mongooseAggregateToPaginatedList } from "../../common/utils/pagination.utils";
 import type { RecipeType } from "./recipes.types";

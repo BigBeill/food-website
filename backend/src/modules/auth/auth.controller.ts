@@ -5,7 +5,7 @@ import { RegisterValidator } from './validators/register.validator';
 import { LoginValidator } from './validators/login.validator';
 import { authenticateMiddleware, authorizeMiddleware } from './auth.middleware';
 import { requestPasswordResetValidator } from './validators/requestPasswordReset.validator';
-import { NotFoundError } from '../../common/errors/app-error';
+import { NotFoundError } from '../../common/types/error.types';
 import { resetPasswordValidator } from './validators/resetPassword.validator';
 import { changePasswordValidator } from './validators/changePassword.validator';
 
@@ -15,7 +15,7 @@ export const authController = new Elysia({ prefix: '/auth' })
    .post( '/login',
       async ({ body, set, cookie: { accessToken, refreshToken } }) => {
          const { name, password, rememberMe } = body;
-         const result = await service.login(name, password, rememberMe);
+         const result = await service.login({ name, password });
          accessToken.set({
             value: result.tokens.accessToken,
             maxAge: 60 * 15 // 15 minutes in seconds
@@ -27,7 +27,7 @@ export const authController = new Elysia({ prefix: '/auth' })
          set.status = 200;
          return { 
             message: "User logged in",
-            data: result.user
+            data: result
          };
       },
       {
@@ -40,14 +40,18 @@ export const authController = new Elysia({ prefix: '/auth' })
    )
    .post( '/refresh',
       async ({ set, cookie: { accessToken, refreshToken } }) => {
-         const result = await service.refreshTokens(refreshToken.value);
+         const result = await service.refresh(refreshToken.value);
          accessToken.set({
             value: result.tokens.accessToken,
             maxAge: 60 * 15 // 15 minutes in seconds
          });
-         set.status = 204;
+         refreshToken.set({
+            value: result.tokens.refreshToken,
+            maxAge: 60 * 60 * 24 * 30 // 30 days in seconds
+         });
+         set.status = 201;
          return {
-            message: "refresh successful"
+            data: result
          };
       },
       {
@@ -60,7 +64,7 @@ export const authController = new Elysia({ prefix: '/auth' })
    .post( '/register',
       async ({ body, set, cookie: { accessToken, refreshToken } }) => {
          const { name, email, password } = body;
-         const result = await service.register(name, email, password);
+         const result = await service.register({ name, email, password });
          accessToken.set({
             value: result.tokens.accessToken,
             maxAge: 60 * 15 // 15 minutes in seconds
@@ -71,7 +75,7 @@ export const authController = new Elysia({ prefix: '/auth' })
          set.status = 201;
          return {
             message: "Account registered",
-            data: result.user,
+            data: result,
          };
       },
       {

@@ -8,6 +8,34 @@ import { DataHandle } from '../shared.types';
 
 
 
+interface InputRadioButtonParams<T> {
+   legend: string;
+   optionList: { label: string, value: string}[];
+   ref: Ref<DataHandle<T>>;
+   initial?: T;
+}
+
+export function InputRadioButtons<T>({ legend, ref, optionList, initial }: InputRadioButtonParams<T>) {
+
+   const [choice, setChoice] = useState<T>(initial || optionList[0].value as T);
+
+   useImperativeHandle(ref, () => ({
+      getData: () => choice,
+      setData: setChoice,
+   }),[])
+   return (
+      <fieldset className={ styles.inputRadioButtons }>
+         <legend>{ legend }</legend>
+         { optionList.map((option, index) => (
+            <div key={ index }>
+               <input type='radio' id={ option.value } name={ option.value } value={ option.value } checked={ choice == option.value } onChange={() => { setChoice(option.value as T); } } />
+               <label htmlFor={ option.value }>{ option.label }</label>
+            </div>
+         )) }
+      </fieldset>
+   );
+}
+
 
 
 /*
@@ -17,14 +45,15 @@ import { DataHandle } from '../shared.types';
 type InputTextParams = React.ComponentPropsWithoutRef<'input'> & {
    label: string;
    dataRef?: Ref<DataHandle<string>>
+   initial?: string
    readOnlyOptions?: {
       condition: boolean;
       placeholder: string;
    }
 }
 
-export function InputText({ label, dataRef, readOnlyOptions, ...rest }: InputTextParams) {
-   const [value, setValue] = useState(String(rest.value) || '');
+export function InputText({ label, dataRef, readOnlyOptions, initial, ...rest }: InputTextParams) {
+   const [value, setValue] = useState(initial || '');
 
    useImperativeHandle(dataRef, () => ({
       getData: () => value,
@@ -54,11 +83,13 @@ interface InputTextAreaParams {
    placeholder: string;
    dataRef: Ref<DataHandle<string>>
    initial?: string;
-   readOnly?: boolean;
-   substitute?: string;
+   readOnlyOptions?: {
+      condition: boolean;
+      placeholder: string;
+   }
 }
 
-export function InputTextArea({ label, placeholder, dataRef, initial, readOnly, substitute }: InputTextAreaParams) {
+export function InputTextArea({ label, placeholder, dataRef, initial, readOnlyOptions }: InputTextAreaParams) {
    const [value, setValue] = useState<string>(initial || '');
 
    useImperativeHandle(dataRef, () => ({
@@ -68,9 +99,9 @@ export function InputTextArea({ label, placeholder, dataRef, initial, readOnly, 
 
    return (
       <div className={ styles.inputTextAreaWrapper }>
-         { readOnly ? (<>
+         { (readOnlyOptions?.condition === true) ? (<>
             <h4>{ label }</h4>
-            <p>{ value || substitute }</p>
+            <p>{ value || readOnlyOptions.placeholder }</p>
          </>) : (<>
             <label>{ label }</label>
             <textarea value={ value } placeholder={ placeholder } onChange={ (event) => { setValue(event.target.value) } } />

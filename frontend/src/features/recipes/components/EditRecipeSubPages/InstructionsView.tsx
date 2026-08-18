@@ -1,22 +1,28 @@
 import { ButtonOval } from "@/shared/components/Button.components";
 import { InputText } from "@/shared/components/Input.components";
+import { NotebookPage } from "@/shared/components/Notebook";
 import { useInteractableList } from "@/shared/hooks/useInteractableList";
 import { DataHandle } from "@/shared/shared.types";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Ref, useImperativeHandle, useRef, useState } from "react";
+import { Ref, useRef } from "react";
 
-interface EditRecipeInstructionsPage {
-   ref: Ref<DataHandle<string[]>>;
-   initial?: string[];
+interface ComponentProps {
+   refs: {
+      instructionList: Ref<DataHandle<string[]>>;
+   }
+   initial: { 
+      instructionList: string[];
+   }
 }
 
-export default function EditRecipeInstructionsPage ({ ref, initial }: EditRecipeInstructionsPage) {
+export default function EditRecipeInstructionsView ({ refs, initial }: ComponentProps) {
 
    const newInstructionRef = useRef<DataHandle<string>>(null);
 
    const instructionList = useInteractableList({
-      initial,
+      initial: initial.instructionList,
+      ref: refs.instructionList,
       renderItemContent: (item: string) => (
          <p>{item}</p>
       ),
@@ -35,12 +41,6 @@ export default function EditRecipeInstructionsPage ({ ref, initial }: EditRecipe
       },
    });
 
-   // function that lets the parent component read and write to instructionList
-   useImperativeHandle(ref, () => ({
-      getData: () => instructionList.content,
-      setData: instructionList.replaceList,
-   }), [instructionList])
-
    function addInstruction() {
       const newInstruction = newInstructionRef.current!.getData();
       if(newInstruction.length < 3) { return; }
@@ -49,7 +49,7 @@ export default function EditRecipeInstructionsPage ({ ref, initial }: EditRecipe
    }
 
    return (
-      <div className='consumeSpace'>
+      <NotebookPage>
          <h2>Recipe Instructions</h2>
          { instructionList.htmlView }
 
@@ -59,6 +59,6 @@ export default function EditRecipeInstructionsPage ({ ref, initial }: EditRecipe
             dataRef={ newInstructionRef }
          />
          <ButtonOval onClick={() => { addInstruction(); }}>Add Instruction</ButtonOval>
-      </div>
+      </NotebookPage>
    )
 }
