@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import useAuth from '@/features/auth/hooks/useAuth';
 import styles from './styles/header.module.scss';
 import { ButtonNarrowNav } from './Button.components';
 
@@ -12,60 +11,104 @@ interface NavigationNodeType {
    href: string,
 }
 
-export default function Header() {
+interface LinePositionType {
+   x: number,
+   scale: number,
+   duration: number,
+}
 
-   const { authId } = useAuth();
+const UNDERLINE_SPEED = 900;         // px per second
+const UNDERLINE_MIN_DURATION = 0.15;  // seconds
+const UNDERLINE_MAX_DURATION = 0.6; // seconds
+
+const withDuration = (
+   previous: LinePositionType,
+   next: { x: number, scale: number },
+): LinePositionType => {
+   const travel = Math.max(
+      Math.abs(next.x - previous.x),
+      Math.abs((next.x + next.scale) - (previous.x + previous.scale)),
+   );
+
+   return {
+      ...next,
+      duration: Math.min(
+         UNDERLINE_MAX_DURATION,
+         Math.max(UNDERLINE_MIN_DURATION, travel / UNDERLINE_SPEED),
+      ),
+   };
+};
+
+export default function Header({ authenticated }: { authenticated: boolean }) {
 
    const navigation = useMemo<NavigationNodeType[][]>(() => [
       [
-            { name: 'Home', href: '/' },
-            { name: 'Find Recipes', href: '/recipes/search/public' },
-            ...(authId ? [{ name: 'My Recipes', href: '/recipes/search/personal' }] : []),
-            { name: 'Ingredients', href: '/ingredients' },
-            { name: 'About Project', href: '/about' },
-         ],
-         [
-            ...(authId
-            ? [{ name: 'Profile', href: `/users` }]
-            : [
+         { name: 'Home', href: '/' },
+         { name: 'Recipes', href: '/recipes' },
+         { name: 'Ingredients', href: '/ingredients' },
+         ...(authenticated ? [{ name: 'Social', href: '/users' }] : []),
+         { name: 'About Project', href: '/about' },
+      ],
+      [ 
+         ...(authenticated ? 
+            [{ name: 'Profile', href: `/users/personal` }]
+         : 
+            [
                { name: 'Login', href: '/auth/login' },
                { name: 'Register', href: '/auth/register' },
-            ]),
-         ]
-   ], [authId]);
+            ]
+         ),
+      ]
+   ], [authenticated]);
 
    const [navOpen, setNavOpen] = useState(false);
    const pathname = usePathname();
 
+   // Longest nav href that prefixes the current pathname, so /recipes/new
+   // resolves to /recipes while /users/personal still beats /users
+   const activeHref = useMemo(() => {
+      let match: string | undefined;
+
+      for (const { href } of navigation.flat()) {
+         const hit = href === '/'
+            ? pathname === '/'
+            : pathname === href || pathname.startsWith(`${href}/`);
+
+         if (hit && (!match || href.length > match.length)) { match = href; }
+      }
+
+      return match;
+   }, [navigation, pathname]);
+
    const navRef = useRef<HTMLElement | null>(null);
 
    const linkRefList = useRef(new Map<string, HTMLAnchorElement | null>());
-   const [linePosition, setLinePosition] = useState({ x: 0, scale: 0 });
+   const [linePosition, setLinePosition] = useState<LinePositionType>({ x: 0, scale: 0, duration: 0 });
 
-   const redefineLinePosition = useCallback((href: string) => {
+   const redefineLinePosition = useCallback((href: string | undefined) => {
       const nav = navRef.current;
-      const activeLink = linkRefList.current.get(href);
-      if (!nav || !activeLink) { return; }
+      const activeLink = href ? linkRefList.current.get(href) : null;
+      if (!nav || !activeLink) {
+         setLinePosition(previous => withDuration(previous, { x: previous.x, scale: 0 }));
+         return;
+      }
 
       const navRectangle = nav.getBoundingClientRect();
       const activeLinkRectangle = activeLink.getBoundingClientRect();
 
-      const remInPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
-      const pixelPadding = 0.3 * remInPx; // This is how many pixels are used to pad one side of a link tag
-
-      setLinePosition({
-         x: activeLinkRectangle.left - navRectangle.left + pixelPadding,
-         scale: activeLinkRectangle.width - (pixelPadding * 2),
-      });
+      setLinePosition(previous => withDuration(previous, {
+         x: activeLinkRectangle.left - navRectangle.left,
+         scale: activeLinkRectangle.width,
+      }));
    }, []);
 
    useEffect(() => {
-      redefineLinePosition(pathname);
+      redefineLinePosition(activeHref);
 
       let frame = 0;
       const handleResize = () => {
          cancelAnimationFrame(frame);
-         frame = requestAnimationFrame(() => redefineLinePosition(pathname));
+         frame = requestAnimationFrame(() => redefineLinePosition(activeHref));
       }
 
       window.addEventListener('resize', handleResize);
@@ -73,20 +116,15 @@ export default function Header() {
          window.removeEventListener('resize', handleResize); 
          cancelAnimationFrame(frame);
       };
-   },[pathname, redefineLinePosition]);
+   },[activeHref, redefineLinePosition]);
 
    return (
       <header className={ styles.header }>
 
          {/* Navigation */}
-         <nav
-            ref={navRef} 
-            className={`${styles.nav} ${navOpen ? styles.visible : ''}`}
-            onMouseLeave={() => redefineLinePosition(pathname)}
-            >
-
+         <nav ref={ navRef } className={ `${styles.nav} ${navOpen ? styles.visible : '' }`} >
             { navigation.map((section, index) => (
-               <div key={ index }>
+               <div key={ index } onMouseLeave={ () => redefineLinePosition(activeHref) } >
                { section.map((navigationNode) => (
                   <Link
                      key={navigationNode.name}
@@ -97,7 +135,7 @@ export default function Header() {
                      } }
                      onMouseEnter={() => redefineLinePosition(navigationNode.href)}
                      onClick={() => setNavOpen(false)}
-                     className={ (pathname === navigationNode.href) ? styles['active-link'] : undefined }
+                     className={ (activeHref === navigationNode.href) ? styles['active-link'] : undefined }
                   >
                      {navigationNode.name}
                   </Link>
@@ -109,7 +147,10 @@ export default function Header() {
             <span
                aria-hidden="true"
                className={styles.navUnderline}
-               style={ { transform: `translateX(${linePosition.x}px) scaleX(${linePosition.scale})` } }
+               style={{
+                  transform: `translateX(${linePosition.x}px) scaleX(${linePosition.scale})`,
+                  transitionDuration: `${linePosition.duration}s`,
+               }}
             />
          </nav>
 

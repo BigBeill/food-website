@@ -1,4 +1,5 @@
-// external imports
+"use client"
+
 import { useState, useEffect } from 'react';
 import styles from './login.module.scss';
 import { useRouter } from 'next/navigation';

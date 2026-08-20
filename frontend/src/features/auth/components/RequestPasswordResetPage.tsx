@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useState } from 'react';
 import { authService } from '../services/auth.service';
 import { useServiceMutation } from '@/shared/hooks/useServiceMutation';

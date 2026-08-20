@@ -1,10 +1,11 @@
 import RequestPasswordResetPage from "@/features/auth/components/RequestPasswordResetPage";
-import RequireNoAuth from "@/features/auth/components/RequireNoAuth";
+import { verifySession } from "@/features/auth/server/session";
+import { redirect } from "next/navigation";
 
-export default function RequestDefaultPassword() {
-   return (
-      <RequireNoAuth>
-         <RequestPasswordResetPage />
-      </RequireNoAuth>
-   );
+export default async function RequestDefaultPassword() {
+
+   const session = await verifySession();
+   if (session !== null) { redirect('/'); }
+
+   return <RequestPasswordResetPage />
 }

@@ -130,7 +130,9 @@ $large-screen-threshold: 48rem;
    height: 0.12rem;
    background-color: $color-text;
    transform-origin: left center;
-   transition: transform 0.3s ease-out;
+   transition-property: transform;
+   transition-timing-function: ease-out;
+   transition-duration: 0.3s; // fallback; set per-move inline
    pointer-events: none;
 
    // hide the underline for narrow screen

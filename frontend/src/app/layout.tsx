@@ -3,6 +3,7 @@ import '../shared/styles/globals.scss';
 import './displayData.scss';
 import './objectView.scss';
 import Header from '@/shared/components/Header';
+import { verifySession } from '@/features/auth/server/session';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -10,11 +11,13 @@ interface LayoutProps {
 
 export default async function Layout({ children }: LayoutProps) {
 
+   const session = await verifySession();
+
    return(
       <html lang="en">
          <body>
             <AuthProvider>
-               <Header/>
+               <Header authenticated={ (session !== null) }/>
                <main>
                   { children }
                </main>
