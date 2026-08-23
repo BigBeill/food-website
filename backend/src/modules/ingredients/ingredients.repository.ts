@@ -83,7 +83,7 @@ export class IngredientsRepository {
       }
    }
 
-   async searchConversions (food_id: number, { skip, limit }: paginationParams ): Promise<PaginatedListType<IngredientConversionType>> {
+   async searchConversions (food_id: number, { skip = 0, limit }: paginationParams ): Promise<PaginatedListType<IngredientConversionType>> {
       const { content, count } = await postgresQueryBuilder('SELECT food_id, measure_id, value FROM conversion_factor', {
          where: [
             { column: 'food_id', operation: '=', value: food_id.toString() }
@@ -105,7 +105,7 @@ export class IngredientsRepository {
             value: conversion.value,
          }
       }));
-      return { list: ingredientConversionList, count: count! };
+      return { list: ingredientConversionList, count: count!, firstItemIndex: skip};
    }
 
    async searchGroups ({ description, skip = 0, limit }: GetGroupListParams): Promise<PaginatedListType<IngredientGroupType>> {
@@ -121,7 +121,7 @@ export class IngredientsRepository {
       return { list: content, count: count!, firstItemIndex: skip };
    }
 
-   async  searchIngredients ({ description, food_group_id, skip, limit }: GetIngredientList): Promise<PaginatedListType<IngredientType>> {
+   async  searchIngredients ({ description, food_group_id, skip = 0, limit }: GetIngredientList): Promise<PaginatedListType<IngredientType>> {
       const { content, count } = await postgresQueryBuilder<IngredientType>('SELECT * FROM food', { 
          where: [
             description && { column: 'description', operation: 'ILIKE', value: `%${description}%` },
@@ -131,6 +131,6 @@ export class IngredientsRepository {
          limit: limit,
          includeCount: true
       });
-      return { list: content, count: count! };
+      return { list: content, count: count!, firstItemIndex: skip };
    }
 }

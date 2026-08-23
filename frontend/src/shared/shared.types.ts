@@ -14,5 +14,12 @@ export type ServiceStateType<T> =
 export type PaginatedListType<T> = {
    list: T[]; // the list of content itself
    count: number; // the number of items applicable to the category (whether or not they exist inside the current list)
-   firstItemIndex?: number; // the index of the first item in the list (assumed to be 0)
+   firstItemIndex: number; // the index of the first item in the list
 };
+
+// same thing as a PaginatedListType, but some components of T may be null, (used for combining 2 or more paginatedLists that may or may not line up)
+export type BrokenPaginatedListType<T> = {
+   list: (T | null)[];
+   count: number;
+   firstItemIndex: number;
+}

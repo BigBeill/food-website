@@ -16,8 +16,6 @@ async function request<T>(config: SendServerRequestProps): Promise<T> {
    const body = config.body;
    const isFormData = body instanceof FormData;
 
-   console.log("making request with body:", body)
-
    let url = `${BASE_URL}${config.url}`;
    // attach the body to the url for get requests
    if (!hasBody && config.body && !isFormData) {

@@ -5,21 +5,20 @@ import PaginationBar from '@/shared/components/PaginationBar';
 import styles from './styles/notebook.module.scss';
 import { useSearchParams } from 'next/navigation';
 import { StateLoadingInsert } from './stateComponents/Loading.states';
+import { BrokenPaginatedListType } from '../shared.types';
 
 interface notebookParams {
-   children: React.ReactNode;
-   childrenCount: number;
-   firstChildIndex?: number;
+   components: BrokenPaginatedListType<React.ReactNode>
 }
 
-export default function Notebook ({ children, childrenCount, firstChildIndex = 0 }: notebookParams) {
+export default function Notebook ({ components }: notebookParams) {
+
+   useEffect(() => { console.log("components given to notebook:", components); }, [components])
 
    const searchParams = useSearchParams();
    const groupNumber = Number(searchParams.get('groupNumber')) || 1;
 
    const currentIndex = useMemo(() => { return (groupNumber - 1) * 2; }, [groupNumber]);
-
-   const childArray = useMemo(() => { return React.Children.toArray(children); }, [children]);
 
    // set the groupNumber in the url and let the parent catch and handle groupNumber changes
    function setGroupNumber(groupNumber: number) {
@@ -33,13 +32,13 @@ export default function Notebook ({ children, childrenCount, firstChildIndex = 0
    }
 
    function grabPageFromList(index: number) {
-      if (childArray[index]) { return index; }
-      else if (index < childrenCount) { return <StateLoadingInsert /> }
+      if (components.list[index]) { return components.list[index]; }
+      else if (index < components.count) { return <StateLoadingInsert /> }
       else { return undefined; }
    }
 
    // real index in pageList of the pages being displayed
-   const firstPageIndex = currentIndex - firstChildIndex;
+   const firstPageIndex = currentIndex - components.firstItemIndex;
    const firstPage = grabPageFromList(firstPageIndex);
    const secondPage = grabPageFromList(firstPageIndex + 1);
 
@@ -47,7 +46,7 @@ export default function Notebook ({ children, childrenCount, firstChildIndex = 0
       handleSetCurrentIndex((newGroup - 1) * 2);
    }
 
-   const paginationBar = <PaginationBar groupNumber={ Math.ceil((currentIndex + 1) / 2) } groupCount={ Math.ceil(childrenCount / 2) } setGroupNumber={ setGroup } />;
+   const paginationBar = <PaginationBar groupNumber={ Math.ceil((currentIndex + 1) / 2) } groupCount={ Math.ceil(components.count / 2) } setGroupNumber={ setGroup } />;
    return <NotebookView firstPage={ firstPage } secondPage={ secondPage } paginationBar={ paginationBar } />;
 }
 

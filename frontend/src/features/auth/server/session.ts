@@ -10,7 +10,6 @@ const JWKS = createRemoteJWKSet(new URL(`${process.env.ELYSIA_URL}/.well-known/j
 
 export const verifySession = cache(async (): Promise<Session | null> => {
    const token = (await cookies()).get('accessToken')?.value;
-   console.log("Verify Session has been referenced");
    if (!token) { return null; }
 
    try {
