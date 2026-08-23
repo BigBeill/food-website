@@ -71,13 +71,26 @@ export class IngredientsRepository {
       }
    }
 
-   async getConversionList (food_id: number, { skip, limit }: paginationParams ): Promise<IngredientConversionType[]> {
-      const { content } = await postgresQueryBuilder('SELECT food_id, measure_id, value FROM conversion_factor', {
+   async getIngredient (_id: number): Promise<IngredientType | null> {
+      const { rows } = await postgresConnection.query(
+         'SELECT description FROM food WHERE _id = $1 LIMIT 1',
+         [ _id ]
+      );
+      if (!rows[0]) { throw new NotFoundError(`Ingredient with ${_id} not found`) }
+      return {
+         food_id: _id,
+         description: rows[0].description
+      }
+   }
+
+   async searchConversions (food_id: number, { skip, limit }: paginationParams ): Promise<PaginatedListType<IngredientConversionType>> {
+      const { content, count } = await postgresQueryBuilder('SELECT food_id, measure_id, value FROM conversion_factor', {
          where: [
             { column: 'food_id', operation: '=', value: food_id.toString() }
          ],
-         skip: skip,
-         limit: limit,
+         skip,
+         limit,
+         includeCount: true
       });
       const ingredientConversionList = await Promise.all(content.map(async conversion => {
          const { rows } = await postgresConnection.query(
@@ -92,10 +105,10 @@ export class IngredientsRepository {
             value: conversion.value,
          }
       }));
-      return ingredientConversionList;
+      return { list: ingredientConversionList, count: count! };
    }
 
-   async getGroupList ({ description, skip = 0, limit }: GetGroupListParams): Promise<PaginatedListType<IngredientGroupType>> {
+   async searchGroups ({ description, skip = 0, limit }: GetGroupListParams): Promise<PaginatedListType<IngredientGroupType>> {
       const { content, count } = await postgresQueryBuilder<IngredientGroupType & { total_count: string }>('SELECT *, COUNT(*) OVER() AS total_count FROM food_group', {
          where: [
             description && { column: 'description', operation: 'ILIKE', value: `%${description}%` },
@@ -108,27 +121,16 @@ export class IngredientsRepository {
       return { list: content, count: count!, firstItemIndex: skip };
    }
 
-   async getIngredient (_id: number): Promise<IngredientType | null> {
-      const { rows } = await postgresConnection.query(
-         'SELECT description FROM food WHERE _id = $1 LIMIT 1',
-         [ _id ]
-      );
-      if (!rows[0]) { throw new NotFoundError(`Ingredient with ${_id} not found`) }
-      return {
-         food_id: _id,
-         description: rows[0].description
-      }
-   }
-
-   async getIngredientList ({ description, food_group_id, skip, limit }: GetIngredientList): Promise<IngredientType[]> {
-      const { content } = await postgresQueryBuilder<IngredientType>('SELECT * FROM food', { 
+   async  searchIngredients ({ description, food_group_id, skip, limit }: GetIngredientList): Promise<PaginatedListType<IngredientType>> {
+      const { content, count } = await postgresQueryBuilder<IngredientType>('SELECT * FROM food', { 
          where: [
             description && { column: 'description', operation: 'ILIKE', value: `%${description}%` },
             food_group_id && { column: 'food_group_id', operation: '=', value: `${food_group_id}` }
          ].filter(Boolean) as { column: string; operation: string; value: string; }[],
          skip: skip,
          limit: limit,
+         includeCount: true
       });
-      return content;
+      return { list: content, count: count! };
    }
 }

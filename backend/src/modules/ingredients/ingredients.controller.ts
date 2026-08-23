@@ -25,9 +25,10 @@ export const ingredientsController = new Elysia({ prefix: '/ingredients' })
    .get( '/search',
       async ({ query }) => {
          const { description, food_group_id, skip = 0, limit = 32 } = query;
-         const ingredientList = service.searchIngredient({ description, food_group_id, skip, limit });
+         console.log(food_group_id);
+         const ingredientList = await service.searchIngredient({ description, food_group_id, skip, limit });
          return { 
-            message: "Ingredient list found",
+            message: "Ingredient search results",
             data: ingredientList 
          };
       },

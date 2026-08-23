@@ -4,7 +4,7 @@ import { PaginatedListType } from "@/shared/shared.types";
 
 interface searchParams {
    description?: string;
-   groupId?: number;
+   food_group_id?: number;
    limit?: number;
 }
 

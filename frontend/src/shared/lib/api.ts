@@ -11,16 +11,22 @@ interface SendServerRequestProps {
 async function request<T>(config: SendServerRequestProps): Promise<T> {
 
    // check what type of request is being made (is it a get request and/or send information as formData)
-   const isGet = config.method.toLowerCase() === 'get';
-   const isFormData = config.body instanceof FormData;
+   const noBodyRequestTypes = new Set(['get', 'head', 'delete']);
+   const hasBody = !noBodyRequestTypes.has(config.method.toLocaleLowerCase());
+   const body = config.body;
+   const isFormData = body instanceof FormData;
+
+   console.log("making request with body:", body)
 
    let url = `${BASE_URL}${config.url}`;
    // attach the body to the url for get requests
-   if (isGet && config.body && !isFormData) {
+   if (!hasBody && config.body && !isFormData) {
       const query = new URLSearchParams(
-         Object.entries(config.body).filter(([_, v]) => v != null)
+         Object.entries(config.body)
+            .filter(([, value]) => value != null)
+            .map(([key, value]) => [key, String(value)])
       ).toString();
-      if (query) url += `?${query}`;
+      if (query) { url += `?${query}`; }
    }
 
    // apply API request options
@@ -33,13 +39,8 @@ async function request<T>(config: SendServerRequestProps): Promise<T> {
    }
 
    // configure the body for non get requests
-   if (!isGet && config.body) {
-      if (config.body instanceof FormData) {
-         options.body = config.body;
-      } 
-      else {
-         options.body = JSON.stringify(config.body);
-      }
+   if (hasBody && body) {
+      options.body = isFormData ? body : JSON.stringify(body)
    }
 
    // make the actual API request

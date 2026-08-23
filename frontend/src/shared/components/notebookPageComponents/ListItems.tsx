@@ -6,15 +6,19 @@ import { LinkBackground } from "../Link.components";
 
 
 
-interface NotebookPageListItemsProps {
+interface ComponentProps {
    itemList: {
       title: string;
       image?: PackagedImageType;
       href: string;
    }[];
+   defaultListSize?: number;
 }
 
-export default function NotebookPageListItems({ itemList }: NotebookPageListItemsProps) {
+export default function NotebookPageListItems({ itemList, defaultListSize = 0 }: ComponentProps) {
+
+   const blankItems = defaultListSize - itemList.length;
+
    return (
       <div className={ styles.page }>
          <ul className={ styles.list } >
@@ -25,6 +29,11 @@ export default function NotebookPageListItems({ itemList }: NotebookPageListItem
                      <div className={ styles.decretiveLine } aria-hidden="true"/>
                      <ImageDisplay packagedImage={ item.image } />
                   </LinkBackground>
+               </li>
+            )) }
+            { Array.from({ length: blankItems }, (_, index) => (
+               <li key={ `blank-${index}` } aria-hidden="true" className={ styles.item }>
+                  <span />
                </li>
             )) }
          </ul>

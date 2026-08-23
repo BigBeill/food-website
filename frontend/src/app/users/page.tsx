@@ -1,11 +1,5 @@
-import RequireAuth from "@/features/auth/components/RequireAuth";
-import ProfilePage from "@/features/users/components/ProfilePage";
+import SearchUserPage from "@/features/users/components/SearchUserPage";
 
-export default function Profile() {
-   
-   return (
-      <RequireAuth>
-         <ProfilePage />
-      </RequireAuth>
-   );
+export default function SearchUser() {
+   return <SearchUserPage />
 }

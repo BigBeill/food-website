@@ -74,21 +74,21 @@ export class IngredientsService {
    }
 
    // TODO: get repository to return count so paginated list can be used effectively
-   async searchConversion (food_id: number, params: PaginationParams): Promise<IngredientConversionType[]> {
+   async searchConversion (food_id: number, params: PaginationParams): Promise<PaginatedListType<IngredientConversionType>> {
       const { skip, limit } = params;
-      const conversionList = await this.repository.getConversionList(food_id, { skip, limit });
+      const conversionList = await this.repository.searchConversions(food_id, { skip, limit });
       return conversionList;
    }
 
    async searchGroup (params: SearchGroupParams): Promise<PaginatedListType<IngredientGroupType>> {
       const { description, skip, limit } = params;
-      const groupList = await this.repository.getGroupList({ description, skip, limit });
+      const groupList = await this.repository.searchGroups({ description, skip, limit });
       return groupList;
    }
 
-   async searchIngredient (params: SearchIngredientParams): Promise<IngredientType[]> {
+   async searchIngredient (params: SearchIngredientParams): Promise<PaginatedListType<IngredientType>> {
       const { description, food_group_id, skip, limit } = params;
-      const ingredientList = await this.repository.getIngredientList({ description, food_group_id, skip, limit });
+      const ingredientList = await this.repository.searchIngredients({ description, food_group_id, skip, limit });
       return ingredientList;
    }
 }

@@ -1,40 +1,47 @@
 'use client'
 
-import React, { useState, useEffect, ComponentPropsWithoutRef } from 'react';
+import React, { useState, useEffect, ComponentPropsWithoutRef, useMemo } from 'react';
 import PaginationBar from '@/shared/components/PaginationBar';
 import styles from './styles/notebook.module.scss';
 import { useSearchParams } from 'next/navigation';
+import { StateLoadingInsert } from './stateComponents/Loading.states';
 
 interface notebookParams {
    children: React.ReactNode;
    childrenCount: number;
    firstChildIndex?: number;
-   initialIndex?: number;
 }
 
-export default function Notebook ({ children, childrenCount, firstChildIndex = 0, initialIndex = firstChildIndex }: notebookParams) {
+export default function Notebook ({ children, childrenCount, firstChildIndex = 0 }: notebookParams) {
 
-   const currentSearchParams = useSearchParams();
+   const searchParams = useSearchParams();
+   const groupNumber = Number(searchParams.get('groupNumber')) || 1;
 
-   const childArray = React.Children.toArray(children);
-   const [currentIndex, setCurrentIndex] = useState<number>(initialIndex || 0);
+   const currentIndex = useMemo(() => { return (groupNumber - 1) * 2; }, [groupNumber]);
+
+   const childArray = useMemo(() => { return React.Children.toArray(children); }, [children]);
 
    // set the groupNumber in the url and let the parent catch and handle groupNumber changes
    function setGroupNumber(groupNumber: number) {
-      const updatedParams = new URLSearchParams(currentSearchParams.toString())
+      const updatedParams = new URLSearchParams(searchParams.toString())
       updatedParams.set('groupNumber', String(groupNumber));
-      window.history.replaceState(null, '', `?${ updatedParams.toString() }`);
+      window.history.pushState(null, '', `?${ updatedParams.toString() }`);
    }
 
    function handleSetCurrentIndex(newIndex: number) {
       setGroupNumber((newIndex / 2) + 1);
-      // only change the current index if the content already exists, otherwise wait for parent to react
-      if (newIndex >= firstChildIndex && newIndex < (firstChildIndex + childArray.length)) { setCurrentIndex(newIndex); }
+   }
+
+   function grabPageFromList(index: number) {
+      if (childArray[index]) { return index; }
+      else if (index < childrenCount) { return <StateLoadingInsert /> }
+      else { return undefined; }
    }
 
    // real index in pageList of the pages being displayed
-   const firstPage = childArray[currentIndex - firstChildIndex];
-   const secondPage = childArray[currentIndex - firstChildIndex + 1];
+   const firstPageIndex = currentIndex - firstChildIndex;
+   const firstPage = grabPageFromList(firstPageIndex);
+   const secondPage = grabPageFromList(firstPageIndex + 1);
 
    function setGroup(newGroup: number) {
       handleSetCurrentIndex((newGroup - 1) * 2);

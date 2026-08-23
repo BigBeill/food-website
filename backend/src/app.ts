@@ -10,7 +10,7 @@ import { imagesController } from './modules/images/images.controller';
 import { recipesController } from './modules/recipes/recipes.controller';
 import { jwksPlugin } from './modules/auth/jwk.plugin';
 
-export const app = new Elysia()
+export const app = new Elysia({ normalize: false })
    .use(errorHandler)
    .use(jwksPlugin)
    .mapResponse({ as: 'global' }, ({ responseValue }) => {
