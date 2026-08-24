@@ -25,13 +25,13 @@ interface ImageType {
 ```
 ### Ingredient
 ```js
-interface IngredientType {
-   food_id: number;
+interface IngredientType {      // equivalent to "food" inside the canadian_nutrient_file database
+   _id: number;
    description: string;
    label?: string;
    commonName?: string;
-   portion?: {
-      measure_id: number;
+   portion?: {      // equivalent to "measure" inside the canadian_nutrient_file database
+      _id: number;
       description: string;
       amount: number;
    }
@@ -39,16 +39,16 @@ interface IngredientType {
 ```
 ### Ingredient Conversion
 ```js
-interface IngredientConversionType {
+interface IngredientConversionType {      // equivalent to "conversion_factor" inside the canadian_nutrient_file database
    food_id: number
    measure_id: number,
-   description: string,
+   measure_description: string,
    value: number
 }
 ```
 ### Ingredient Group
 ```js
-interface IngredientGroupType {
+interface IngredientGroupType {      // equivalent to "food_group" inside the canadian_nutrient_file database
    _id: string;
    name: string;
 }

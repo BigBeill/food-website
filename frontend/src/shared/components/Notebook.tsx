@@ -4,7 +4,7 @@ import React, { useState, useEffect, ComponentPropsWithoutRef, useMemo } from 'r
 import PaginationBar from '@/shared/components/PaginationBar';
 import styles from './styles/notebook.module.scss';
 import { useSearchParams } from 'next/navigation';
-import { StateLoadingInsert } from './stateComponents/Loading.states';
+import { StateLoadingPage } from './stateComponents/Loading.states';
 import { BrokenPaginatedListType } from '../shared.types';
 
 interface notebookParams {
@@ -33,7 +33,7 @@ export default function Notebook ({ components }: notebookParams) {
 
    function grabPageFromList(index: number) {
       if (components.list[index]) { return components.list[index]; }
-      else if (index < components.count) { return <StateLoadingInsert /> }
+      else if (index < components.count) { return <StateLoadingPage /> }
       else { return undefined; }
    }
 

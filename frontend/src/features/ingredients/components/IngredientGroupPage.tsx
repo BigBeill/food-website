@@ -15,17 +15,13 @@ export default async function IngredientGroupPage() {
 
 export function IngredientGroupView({ ingredientGroups }: { ingredientGroups: PaginatedListType<IngredientGroupType> }) {
 
-   const pageComponentList: React.ReactElement[] = [];
+   const notebookComponents: PaginatedListType<React.ReactElement> = { list: [], count: Math.ceil(ingredientGroups.count / groupSize), firstItemIndex: 0  };
    
    for (let groupStartIndex = 0; groupStartIndex < ingredientGroups.list.length; groupStartIndex += groupSize) {
       const ingredientGroupList = ingredientGroups.list.slice(groupStartIndex, groupStartIndex + groupSize);
       const itemList = ingredientGroupList.map((ingredientGroup) => { return { title: ingredientGroup.description, href: `/ingredients/${ ingredientGroup._id }` } });
-      pageComponentList.push(<NotebookPageListItems key={ groupStartIndex } itemList={ itemList } />);
+      notebookComponents.list.push(<NotebookPageListItems key={ groupStartIndex } itemList={ itemList } />);
    }
 
-   return ( 
-      <Notebook childrenCount={ ingredientGroups.count / groupSize } >
-         { ...pageComponentList }
-      </Notebook>
-   );
+   return <Notebook components={ notebookComponents } />
 }

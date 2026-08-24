@@ -1,8 +1,8 @@
 import type { UserRecord } from "../../common/mongo-db/schemas/user.schema";
 import { joinWithOxfordComma } from "../../common/utils/joinWithOxfordComma";
-import type { PublicUserType } from "./users.types";
+import type { UserType } from "./users.types";
 
-export function buildConflictString(userA: PublicUserType, userBList: PublicUserType[] | UserRecord[]): string | null {
+export function buildConflictString(userA: UserType, userBList: UserType[] | UserRecord[]): string | null {
    const conflictList = new Set<string>();
 
    userBList.forEach((userB) => {

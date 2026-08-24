@@ -1,7 +1,6 @@
 import { RecipeModel, type RecipeRecord } from "../../common/mongo-db/schemas/recipe.schema";
 import type { PaginatedListType } from "../../common/types/return.types";
 import { escapeRegex } from "../../common/utils/filter";
-import { mongooseAggregateToPaginatedList } from "../../common/utils/pagination.utils";
 import type { RecipeType } from "./recipes.types";
 import { toStoredRecipe } from "./recipes.utils";
 
@@ -29,7 +28,7 @@ export class RecipesRepository {
       return RecipeModel.findOne({ _id }).lean<RecipeRecord | null>();
    }
 
-   async getRecipeList(params: GetRecipeListParams): Promise<PaginatedListType<RecipeRecord>> {
+   async searchRecipes(params: GetRecipeListParams): Promise<PaginatedListType<RecipeRecord>> {
       const { title, ownerIdList, ingredientIdList, visibilityList, skip, limit } = params;
 
       // quick safety check to make sure this function is being used correctly (not effective authorization)
@@ -60,8 +59,9 @@ export class RecipesRepository {
             }
          }
       ]);
+      const { recordList, countList } = resultList[0]!;
 
-      return mongooseAggregateToPaginatedList(resultList, skip, limit);
+      return { list: recordList, count: countList[0]!.count, firstItemIndex: skip ?? 0 };
    }
 
    async updateRecipe(recipe: RecipeType): Promise<RecipeRecord | null> {

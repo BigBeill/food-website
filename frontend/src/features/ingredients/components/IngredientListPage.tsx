@@ -30,14 +30,12 @@ export default function IngredientListPage({ ingredientGroupId }: PageProps) {
          limit: 10,
       });
 
-      console.log("ingredients found:", ingredients);
-
       for (let i = 0; i < ingredients.list.length; i += groupSize) {
          const ingredientList = ingredients.list.slice(i, i + groupSize);
          const itemList = ingredientList.map((ingredient) => { 
             return { 
                title: ingredient.description, 
-               href: `/ingredients/${ingredientGroupId}/${ ingredient.food_id }` 
+               href: `/ingredients/${ingredientGroupId}/${ ingredient._id }` 
             } 
          });
          setNotebookComponents((previous) => {

@@ -83,17 +83,17 @@ export function breakupMeasureDescription(measureDescription: string ): { number
    return { number, string }
 }
 
-type StoredIngredient = Pick<IngredientType, 'food_id' | 'label'> & {
-   portion: Pick<NonNullable<IngredientType['portion']>, 'measure_id' | 'amount'>;
+type StoredIngredient = Pick<IngredientType, '_id' | 'label'> & {
+   portion: Pick<NonNullable<IngredientType['portion']>, '_id' | 'amount'>;
 };
 
 export function toStoredIngredient(ingredient: IngredientType): StoredIngredient {
    if (!ingredient.portion) { throw new Error("ingredient is missing portions field and cannot be converted into storedIngredientType."); }
    return {
-      food_id: ingredient.food_id,
+      _id: ingredient._id,
       label: ingredient.label,
       portion: {
-         measure_id: ingredient.portion.measure_id,
+         _id: ingredient.portion._id,
          amount: ingredient.portion.amount,
       }
    };

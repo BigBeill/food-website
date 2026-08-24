@@ -1,22 +1,38 @@
-import { Schema, Types, model, type HydratedDocument, type InferSchemaType } from 'mongoose';
+import { Schema, Types, model, type HydratedDocument } from 'mongoose';
 import { ImageSchema } from './image.schema';
+import type { ImageType } from '../../../modules/images/images.types';
 
-const userSchema = new Schema(
-   {
-      name: { type: String, required: true, unique:true },
-      email: { type: String, required: true, unique:true },
-      bio: String,
-      image: { type: ImageSchema, default: null },
-      passwordHash: {type: String, select: false},
-   },
-   { timestamps: true }
-);
-
-type UserSchemaType = InferSchemaType<typeof userSchema>;
-export type UserDocument = HydratedDocument<UserSchemaType>;
-export type UserRecord = UserSchemaType & { 
-   _id: Types.ObjectId,
+interface TypeTimestamps {
    createdAt: Date;
    updatedAt: Date;
-};
-export const UserModel = model('User', userSchema);
+}
+
+interface TypeDatabaseUser {
+   name: string;
+   email?: string;
+   bio?: string;
+   image?: ImageType;
+}
+
+interface TypeUserSecrets {
+   email: string;
+   passwordHash: string;
+}
+
+type UserModelType = TypeDatabaseUser & Partial<TypeUserSecrets> & TypeTimestamps;
+
+const userSchema = new Schema<UserModelType>(
+   {
+      name: { type: String, required: true, unique:true },
+      email: { type: String, required: true, unique:true, select: false },
+      bio: String,
+      image: { type: ImageSchema, default: undefined, set: (v: unknown) => (v === null ? undefined : v) },
+      passwordHash: {type: String, required: true, select: false},
+   }, { timestamps: true }
+);
+
+export type UserDocument = HydratedDocument<UserModelType>;
+export type UserRecord = TypeDatabaseUser & TypeTimestamps & { _id: Types.ObjectId };
+export type UserRecordSecrets = UserRecord & TypeUserSecrets;
+
+export const UserModel = model<UserModelType>('User', userSchema);

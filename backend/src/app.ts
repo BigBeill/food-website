@@ -4,7 +4,7 @@ import { errorHandler } from './common/middleware/errorHandler';
 import { logger } from './common/middleware/logger';
 import { authController } from './modules/auth/auth.controller';
 import { usersController } from './modules/users/users.controller';
-import { removeMongooseNoise } from './common/utils/db.mapper';
+import removeMongooseNoise from './common/utils/removeMongooseNoise';
 import { ingredientsController } from './modules/ingredients/ingredients.controller';
 import { imagesController } from './modules/images/images.controller';
 import { recipesController } from './modules/recipes/recipes.controller';

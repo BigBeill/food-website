@@ -66,7 +66,7 @@ export class IngredientsRepository {
       return {
          food_id,
          measure_id,
-         description: measureList.rows[0].description,
+         measure_description: measureList.rows[0].description,
          value: conversionFactorList.rows[0].value,
       }
    }
@@ -78,7 +78,7 @@ export class IngredientsRepository {
       );
       if (!rows[0]) { throw new NotFoundError(`Ingredient with ${_id} not found`) }
       return {
-         food_id: _id,
+         _id,
          description: rows[0].description
       }
    }
@@ -101,7 +101,7 @@ export class IngredientsRepository {
          return {
             food_id: conversion.food_id,
             measure_id: conversion.measure_id,
-            description: rows[0].description,
+            measure_description: rows[0].description,
             value: conversion.value,
          }
       }));

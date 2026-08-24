@@ -16,7 +16,7 @@ export default function IngredientSearch({ onSubmit, includePortion = false }: I
 
    const ingredientSearchState = useServiceState(() => {
       if (searchTerm.length >= 3) { return ingredientService.search({ description: searchTerm }) }
-      else { return Promise.resolve({ list: [], count: 0 }); }
+      else { return Promise.resolve({ list: [], count: 0, firstItemIndex: 0 }); }
    }, [searchTerm])
 
    const options = ingredientSearchState.status === 'ready' ? ingredientSearchState.data : { list: [], count: 0 };

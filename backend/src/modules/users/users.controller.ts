@@ -1,6 +1,5 @@
 import Elysia from "elysia";
 import { authenticateMiddleware, authorizeMiddleware } from "../auth/auth.middleware";
-import { FolderListValidator } from "./validators/folderList.validator";
 import { GetValidator } from "./validators/get.validator";
 import { SearchValidator } from "./validators/search.validator";
 import { usersService } from "../../container";
@@ -57,19 +56,6 @@ export const usersController = new Elysia({ prefix: '/users' })
       },
       {
          params: IdValidator
-      }
-   )
-   .get( '/searchFolders',
-      async ({ authId, query }) => {
-         const { parentId, skip = 0, limit = 32 } = query;
-         const folderList = await service.searchFolders({ authId, parentId, skip, limit });
-         return { 
-            message: "Folder list found",
-            data: folderList 
-         }
-      },
-      {
-         query: FolderListValidator,
       }
    )
    .post( '/deleteFriendship/:_id',

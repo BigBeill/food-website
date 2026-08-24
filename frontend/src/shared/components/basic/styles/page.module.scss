@@ -1,0 +1,12 @@
+@use '../../../styles/variables' as *;
+
+.wrapper {
+   margin-top: 6rem;
+   padding: 3rem;
+   width: calc( 100% - 24rem);
+   min-width: 30rem;
+   min-height: calc( 100% - 12rem );
+   overflow: hidden;
+   background-color: $color-background;
+   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}

@@ -7,7 +7,7 @@ import type AuthIdParams from '../../common/parameters/authId.parameters';
 import { buildConflictString } from '../users/users.utils';
 import { randomBytes } from 'node:crypto';
 import type { DeleteResult } from 'mongoose';
-import { removeMongooseNoise } from '../../common/utils/db.mapper';
+import removeMongooseNoise from '../../common/utils/removeMongooseNoise';
 import { generateRefreshToken, signAccessToken } from './tokenSigner';
 
 export class AuthService {
@@ -73,7 +73,8 @@ export class AuthService {
    async refresh(refreshToken: string): Promise<AuthResultType> {
 
       const hashedToken = new Bun.CryptoHasher("sha256").update(refreshToken).digest("hex");
-      const databaseRefreshToken = removeMongooseNoise<SavedTokenType>(await this.repository.getRefreshToken(hashedToken));
+      const databaseRefreshToken: SavedTokenType | null = removeMongooseNoise(await this.repository.getRefreshToken(hashedToken));
+      if (!databaseRefreshToken) { throw new UnauthorizedError('invalid refresh token'); }
 
       const user = await this.repository.getUserById(databaseRefreshToken.userId);
       if (!user) { throw new UnauthorizedError('invalid refresh token'); }

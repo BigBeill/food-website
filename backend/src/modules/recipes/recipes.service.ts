@@ -1,7 +1,7 @@
 import { NotFoundError, UnauthorizedError } from "../../common/types/error.types";
 import type { RecipeRecord } from "../../common/mongo-db/schemas/recipe.schema";
 import type AuthIdParams from "../../common/parameters/authId.parameters";
-import { removeMongooseNoise } from "../../common/utils/db.mapper";
+import removeMongooseNoise from "../../common/utils/removeMongooseNoise";
 import type { ImagesService } from "../images/images.service";
 import type { IngredientsService } from "../ingredients/ingredients.service";
 import type { RecipesRepository } from "./recipes.repository";
@@ -70,7 +70,7 @@ export class RecipesService {
    async deleteManyRecipes(ownerId: string): Promise<boolean> {
 
       // get all the recipes that need to be deleted
-      const recipes = await this.repository.getRecipeList({ ownerIdList: [ownerId], visibilityList: ['public', 'personal', 'private'] });
+      const recipes = await this.repository.searchRecipes({ ownerIdList: [ownerId], visibilityList: ['public', 'personal', 'private'] });
 
       // check for images associated with the recipes and then delete both the images and recipes
       const promiseList = recipes.list.map(async (recipe) => {
@@ -91,7 +91,7 @@ export class RecipesService {
          if (!authId) { throw new UnauthorizedError(); }
          if ( mongooseRecord.visibility === 'personal' && mongooseRecord.ownerId.toString() !== authId) { throw new UnauthorizedError(); }
          if ( mongooseRecord.visibility === 'private' ) {
-            const relationship = await this.permissionsService.defineRelationship(authId, mongooseRecord.ownerId.toString());
+            const relationship = await this.permissionsService.defineRelationship({ authId, userId: mongooseRecord.ownerId.toString() });
             if (relationship.type !== 'friend') { throw new UnauthorizedError(); }
          }
       }
@@ -136,9 +136,12 @@ export class RecipesService {
          allowedOwnerIdList = allowedOwnerIdList.filter(item => ownerIdList.includes(item));
       }
 
-      const recipes = await this.repository.getRecipeList({ title, ownerIdList: allowedOwnerIdList, visibilityList, skip, limit });
+      const recipes = await this.repository.searchRecipes({ title, ownerIdList: allowedOwnerIdList, visibilityList, skip, limit });
 
-      return removeMongooseNoise(recipes) as PaginatedListType<RecipeType>;
+      return { 
+         ...recipes, 
+         list: await Promise.all(recipes.list.map((recipe) => { return this.hydrateRecipe(recipe); })) 
+      };
    }
 
    async updateRecipe(recipe: Omit<RecipeType, 'nutrition'> & {nutrition?: NutritionType}, params: AuthIdParams): Promise<boolean> {
@@ -154,9 +157,10 @@ export class RecipesService {
          recipe.ingredientList.forEach((ingredient, index) => {
             const oldIngredient = oldMongooseRecord.ingredientList[index]!;
             if (
-               !ingredient.portion
-               || ingredient.food_id !== oldIngredient.food_id 
-               || ingredient.portion.measure_id !== oldIngredient.portion.measure_id
+                  !oldIngredient.portion
+               || !ingredient.portion
+               || ingredient._id !== oldIngredient._id 
+               || ingredient.portion._id !== oldIngredient.portion._id
                || ingredient.portion.amount !== oldIngredient.portion.amount
             ) { recalculateNutrition = true; }
          });

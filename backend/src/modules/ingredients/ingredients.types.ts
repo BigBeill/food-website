@@ -1,10 +1,10 @@
 export interface IngredientType {
-   food_id: number;
+   _id: number;
    description: string;
    label?: string;
    commonName?: string;
    portion?: {
-      measure_id: number;
+      _id: number;
       description: string;
       amount: number;
    }
@@ -13,11 +13,11 @@ export interface IngredientType {
 export interface IngredientConversionType {
    food_id: number
    measure_id: number,
-   description: string,
+   measure_description: string,
    value: number
 }
 
 export interface IngredientGroupType {
-   id: string;
+   _id: string;
    name: string;
 }

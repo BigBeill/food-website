@@ -1,11 +1,9 @@
-import { FriendFolderModel, type FriendFolderRecord } from "../../common/mongo-db/schemas/friendFolder.schema";
 import { FriendRequestModel, type FriendRequestRecord } from "../../common/mongo-db/schemas/friendRequest.schema";
 import { FriendshipModel, type FriendshipRecord } from "../../common/mongo-db/schemas/friendship.schema";
 import { UserModel, type UserRecord } from "../../common/mongo-db/schemas/user.schema";
 import type { ImageType } from "../images/images.types";
 import type PaginationParams from "../../common/parameters/pagination.parameters";
 import type { PaginatedListType } from "../../common/types/return.types";
-import { mongooseAggregateToPaginatedList } from "../../common/utils/pagination.utils";
 
 interface GetFolderListParams extends PaginationParams{
    ownerId: string,
@@ -26,7 +24,6 @@ interface GetUserListParams extends PaginationParams{
 }
 
 interface UpdateUserParams {
-   _id: string,
    name?: string,
    email?: string,
    bio?: string,
@@ -69,31 +66,6 @@ export class UsersRepository {
       return userList;
    }
 
-   async getFolderList({ ownerId, parentId, skip, limit }: GetFolderListParams): Promise<PaginatedListType<FriendFolderRecord>> {
-      const resultList = await UserModel.aggregate<{
-         recordList: FriendFolderRecord[];
-         countList: { count: number }[];
-      }>([
-         {
-            $match: {
-               ownerId, 
-               ...(parentId && { parentId }),
-            },
-         },
-         {
-            $facet: {
-               recordList: [
-                  ...(skip ? [{ $skip: skip }] : []), 
-                  ...(limit ? [{ $limit: limit }] : []), 
-               ],
-               countList: [{ $count: 'count' }],
-            }
-         }
-      ]);
-
-      return mongooseAggregateToPaginatedList(resultList, skip, limit);
-   }
-
    async getFriendRequest({ _id, senderId, receiverId }: GetFriendRequestParams): Promise<FriendRequestRecord | null> {
       return FriendRequestModel.findOne({ ...(_id && { _id }), ...((senderId && receiverId) && { senderId, receiverId }) }).lean<FriendRequestRecord>();
    }
@@ -116,7 +88,7 @@ export class UsersRepository {
       return user;
    }
 
-   async getUserList({ _id, name, skip, limit }: GetUserListParams): Promise<PaginatedListType<UserRecord>> {
+   async searchUsers({ _id, name, skip, limit }: GetUserListParams): Promise<PaginatedListType<UserRecord>> {
       const resultList = await UserModel.aggregate<{
          recordList: UserRecord[];
          countList: { count: number }[];
@@ -137,11 +109,12 @@ export class UsersRepository {
             }
          }
       ]);
+      const { recordList, countList } = resultList[0]!;
 
-      return mongooseAggregateToPaginatedList(resultList, skip, limit)
+      return { list: recordList, count: countList[0]!.count, firstItemIndex: skip ?? 0 }
    }
 
-   async updateUser({ _id, name, email, bio, image }: UpdateUserParams): Promise<UserRecord | null> {
+   async updateUser(_id: string, { name, email, bio, image }: UpdateUserParams): Promise<UserRecord | null> {
       return UserModel.findByIdAndUpdate(
          _id,
          { $set: { 

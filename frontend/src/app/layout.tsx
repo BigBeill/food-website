@@ -7,9 +7,10 @@ import { verifySession } from '@/features/auth/server/session';
 
 interface LayoutProps {
   children: React.ReactNode;
+  modal: React.ReactNode;
 }
 
-export default async function Layout({ children }: LayoutProps) {
+export default async function Layout({ children, modal }: LayoutProps) {
 
    const session = await verifySession();
 

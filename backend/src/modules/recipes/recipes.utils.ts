@@ -7,7 +7,7 @@ export function toStoredRecipe(recipe: Omit<RecipeType, '_id'>) {
       ownerId: new Types.ObjectId(recipe.ownerId),
       title: recipe.title,
       description: recipe.description,
-      image: recipe.image ?? null,
+      image: recipe.image ?? undefined,
       ingredientList: recipe.ingredientList.map(toStoredIngredient),
       instructionList: recipe.instructionList,
       nutrition: recipe.nutrition,

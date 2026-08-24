@@ -32,11 +32,11 @@ export class IngredientsService {
       // get a list of nutrients found in each ingredient
       const nutritionList: NutritionType[] = await Promise.all( ingredientList.map(async (ingredient) => {
          const [ nutrition, conversion ] = await Promise.all([
-            this.repository.getBaseNutrition(ingredient.food_id),
-            this.repository.getConversion(ingredient.food_id, ingredient.portion!.measure_id),
+            this.repository.getBaseNutrition(ingredient._id),
+            this.repository.getConversion(ingredient._id, ingredient.portion!._id),
          ]);
 
-         const { number: measureNumber } = conversion ? breakupMeasureDescription(conversion.description): { number: 1 };
+         const { number: measureNumber } = conversion ? breakupMeasureDescription(conversion.measure_description): { number: 1 };
          
          const totalConversion = ((conversion?.value || 1) / measureNumber) * ingredient.portion!.amount;
 
@@ -60,15 +60,15 @@ export class IngredientsService {
 
    async hydrateIngredient(record: IngredientRecord): Promise<IngredientType> {
       const [ ingredient, conversion ] = await Promise.all([
-         this.repository.getIngredient(record.food_id),
-         this.repository.getConversion(record.food_id, record.portion.measure_id),
+         this.repository.getIngredient(record._id),
+         this.repository.getConversion(record._id, record.portion._id),
       ]);
       return {
          ...record,
          description: ingredient?.description || "",
          portion: {
             ...record.portion,
-            description: conversion?.description || "",
+            description: conversion?.measure_description || "",
          }
       }
    }
