@@ -1,3 +1,5 @@
+import type { NutritionType } from "../recipes/recipes.types";
+
 export interface IngredientType {
    _id: number;
    description: string;
@@ -8,6 +10,7 @@ export interface IngredientType {
       description: string;
       amount: number;
    }
+   nutrition?: NutritionType
 }
 
 export interface IngredientConversionType {

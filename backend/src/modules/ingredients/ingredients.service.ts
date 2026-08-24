@@ -1,3 +1,4 @@
+import { NotFoundError } from "elysia";
 import type { IngredientRecord } from "../../common/mongo-db/schemas/recipe.schema";
 import type PaginationParams from "../../common/parameters/pagination.parameters";
 import type { PaginatedListType } from "../../common/types/return.types";
@@ -22,9 +23,19 @@ export class IngredientsService {
       this.repository = ingredientsRepository;
    }
 
-   async getIngredient (_id: number): Promise<IngredientType | null> {
+   async getIngredient (_id: number, params: { includeNutrition?: boolean } = {}): Promise<IngredientType | null> {
+      const { includeNutrition } = params;
+
       const ingredient = await this.repository.getIngredient(_id);
-      return ingredient;
+      if (!ingredient) { throw new NotFoundError(); }
+
+      if (!includeNutrition) { return ingredient; }
+      else {
+         console.log(ingredient);
+         const nutrition = await this.repository.getBaseNutrition(ingredient._id);
+         console.log(nutrition);
+         return { ...ingredient, nutrition }
+      }
    }
 
    async getNutrition (ingredientList: IngredientType[]): Promise<NutritionType> {

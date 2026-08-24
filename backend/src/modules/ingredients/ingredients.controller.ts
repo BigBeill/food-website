@@ -5,20 +5,22 @@ import { PostgresIdValidator } from "../../common/validators/postgresId.validato
 import { SearchConversionValidator } from "./validators/searchConversion.validator";
 import type { PaginatedListType } from "../../common/types/return.types";
 import type { IngredientGroupType } from "./ingredients.types";
+import { GetValidator } from "./validators/get.validator";
 
 const service = ingredientsService;
 
 export const ingredientsController = new Elysia({ prefix: '/ingredients' })
    .get( '/get/:_id',
-      async ({ params }) => {
+      async ({ params, query }) => {
          const { _id } = params;
-         const ingredient = await service.getIngredient(_id);
-         return { 
-            data: ingredient 
+         const ingredient = await service.getIngredient(_id, query);
+         return {
+            data: ingredient
          };
       },
       {
          params: PostgresIdValidator,
+         query: GetValidator,
       }
    )
    .get( '/search',

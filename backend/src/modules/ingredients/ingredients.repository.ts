@@ -17,35 +17,37 @@ interface GetIngredientList extends paginationParams {
 export class IngredientsRepository {
 
    async getBaseNutrition(ingredient_id: number): Promise<{ calories: number, fat: number, cholesterol: number, sodium: number, potassium: number, carbohydrates: number, fibre: number, sugar: number, protein: number }> {
-      const { content } = await postgresQueryBuilder(`SELECT nutrient_id, nutrient_value FROM nutrient_amount`, {
+      const { content } = await postgresQueryBuilder(`SELECT nutrient_id, value FROM nutrient_amount`, {
          where: [
             { column: 'food_id', operation: '=', value: ingredient_id.toString() },
-            { column: 'nutrient_id', operation: 'IN', value: '(203, 204, 205, 208, 269, 291, 306, 307, 601)' }
+            { column: 'nutrient_id', operation: 'IN', value: [203, 204, 205, 208, 269, 291, 306, 307, 601] }
          ],
          order: { column: 'nutrient_id', direction: 'ASC' }
       });
 
+      console.log(content)
+
       // make sure all nutrientRows have been found, if any are missing set them to 0
-      if (!content[0] || content[0].nutrient_id != 203) { content.splice(0, 0, { nutrient_id: '203', nutrient_value: '0' } ); }
-      if (!content[1] || content[1].nutrient_id != 204) content.splice(1, 0, { nutrient_id: '204', nutrient_value: '0' } );
-      if (!content[2] || content[2].nutrient_id != 205) content.splice(2, 0, { nutrient_id: '205', nutrient_value: '0' } );
-      if (!content[3] || content[3].nutrient_id != 208) content.splice(3, 0, { nutrient_id: '208', nutrient_value: '0' } );
-      if (!content[4] || content[4].nutrient_id != 269) content.splice(4, 0, { nutrient_id: '269', nutrient_value: '0' } );
-      if (!content[5] || content[5].nutrient_id != 291) content.splice(5, 0, { nutrient_id: '291', nutrient_value: '0' } );
-      if (!content[6] || content[6].nutrient_id != 306) content.splice(6, 0, { nutrient_id: '306', nutrient_value: '0' } );
-      if (!content[7] || content[7].nutrient_id != 307) content.splice(7, 0, { nutrient_id: '307', nutrient_value: '0' } );
-      if (!content[8]) content.splice(8, 0, { nutrient_id: '601', nutrient_value: '0' } );
+      if (!content[0] || content[0].nutrient_id != 203) { content.splice(0, 0, { nutrient_id: '203', value: '0' } ); }
+      if (!content[1] || content[1].nutrient_id != 204) content.splice(1, 0, { nutrient_id: '204', value: '0' } );
+      if (!content[2] || content[2].nutrient_id != 205) content.splice(2, 0, { nutrient_id: '205', value: '0' } );
+      if (!content[3] || content[3].nutrient_id != 208) content.splice(3, 0, { nutrient_id: '208', value: '0' } );
+      if (!content[4] || content[4].nutrient_id != 269) content.splice(4, 0, { nutrient_id: '269', value: '0' } );
+      if (!content[5] || content[5].nutrient_id != 291) content.splice(5, 0, { nutrient_id: '291', value: '0' } );
+      if (!content[6] || content[6].nutrient_id != 306) content.splice(6, 0, { nutrient_id: '306', value: '0' } );
+      if (!content[7] || content[7].nutrient_id != 307) content.splice(7, 0, { nutrient_id: '307', value: '0' } );
+      if (!content[8]) content.splice(8, 0, { nutrient_id: '601', value: '0' } );
 
       return {
-         calories: Number(content[3]),
-         fat: Number(content[1]),
-         cholesterol: Number(content[8]),
-         sodium: Number(content[7]),
-         potassium: Number(content[6]),
-         carbohydrates: Number(content[2]),
-         fibre: Number(content[5]),
-         sugar: Number(content[4]),
-         protein: Number(content[0]),
+         calories: Number(content[3]!.value),
+         fat: Number(content[1]!.value),
+         cholesterol: Number(content[8]!.value),
+         sodium: Number(content[7]!.value),
+         potassium: Number(content[6]!.value),
+         carbohydrates: Number(content[2]!.value),
+         fibre: Number(content[5]!.value),
+         sugar: Number(content[4]!.value),
+         protein: Number(content[0]!.value),
       }
    }
 

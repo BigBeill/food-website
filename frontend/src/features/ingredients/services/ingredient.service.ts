@@ -13,8 +13,8 @@ export const ingredientService = {
    conversionOptionList: (ingredientId: number) => {
       return ingredientApi.conversionOptionList(ingredientId);
    },
-   get: (ingredientId: number): Promise<IngredientType> => {
-      return ingredientApi.get(ingredientId);
+   get: (ingredientId: number, params?: { includeNutrition: boolean }): Promise<IngredientType> => {
+      return ingredientApi.get(ingredientId, params);
    },
    search: (params: searchParams): Promise<PaginatedListType<IngredientType>> => {
       return ingredientApi.search(params);

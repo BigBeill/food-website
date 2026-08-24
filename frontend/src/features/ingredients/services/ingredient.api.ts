@@ -15,10 +15,11 @@ export const ingredientApi = {
          url: `/ingredients/conversionOptionList/${ingredientId}`,
          method: 'get',
       }),
-   get: (ingredientId: number) =>
+   get: (ingredientId: number, params?: { includeNutrition: boolean }) =>
       sendServerRequest<IngredientType>({
          url: `/ingredients/get/${ingredientId}`,
          method: 'get',
+         body: params
       }),
    search: (params: searchParams) => 
       sendServerRequest<PaginatedListType<IngredientType>>({

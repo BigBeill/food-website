@@ -6,7 +6,7 @@ interface BuildPostgresQueryParams {
    where?: {
       column: string,
       operation: string,
-      value: string,
+      value: unknown,
    }[],
    skip?: number,
    limit?: number,
@@ -17,13 +17,18 @@ interface BuildPostgresQueryParams {
 export async function postgresQueryBuilder<T extends QueryResultRow>(baseQuery: string, functionParams: BuildPostgresQueryParams = {}): Promise<{ content: T[], count?: number }>{
    const { where = [], skip, limit, order, includeCount } = functionParams;
 
-   const params: string[] = [];
+   const params: unknown[] = [];
    const conditions: string[] = [];
 
    for (const { column, operation, value } of where) {
       params.push(value);
-      // TODO: ADD A CHECK FOR {column} AND {operations} TO PREVENT SQL INJECTION
-      conditions.push(`${column} ${operation} $${params.length}`);
+      if (operation === 'IN') {
+         conditions.push(`${column} = ANY($${params.length})`);
+      } else if (operation === 'NOT IN') {
+         conditions.push(`${column} <> ALL($${params.length})`);
+      } else {
+         conditions.push(`${column} ${operation} $${params.length}`);
+      }
    }
 
    const whereClause = conditions.length ? ` WHERE ${conditions.join(' AND ')}` : '';
