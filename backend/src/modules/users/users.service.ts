@@ -10,7 +10,7 @@ import type { ImagesService } from "../images/images.service";
 import type { ImageType } from "../images/images.types";
 import type { RecipesService } from "../recipes/recipes.service";
 import { UsersRepository } from "./users.repository";
-import type { FriendFolderType, UserType, RelationshipType } from "./users.types";
+import type { UserType, RelationshipType } from "./users.types";
 import { buildConflictString } from "./users.utils";
 
 interface DefinedRelationshipParams {

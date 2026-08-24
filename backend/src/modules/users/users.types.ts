@@ -15,9 +15,3 @@ export interface RelationshipType {
    targetId: string;
    type: "none" | "friend" | "requestReceived" | "requestSent" | "self";
 }
-
-export interface FriendFolderType {
-   _id: string;
-   title: string;
-   content?: UserType[];
-}

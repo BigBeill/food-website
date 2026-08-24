@@ -1,4 +1,4 @@
-import { Schema, Types, model, type HydratedDocument, type InferSchemaType } from 'mongoose';
+import { Schema, Types, model, type HydratedDocument } from 'mongoose';
 import { ImageSchema } from './image.schema';
 import type { NutritionType } from '../../../modules/recipes/recipes.types';
 import type { ImageType } from '../../../modules/images/images.types';

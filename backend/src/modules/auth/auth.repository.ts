@@ -66,12 +66,12 @@ export class AuthRepository {
    async searchUserExact({ name, email }: { name?: string, email?: string }): Promise<UserRecord[]> {
       const conditions: any[] = [];
 
-      if (name) conditions.push({ name });
-      if (email) conditions.push({ email });
+      if (name) { conditions.push({ name }); }
+      if (email) { conditions.push({ email }); }
 
       if (conditions.length === 0) { return []; }
 
-      const userList = await UserModel.find({ $or: conditions }).lean();
+      const userList = await UserModel.find({ $or: conditions }).select('+email').lean();
       return userList;
    }
 
