@@ -48,12 +48,16 @@ export default function EditRecipeView({ recipe }: ComponentParams ) {
 
 	// call notebook and give it pageList
 	return (
-		<Notebook childrenCount={ 5 }>
-			<EditRecipeGeneralInfoView newRecipe={ !('_id' in recipe) } refs={ { title: refs.title, description: refs.description } } initial={ { title: recipe.title, description: recipe.description } } />
-			<EditRecipeAdditionalInfoView refs={ { image: refs.image, visibility: refs.visibility } } initial={ { image: recipe.image || undefined, visibility: recipe.visibility } } />
-			<EditRecipeIngredientsView refs={ { ingredientList: refs.ingredientList } } initial={ { ingredientList: recipe.ingredientList } } />
-			<EditRecipeInstructionsView refs={ { instructionList: refs.instructionList } } initial={ { instructionList: recipe.instructionList } } />
-			<EditRecipeFinalizeChangesView saveMutator={ saveMutator } deleteMutator={ deleteMutator } />
-		</Notebook>
+		<Notebook components={ {
+			list: [
+				<EditRecipeGeneralInfoView newRecipe={ !('_id' in recipe) } refs={ { title: refs.title, description: refs.description } } initial={ { title: recipe.title, description: recipe.description } } />,
+				<EditRecipeAdditionalInfoView refs={ { image: refs.image, visibility: refs.visibility } } initial={ { image: recipe.image || undefined, visibility: recipe.visibility } } />,
+				<EditRecipeIngredientsView refs={ { ingredientList: refs.ingredientList } } initial={ { ingredientList: recipe.ingredientList } } />,
+				<EditRecipeInstructionsView refs={ { instructionList: refs.instructionList } } initial={ { instructionList: recipe.instructionList } } />,
+				<EditRecipeFinalizeChangesView saveMutator={ saveMutator } deleteMutator={ deleteMutator } />,
+			],
+			count: 5,
+			firstItemIndex: 0
+		} } />
 	)
 }

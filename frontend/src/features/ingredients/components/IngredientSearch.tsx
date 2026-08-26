@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react";
 import { IngredientType } from "../domain/ingredient.types";
 import { ingredientService } from "../services/ingredient.service";
@@ -5,40 +7,45 @@ import useServiceState from "@/shared/hooks/useServiceState";
 import { InputText } from "@/shared/components/Input.components";
 import { ButtonIconList } from "@/shared/components/Button.components";
 import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
+import { PaginatedListType } from "@/shared/shared.types";
 
-interface IngredientSearchParams {
-   onSubmit: (ingredient: IngredientType) => void;
-   includePortion?: boolean
+interface ComponentProps {
+   onSubmit: (ingredient: IngredientType) => void
 }
-export default function IngredientSearch({ onSubmit, includePortion = false }: IngredientSearchParams) {
-   const [ingredient, setIngredient] = useState<IngredientType>({ food_id: 0, description: '' });
+
+export default function IngredientSearch({ onSubmit }: ComponentProps) {
+
+   const defaultIngredient: IngredientType = { _id: 0, description: '' }
+   
+   const [currentIngredient, setCurrentIngredient] = useState<IngredientType>(defaultIngredient);
    const [searchTerm, setSearchTerm] = useState('');
 
-   const ingredientSearchState = useServiceState(() => {
+   // search for ingredients based on what is held in the search term
+   const searchResultsState = useServiceState(() => {
       if (searchTerm.length >= 3) { return ingredientService.search({ description: searchTerm }) }
       else { return Promise.resolve({ list: [], count: 0, firstItemIndex: 0 }); }
-   }, [searchTerm])
+   }, [searchTerm]);
 
-   const options = ingredientSearchState.status === 'ready' ? ingredientSearchState.data : { list: [], count: 0 };
+   const searchResults: PaginatedListType<IngredientType> = searchResultsState.status === 'ready' ? searchResultsState.data : { list: [], count: 0, firstItemIndex: 0 };
 
    function selectIngredient(ingredient: IngredientType) {
       setSearchTerm('');
-      setIngredient(ingredient);
+      setCurrentIngredient(ingredient);
    }
 
    function handleSubmit() {
-      if (ingredient.food_id !== 0) {
-         setIngredient({ food_id: 0, description: '' })
-         onSubmit(ingredient); 
+      if (currentIngredient._id !== 0) {
+         onSubmit(currentIngredient);
+         setCurrentIngredient(defaultIngredient);
       }
    }
 
    return (
-      <div className='textInput sideButton additionalMargin'>
-         <div className='activeSearchBar bottom'>
+      <div>
+         <div>
             <InputText label="Search Ingredient" onChange={ (event) => setSearchTerm(event.target.value) }/>
-            <ul className={`${ options.count === 0 ? 'hidden' : '' }`}>
-               { options.list.map((ingredient, index) => (
+            <ul className={`${ searchResults.count === 0 ? 'hidden' : '' }`}>
+               { searchResults.list.map((ingredient, index) => (
                   <li key={index} onClick={ () => selectIngredient(ingredient) }> { ingredient.commonName ? ingredient.commonName : ingredient.description } </li>
                ))}
             </ul>

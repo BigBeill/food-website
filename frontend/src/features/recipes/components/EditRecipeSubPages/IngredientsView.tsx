@@ -46,16 +46,16 @@ export default function EditRecipeIngredientsView ({ refs, initial}: ComponentPr
       ), 
    });
    
-   const [newIngredient, setNewIngredient] = useState<NewIngredientType>({ food_id: 0, description: '', label: '', commonName: '', portion: { measure_id: 0, description: '', amount: 0 } });
+   const [newIngredient, setNewIngredient] = useState<NewIngredientType>({ _id: 0, description: '', label: '', commonName: '', portion: { _id: 0, description: '', amount: 0 } });
 
    const conversionListState = useServiceState<IngredientConversionType[]>(() => { 
-      if (newIngredient.food_id !== 0) { return ingredientService.conversionOptionList(newIngredient.food_id); }
-      else { return Promise.resolve([{ food_id: 0, measure_id: 1489, description: 'g', value: 1 }]); }
-   }, [newIngredient.food_id])
+      if (newIngredient._id !== 0) { return ingredientService.conversionOptionList(newIngredient._id); }
+      else { return Promise.resolve([{ food_id: 0, measure_id: 1489, measure_description: 'g', value: 1 }]); }
+   }, [newIngredient._id])
 
    function addIngredient() {
       ingredientList.addItem(newIngredient);
-      setNewIngredient({ food_id: 0, description: '', label: '', commonName: '', portion: { measure_id: 0, description: '', amount: 0 } })
+      setNewIngredient({ _id: 0, description: '', label: '', commonName: '', portion: { _id: 0, description: '', amount: 0 } })
    }
 
    return (
@@ -78,7 +78,7 @@ export default function EditRecipeIngredientsView ({ refs, initial}: ComponentPr
             >
                <option value="" disabled hidden className='light'>Units</option>
                { conversionListState.status === 'ready' && conversionListState.data.map((conversionFactor, index) => (
-                  <option key={index} id={ String(conversionFactor.measure_id) }>{conversionFactor.description}</option>
+                  <option key={index} id={ String(conversionFactor.measure_id) }>{conversionFactor.measure_description}</option>
                )) }
             </select>
          </div>

@@ -22,7 +22,8 @@ export function InputRadioButtons<T>({ legend, ref, optionList, initial }: Input
    useImperativeHandle(ref, () => ({
       getData: () => choice,
       setData: setChoice,
-   }),[])
+   }),[]);
+   
    return (
       <fieldset className={ styles.inputRadioButtons }>
          <legend>{ legend }</legend>

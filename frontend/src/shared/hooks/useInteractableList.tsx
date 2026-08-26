@@ -1,6 +1,6 @@
 import "client-only";
 
-import { ReactNode, Ref, useImperativeHandle, useRef, useState } from 'react';
+import { Component, ReactNode, Ref, useImperativeHandle, useRef, useState } from 'react';
 import styles from './styles/interactableList.module.scss'
 import { Reorder } from 'framer-motion';
 import { DataHandle } from "../shared.types";
@@ -10,7 +10,7 @@ interface InteractableListActions<T> {
    removeIndex: (index: number) => void;
 }
 
-interface InteractableListOptions<T> {
+interface ComponentProps<T> {
    initial: T[];
    ref: Ref<DataHandle<T[]>>;
    renderItemContent: (item: T, index: number, actions: InteractableListActions<T>) => ReactNode;
@@ -23,7 +23,7 @@ interface ListItem<T> {
    content: T;
 }
 
-export function useInteractableList<T>({ initial, ref, renderItemContent, renderItemOptions, renderItemHeader }: InteractableListOptions<T>) {
+export function useInteractableList<T>({ initial, ref, renderItemContent, renderItemOptions, renderItemHeader }: ComponentProps<T>) {
 
    const nextId = useRef(0); // for simplicity, once an ID has been assigned, it will never be reassigned in this list, even if deleted (unless a list reset happens)
    const [list, setList] = useState<ListItem<T>[]>(() => assignIds(initial));
