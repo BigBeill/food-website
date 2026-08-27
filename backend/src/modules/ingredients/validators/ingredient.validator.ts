@@ -4,12 +4,12 @@ import { PostgresIdValidator } from "../../../common/validators/postgresId.valid
 
 export const IngredientValidator = t.Object({
    ingredient: t.Object({
-      food_id: PostgresIdValidator.properties._id,
+      _id: PostgresIdValidator.properties._id,
       description: t.String(),
       label: t.Optional(t.String()),
       commonName: t.Optional(t.String()),
       portion: t.Object({
-         measure_id: t.Number(),
+         _id: t.Number(),
          description: t.String(),
          amount: t.Number()
       }),

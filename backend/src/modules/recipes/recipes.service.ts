@@ -115,20 +115,18 @@ export class RecipesService {
    }
 
    async searchRecipes(params: GetRecipeListParams): Promise<PaginatedListType<RecipeType>> {
-      const { authId, title, ownerIdList, ingredientIdList, visibilityList = ['public'], skip = 0, limit = 12 } = params;
+      const { authId, title, ownerIdList = [], ingredientIdList, visibilityList = ['public'], skip = 0, limit = 12 } = params;
 
-      let allowedOwnerIdList: string[] | undefined;
+      let allowedOwnerIdList: string[] = ownerIdList;
+
+      if (visibilityList.includes('private')) {
+         if (!authId) { throw new UnauthorizedError(); }
+         const friendIdList = await this.permissionsService.getFriendIdList(authId);
+         allowedOwnerIdList.push(...friendIdList);
+      }
       if (visibilityList.includes('personal')) {
          if (!authId) { throw new UnauthorizedError(); }
-         allowedOwnerIdList = [ authId ];
-      }
-      else if (visibilityList.includes('private')) {
-         if (!authId) { throw new UnauthorizedError(); }
-         allowedOwnerIdList = await this.permissionsService.getFriendIdList(authId);
          allowedOwnerIdList.push(authId);
-      }
-      else {
-         allowedOwnerIdList = ownerIdList;
       }
 
       // remove any ownerIds from OwnerIdList that the calling function isn't requesting
@@ -136,10 +134,12 @@ export class RecipesService {
          allowedOwnerIdList = allowedOwnerIdList.filter(item => ownerIdList.includes(item));
       }
 
+      console.log('checkpoint 1');
+
       const recipes = await this.repository.searchRecipes({ title, ownerIdList: allowedOwnerIdList, visibilityList, skip, limit });
 
-      return { 
-         ...recipes, 
+      return {
+         ...recipes,
          list: await Promise.all(recipes.list.map((recipe) => { return this.hydrateRecipe(recipe); })) 
       };
    }

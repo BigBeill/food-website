@@ -7,13 +7,12 @@ interface getParams {
 }
 
 interface searchParams {
-   title?: string
-   ingredientIdList?: string; // use ',' to break up entries
-   category?: "public" | "friends" | "personal"
+   title?: string;
+   ownerIdList?: string[];
+   ingredientIdList?: string[];
+   visibilityList?: ('public' | 'private' | 'personal')[]
    limit?: number;
    skip?: number;
-   includeCount?: boolean;
-   includeNutrition?: boolean;
 }
 
 export const recipeApi = {

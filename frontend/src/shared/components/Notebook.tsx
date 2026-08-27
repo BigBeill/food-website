@@ -13,8 +13,6 @@ interface notebookParams {
 
 export default function Notebook ({ components }: notebookParams) {
 
-   useEffect(() => { console.log("components given to notebook:", components); }, [components])
-
    const searchParams = useSearchParams();
    const groupNumber = Number(searchParams.get('groupNumber')) || 1;
 
@@ -105,8 +103,8 @@ function NotebookView({firstPage, secondPage, paginationBar}: NotebookProps) {
 export function NotebookPage({ children, className, ...rest }: ComponentPropsWithoutRef<'div'>) {
    
    return (
-      <div className={ [styles.NotebookPage, className].filter(Boolean).join(' ') } { ...rest } >
+      <section className={ [styles.NotebookPage, className].filter(Boolean).join(' ') } { ...rest } >
          { children }
-      </div>
+      </section>
    );
 }

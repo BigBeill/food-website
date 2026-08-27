@@ -30,38 +30,46 @@ export class RecipesRepository {
 
    async searchRecipes(params: GetRecipeListParams): Promise<PaginatedListType<RecipeRecord>> {
       const { title, ownerIdList, ingredientIdList, visibilityList, skip, limit } = params;
-
       // quick safety check to make sure this function is being used correctly (not effective authorization)
       if (visibilityList.length == 0) { throw new Error('recipes.repository received an empty visibilityList array'); }
-      if (visibilityList.includes('private') && (!ownerIdList || ownerIdList.length == 0)) { throw new Error('recipes.repository is looking for private recipes but no userIds were specified') }
-      if (visibilityList.includes('personal') && (!ownerIdList || ownerIdList.length != 1)) { throw new Error('recipes.repository is looking for personal recipes but was not given exactly 1 ownerId')}
+      if (visibilityList.includes('personal') && (!ownerIdList || ownerIdList.length != 1)) { throw new Error('recipes.repository is looking for personal recipes but was not given exactly 1 ownerId'); }
 
-      // return the actual fetch
+      // public recipes match regardless of owner; everything else is owner-scoped
+      const restrictedVisibilityList = visibilityList.filter((visibility) => visibility !== 'public');
+      if (restrictedVisibilityList.length && !ownerIdList?.length) {
+         throw new Error('recipes.repository is looking for non-public recipes but no ownerIds were specified');
+      }
+
+      const visibilityClauseList = [
+         ...(visibilityList.includes('public') ? [{ visibility: 'public' }] : []),
+         ...(restrictedVisibilityList.length
+            ? [{ visibility: { $in: restrictedVisibilityList }, ownerId: { $in: ownerIdList } }]
+            : []),
+      ];
+
       const resultList = await RecipeModel.aggregate<{
          recordList: RecipeRecord[];
          countList: { count: number }[];
       }>([
          {
             $match: {
-               ...(title && { title: { $regex: escapeRegex(title), $options: 'i' } }), 
-               ...(ownerIdList?.length && { ownerId: { $in: ownerIdList } }),
+               ...(title && { title: { $regex: escapeRegex(title), $options: 'i' } }),
                ...(ingredientIdList?.length && { 'ingredientList._id': { $all: ingredientIdList } }),
-               visibility: { $in: visibilityList },
+               $or: visibilityClauseList,
             },
          },
          {
             $facet: {
                recordList: [
-                  ...(skip ? [{ $skip: skip }] : []), 
-                  ...(limit ? [{ $limit: limit }] : []), 
+                  ...(skip ? [{ $skip: skip }] : []),
+                  ...(limit ? [{ $limit: limit }] : []),
                ],
                countList: [{ $count: 'count' }],
             }
          }
       ]);
       const { recordList, countList } = resultList[0]!;
-
-      return { list: recordList, count: countList[0]!.count, firstItemIndex: skip ?? 0 };
+      return { list: recordList, count: countList[0]?.count || 0, firstItemIndex: skip ?? 0 };
    }
 
    async updateRecipe(recipe: RecipeType): Promise<RecipeRecord | null> {

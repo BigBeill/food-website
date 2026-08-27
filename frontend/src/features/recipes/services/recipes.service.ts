@@ -5,11 +5,10 @@ import { checkValidRecipeDraft, createRecipeFormData } from "./recipes.utils";
 
 interface SearchParams {
    title?: string
-   ingredientIdList: number[];
-   category?: "public" | "friends" | "personal"
+   ingredientIdList?: number[];
+   visibilityList?: ('public' | 'private' | 'personal')[];
    limit?: number;
    skip?: number;
-   includeNutrition?: boolean;
 }
 
 export const recipeService = {
@@ -25,14 +24,13 @@ export const recipeService = {
       return recipeApi.get(recipeId, { includeNutrients: true });
    },
    search: (params: SearchParams): Promise<PaginatedListType<RecipeType>> => {
-      const { title, ingredientIdList, category, limit, skip, includeNutrition } = params;
+      const { title, ingredientIdList, visibilityList, limit, skip } = params;
       return recipeApi.search({ 
-         ...(title ? { title } : null),
-         ...(ingredientIdList.length === 0 ? { ingredientIdList: ingredientIdList.join(',') } : null), 
-         category, 
-         limit, 
+         ...(title ? { title } : undefined),
+         ...(ingredientIdList?.length !== 0 ? ingredientIdList : undefined), 
+         visibilityList,
+         limit,
          skip,
-         includeNutrition 
       });
    },
    update: (recipeId: string, recipe: RecipeDraft): Promise<void> => {

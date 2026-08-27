@@ -70,9 +70,12 @@ export class IngredientsService {
    }
 
    async hydrateIngredient(record: IngredientRecord): Promise<IngredientType> {
-      const [ ingredient, conversion ] = await Promise.all([
+      const [ingredient, conversion] = await Promise.all([
          this.repository.getIngredient(record._id),
-         this.repository.getConversion(record._id, record.portion._id),
+         this.repository.getConversion(record._id, record.portion._id).catch((error) => {
+            console.log(error);
+            return null;
+         }),
       ]);
       return {
          ...record,
