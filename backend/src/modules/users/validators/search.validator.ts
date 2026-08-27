@@ -3,7 +3,7 @@ import { PaginationValidator } from "../../../common/validators/pagination.valid
 import { IdValidator } from "../../../common/validators/id.validator";
 
 export const SearchValidator = t.Object({
-   _id: IdValidator.properties._id,
+   _id: t.Optional(IdValidator.properties._id),
    name: t.Optional(t.String()),
    ...PaginationValidator.properties,
    includeRelationship: t.Optional(t.Boolean()),

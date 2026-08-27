@@ -29,7 +29,7 @@ export default function SearchRecipePage() {
          title,
          visibilityList: ['public', 'private', 'personal'],
          ingredientIdList,
-         skip: ((groupSize * (groupNumber - 1))),
+         skip: Math.max(((groupNumber - 1) * groupSize * 2) - groupSize, 0),
          limit: (groupNumber == 1 ? groupSize : groupSize * 2)
       });
 
