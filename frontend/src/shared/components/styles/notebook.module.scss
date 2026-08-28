@@ -36,7 +36,7 @@
          position: relative;
          height: calc(100% - 0.3rem);
          box-sizing: border-box;
-         background-color: var(--background-color);
+         background-color: $color-background;
          overflow: hidden;
          box-shadow: 0.09rem 0.09rem 0.3rem #2C1A1D;
 

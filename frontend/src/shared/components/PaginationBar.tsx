@@ -3,21 +3,29 @@ import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 import styles from './styles/paginationBar.module.scss';
 import { useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 
 interface PaginationBarProps {
-   groupNumber: number;
-   groupCount: number;
-   setGroupNumber: (index: number) => void;
+   pageCount: number;
 }
 
-export default function PaginationBar({ groupNumber, groupCount, setGroupNumber }: PaginationBarProps) {
+export default function PaginationBar({ pageCount }: PaginationBarProps) {
+
+   const searchParams = useSearchParams();
+   const currentPage = Number(searchParams.get('page')) || 1;
+   
+   function setPage(page: number) {
+      const updatedParams = new URLSearchParams(searchParams.toString())
+      updatedParams.set('page', String(page));
+      window.history.pushState(null, '', `?${ updatedParams.toString() }`);
+   }
 
    // guard to try and limit out of bounds requests leaving this component
-   function handleGroupChange(newGroupNumber: number) {
-      if (newGroupNumber < 1) { setGroupNumber(1); }
-      else if (newGroupNumber > groupCount) { setGroupNumber(groupCount); }
-      else { setGroupNumber(newGroupNumber); }
+   function handlePageChange(newPage: number) {
+      if (newPage < 1) { setPage(1); }
+      else if (newPage > pageCount) { setPage(pageCount); }
+      else { setPage(newPage); }
    }
 
    // creates event listener for key presses
@@ -26,45 +34,45 @@ export default function PaginationBar({ groupNumber, groupCount, setGroupNumber 
       function handleKeyDown(event: KeyboardEvent) {
          const focusedElement = (event.target as HTMLElement)?.tagName;
          if (focusedElement === 'INPUT' || focusedElement === 'TEXTAREA') { return; }
-         if (event.key == 'a' || event.key == 'ArrowLeft') { handleGroupChange(groupNumber - 1); }
-         if (event.key == 'd' || event.key == 'ArrowRight') { handleGroupChange(groupNumber + 1); }
+         if (event.key == 'a' || event.key == 'ArrowLeft') { handlePageChange(currentPage - 1); }
+         if (event.key == 'd' || event.key == 'ArrowRight') { handlePageChange(currentPage + 1); }
       }
 
       window.addEventListener('keydown', handleKeyDown);
       return () => { window.removeEventListener('keydown', handleKeyDown); }
-   }, [groupNumber, setGroupNumber]);
+   }, [currentPage, handlePageChange]);
 
    return (
       <div className={styles.paginationBar}>
-         <button onClick={() => handleGroupChange(groupNumber - 1)} > <FontAwesomeIcon icon={faArrowLeft} /> </button>
-         { groupNumber == 4 ? (
+         <button onClick={() => handlePageChange(currentPage - 1)} > <FontAwesomeIcon icon={faArrowLeft} /> </button>
+         { currentPage == 4 ? (
             <>
-               <button onClick={() => handleGroupChange(1)}> 1 </button>
+               <button onClick={() => handlePageChange(1)}> 1 </button>
             </>
-         ): groupNumber > 4 ? (
+         ): currentPage > 4 ? (
             <>
-               <button onClick={() => handleGroupChange(1)}> 1 </button>
-               <button onClick={() => handleGroupChange(2)}> 2 </button>
+               <button onClick={() => handlePageChange(1)}> 1 </button>
+               <button onClick={() => handlePageChange(2)}> 2 </button>
             </>
          ) : null }
-         { groupNumber > 5 ? (<p>...</p>) : null}
-         { groupNumber > 2 ? (<button onClick={() => handleGroupChange(groupNumber - 2)}> {groupNumber - 2} </button>) : null }
-         { groupNumber > 1 ? (<button onClick={() => handleGroupChange(groupNumber - 1)}> {groupNumber - 1} </button>) : null }
-         <p className="primaryBlock">{groupNumber}</p>
-         { groupNumber < groupCount ?  (<button onClick={() => handleGroupChange(groupNumber + 1)}> {groupNumber + 1} </button>) : null}
-         { groupNumber < groupCount - 1 ? (<button onClick={() => handleGroupChange(groupNumber + 2)}> {groupNumber + 2} </button>) : null }
-         { groupNumber < groupCount - 4 ? (<p>...</p>) : null}
-         { groupNumber == (groupCount - 3)? (
+         { currentPage > 5 ? (<p>...</p>) : null}
+         { currentPage > 2 ? (<button onClick={() => handlePageChange(currentPage - 2)}> {currentPage - 2} </button>) : null }
+         { currentPage > 1 ? (<button onClick={() => handlePageChange(currentPage - 1)}> {currentPage - 1} </button>) : null }
+         <p className="primaryBlock">{currentPage}</p>
+         { currentPage < pageCount ?  (<button onClick={() => handlePageChange(currentPage + 1)}> {currentPage + 1} </button>) : null}
+         { currentPage < pageCount - 1 ? (<button onClick={() => handlePageChange(currentPage + 2)}> {currentPage + 2} </button>) : null }
+         { currentPage < pageCount - 4 ? (<p>...</p>) : null}
+         { currentPage == (pageCount - 3)? (
             <>
-               <button onClick={() => handleGroupChange(groupCount)}> {groupCount} </button>
+               <button onClick={() => handlePageChange(pageCount)}> {pageCount} </button>
             </>
-         ) : groupNumber < (groupCount - 3)? (
+         ) : currentPage < (pageCount - 3)? (
             <>
-              <button  onClick={() => handleGroupChange(groupCount - 1)}> {groupCount - 1} </button>
-              <button onClick={() => handleGroupChange(groupCount)}> {groupCount} </button> 
+              <button  onClick={() => handlePageChange(pageCount - 1)}> {pageCount - 1} </button>
+              <button onClick={() => handlePageChange(pageCount)}> {pageCount} </button> 
             </>
          ) : null}
-         <button onClick={() => handleGroupChange(groupNumber + 1)} > <FontAwesomeIcon icon={faArrowRight} /> </button>
+         <button onClick={() => handlePageChange(currentPage + 1)} > <FontAwesomeIcon icon={faArrowRight} /> </button>
       </div>
    )
 }

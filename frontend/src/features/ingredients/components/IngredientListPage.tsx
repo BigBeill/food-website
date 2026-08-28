@@ -18,36 +18,31 @@ interface PageProps {
 export default function IngredientListPage({ ingredientGroupId }: PageProps) {
 
    const searchParams = useSearchParams();
-   const groupNumber = Number(searchParams.get('groupNumber')) || 1;
+   const page = Number(searchParams.get('page')) || 1;
 
    const [notebookComponents, setNotebookComponents] = useState<BrokenPaginatedListType<React.ReactElement>>({ list: [], count: 0, firstItemIndex: 0 });
 
    useServiceState(async () => {
-      console.log("collecting ingredients for group number", groupNumber);
-      const ingredients = await ingredientService.search({ 
+      const firstComponent = (page - 1) * 2; // index of the first component being added to notebookComponents
+      const firstItem = firstComponent * groupSize; // index of the first user being grabbed from the server
+
+      const response = await ingredientService.search({ 
          food_group_id: ingredientGroupId, 
-         skip: ((groupNumber - 1) * 2 * groupSize),
+         skip: firstItem,
          limit: 10,
       });
 
-      for (let i = 0; i < ingredients.list.length; i += groupSize) {
-         const ingredientList = ingredients.list.slice(i, i + groupSize);
-         const itemList = ingredientList.map((ingredient) => { 
-            return { 
-               title: ingredient.description, 
-               href: `/ingredients/${ingredientGroupId}/${ ingredient._id }` 
-            } 
-         });
-         setNotebookComponents((previous) => {
-            const itemIndex = ((groupNumber - 1) * 2) + (Math.ceil(i / groupSize));
-            return combinePaginatedLists(previous, {
-               list: [<NotebookPageListItems key={ itemIndex } itemList={ itemList } defaultListSize={ groupSize } />],
-               count: Math.ceil(ingredients.count / groupSize),
-               firstItemIndex: itemIndex,
-            })
-         });
+      let newComponents = []
+
+      for (let i = 0; i < response.list.length; i += groupSize) {
+         const ingredientList = response.list.slice(i, i + groupSize);
+         const itemList = ingredientList.map((ingredient) => { return { title: ingredient.description, href: `/ingredients/${ingredientGroupId}/${ ingredient._id }` } });
+         newComponents.push(<NotebookPageListItems itemList={ itemList } defaultListSize={ groupSize } />);
       }
-   }, [groupNumber]);
+
+      setNotebookComponents((previous) => { return combinePaginatedLists(previous, { list: newComponents,  count: Math.ceil(response.count / groupSize) + 1, firstItemIndex: firstComponent }) });
+
+   }, [searchParams]);
 
    return <Notebook components={ notebookComponents } />
 }

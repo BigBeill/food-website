@@ -20,17 +20,20 @@ export default function SearchRecipePage() {
    const ingredientIdListParam = searchParams.get('ingredientIdList');
    const category = searchParams.get('category') as "public" | "friends" | "personal" || 'public';
    const ingredientIdList = useMemo(() => { return ingredientIdListParam ? ingredientIdListParam.split(',').map(Number) : [] }, [ingredientIdListParam] );
-   const groupNumber: number = Number(searchParams.get('groupNumber')) || 1;
+   const page: number = Number(searchParams.get('page')) || 1;
 
    const [notebookComponents, setNotebookComponents] = useState<BrokenPaginatedListType<React.ReactElement>>({ list: [<RecipeFilterPage />], count: 1, firstItemIndex: 0 });
 
    useServiceState(async () => {
+      const firstComponent = Math.max((page - 1) * 2, 1); // index of the first component being added to notebookComponents
+      const firstItem = (firstComponent - 1) * groupSize; // index of the first user being grabbed from the server
+
       const response = await recipeService.search({
          title,
          visibilityList: ['public', 'private', 'personal'],
          ingredientIdList,
-         skip: Math.max(((groupNumber - 1) * groupSize * 2) - groupSize, 0),
-         limit: (groupNumber == 1 ? groupSize : groupSize * 2)
+         skip: firstComponent,
+         limit: (page === 1 ? groupSize : groupSize * 2)
       });
 
       let newComponents = []
@@ -41,7 +44,7 @@ export default function SearchRecipePage() {
          newComponents.push(<NotebookPageListItems itemList={ itemList } defaultListSize={ groupSize } />);
       }
 
-      setNotebookComponents((previous) => { return combinePaginatedLists(previous, { list: newComponents,  count: Math.ceil(response.count / groupSize), firstItemIndex: ((groupNumber - 1) * 2) + 1 }) });
+      setNotebookComponents((previous) => { return combinePaginatedLists(previous, { list: newComponents,  count: Math.ceil(response.count / groupSize) + 1, firstItemIndex: firstItem }) });
 
    }, [searchParams]);
 

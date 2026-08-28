@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, ComponentPropsWithoutRef, useMemo } from 'react';
+import React, { useState, useEffect, ComponentPropsWithoutRef } from 'react';
 import PaginationBar from '@/shared/components/PaginationBar';
 import styles from './styles/notebook.module.scss';
 import { useSearchParams } from 'next/navigation';
@@ -14,47 +14,34 @@ interface notebookParams {
 export default function Notebook ({ components }: notebookParams) {
 
    const searchParams = useSearchParams();
-   const groupNumber = Number(searchParams.get('groupNumber')) || 1;
+   const page = Number(searchParams.get('page')) || 1;
 
-   const currentIndex = useMemo(() => { return (groupNumber - 1) * 2; }, [groupNumber]);
+   const currentIndex = (page - 1) * 2;
 
-   // set the groupNumber in the url and let the parent catch and handle groupNumber changes
-   function setGroupNumber(groupNumber: number) {
-      const updatedParams = new URLSearchParams(searchParams.toString())
-      updatedParams.set('groupNumber', String(groupNumber));
-      window.history.pushState(null, '', `?${ updatedParams.toString() }`);
-   }
-
-   function handleSetCurrentIndex(newIndex: number) {
-      setGroupNumber((newIndex / 2) + 1);
-   }
-
-   function grabPageFromList(index: number) {
+   // Fetches a component from components.list
+   // If the component does not exist return a loading state component or nothing, depending on if the component is within the components.count range
+   function grabComponentFromList(index: number) {
       if (components.list[index]) { return components.list[index]; }
       else if (index < components.count) { return <StateLoadingPage /> }
       else { return undefined; }
    }
 
-   // real index in pageList of the pages being displayed
-   const firstPageIndex = currentIndex - components.firstItemIndex;
-   const firstPage = grabPageFromList(firstPageIndex);
-   const secondPage = grabPageFromList(firstPageIndex + 1);
-
-   function setGroup(newGroup: number) {
-      handleSetCurrentIndex((newGroup - 1) * 2);
-   }
-
-   const paginationBar = <PaginationBar groupNumber={ Math.ceil((currentIndex + 1) / 2) } groupCount={ Math.ceil(components.count / 2) } setGroupNumber={ setGroup } />;
-   return <NotebookView firstPage={ firstPage } secondPage={ secondPage } paginationBar={ paginationBar } />;
+   // grab the actual component being used.
+   const firstComponentIndex = currentIndex - components.firstItemIndex;
+   const firstComponent = grabComponentFromList(firstComponentIndex);
+   const secondComponent = grabComponentFromList(firstComponentIndex + 1);
+   const paginationBar = <PaginationBar pageCount={ Math.ceil(components.count / 2) } />;
+   
+   return <NotebookView firstComponent={ firstComponent } secondComponent={ secondComponent } paginationBar={ paginationBar } />;
 }
 
 
 interface NotebookProps {
-   firstPage?: React.ReactNode;
-   secondPage?: React.ReactNode;
+   firstComponent?: React.ReactNode;
+   secondComponent?: React.ReactNode;
    paginationBar: React.ReactNode;
 }
-function NotebookView({firstPage, secondPage, paginationBar}: NotebookProps) {
+function NotebookView({firstComponent, secondComponent, paginationBar}: NotebookProps) {
 
    // use States that keep track of whether the screen is too narrow to display both pages at once, and if so which page to display
    const [narrowScreen, setNarrowScreen] = useState<boolean>(false);
@@ -83,11 +70,11 @@ function NotebookView({firstPage, secondPage, paginationBar}: NotebookProps) {
       <div className={styles.notebookContainer}>
          <div className={`${styles.notebook} ${displayRight ? styles.displayRight : ''}`}>
             <div className={`${styles.page} ${(displayRight && narrowScreen) ? 'shielded' : ''}`} onClick={() => setDisplayRight(false)}>
-               {firstPage || null}
+               {firstComponent || null}
             </div>
             <img className={ styles.spine } src="/notebookSpine.png" alt="notebookSpine" />
             <div className={`${ styles.page } ${(!displayRight && narrowScreen) ? 'shielded' : ''}`} onClick={() => setDisplayRight(true)}>
-               {secondPage || null}
+               {secondComponent || null}
             </div>
          </div>
          {paginationBar}
@@ -100,6 +87,7 @@ function NotebookView({firstPage, secondPage, paginationBar}: NotebookProps) {
 
 
 
+// component used as a wrapper for any component designed to fit inside notebook (guarantees size, position and hidden overflow)
 export function NotebookPage({ children, className, ...rest }: ComponentPropsWithoutRef<'div'>) {
    
    return (
