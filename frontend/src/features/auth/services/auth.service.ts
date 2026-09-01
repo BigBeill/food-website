@@ -30,7 +30,7 @@ export const authService = {
    checkAuthStatus: (): Promise<string> => {
       return authApi.checkStatus();
    },
-   login: (params: LoginParams): Promise<void> => {
+   login: (params: LoginParams): Promise<{ _id: string }> => {
       const { username, password, rememberMe } = params;
       checkValidPassword(password);
       return authApi.login({ name: username, password, rememberMe });
@@ -38,7 +38,7 @@ export const authService = {
    logout: (): Promise<void> => {
       return authApi.logout();
    },
-   register: (params: RegisterParams) => {
+   register: (params: RegisterParams): Promise<{ _id: string }> => {
       const { username, email, passwordOne, passwordTwo } = params
       checkValidEmail(email);
       checkValidPassword(passwordOne);

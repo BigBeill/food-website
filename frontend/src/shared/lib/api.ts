@@ -50,7 +50,6 @@ async function request<T>(config: SendServerRequestProps): Promise<T> {
    //check if the request failed for any reason and set errors
    if (!response.ok) {
       const responseContent = await response.json().catch(() => ({}));
-      console.warn(`API request {${config.url}} ran into an error:`, responseContent );
       
       if (response.status === 401) { throw new ErrorUnauthorized(responseContent.error.message); }
       else if (response.status === 404) { throw new ErrorNotFound(); }
@@ -59,7 +58,6 @@ async function request<T>(config: SendServerRequestProps): Promise<T> {
 
    // if nothing went wrong return the content of the response
    const jsonResponse = await response.json();
-   console.log(`API request ${config.url} received a response:`, jsonResponse);
    return jsonResponse.data;
 }
 
@@ -73,7 +71,6 @@ export default async function sendServerRequest<T>(config: SendServerRequestProp
       const skipRefresh = (config.url === '/auth/login' || config.url === '/auth/register');
       if (error instanceof ErrorUnauthorized && !skipRefresh) {
          // request a new access token
-         console.warn('accessToken rejected, requesting new accessToken');
          try { await request<T>({ method: 'POST', url: '/auth/refresh' }); }
          catch { throw error; }
          return await request<T>(config);

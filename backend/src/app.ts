@@ -9,8 +9,9 @@ import { ingredientsController } from './modules/ingredients/ingredients.control
 import { imagesController } from './modules/images/images.controller';
 import { recipesController } from './modules/recipes/recipes.controller';
 import { jwksPlugin } from './modules/auth/jwk.plugin';
+import { cookieConfig } from './config/cookies';
 
-export const app = new Elysia({ normalize: false })
+export const app = new Elysia({ normalize: false, cookie: cookieConfig })
    .use(errorHandler)
    .use(jwksPlugin)
    .mapResponse({ as: 'global' }, ({ responseValue }) => {

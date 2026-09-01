@@ -9,6 +9,7 @@ export type Session = { userId: string; roles: string[] };
 const JWKS = createRemoteJWKSet(new URL(`${process.env.ELYSIA_URL}/.well-known/jwks.json`));
 
 export const verifySession = cache(async (): Promise<Session | null> => {
+
    const token = (await cookies()).get('accessToken')?.value;
    if (!token) { return null; }
 

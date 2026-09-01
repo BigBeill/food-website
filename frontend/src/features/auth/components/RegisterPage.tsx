@@ -9,7 +9,7 @@ import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
 import useAuth from '../hooks/useAuth';
 
-interface registerDataType {
+interface TypeRegisterData {
    username: string,
    email: string,
    passwordOne: string,
@@ -19,10 +19,10 @@ interface registerDataType {
 export default function RegisterPage() {
 
    const router = useRouter();
-   const { refetchStatus: refetchAuth } = useAuth();
+   const { override: overrideAuth } = useAuth();
 
-   const [registerData, setRegisterData] = useState<registerDataType>({ username: "", email: "", passwordOne: "", passwordTwo: "" });
-   const registerMutator = useServiceMutation<registerDataType, void>((input) => authService.register(input));
+   const [registerData, setRegisterData] = useState<TypeRegisterData>({ username: "", email: "", passwordOne: "", passwordTwo: "" });
+   const registerMutator = useServiceMutation((input: TypeRegisterData) => authService.register(input));
 
    useEffect(() => {
       document.body.classList.add(styles.loginBackground);
@@ -31,7 +31,7 @@ export default function RegisterPage() {
 
    useEffect(() => {
       if (registerMutator.status === "ready") { 
-         refetchAuth();
+         overrideAuth(registerMutator.data._id)
          router.replace('/');
       }
    }, [registerMutator.status]);

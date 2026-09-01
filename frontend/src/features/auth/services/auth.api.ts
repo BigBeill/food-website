@@ -29,7 +29,7 @@ export const authApi = {
          method: 'GET'
       }),
 
-   login: (params: LoginParams): Promise<void> =>
+   login: (params: LoginParams): Promise<{ _id: string }> =>
       sendServerRequest({
          url: "/auth/login",
          method: "POST",
@@ -42,7 +42,7 @@ export const authApi = {
          method: 'POST',
       }),
 
-   register: (params: RegisterParams): Promise<void> =>
+   register: (params: RegisterParams): Promise<{ _id: string }> =>
       sendServerRequest({
          url: "/auth/register",
          method: "POST",

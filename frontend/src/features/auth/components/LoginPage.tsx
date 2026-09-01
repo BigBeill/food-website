@@ -18,7 +18,7 @@ interface FormDataType {
 export default function LoginPage() {
 
    const router = useRouter();
-   const { refetchStatus: refetchAuth } = useAuth();
+   const { override: overrideAuth } = useAuth();
    const [loginData, setLoginData] = useState<FormDataType>({ username: "", password: "", rememberMe: false });
    const loginMutator = useServiceMutation((input: FormDataType) => authService.login(input));
 
@@ -29,7 +29,7 @@ export default function LoginPage() {
 
    useEffect(() => {
       if (loginMutator.status === "ready") { 
-         refetchAuth();
+         overrideAuth(loginMutator.data._id);
          router.replace('/'); 
       }
    }, [loginMutator.status]);

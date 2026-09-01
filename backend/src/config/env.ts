@@ -8,6 +8,7 @@ function required(name: string): string {
 
 export const env = {
 	PORT: required('PORT'),
+	NODE_ENVIRONMENT: required('NODE_ENVIRONMENT'),
 
 	CORS_ORIGIN: required('CORS_ORIGIN'),
 
