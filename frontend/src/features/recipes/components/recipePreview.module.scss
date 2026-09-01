@@ -1,37 +1,18 @@
-.recipeObjectView {
+@use '../../../shared/styles/variables' as *;
+
+.preview {
+
+   margin: 3em auto;
+   box-sizing: border-box;
+   width: calc(100% - 3em); max-width: 60em;
+   height: fit-content;
+   padding: 3em;
+   background-color: $color-background;
 
    display: grid;
-   box-sizing: border-box;
-   background-color: var(--background-color);
-
-   &.fullPage {
-      margin: 3em auto;
-      width: calc(100% - 3em);
-      max-width: 60em;
-      padding: 3em;
-      gap: 1.2em;
-      grid-template-columns: calc(100% - 16.2em) 15em;
-      grid-template-rows: 15em 12em 18em 1fr;
-      grid-template-areas: "titleContainer image" "description description" "ingredients nutrientInformation" "instructions instructions";
-   }
-
-   &.previewPage {
-
-      height: 100%;
-      width: 100%;
-      gap: 0.6rem;
-      grid-template-columns: calc(100% - 12.6rem) 12rem;
-      grid-template-rows: 12rem 9rem 1fr auto;
-      grid-template-areas: "titleContainer image" "description description" "ingredients nutrientInformation" "bottomButtons bottomButtons";
-
-      img {
-         clip-path: polygon(0rem 0rem, 0rem 10.2rem, 1.8rem 12rem, 12rem 12rem, 12rem 1.8rem , 10.2rem 0rem);
-      }
-
-      .bottomButtons {
-         grid-area: bottomButtons;
-      }
-   }
+   gap: 1.2em;
+   grid-template-columns: 1fr 15em;
+   grid-template-areas: "titleContainer image" "description description" "ingredients nutrientInformation" "instructions instructions";
 
    .titleContainer {
       grid-area: titleContainer;
@@ -105,7 +86,7 @@
       font-size: 2em;
       margin-top: 0em;
       font-weight: bold;
-      text-decoration: underline #065F46;
+      text-decoration: underline $color-primary;
       text-decoration-thickness: 0.1em;
    }
 

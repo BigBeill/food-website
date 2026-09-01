@@ -1,63 +1,60 @@
+import styles from './recipePreview.module.scss';
 import { RecipeType } from "../domain/recipes.types";
 import GrowingText from "@/shared/components/GrowingText";
-import { RecipeView } from "./RecipePage";
-import { useRouter } from "next/router";
-import useAuth from "@/features/auth/hooks/useAuth";
-import { unpackImage } from "@/features/images/services/image.services";
-import { usePopup } from "../../../shared/hooks/usePopup";
+import ImageDisplay from "@/features/images/components/ImageDisplay";
 
-interface RecipePreviewProps {
-   recipe: RecipeType;
-}
-
-export default function RecipePreview({ recipe }: RecipePreviewProps) {
-   const router = useRouter();
-   const { authId } = useAuth();
-   const popup = usePopup(<RecipeView recipe={recipe}/>);
+export default function RecipePreview({ recipe }: { recipe: RecipeType }) {
 
    return (
-      <>
-      <div className="recipeObjectView previewPage">
+      <div className={ styles.preview }>
          <GrowingText text={recipe.title}/>
-         <img {...unpackImage(recipe.image)} />
-         <p className="description">{recipe.description}</p>
+
+         <ImageDisplay packagedImage={recipe.image} />
+
+         <div className="description">
+            <h3>Description</h3>
+            <p>{recipe.description}</p>
+         </div>
+
+         <div className="nutrition">
+            <h3>Nutrition</h3>
+            <ul>
+               { recipe.nutrition ? 
+               <>
+                  <li>Calories: {recipe.nutrition.calories.toFixed(2)}</li>
+                  <li>Fat: {recipe.nutrition.fat.toFixed(2)}</li>
+                  <li>Cholesterol: {recipe.nutrition.cholesterol.toFixed(2)}</li>
+                  <li>Sodium: {recipe.nutrition.sodium.toFixed(2)}</li>
+                  <li>Potassium: {recipe.nutrition.potassium.toFixed(2)}</li>
+                  <li>Carbohydrates: {recipe.nutrition.carbohydrates.toFixed(2)}</li>
+                  <li>Fibre: {recipe.nutrition.fibre.toFixed(2)}</li>
+                  <li>Sugar: {recipe.nutrition.sugar.toFixed(2)}</li>
+                  <li>Protein: {recipe.nutrition.protein.toFixed(2)}</li>
+               </>
+               : null }
+            </ul>
+         </div>
+
+         <div className="instructions">
+            <h3>Instructions</h3>
+            <ol>
+               {recipe.instructionList.map((instruction, index) => (
+                  <li key={index}>{instruction}</li>
+               ))}
+            </ol>
+         </div>
+
          <div className="ingredients">
-            <p>Ingredients:</p>
+            <h3>Ingredients</h3>
             <ul>
                {recipe.ingredientList.map((ingredient, index) => (
                   <li key={index}>
-                     {ingredient.label ? ingredient.label : ingredient.portion?.amount + " " + ingredient.portion?.description + " of [" + ingredient.description + "]"}
+                     {ingredient.label ? ingredient.label : `${ingredient.portion?.amount} ${ingredient.portion?.description} of [${ingredient.description}]`}
                   </li>
                ))}
             </ul>
          </div>
-         <div className="nutrition">
-            { recipe.nutrition ? 
-            <>
-               <p>Calories: {recipe.nutrition.calories.toFixed(2)}</p>
-               <p>Fat: {recipe.nutrition.fat.toFixed(2)}</p>
-               <p>Cholesterol: {recipe.nutrition.cholesterol.toFixed(2)}</p>
-               <p>Sodium: {recipe.nutrition.sodium.toFixed(2)}</p>
-               <p>Potassium: {recipe.nutrition.potassium.toFixed(2)}</p>
-               <p>Carbohydrates: {recipe.nutrition.carbohydrates.toFixed(2)}</p>
-               <p>Fibre: {recipe.nutrition.fibre.toFixed(2)}</p>
-               <p>Sugar: {recipe.nutrition.sugar.toFixed(2)}</p>
-               <p>Protein: {recipe.nutrition.protein.toFixed(2)}</p>
-            </>
-            : null }
-         </div>
 
-         <div className="bottomButtons splitSpace">
-            <button onClick={() => popup.show()}> View Recipe </button>
-            { recipe.ownerId == authId ? 
-               <button onClick={() => {router.push(`/editRecipe/${recipe._id}`)}}>Edit Recipe</button>
-               : null
-            }
-         </div>
-         
       </div>
-
-      {popup.content}
-      </>
    );
-};
+}

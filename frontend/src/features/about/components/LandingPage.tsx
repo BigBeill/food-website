@@ -1,15 +1,15 @@
-import { RecipeView } from "@/features/recipes/components/RecipePage";
 import MiniComponent from "@/shared/components/MiniComponent";
 import AnimationCrooked from "@/shared/animations/crooked.animation";
 import { LinkPair } from "@/shared/components/Link.components";
 import LandingPageLinks from "./LandingPageLinks";
 import LazyLoad from "@/shared/components/LazyLoad";
 import { recipeService } from "@/features/recipes/services/recipes.service";
+import RecipePreview from "@/features/recipes/components/RecipePreview";
 
 export default function LandingPage() {
 
    const featuredRecipeId = '6879a6901775cc14af3170ef';
-
+   
    return (
       <>
         <section className="splitSpace" style={{ paddingBottom: '6rem', }}>
@@ -22,7 +22,7 @@ export default function LandingPage() {
             <AnimationCrooked>
                <MiniComponent>
                   <LazyLoad serviceCall={ () => recipeService.get(featuredRecipeId) } >
-                     { (response) => <RecipeView recipe={response} /> }
+                     { (response) => <RecipePreview recipe={response} /> }
                   </ LazyLoad>
                </MiniComponent>
             </AnimationCrooked>
