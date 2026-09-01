@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useMemo, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { recipeService } from '../services/recipes.service';
 import useServiceState from '@/shared/hooks/useServiceState';
 import Notebook from '@/shared/components/Notebook';
@@ -9,11 +9,14 @@ import NotebookPageListItems from '@/shared/components/notebookPageComponents/Li
 import RecipeFilterPage from './RecipeFilterPage';
 import { BrokenPaginatedListType } from '@/shared/shared.types';
 import combinePaginatedLists from '@/shared/lib/combinePaginatedLists';
+import useAuth from '@/features/auth/hooks/useAuth';
 
 const groupSize = 5
 
 export default function SearchRecipePage() {
 
+   const { authId } = useAuth();
+   const router = useRouter();
    const searchParams = useSearchParams();
 
    const title: string =  searchParams.get('title') || '';
@@ -21,6 +24,8 @@ export default function SearchRecipePage() {
    const category = searchParams.get('category') as "public" | "friends" | "personal" || 'public';
    const ingredientIdList = useMemo(() => { return ingredientIdListParam ? ingredientIdListParam.split(',').map(Number) : [] }, [ingredientIdListParam] );
    const page: number = Number(searchParams.get('page')) || 1;
+
+   if (!authId && (category === 'friends' || category === 'personal')) { router.replace('login'); }
 
    const [notebookComponents, setNotebookComponents] = useState<BrokenPaginatedListType<React.ReactElement>>({ list: [<RecipeFilterPage />], count: 1, firstItemIndex: 0 });
 
@@ -30,9 +35,14 @@ export default function SearchRecipePage() {
 
       const response = await recipeService.search({
          title,
-         visibilityList: ['public', 'private', 'personal'],
+         visibilityList: [...(
+            !authId ? ['public']
+            : category === 'public' ? ['public', 'private', 'personal']
+            : category === 'friends' ? ['private, personal']
+            : ['personal']
+         ) as ('public' | 'private' | 'personal')[]],
          ingredientIdList,
-         skip: firstComponent,
+         skip: firstItem,
          limit: (page === 1 ? groupSize : groupSize * 2)
       });
 
@@ -44,7 +54,7 @@ export default function SearchRecipePage() {
          newComponents.push(<NotebookPageListItems itemList={ itemList } defaultListSize={ groupSize } />);
       }
 
-      setNotebookComponents((previous) => { return combinePaginatedLists(previous, { list: newComponents,  count: Math.ceil(response.count / groupSize) + 1, firstItemIndex: firstItem }) });
+      setNotebookComponents((previous) => { return combinePaginatedLists(previous, { list: newComponents,  count: Math.ceil(response.count / groupSize) + 1, firstItemIndex: firstComponent }) });
 
    }, [searchParams]);
 

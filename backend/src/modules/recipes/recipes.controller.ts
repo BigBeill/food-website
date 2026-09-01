@@ -10,58 +10,62 @@ const service = recipesService;
 
 export const recipesController = new Elysia({ prefix: '/recipes' })
 
+
+
    //* Routes past this point use but do not require an accessToken
    .use(authenticateMiddleware)
+
+
+
    .get( '/get/:_id',
       async ({ authId, params }) => {
          const { _id } = params;
          const recipe = await service.getRecipe(_id, { authId });
-         return { 
-            message: "recipe found",
-            data: recipe 
-         };
+         return { data: recipe };
       },
       {
          params: IdValidator
       }
    )
+
+
+
    .get( '/search', 
       async ({ authId, query }) => {
          const { title, ownerIdList, ingredientIdList, visibilityList, limit, skip } = query;
          const recipes = await service.searchRecipes({ authId, title, ownerIdList, ingredientIdList, visibilityList, skip, limit });
-         return { 
-            message: "recipe list found",
-            data: recipes 
-         };
+         return { data: recipes };
       },
       {
          query: SearchValidator
       }
    )
 
+
+
    //* Routes past this point require an access token
    .use(authorizeMiddleware)
+
+
+
    .post( '/create',
       async ({ authId, body }) => {
          const { recipe } = body;
          const newRecipe = await service.createRecipe(recipe, { authId })
-         return {
-            message: "recipe created",
-            data: newRecipe,
-         }
+         return { data: newRecipe }
       },
       {
          body: AddRecipeValidator
       }
    )
+
+
+
    .put( '/update',
       async ({ authId, body }) => {
          const { recipe } = body;
          const updatedRecipe = await service.updateRecipe(recipe, { authId })
-         return { 
-            message: "Recipe updated",
-            data: updatedRecipe 
-         }
+         return { data: updatedRecipe }
       },
       {
          body: RecipeValidator

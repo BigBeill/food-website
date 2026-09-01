@@ -32,6 +32,8 @@ export class RecipesService {
       this.permissionsService = permissionsService;
    }
 
+
+
    async createRecipe(recipe: Omit<RecipeType, '_id' | 'ownerId' | 'nutrition'> & {nutrition?: NutritionType}, params: AuthIdParams): Promise<RecipeType> {
       const { authId } = params;
       if (!authId) { throw new UnauthorizedError(); }
@@ -58,6 +60,8 @@ export class RecipesService {
       }
    }
 
+
+
    async deleteRecipe(_id: string, { authId }: AuthIdParams ): Promise<boolean> {
       const recipe = await this.repository.getRecipe(_id);
       if (!recipe) { throw new NotFoundError('Recipe not found'); }
@@ -66,6 +70,8 @@ export class RecipesService {
       await this.repository.deleteRecipe(_id);
       return true;
    }
+
+
 
    async deleteManyRecipes(ownerId: string): Promise<boolean> {
 
@@ -81,6 +87,8 @@ export class RecipesService {
       await Promise.all(promiseList);
       return true;
    }
+
+
 
    async getRecipe(_id: string, { authId }: AuthIdParams): Promise<RecipeType> {
       const mongooseRecord = await this.repository.getRecipe(_id);
@@ -100,6 +108,8 @@ export class RecipesService {
       return recipe;
    }
 
+
+
    async hydrateRecipe(record: RecipeRecord): Promise<RecipeType> {
       return {
          _id: record._id.toString(),
@@ -113,6 +123,8 @@ export class RecipesService {
          visibility: record.visibility,
       };
    }
+
+
 
    async searchRecipes(params: GetRecipeListParams): Promise<PaginatedListType<RecipeType>> {
       const { authId, title, ownerIdList = [], ingredientIdList, visibilityList = ['public'], skip = 0, limit = 12 } = params;
@@ -134,8 +146,6 @@ export class RecipesService {
          allowedOwnerIdList = allowedOwnerIdList.filter(item => ownerIdList.includes(item));
       }
 
-      console.log('checkpoint 1');
-
       const recipes = await this.repository.searchRecipes({ title, ownerIdList: allowedOwnerIdList, visibilityList, skip, limit });
 
       return {
@@ -143,6 +153,8 @@ export class RecipesService {
          list: await Promise.all(recipes.list.map((recipe) => { return this.hydrateRecipe(recipe); })) 
       };
    }
+
+
 
    async updateRecipe(recipe: Omit<RecipeType, 'nutrition'> & {nutrition?: NutritionType}, params: AuthIdParams): Promise<boolean> {
       const { authId } = params;
@@ -177,4 +189,6 @@ export class RecipesService {
       return true;
    }
 
+
+   
 }
