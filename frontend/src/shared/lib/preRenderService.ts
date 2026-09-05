@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { ErrorNotFound } from "./errorClasses";
+import { ErrorNotFound } from "./api/errorClasses";
 
 /*
 used to wrap service references before sending page content to the client

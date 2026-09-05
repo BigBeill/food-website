@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './styles/header.module.scss';
 import { ButtonNarrowNav } from './Button.components';
+import useAuth from '@/features/auth/hooks/useAuth';
 
 interface NavigationNodeType {
    name: string,
@@ -39,19 +40,20 @@ const withDuration = (
    };
 };
 
-export default function Header({ authenticated }: { authenticated: boolean }) {
+export default function Header() {
+   const { authId } = useAuth();
 
    const navigation = useMemo<NavigationNodeType[][]>(() => [
       [
          { name: 'Home', href: '/' },
          { name: 'Recipes', href: '/recipes' },
          { name: 'Ingredients', href: '/ingredients' },
-         ...(authenticated ? [{ name: 'Social', href: '/users' }] : []),
+         ...(authId !== null ? [{ name: 'Social', href: '/users' }] : []),
          { name: 'About Project', href: '/about' },
       ],
       [ 
-         ...(authenticated ? 
-            [{ name: 'Profile', href: `/users/personal` }]
+         ...(authId !== null ? 
+            [{ name: 'Profile', href: `/users/${ authId }` }]
          : 
             [
                { name: 'Login', href: '/auth/login' },
@@ -59,7 +61,7 @@ export default function Header({ authenticated }: { authenticated: boolean }) {
             ]
          ),
       ]
-   ], [authenticated]);
+   ], [authId]);
 
    const [navOpen, setNavOpen] = useState(false);
    const pathname = usePathname();
@@ -127,8 +129,8 @@ export default function Header({ authenticated }: { authenticated: boolean }) {
                <div key={ index } onMouseLeave={ () => redefineLinePosition(activeHref) } >
                { section.map((navigationNode) => (
                   <Link
-                     key={navigationNode.name}
-                     href={navigationNode.href}
+                     key={ navigationNode.name }
+                     href={ navigationNode.href }
                      ref={(element) => { 
                         if(element) { linkRefList.current.set(navigationNode.href, element); } 
                         else { linkRefList.current.delete(navigationNode.href); }
@@ -137,20 +139,20 @@ export default function Header({ authenticated }: { authenticated: boolean }) {
                      onClick={() => setNavOpen(false)}
                      className={ (activeHref === navigationNode.href) ? styles['active-link'] : undefined }
                   >
-                     {navigationNode.name}
+                     { navigationNode.name }
                   </Link>
                )) }
                </div>
             )) }
 
-            {/* Sliding underline */}
+            { /* Sliding underline */ }
             <span
                aria-hidden="true"
-               className={styles.navUnderline}
-               style={{
+               className={ styles.navUnderline }
+               style={ {
                   transform: `translateX(${linePosition.x}px) scaleX(${linePosition.scale})`,
                   transitionDuration: `${linePosition.duration}s`,
-               }}
+               } }
             />
          </nav>
 

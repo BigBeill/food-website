@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useCallback, useState, useMemo } from 'react';
-import { authService } from '../services/auth.service';
+import { authService } from '../services/auth.service.client';
 import { useRouter } from 'next/navigation';
 
 type AuthContextType = {

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import styles from './login.module.scss';
 import { useRouter } from 'next/navigation';
 import { ButtonOval } from '@/shared/components/Button.components';
-import { authService } from '../services/auth.service';
+import { authService } from '../services/auth.service.client';
 import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
 import useAuth from '../hooks/useAuth';
@@ -22,7 +22,7 @@ export default function RegisterPage() {
    const { override: overrideAuth } = useAuth();
 
    const [registerData, setRegisterData] = useState<TypeRegisterData>({ username: "", email: "", passwordOne: "", passwordTwo: "" });
-   const registerMutator = useServiceMutation((input: TypeRegisterData) => authService.register(input));
+   const registerMutator = useServiceMutation((input: TypeRegisterData) => authService.register({ ...input, name: input.username }));
 
    useEffect(() => {
       document.body.classList.add(styles.loginBackground);

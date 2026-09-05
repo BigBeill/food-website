@@ -12,7 +12,7 @@ import EditRecipeGeneralInfoView from './EditRecipeSubPages/GeneralInfoView';
 import EditRecipeAdditionalInfoView from './EditRecipeSubPages/AdditionalInfoView';
 import EditRecipeIngredientsView from './EditRecipeSubPages/IngredientsView';
 import EditRecipeInstructionsView from './EditRecipeSubPages/InstructionsView';
-import { recipeService } from '../services/recipes.service';
+import { recipeService } from '../services/recipes.service.client';
 import { useRouter } from 'next/navigation';
 
 interface ComponentParams {

@@ -2,7 +2,6 @@
 
 import React, { useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { recipeService } from '../services/recipes.service';
 import useServiceState from '@/shared/hooks/useServiceState';
 import Notebook from '@/shared/components/Notebook';
 import NotebookPageListItems from '@/shared/components/notebookPageComponents/ListItems';
@@ -10,6 +9,7 @@ import RecipeFilterPage from './RecipeFilterPage';
 import { BrokenPaginatedListType } from '@/shared/shared.types';
 import combinePaginatedLists from '@/shared/lib/combinePaginatedLists';
 import useAuth from '@/features/auth/hooks/useAuth';
+import { recipeService } from '../services/recipes.service.client';
 
 const groupSize = 5
 

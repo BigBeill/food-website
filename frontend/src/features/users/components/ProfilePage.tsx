@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useRef } from 'react'
 import GrowingText from '@/shared/components/GrowingText';
 import { RelationshipType, UserType } from '../domain/user.types';
@@ -5,48 +7,27 @@ import ImageUploader from '@/features/images/components/ImageUploader';
 import { useRouter } from 'next/navigation';
 import useAuth from '@/features/auth/hooks/useAuth';
 import { unpackImage } from '@/features/images/services/image.services';
-import useServiceState from '@/shared/hooks/useServiceState';
-import { userService } from '../services/user.service';
 import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import styles from './profilePage.module.scss';
 import { ButtonOval, ButtonShielded } from '@/shared/components/Button.components';
 import { InputTextArea } from '@/shared/components/Input.components';
 import { DataHandle } from '@/shared/shared.types';
-import RequireServiceStateReady from '@/shared/components/RequireServiceStateReady';
+import { userService } from '../services/user.service.client';
 
-interface ProfilePageProps {
-   userId?: string;
-}
-export default function ProfilePage({ userId }: ProfilePageProps) {
-
-   const router = useRouter();
-   const { authId } = useAuth();
-
-   const userState = useServiceState((): Promise<UserType> => {
-      const requestId = userId ?? authId;
-      if (requestId) { return userService.get(requestId, { includeRelationship: true }); }
-      else {
-         router.replace('/login');
-         throw new Error ("This page is not accessible without being logged in");
-      }
-   }, [userId]);
-
-   return (
-      <RequireServiceStateReady serviceState={ userState }>
-         { (user) => <ProfileView user={ user } updateUser={ userState.overrideOutput } /> }
-      </RequireServiceStateReady>
-   )
+interface Props {
+   initial: UserType
 }
 
-function ProfileView({ user, updateUser }: { user: UserType, updateUser: (input: UserType) => void }) {
+export default function ProfilePage({ initial }: Props) {
+
+   const [user, setUser] = useState<UserType>(initial);
+   const [modifiedUser, setModifiedUser] = useState<UserType | null>(null);
 
    const router = useRouter();
    const { logout } = useAuth();
 
    const bioRef = useRef<DataHandle<string>>(null);
-
-   const [modifiedUser, setModifiedUser] = useState<UserType | null>(null);
-   const [imageBuffer, setImageBuffer] = useState<File | null>(null);
+   const imageRef = useRef<DataHandle<File | null>>(null);
 
    const userMutator = useServiceMutation((newUser: UserType): Promise<UserType> => { return userService.update(newUser); })
 
@@ -54,7 +35,7 @@ function ProfileView({ user, updateUser }: { user: UserType, updateUser: (input:
       if (!modifiedUser) { return; }
 
       const mutatedUser = await userMutator.send(modifiedUser);
-      updateUser({ ...mutatedUser, relationship: user.relationship });
+      setUser((previous) => { return { ...mutatedUser, relationship: previous.relationship } });
       setModifiedUser(null);
    }
 
@@ -75,7 +56,7 @@ function ProfileView({ user, updateUser }: { user: UserType, updateUser: (input:
 
    async function updateRelationship(newRelationship: 'none' | 'requestReceived' | 'friend') {
       const mutatedRelationship = await relationshipMutator.send(newRelationship);
-      updateUser({ ...user, relationship: mutatedRelationship });
+      setUser((previous) => { return { ...previous, relationship: mutatedRelationship } });
    }
 
    // handle logout function
@@ -92,9 +73,8 @@ function ProfileView({ user, updateUser }: { user: UserType, updateUser: (input:
                <img className='consumeSpace' { ...unpackImage(user.image) }/>
             ) : (
                <ImageUploader
-                  imageBuffer={ imageBuffer }
-                  setImageBuffer={ setImageBuffer }
-                  oldImage={ user.image }
+                  ref={ imageRef }
+                  initial={ user.image }
                   category={ 'user' }
                />
             ) }
@@ -110,10 +90,12 @@ function ProfileView({ user, updateUser }: { user: UserType, updateUser: (input:
          <InputTextArea 
             label='Personal Bio' 
             placeholder='Talk about yourself' 
-            dataRef={ bioRef } 
+            dataRef={ bioRef }
             initial={ user.bio }
-            readOnly={ !modifiedUser }
-            substitute='Bio not yet created'
+            readOnlyOptions={ {
+               condition: !modifiedUser,
+               placeholder: "No bio created yet"
+            } }
          />
 
          <div> {/* styleDiv, should not contain anything */} </div>

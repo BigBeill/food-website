@@ -55,6 +55,8 @@ export class UsersService {
       this.imagesService = imagesService;
    }
 
+
+
    async defineRelationship({ authId, userId }: DefinedRelationshipParams): Promise<RelationshipType> {
       const definingRelationship = { ownerId: userId, targetId: authId }
 
@@ -80,6 +82,8 @@ export class UsersService {
       return { _id: "0", type: "none", ...definingRelationship };
    }
 
+
+
    async deleteAccount(password: string, params: AuthIdParams): Promise<boolean> {
       const { authId } = params;
       if (!authId) { throw new UnauthorizedError(); }
@@ -101,6 +105,8 @@ export class UsersService {
       return true;
    }
 
+
+
    async deleteFriendship(_id: string, params: AuthIdParams): Promise<boolean> {
       const { authId } = params;
       if (!authId) { throw new UnauthorizedError(); }
@@ -111,6 +117,8 @@ export class UsersService {
       await this.repository.deleteFriendship(_id);
       return true;
    }
+
+
 
    async getFriendIdList(userId: string) {
       const friendshipList = await this.repository.getFriendshipList(userId);
@@ -123,6 +131,8 @@ export class UsersService {
       });
    }
 
+
+
    async getUser(_id: string, {authId, includeRelationship}: GetUserParams): Promise<UserType | null> {
       const [user, relationship] = await Promise.all([
          this.repository.getUser(_id),
@@ -131,9 +141,11 @@ export class UsersService {
             else { return this.defineRelationship({ authId, userId: _id }); }
          })(),
       ]);
-      if (!user) { throw new NotFoundError(`User with id: ${_id}, not found`) }
+      if (!user) { throw new NotFoundError(`User with id: ${_id}, not found`); }
       return { ...removeMongooseNoise(user), relationship };
    }
+
+
 
    async sendFriendRequest(targetId: string, params: AuthIdParams): Promise<RelationshipType> {
       const { authId } = params;
@@ -147,6 +159,8 @@ export class UsersService {
          type: 'requestReceived',
       }
    }
+
+
 
    async processFriendRequest(_id: string, response: boolean, params: AuthIdParams): Promise<RelationshipType> {
       const { authId } = params;
@@ -183,6 +197,8 @@ export class UsersService {
       else { throw new UnauthorizedError('Invalid credentials'); }
    }
 
+
+
    async searchUsers(params: SearchUsersParams): Promise<PaginatedListType<UserType>> {
       const { authId, _id, name, skip, limit, includeRelationship } = params;
       const userRecords = await this.repository.searchUsers({ _id, name, skip, limit });
@@ -197,6 +213,8 @@ export class UsersService {
 
       return users;
    }
+
+
 
    async updateAccount(params: UpdateAccountParams): Promise<UserType> {
       const { authId, name, email, bio, image } = params;
@@ -227,4 +245,7 @@ export class UsersService {
       if (!updatedUser) { throw new NotFoundError("user not updated"); }
       return removeMongooseNoise(updatedUser);
    }
+
+
+
 }

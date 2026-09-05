@@ -1,65 +1,67 @@
 // features/auth/services/authService.ts
-import sendServerRequest from "@/shared/lib/api";
+import { TypeApiCaller } from "@/shared/lib/api/types";
 
-interface LoginParams {
+export type TypeAuthServiceLoginParams = {
   name: string;
   password: string;
   rememberMe: boolean;
 }
-
-interface RegisterParams {
+export type TypeAuthServiceRegisterParams = {
   name: string;
   email: string;
   password: string;
 }
-
-interface RequestPasswordResetParams {
+export type TypeAuthServiceRequestPasswordResetParams = {
    email: string;
 }
-
-interface ResetPasswordParams {
+export type TypeAuthServiceResetPasswordParams = {
   token: string;
   password: string;
 }
 
-export const authApi = {
-   checkStatus: (): Promise<string> => 
-      sendServerRequest({
-         url: '/auth/status',
-         method: 'GET'
-      }),
+export function createAuthApi(call: TypeApiCaller) {
+   return {
 
-   login: (params: LoginParams): Promise<{ _id: string }> =>
-      sendServerRequest({
-         url: "/auth/login",
-         method: "POST",
-         body: params,
-      }),
+      checkStatus: (): Promise<string> => 
+         call({
+            url: '/auth/status',
+            method: 'GET'
+         }),
 
-   logout: (): Promise<void> => 
-      sendServerRequest({
-         url: '/auth/logout',
-         method: 'POST',
-      }),
+      login: (params: TypeAuthServiceLoginParams): Promise<{ _id: string }> =>
+         call({
+            url: "/auth/login",
+            method: "POST",
+            body: params,
+         }),
 
-   register: (params: RegisterParams): Promise<{ _id: string }> =>
-      sendServerRequest({
-         url: "/auth/register",
-         method: "POST",
-         body: params,
-      }),
+      logout: (): Promise<void> => 
+         call({
+            url: '/auth/logout',
+            method: 'POST',
+         }),
 
-   requestPasswordReset: (params: RequestPasswordResetParams): Promise<void> =>
-      sendServerRequest({
-         url: "/auth/requestPasswordReset",
-         method: "POST",
-         body: params,
-      }),
+      register: (params: TypeAuthServiceRegisterParams): Promise<{ _id: string }> =>
+         call({
+            url: "/auth/register",
+            method: "POST",
+            body: params,
+         }),
 
-   resetPassword: (params: ResetPasswordParams): Promise<void> =>
-      sendServerRequest({
-         url: "/auth/resetPassword",
-         method: "POST",
-         body: params,
-      }),
+      requestPasswordReset: (params: TypeAuthServiceRequestPasswordResetParams): Promise<void> =>
+         call({
+            url: "/auth/requestPasswordReset",
+            method: "POST",
+            body: params,
+         }),
+
+      resetPassword: (params: TypeAuthServiceResetPasswordParams): Promise<void> =>
+         call({
+            url: "/auth/resetPassword",
+            method: "POST",
+            body: params,
+         }),
+   }
 };
+
+export type TypeAuthApi = ReturnType<typeof createAuthApi>;

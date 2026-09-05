@@ -1,59 +1,46 @@
-import { authApi } from "./auth.api";
 import { checkValidEmail, checkValidPassword } from "./auth.utils";
-import { ErrorValidation } from "@/shared/lib/errorClasses";
+import { ErrorValidation } from "@/shared/lib/api/errorClasses";
+import type {
+   TypeAuthApi,
+   TypeAuthServiceLoginParams,
+   TypeAuthServiceRegisterParams,
+   TypeAuthServiceRequestPasswordResetParams,
+   TypeAuthServiceResetPasswordParams,
+} from './auth.api';
 
+export function createAuthService(api: TypeAuthApi) {
+   return {
 
-interface LoginParams {
-  username: string;
-  password: string;
-  rememberMe: boolean;
-}
+      checkAuthStatus: (): Promise<string> => {
+         return api.checkStatus();
+      },
 
-interface RegisterParams {
-  username: string;
-  email: string;
-  passwordOne: string;
-  passwordTwo: string;
-}
+      login: (params: TypeAuthServiceLoginParams): Promise<{ _id: string }> => {
+         checkValidPassword(params.password);
+         return api.login(params);
+      },
 
-interface RequestPasswordResetParams {
-   email: string;
-}
+      logout: (): Promise<void> => {
+         return api.logout();
+      },
 
-interface ResetPasswordParams {
-  passwordOne: string;
-  passwordTwo: string;
-  token: string;
-}
+      register: (params: Omit<TypeAuthServiceRegisterParams, 'password'> & { passwordOne: string, passwordTwo: string }): Promise<{ _id: string }> => {
+         checkValidEmail(params.email);
+         checkValidPassword(params.passwordOne);
+         if (params.passwordOne != params.passwordTwo) { throw new ErrorValidation([{ field: 'passwords', issueList: ['do not match'] }]); }
+         return api.register({ name: params.name, email: params.email, password: params.passwordOne });
+      },
 
-export const authService = {
-   checkAuthStatus: (): Promise<string> => {
-      return authApi.checkStatus();
-   },
-   login: (params: LoginParams): Promise<{ _id: string }> => {
-      const { username, password, rememberMe } = params;
-      checkValidPassword(password);
-      return authApi.login({ name: username, password, rememberMe });
-   },
-   logout: (): Promise<void> => {
-      return authApi.logout();
-   },
-   register: (params: RegisterParams): Promise<{ _id: string }> => {
-      const { username, email, passwordOne, passwordTwo } = params
-      checkValidEmail(email);
-      checkValidPassword(passwordOne);
-      if (passwordOne != passwordTwo) { throw new ErrorValidation([{ field: 'passwords', issueList: ['do not match'] }]); }
-      return authApi.register({ name: username, email, password: passwordOne });
-   },
-   requestPasswordReset: (params: RequestPasswordResetParams) => {
-      const { email } = params;
-      checkValidEmail(email);
-      return authApi.requestPasswordReset({ email });
-   },
-   resetPassword: (params: ResetPasswordParams) => {
-      const { passwordOne, passwordTwo, token } = params;
-      checkValidPassword(passwordOne); // errors will handle any issue
-      if (passwordOne !== passwordTwo) { throw new Error("Passwords do not match!"); }
-      return authApi.resetPassword({password: passwordOne, token});
+      requestPasswordReset: (params: TypeAuthServiceRequestPasswordResetParams) => {
+         checkValidEmail(params.email);
+         return api.requestPasswordReset(params);
+      },
+
+      resetPassword: (params: Omit<TypeAuthServiceResetPasswordParams, 'password'> & { passwordOne: string, passwordTwo: string }) => {
+         checkValidPassword(params.passwordOne);
+         if (params.passwordOne !== params.passwordTwo) { throw new Error("Passwords do not match!"); }
+         return api.resetPassword({password: params.passwordOne, token: params.token});
+      },
+
    }
 }

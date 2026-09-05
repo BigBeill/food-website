@@ -1,5 +1,5 @@
 import styles from './states.module.scss';
-import { ErrorValidation } from '@/shared/lib/errorClasses';
+import { ErrorValidation } from '@/shared/lib/api/errorClasses';
 
 export function InsertError({ error }: { error?: Error }) {
    return (

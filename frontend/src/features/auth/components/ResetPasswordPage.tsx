@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { authService } from '../services/auth.service';
+import { authService } from '../services/auth.service.client';
 import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import { ButtonOval } from '@/shared/components/Button.components';
 import { useRouter } from 'next/navigation';

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation';
 import styles from './login.module.scss';
 import { ButtonOval } from '@/shared/components/Button.components';
-import { authService } from '../services/auth.service';
+import { authService } from '../services/auth.service.client';
 import { useServiceMutation } from '@/shared/hooks/useServiceMutation';
 import { InsertError } from '@/shared/components/stateComponents/InsertStateComponents';
 import useAuth from '../hooks/useAuth';
@@ -20,7 +20,7 @@ export default function LoginPage() {
    const router = useRouter();
    const { override: overrideAuth } = useAuth();
    const [loginData, setLoginData] = useState<FormDataType>({ username: "", password: "", rememberMe: false });
-   const loginMutator = useServiceMutation((input: FormDataType) => authService.login(input));
+   const loginMutator = useServiceMutation((input: FormDataType) => authService.login({ ...input, name: input.username }));
 
    useEffect(() => {
       document.body.classList.add(styles.loginBackground);

@@ -1,6 +1,5 @@
 "use client"
 
-import { ingredientService } from "../services/ingredient.service";
 import NotebookPageListItems from "@/shared/components/notebookPageComponents/ListItems";
 import Notebook from "@/shared/components/Notebook";
 import { BrokenPaginatedListType } from "@/shared/shared.types";
@@ -8,6 +7,7 @@ import useServiceState from "@/shared/hooks/useServiceState";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import combinePaginatedLists from "@/shared/lib/combinePaginatedLists";
+import { ingredientService } from "../services/ingredient.service.client";
 
 const groupSize = 5;
 

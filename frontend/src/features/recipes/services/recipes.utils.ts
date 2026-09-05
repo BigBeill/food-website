@@ -1,5 +1,5 @@
 import { RecipeDraft, RecipeType } from "../domain/recipes.types";
-import { ErrorValidation } from "@/shared/lib/errorClasses";
+import { ErrorValidation } from "@/shared/lib/api/errorClasses";
 
 export function checkValidRecipeDraft(recipe: RecipeDraft) {
    const issueList: string[] = [];

@@ -1,54 +1,42 @@
 import { PaginatedListType } from "@/shared/shared.types";
-import { FolderType, RelationshipType, UserType } from "../domain/user.types";
-import { userApi } from "./user.api"
+import { RelationshipType, UserType } from "../domain/user.types";
 import { createUserFormData } from "./user.utils";
+import type {
+   TypeUserApi,
+   TypeUserServiceGetParam,
+   TypeUserServiceProcessFriendRequestParams,
+   TypeUserServiceSearchParams
+} from "./user.api";
 
-interface GetParams {
-   includeRelationship: boolean
-}
+export function createUserService(api: TypeUserApi) {
+   return {
 
-interface SearchFolderParams {
-   skip?: number;
-   limit?: number
-}
+      defineRelationship: (userId: string): Promise<RelationshipType> => {
+         return api.defineRelationship(userId);
+      },
 
-interface ProcessFriendRequestParams {
-   accept: boolean;
-}
+      get: (userId: string, params?: TypeUserServiceGetParam) => {
+         return api.get(userId, params);
+      },
 
-interface SearchParams {
-   _id?: string;
-   folderId?: string;
-   name?: string;
-   category?: 'friends' | 'incomingRequests' | 'outgoingRequests' | 'none';
-   skip?: number;
-   limit?: number;
-}
+      processFriendRequest: (relationshipId: string, params: TypeUserServiceProcessFriendRequestParams) => {
+         return api.processFriendRequest(relationshipId, params);
+      },
 
-export const userService = {
-   defineRelationship: (userId: string): Promise<RelationshipType> => {
-      return userApi.defineRelationship(userId);
-   },
-   get: (userId: string, params?: GetParams) => {
-      return userApi.get(userId, params);
-   },
-   processFriendRequest: (relationshipId: string, params: ProcessFriendRequestParams) => {
-      return userApi.processFriendRequest(relationshipId, params);
-   },
-   removeFriend: (relationshipId: string) => {
-      return userApi.removeFriend(relationshipId);
-   },
-   search: (params: SearchParams): Promise<PaginatedListType<UserType>> => {
-      return userApi.search(params);
-   },
-   searchFolder: (params: SearchFolderParams): Promise<PaginatedListType<FolderType>> => {
-      return userApi.searchFolder(params); 
-   },
-   sendFriendRequest: (userId: string) => {
-      return userApi.sendFriendRequest(userId);
-   },
-   update: (user: UserType, image?: File): Promise<UserType> => {
-      const userFormData = createUserFormData(user, image);
-      return userApi.update(userFormData);
-   },
+      removeFriend: (relationshipId: string) => {
+         return api.removeFriend(relationshipId);
+      },
+
+      search: (params: TypeUserServiceSearchParams): Promise<PaginatedListType<UserType>> => {
+         return api.search(params);
+      },
+
+      sendFriendRequest: (userId: string) => {
+         return api.sendFriendRequest(userId);
+      },
+
+      update: (user: UserType, image?: File): Promise<UserType> => {
+         return api.update(createUserFormData(user, image));
+      },
+   }
 }

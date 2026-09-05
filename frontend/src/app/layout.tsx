@@ -14,7 +14,7 @@ export default async function Layout({ children }: LayoutProps) {
       <html lang="en">
          <body>
             <AuthProvider initial={ session?.userId ?? null }>
-               <Header authenticated={ (session !== null) }/>
+               <Header />
                <main>
                   { children }
                </main>

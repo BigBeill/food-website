@@ -26,17 +26,17 @@ This component will attempt to display an image source, it chooses what to displ
 It will give the user the option to upload a new image file, which will be sent to setImageBuffer provided by the parent component.
 */
 interface ImageUploaderProps {
-   imageRef: Ref<DataHandle<File | null>>;
+   ref: Ref<DataHandle<File | null>>;
    initial?: PackagedImageType;
    category: string;
 }
 
-export default function ImageUploader({ imageRef, initial, category }: ImageUploaderProps) {
+export default function ImageUploader({ ref, initial, category }: ImageUploaderProps) {
    const maxFileSize = 5 * 1024 * 1024; // 5 MB
 
    const [imageBuffer, setImageBuffer] = useState<File | null>(null);
 
-   useImperativeHandle(imageRef, () => ({
+   useImperativeHandle(ref, () => ({
       getData: () => imageBuffer,
       setData: setImageBuffer,
    }),[]);

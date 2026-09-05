@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { IngredientType } from "../domain/ingredient.types";
-import { ingredientService } from "../services/ingredient.service";
 import useServiceState from "@/shared/hooks/useServiceState";
 import { InputText } from "@/shared/components/Input.components";
 import { ButtonIconList } from "@/shared/components/Button.components";
 import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 import { PaginatedListType } from "@/shared/shared.types";
+import { ingredientService } from "../services/ingredient.service.client";
 
 interface ComponentProps {
    onSubmit: (ingredient: IngredientType) => void

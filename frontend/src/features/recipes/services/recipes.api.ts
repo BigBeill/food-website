@@ -1,53 +1,55 @@
-import sendServerRequest from "@/shared/lib/api";
+import type { TypeApiCaller } from "@/shared/lib/api/types";
 import { RecipeType } from "../domain/recipes.types";
 import { PaginatedListType } from "@/shared/shared.types";
 
-interface getParams {
-   includeNutrients?: boolean;
-}
-
-interface searchParams {
+export type TypeRecipeServiceGetParams = { includeNutrients?: boolean; }
+export type TypeRecipeServiceSearchParams = {
    title?: string;
    ownerIdList?: string[];
-   ingredientIdList?: string[];
+   ingredientIdList?: number[];
    visibilityList?: ('public' | 'private' | 'personal')[]
    limit?: number;
    skip?: number;
 }
 
-export const recipeApi = {
-   create: (recipe: FormData): Promise<void> =>
-      sendServerRequest({
-         url: '/recipes/create',
-         method: 'post',
-         body: { recipe: recipe }
-      }),
-   
-   delete: (recipeId: string): Promise<void> => 
-      sendServerRequest({
-         url: `/recipes/delete/${recipeId}`,
-         method: 'delete'
-      }),
+export function createRecipeApi(call: TypeApiCaller ) {
+   return {
 
-   get: (recipeId: string, params?: getParams) =>
-      sendServerRequest<RecipeType>({
-         url:`/recipes/get/${recipeId}`,
-         method: 'get',
-         body: params,
-      }),
+      create: (recipe: FormData): Promise<void> =>
+         call({
+            url: '/recipes/create',
+            method: 'post',
+            body: { recipe: recipe }
+         }),
+      
+      delete: (recipeId: string): Promise<void> => 
+         call({
+            url: `/recipes/delete/${recipeId}`,
+            method: 'delete'
+         }),
 
-   // under normal conditions this function will return RecipeType[], if count: true is passed in the params {count: number, list: RecipeType[]} will be returned
-   search: (params: searchParams) => 
-      sendServerRequest<PaginatedListType<RecipeType>>({
-         url:`/recipes/search`,
-         method: 'get',
-         body: params,
-      }),
+      get: (recipeId: string, params?: TypeRecipeServiceGetParams) =>
+         call<RecipeType>({
+            url:`/recipes/get/${recipeId}`,
+            method: 'get',
+            body: params,
+         }),
 
-   update: (recipeId: string, recipe: FormData): Promise<void> =>
-      sendServerRequest({
-         url:`/recipes/update/${recipeId}`,
-         method: 'put',
-         body: { recipe: recipe },
-      })
+      search: (params: TypeRecipeServiceSearchParams) => 
+         call<PaginatedListType<RecipeType>>({
+            url:`/recipes/search`,
+            method: 'get',
+            body: params,
+         }),
+
+      update: (recipeId: string, recipe: FormData): Promise<void> =>
+         call({
+            url:`/recipes/update/${recipeId}`,
+            method: 'put',
+            body: { recipe: recipe },
+         })
+
+   }
 }
+
+export type TypeRecipeApi = ReturnType<typeof createRecipeApi>;

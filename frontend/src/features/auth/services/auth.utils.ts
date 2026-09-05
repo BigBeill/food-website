@@ -1,4 +1,4 @@
-import { ErrorValidation } from "@/shared/lib/errorClasses";
+import { ErrorValidation } from "@/shared/lib/api/errorClasses";
 
 export function checkValidUsername(username: string): void {
    let issueList: string[] = []

@@ -3,8 +3,8 @@ import AnimationCrooked from "@/shared/animations/crooked.animation";
 import { LinkPair } from "@/shared/components/Link.components";
 import LandingPageLinks from "./LandingPageLinks";
 import LazyLoad from "@/shared/components/LazyLoad";
-import { recipeService } from "@/features/recipes/services/recipes.service";
 import RecipePreview from "@/features/recipes/components/RecipePreview";
+import { recipeService } from "@/features/recipes/services/recipes.service.server";
 
 export default function LandingPage() {
 

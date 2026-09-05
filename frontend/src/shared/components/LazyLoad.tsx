@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { ErrorNotFound } from "../lib/errorClasses";
+import { ErrorNotFound } from "../lib/api/errorClasses";
 import { Suspense } from "react";
 import { StateLoadingPage } from "./stateComponents/Loading.states";
 
